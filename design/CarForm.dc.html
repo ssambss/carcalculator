@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; color: #191813; }
+    a { color: #235a9f; text-decoration: none; }
+    a:hover { color: #16406f; }
+    .display { font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; }
+    .flabel { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8c80; }
+    .finput { display: flex; align-items: center; justify-content: space-between; height: 40px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+    .funit { color: #8f8c80; font-size: 13px; }
+    .section { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #57544b; border-bottom: 1px solid rgba(25,24,19,0.10); padding-bottom: 8px; }
+  </style>
+</helmet>
+<div style="width: 760px; min-height: 1380px; background: #b9b6ab; padding: 40px 60px; display: flex; align-items: flex-start; justify-content: center;">
+  <div style="width: 640px; background: #fdfdfb; border-radius: 14px; box-shadow: 0 24px 60px rgba(25,24,19,0.35); padding: 28px 32px 24px 32px; display: flex; flex-direction: column; gap: 22px;">
+
+    <!-- Header -->
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div class="display" style="font-size: 20px; font-weight: 700;">Edit car</div>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#8f8c80" stroke-width="1.6" stroke-linecap="round"><path d="M5 5l10 10"></path><path d="M15 5L5 15"></path></svg>
+    </div>
+
+    <!-- Car -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="section">Car</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <label style="display: flex; flex-direction: column; gap: 5px; grid-column: span 2;">
+          <span class="flabel">Name</span>
+          <span class="finput">Volvo XC40 T5 Recharge (2020)</span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Powertrain</span>
+          <span class="finput">Plug-in hybrid
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#8f8c80" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5L7 9l3.5-3.5"></path></svg>
+          </span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Notes</span>
+          <span class="finput" style="color: #57544b;">Dealer asking 29&#8201;900, offered 28&#8201;900</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Purchase & value -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="section">Purchase &amp; value</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Purchase price</span>
+          <span class="finput">28&#8201;900 <span class="funit">€</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Expected value after 5 years</span>
+          <span class="finput">18&#8201;200 <span class="funit">€</span></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Financing -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="section">Financing</div>
+      <div style="display: flex; height: 40px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; overflow: hidden; width: 240px;">
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #57544b; background: #ffffff;">Cash</div>
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #f6f5f1; background: #191813;">Loan</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Down payment</span>
+          <span class="finput">3&#8201;000 <span class="funit">€</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Interest rate</span>
+          <span class="finput">5,9 <span class="funit">% / year</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Term</span>
+          <span class="finput">48 <span class="funit">months</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Final balloon payment</span>
+          <span class="finput">8&#8201;000 <span class="funit">€</span></span>
+        </label>
+      </div>
+      <div style="background: #f6f5f1; border-radius: 8px; padding: 12px 14px; display: flex; align-items: baseline; gap: 8px;">
+        <span class="display" style="font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;">458,80&#8201;€ / month</span>
+        <span style="font-size: 13px; color: #57544b;">· 4&#8201;122&#8201;€ interest over the term</span>
+      </div>
+    </div>
+
+    <!-- Energy -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="section">Energy use</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Fuel consumption</span>
+          <span class="finput">7,2 <span class="funit">l / 100 km</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Electricity consumption</span>
+          <span class="finput">18 <span class="funit">kWh / 100 km</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Driven on electricity</span>
+          <span class="finput">45 <span class="funit">%</span></span>
+        </label>
+      </div>
+      <div style="font-size: 12px; color: #8f8c80;">Share of your yearly kilometres driven on battery power.</div>
+    </div>
+
+    <!-- Annual costs -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="section">Costs per year</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Insurance</span>
+          <span class="finput">710 <span class="funit">€ / yr</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Vehicle tax</span>
+          <span class="finput">140 <span class="funit">€ / yr</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Maintenance</span>
+          <span class="finput">520 <span class="funit">€ / yr</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Tires</span>
+          <span class="finput">220 <span class="funit">€ / yr</span></span>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 5px;">
+          <span class="flabel">Other</span>
+          <span class="finput">0 <span class="funit">€ / yr</span></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(25,24,19,0.10); padding-top: 18px;">
+      <button style="height: 40px; padding: 0 18px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #fdfdfb; color: #191813; font-size: 14px; font-weight: 500; font-family: inherit;">Cancel</button>
+      <button style="height: 40px; padding: 0 20px; border: 1px solid #191813; border-radius: 8px; background: #191813; color: #f6f5f1; font-size: 14px; font-weight: 600; font-family: inherit;">Save car</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

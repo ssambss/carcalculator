@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; color: #191813; }
+    a { color: #235a9f; text-decoration: none; }
+    a:hover { color: #16406f; }
+    .display { font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; }
+    .card { background: #fdfdfb; border: 1px solid rgba(25,24,19,0.10); border-radius: 12px; }
+    .chip { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border: 1px solid rgba(25,24,19,0.16); border-radius: 999px; font-size: 11px; font-weight: 500; color: #57544b; background: #fdfdfb; }
+    .statlabel { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8c80; }
+    .statvalue { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; background: #f6f5f1; padding: 18px 16px; overflow: hidden; position: relative;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; min-height: 44px;">
+    <div class="display" style="font-size: 20px; font-weight: 700;">Car TCO</div>
+    <div style="display: flex; gap: 6px;">
+      <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(25,24,19,0.16); border-radius: 10px; background: #fdfdfb;">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#57544b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2"></path><path d="M5 5l3-3 3 3"></path><path d="M2 13h12"></path></svg>
+      </div>
+      <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(25,24,19,0.16); border-radius: 10px; background: #fdfdfb;">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#57544b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8"></path><path d="M5 7l3 3 3-3"></path><path d="M2 13h12"></path></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assumptions summary -->
+  <div class="card" style="margin-top: 12px; min-height: 48px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between;">
+    <span style="font-size: 13px; color: #57544b; font-variant-numeric: tabular-nums;">20&#8201;000 km/yr · 5 yrs · 1,85 €/l · 0,15 €/kWh</span>
+    <a href="#" style="font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; height: 44px; padding: 0 12px; margin-right: -12px;">Edit</a>
+  </div>
+
+  <!-- Tesla card -->
+  <div class="card" style="margin-top: 14px; padding: 16px; display: flex; flex-direction: column; gap: 11px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="display" style="font-size: 16px; font-weight: 600; flex: 1;">Tesla Model 3 LR (2021)</div>
+      <span class="chip">Electric</span>
+    </div>
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+      <div>
+        <span class="display" style="font-size: 34px; font-weight: 700; letter-spacing: -0.02em;">327&#8201;€</span>
+        <span style="font-size: 14px; color: #8f8c80;">/mo</span>
+      </div>
+      <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px; border-radius: 999px; background: #e5f1e0; color: #006300; font-size: 11px; font-weight: 600;">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#006300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3.5"></path></svg>
+        Lowest
+      </span>
+    </div>
+    <div style="display: flex; gap: 2px; height: 12px;">
+      <div style="width: 53.5%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+      <div style="width: 12.2%; background: #1baf7a;"></div>
+      <div style="width: 19.9%; background: #eda100;"></div>
+      <div style="width: 1.7%; background: #e87ba4;"></div>
+      <div style="width: 12.7%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Per km</span><span class="statvalue">0,20&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">19&#8201;625&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Financing</span><span class="statvalue">Cash</span></div>
+    </div>
+  </div>
+
+  <!-- Volvo card -->
+  <div class="card" style="margin-top: 12px; padding: 16px; display: flex; flex-direction: column; gap: 11px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="display" style="font-size: 16px; font-weight: 600; flex: 1;">Volvo XC40 T5 Recharge (2020)</div>
+      <span class="chip">PHEV</span>
+    </div>
+    <div style="display: flex; align-items: baseline;">
+      <span class="display" style="font-size: 34px; font-weight: 700; letter-spacing: -0.02em;">522&#8201;€</span>
+      <span style="font-size: 14px; color: #8f8c80;">/mo</span>
+    </div>
+    <div style="display: flex; gap: 2px; height: 12px;">
+      <div style="width: 34.2%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+      <div style="width: 13.2%; background: #eb6834;"></div>
+      <div style="width: 27.3%; background: #1baf7a;"></div>
+      <div style="width: 11.3%; background: #eda100;"></div>
+      <div style="width: 2.2%; background: #e87ba4;"></div>
+      <div style="width: 11.8%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Per km</span><span class="statvalue">0,31&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">31&#8201;312&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Loan / mo</span><span class="statvalue">458,80&#8201;€</span></div>
+    </div>
+  </div>
+
+  <!-- Skoda card -->
+  <div class="card" style="margin-top: 12px; padding: 16px; display: flex; flex-direction: column; gap: 11px;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="display" style="font-size: 16px; font-weight: 600; flex: 1;">Škoda Octavia 2.0 TSI (2022)</div>
+      <span class="chip">Petrol</span>
+    </div>
+    <div style="display: flex; align-items: baseline;">
+      <span class="display" style="font-size: 34px; font-weight: 700; letter-spacing: -0.02em;">531&#8201;€</span>
+      <span style="font-size: 14px; color: #8f8c80;">/mo</span>
+    </div>
+    <div style="display: flex; gap: 2px; height: 12px;">
+      <div style="width: 29.5%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+      <div style="width: 8.1%; background: #eb6834;"></div>
+      <div style="width: 39.5%; background: #1baf7a;"></div>
+      <div style="width: 9.7%; background: #eda100;"></div>
+      <div style="width: 3.0%; background: #e87ba4;"></div>
+      <div style="width: 10.2%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Per km</span><span class="statvalue">0,32&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">31&#8201;854&#8201;€</span></div>
+      <div style="display: flex; flex-direction: column; gap: 1px;"><span class="statlabel">Loan / mo</span><span class="statvalue">374,60&#8201;€</span></div>
+    </div>
+  </div>
+
+  <!-- Floating add button -->
+  <div style="position: absolute; right: 18px; bottom: 22px; width: 56px; height: 56px; border-radius: 999px; background: #191813; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(25,24,19,0.35);">
+    <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#f6f5f1" stroke-width="1.7" stroke-linecap="round"><path d="M8 3v10"></path><path d="M3 8h10"></path></svg>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

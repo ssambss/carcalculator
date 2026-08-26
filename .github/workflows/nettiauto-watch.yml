@@ -1,0 +1,71 @@
+name: Nettiauto watch
+
+# Checks nettiauto for new listings matching the spec in scraper/src/config.js
+# and posts anything new to Discord. Independent of the Pages deploy workflow -
+# it touches nothing the frontend build uses.
+
+on:
+  schedule:
+    # Every 30 minutes. GitHub queues cron runs on shared capacity, so the
+    # actual time drifts; that is fine, the scraper is idempotent.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Check and report, but post nothing and save no state'
+        type: boolean
+        default: false
+      seed:
+        description: 'Re-record everything currently on sale without posting'
+        type: boolean
+        default: false
+
+# The state file is committed back after each run, so runs must not overlap.
+concurrency:
+  group: nettiauto-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check for new listings
+        working-directory: scraper
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          node src/index.js \
+            --notify-errors \
+            ${{ inputs.dry_run && '--dry-run' || '' }} \
+            ${{ inputs.seed && '--seed' || '' }}
+
+      - name: Remember what was found
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if git diff --quiet -- scraper/data/seen.json; then
+            echo "State unchanged."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add scraper/data/seen.json
+          git commit -m 'chore(scraper): update seen listings'
+          # Another scheduled run may have pushed while this one was working.
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+            echo "Push rejected, rebasing onto origin (attempt $attempt)..."
+            git pull --rebase --autostash || true
+          done
+          echo "Could not push the state file after 3 attempts." >&2
+          exit 1

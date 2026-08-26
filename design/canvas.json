@@ -1,0 +1,14 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 1280, "title": "Desktop — comparison" },
+    { "file": "CarForm.dc.html", "x": 1540, "y": 0, "w": 760, "h": 1380, "title": "Add / edit car" },
+    { "file": "Mobile.dc.html", "x": 2400, "y": 0, "w": 390, "h": 844, "title": "Mobile — at the dealership" },
+    { "file": "DirectionA.dc.html", "x": 0, "y": 1520, "w": 480, "h": 620, "title": "Alt A — Night cockpit" },
+    { "file": "DirectionB.dc.html", "x": 580, "y": 1520, "w": 480, "h": 620, "title": "Alt B — Soft & friendly" }
+  ],
+  "annotations": [
+    { "id": "direction-note", "x": 2880, "y": 40, "w": 300, "text": "Direction: \"Paper ledger\" — warm paper surfaces, ink-black actions, Space Grotesk numbers.\nData colors appear only in the cost-breakdown bars and table swatches.\nCars and numbers are realistic samples computed with the actual TCO formulas (20 000 km/yr, 5 years)." },
+    { "id": "alts-note", "x": 1160, "y": 1520, "w": 280, "text": "Two rough alternate directions, structure only.\nIf one of these feels more like it, say so and the three screens get rebuilt in that style." }
+  ],
+  "launch": { "view": "canvas" }
+}

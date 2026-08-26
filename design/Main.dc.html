@@ -1,0 +1,277 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; color: #191813; }
+    a { color: #235a9f; text-decoration: none; }
+    a:hover { color: #16406f; }
+    .display { font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #fdfdfb; color: #191813; font-size: 14px; font-weight: 500; font-family: inherit; }
+    .btn-primary { background: #191813; border-color: #191813; color: #f6f5f1; }
+    .chip { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border: 1px solid rgba(25,24,19,0.16); border-radius: 999px; font-size: 12px; font-weight: 500; color: #57544b; background: #fdfdfb; }
+    .card { background: #fdfdfb; border: 1px solid rgba(25,24,19,0.10); border-radius: 12px; }
+    .statlabel { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8c80; }
+    .statvalue { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: #191813; }
+    .cmp td, .cmp th { padding: 11px 14px; font-size: 14px; border-bottom: 1px solid rgba(25,24,19,0.08); }
+    .cmp th { text-align: left; font-weight: 600; }
+    .cmp td.num { text-align: right; font-variant-numeric: tabular-nums; color: #191813; }
+    .cmp td.min { font-weight: 600; background: #edf4ea; }
+    .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: baseline; }
+  </style>
+</helmet>
+<div style="width: 1440px; min-height: 1280px; background: #f6f5f1; padding: 36px 44px;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div class="display" style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em;">Car TCO</div>
+      <div style="font-size: 13px; color: #8f8c80;">Total cost of ownership — compare your candidates</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button class="btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#57544b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8"></path><path d="M5 7l3 3 3-3"></path><path d="M2 13h12"></path></svg>
+        Import
+      </button>
+      <button class="btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#57544b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10V2"></path><path d="M5 5l3-3 3 3"></path><path d="M2 13h12"></path></svg>
+        Export
+      </button>
+      <button class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#f6f5f1" stroke-width="1.7" stroke-linecap="round"><path d="M8 3v10"></path><path d="M3 8h10"></path></svg>
+        Add car
+      </button>
+    </div>
+  </div>
+
+  <!-- Assumptions -->
+  <div class="card" style="margin-top: 24px; padding: 16px 20px; display: flex; align-items: center; gap: 28px;">
+    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 130px;">
+      <div style="font-size: 14px; font-weight: 600;">Assumptions</div>
+      <div style="font-size: 12px; color: #8f8c80;">shared by every car</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+      <label style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="statlabel">Driving / year</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 10px; font-size: 14px; font-variant-numeric: tabular-nums;">20&#8201;000&nbsp;<span style="color: #8f8c80;">km</span></span>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="statlabel">Ownership</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 10px; font-size: 14px; font-variant-numeric: tabular-nums;">5&nbsp;<span style="color: #8f8c80;">years</span></span>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="statlabel">Petrol</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 10px; font-size: 14px; font-variant-numeric: tabular-nums;">1,85&nbsp;<span style="color: #8f8c80;">€/l</span></span>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="statlabel">Diesel</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 10px; font-size: 14px; font-variant-numeric: tabular-nums;">1,75&nbsp;<span style="color: #8f8c80;">€/l</span></span>
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px;">
+        <span class="statlabel">Electricity</span>
+        <span style="display: inline-flex; align-items: center; height: 36px; border: 1px solid rgba(25,24,19,0.16); border-radius: 8px; background: #ffffff; padding: 0 10px; font-size: 14px; font-variant-numeric: tabular-nums;">0,15&nbsp;<span style="color: #8f8c80;">€/kWh</span></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="margin-top: 20px; display: flex; align-items: center; gap: 18px; font-size: 12px; color: #57544b;">
+    <span><span class="swatch" style="background: #2a78d6;"></span>Depreciation</span>
+    <span><span class="swatch" style="background: #eb6834;"></span>Financing</span>
+    <span><span class="swatch" style="background: #1baf7a;"></span>Energy</span>
+    <span><span class="swatch" style="background: #eda100;"></span>Insurance</span>
+    <span><span class="swatch" style="background: #e87ba4;"></span>Vehicle tax</span>
+    <span><span class="swatch" style="background: #008300;"></span>Maintenance &amp; tires</span>
+  </div>
+
+  <!-- Car cards -->
+  <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+
+    <!-- Tesla (cheapest) -->
+    <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="display" style="font-size: 17px; font-weight: 600; flex: 1;">Tesla Model 3 LR (2021)</div>
+        <span class="chip">Electric</span>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <div>
+          <span class="display" style="font-size: 40px; font-weight: 700; letter-spacing: -0.02em;">327&#8201;€</span>
+          <span style="font-size: 15px; color: #8f8c80;">/mo</span>
+        </div>
+        <span style="display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px; border-radius: 999px; background: #e5f1e0; color: #006300; font-size: 12px; font-weight: 600;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#006300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3.5"></path></svg>
+          Lowest cost
+        </span>
+      </div>
+      <div style="display: flex; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Per km</span><span class="statvalue">0,20&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">19&#8201;625&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Financing</span><span class="statvalue">Cash</span></div>
+      </div>
+      <div style="display: flex; gap: 2px; height: 14px;">
+        <div style="width: 53.5%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+        <div style="width: 12.2%; background: #1baf7a;"></div>
+        <div style="width: 19.9%; background: #eda100;"></div>
+        <div style="width: 1.7%; background: #e87ba4;"></div>
+        <div style="width: 12.7%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+      </div>
+      <div style="display: flex; gap: 14px; border-top: 1px solid rgba(25,24,19,0.08); padding-top: 12px;">
+        <a href="#" style="font-size: 13px; font-weight: 500;">Edit</a>
+        <a href="#" style="font-size: 13px; font-weight: 500;">Duplicate</a>
+        <a href="#" style="font-size: 13px; font-weight: 500; color: #a13c2f;">Delete</a>
+      </div>
+    </div>
+
+    <!-- Volvo -->
+    <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="display" style="font-size: 17px; font-weight: 600; flex: 1;">Volvo XC40 T5 Recharge (2020)</div>
+        <span class="chip">Plug-in hybrid</span>
+      </div>
+      <div style="display: flex; align-items: baseline;">
+        <span class="display" style="font-size: 40px; font-weight: 700; letter-spacing: -0.02em;">522&#8201;€</span>
+        <span style="font-size: 15px; color: #8f8c80;">/mo</span>
+      </div>
+      <div style="display: flex; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Per km</span><span class="statvalue">0,31&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">31&#8201;312&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Loan / mo</span><span class="statvalue">458,80&#8201;€</span></div>
+      </div>
+      <div style="display: flex; gap: 2px; height: 14px;">
+        <div style="width: 34.2%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+        <div style="width: 13.2%; background: #eb6834;"></div>
+        <div style="width: 27.3%; background: #1baf7a;"></div>
+        <div style="width: 11.3%; background: #eda100;"></div>
+        <div style="width: 2.2%; background: #e87ba4;"></div>
+        <div style="width: 11.8%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+      </div>
+      <div style="display: flex; gap: 14px; border-top: 1px solid rgba(25,24,19,0.08); padding-top: 12px;">
+        <a href="#" style="font-size: 13px; font-weight: 500;">Edit</a>
+        <a href="#" style="font-size: 13px; font-weight: 500;">Duplicate</a>
+        <a href="#" style="font-size: 13px; font-weight: 500; color: #a13c2f;">Delete</a>
+      </div>
+    </div>
+
+    <!-- Skoda -->
+    <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="display" style="font-size: 17px; font-weight: 600; flex: 1;">Škoda Octavia 2.0 TSI (2022)</div>
+        <span class="chip">Petrol</span>
+      </div>
+      <div style="display: flex; align-items: baseline;">
+        <span class="display" style="font-size: 40px; font-weight: 700; letter-spacing: -0.02em;">531&#8201;€</span>
+        <span style="font-size: 15px; color: #8f8c80;">/mo</span>
+      </div>
+      <div style="display: flex; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Per km</span><span class="statvalue">0,32&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Over 5 yrs</span><span class="statvalue">31&#8201;854&#8201;€</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px;"><span class="statlabel">Loan / mo</span><span class="statvalue">374,60&#8201;€</span></div>
+      </div>
+      <div style="display: flex; gap: 2px; height: 14px;">
+        <div style="width: 29.5%; background: #2a78d6; border-radius: 4px 0 0 4px;"></div>
+        <div style="width: 8.1%; background: #eb6834;"></div>
+        <div style="width: 39.5%; background: #1baf7a;"></div>
+        <div style="width: 9.7%; background: #eda100;"></div>
+        <div style="width: 3.0%; background: #e87ba4;"></div>
+        <div style="width: 10.2%; background: #008300; border-radius: 0 4px 4px 0;"></div>
+      </div>
+      <div style="display: flex; gap: 14px; border-top: 1px solid rgba(25,24,19,0.08); padding-top: 12px;">
+        <a href="#" style="font-size: 13px; font-weight: 500;">Edit</a>
+        <a href="#" style="font-size: 13px; font-weight: 500;">Duplicate</a>
+        <a href="#" style="font-size: 13px; font-weight: 500; color: #a13c2f;">Delete</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison table -->
+  <div class="card" style="margin-top: 28px; padding: 8px 0 0 0; overflow: hidden;">
+    <div style="padding: 14px 20px 10px 20px; display: flex; align-items: baseline; gap: 10px;">
+      <div class="display" style="font-size: 16px; font-weight: 600;">Side by side</div>
+      <div style="font-size: 12px; color: #8f8c80;">over 5 years · lowest in each row highlighted</div>
+    </div>
+    <table class="cmp" style="width: 100%; border-collapse: collapse;">
+      <tbody>
+        <tr style="color: #57544b;">
+          <th style="width: 28%; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #8f8c80;">Cost</th>
+          <th style="text-align: right; font-size: 13px;">Tesla Model 3 LR</th>
+          <th style="text-align: right; font-size: 13px;">Volvo XC40 T5</th>
+          <th style="text-align: right; font-size: 13px;">Škoda Octavia</th>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #2a78d6;"></span>Depreciation</th>
+          <td class="num">10&#8201;500&#8201;€</td>
+          <td class="num">10&#8201;700&#8201;€</td>
+          <td class="num min">9&#8201;400&#8201;€</td>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #eb6834;"></span>Financing interest</th>
+          <td class="num min">0&#8201;€</td>
+          <td class="num">4&#8201;122&#8201;€</td>
+          <td class="num">2&#8201;574&#8201;€</td>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #1baf7a;"></span>Energy</th>
+          <td class="num min">2&#8201;400&#8201;€</td>
+          <td class="num">8&#8201;540&#8201;€</td>
+          <td class="num">12&#8201;580&#8201;€</td>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #eda100;"></span>Insurance</th>
+          <td class="num">3&#8201;900&#8201;€</td>
+          <td class="num">3&#8201;550&#8201;€</td>
+          <td class="num min">3&#8201;100&#8201;€</td>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #e87ba4;"></span>Vehicle tax</th>
+          <td class="num min">325&#8201;€</td>
+          <td class="num">700&#8201;€</td>
+          <td class="num">950&#8201;€</td>
+        </tr>
+        <tr>
+          <th><span class="swatch" style="background: #008300;"></span>Maintenance &amp; tires</th>
+          <td class="num min">2&#8201;500&#8201;€</td>
+          <td class="num">3&#8201;700&#8201;€</td>
+          <td class="num">3&#8201;250&#8201;€</td>
+        </tr>
+        <tr style="background: #f6f5f1;">
+          <th>Total over 5 years</th>
+          <td class="num min" style="font-weight: 600;">19&#8201;625&#8201;€</td>
+          <td class="num" style="font-weight: 600;">31&#8201;312&#8201;€</td>
+          <td class="num" style="font-weight: 600;">31&#8201;854&#8201;€</td>
+        </tr>
+        <tr>
+          <th>Per month</th>
+          <td class="num min">327&#8201;€</td>
+          <td class="num">522&#8201;€</td>
+          <td class="num">531&#8201;€</td>
+        </tr>
+        <tr>
+          <th>Per kilometre</th>
+          <td class="num min">0,20&#8201;€</td>
+          <td class="num">0,31&#8201;€</td>
+          <td class="num">0,32&#8201;€</td>
+        </tr>
+        <tr>
+          <th style="border-bottom: none;">Loan payment / mo</th>
+          <td class="num" style="border-bottom: none; color: #8f8c80;">—</td>
+          <td class="num" style="border-bottom: none;">458,80&#8201;€</td>
+          <td class="num" style="border-bottom: none;">374,60&#8201;€</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 18px; font-size: 12px; color: #8f8c80; text-align: center;">
+    Data is stored in this browser only — export a backup now and then.
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
