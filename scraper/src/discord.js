@@ -27,9 +27,21 @@ function kilometres(value) {
   return value === null || value === undefined ? '? km' : `${KM.format(value)} km`;
 }
 
-/** Colour by price band, so a cheap find is visually obvious in the channel. */
-function accentColour(price) {
+/**
+ * Colour by price, so a cheap find is visually obvious in the channel.
+ *
+ * Read against the filter's own ceiling where it has one - what counts as
+ * cheap depends entirely on what you are shopping for - and against fixed
+ * bands only when the filter sets no maximum.
+ */
+export function accentColour(price, maxPrice = null) {
   if (price === null || price === undefined) return 0x8a8a8a;
+  if (maxPrice) {
+    const share = price / maxPrice;
+    if (share <= 0.85) return 0x2ecc71;
+    if (share <= 0.95) return 0x3498db;
+    return 0x9b59b6;
+  }
   if (price < 28000) return 0x2ecc71;
   if (price < 32000) return 0x3498db;
   return 0x9b59b6;
@@ -42,7 +54,7 @@ function accentColour(price) {
  * seller free text, so showing the phrase we matched on lets the reader judge
  * the call themselves instead of trusting the scraper.
  */
-export function buildEmbed(listing, verdict) {
+export function buildEmbed(listing, verdict, filter = null) {
   const headline = [listing.year, listing.subTitle || listing.title].filter(Boolean).join(' ');
 
   const fields = [
@@ -86,24 +98,35 @@ export function buildEmbed(listing, verdict) {
     });
   }
 
+  // The footer names the filter that matched, so a channel carrying several
+  // searches stays readable. The listing id has to stay in it verbatim:
+  // reactions.js maps a reacted post back to its car through this line.
+  const footer = ['nettiauto.com', filter?.name, `ilmoitus ${listing.id}`]
+    .filter(Boolean)
+    .join(' · ');
+
   return {
-    title: clamp(headline || 'Polestar 2', LIMITS.title),
+    title: clamp(headline || listing.title || 'Ilmoitus', LIMITS.title),
     url: listing.url,
-    color: accentColour(listing.price),
+    color: accentColour(listing.price, filter?.maxPrice ?? null),
     fields,
     image: listing.image ? { url: listing.image } : undefined,
-    footer: { text: clamp(`nettiauto.com · ilmoitus ${listing.id}`, LIMITS.footer) },
+    footer: { text: clamp(footer, LIMITS.footer) },
     timestamp: new Date().toISOString(),
   };
 }
 
 /**
- * Announce listings, newest-cheapest first, in batches.
+ * Announce one filter's new listings, cheapest first, in batches.
  *
  * Returns the ids that Discord accepted, so the caller only marks those as
  * announced - a failed batch is retried on the next run rather than lost.
  */
-export async function announce(items, { webhookUrl = config.discord.webhookUrl, dryRun = false } = {}) {
+export async function announce(
+  filter,
+  items,
+  { webhookUrl = config.discord.webhookUrl, dryRun = false } = {},
+) {
   if (items.length === 0) return { announced: [], batches: 0 };
   if (!dryRun && !webhookUrl) {
     throw new Error(
@@ -118,15 +141,16 @@ export async function announce(items, { webhookUrl = config.discord.webhookUrl, 
   for (let start = 0; start < items.length; start += embedsPerMessage) {
     const batch = items.slice(start, start + embedsPerMessage);
     const isFirstBatch = start === 0;
+    const name = clamp(filter?.name ?? 'haku', 120);
     const heading =
       items.length === 1
-        ? '**Uusi Polestar 2 hakuehdoillasi**'
-        : `**${items.length} uutta Polestar 2 -ilmoitusta hakuehdoillasi**`;
+        ? `**Uusi osuma hakuun ${name}**`
+        : `**${items.length} uutta osumaa hakuun ${name}**`;
 
     const payload = {
       username,
       content: isFirstBatch ? heading : undefined,
-      embeds: batch.map(({ listing, verdict }) => buildEmbed(listing, verdict)),
+      embeds: batch.map(({ listing, verdict }) => buildEmbed(listing, verdict, filter)),
       // Suppress link previews: the embeds already carry the images.
       allowed_mentions: { parse: [] },
     };

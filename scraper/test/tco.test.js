@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 
 import config from '../src/config.js';
-import { carName, toCarListing } from '../src/gist.js';
+import { carName, powertrainOf, toCarListing, variantHint } from '../src/gist.js';
 import { webhookIdFrom } from '../src/reactions.js';
 import { loadState, needsTcoAdd, recordTcoAdd, recordTcoConfirmed, saveState } from '../src/state.js';
 
@@ -66,10 +66,10 @@ describe('turning a listing into a calculator car', () => {
   it('covers every field the app knows, so nothing normalises to a surprise', async () => {
     // Field list mirrored from CarListing in src/types.ts (repo root).
     const expected = [
-      'id', 'name', 'notes', 'powertrain', 'purchasePrice', 'odometerKm',
+      'id', 'name', 'notes', 'favorite', 'powertrain', 'purchasePrice', 'odometerKm',
       'autoResale', 'expectedResaleValue', 'financing', 'fuelLPer100',
       'elecKwhPer100', 'electricSharePct', 'insurancePerYear', 'taxPerYear',
-      'maintenancePerYear', 'tiresPerYear', 'otherPerYear', 'createdAt',
+      'maintenancePerYear', 'tiresPerYear', 'otherPerYear', 'createdAt', 'updatedAt',
     ];
     const car = toCarListing(listing());
     assert.deepEqual(Object.keys(car).sort(), [...expected].sort());
@@ -85,12 +85,46 @@ describe('turning a listing into a calculator car', () => {
     assert.match(car.notes, /nettiauto\.com/);
   });
 
-  it('names the car tersely for the comparison table', () => {
-    assert.equal(carName(listing()), 'Polestar 2 LR DM 2021 · 120 tkm');
+  it('names the car from the listing, whatever the car is', () => {
+    assert.equal(carName(listing()), 'Polestar 2 Long Range Dual Motor 2021 · 120 tkm');
     assert.equal(
       carName(listing({ subTitle: '78 kWh, Long Range Dual Motor Performance', mileage: 29000, year: 2023 })),
-      'Polestar 2 LR DM Perf 2023 · 29 tkm',
+      'Polestar 2 Long Range Dual Motor Performance 2023 · 29 tkm',
     );
+    // Now that a filter can watch anything, nothing here may assume Polestar.
+    assert.equal(
+      carName({ title: 'Toyota Corolla', subTitle: '1.8 Hybrid Active', year: 2022, mileage: 45000 }),
+      'Toyota Corolla 1.8 Hybrid Active 2022 · 45 tkm',
+    );
+    assert.equal(carName({ title: '', subTitle: '', year: null, mileage: null }), 'Auto');
+  });
+
+  it('drops the figures the card already shows from the variant name', () => {
+    assert.equal(variantHint('78 kWh, Long Range Dual Motor, 300kW, 78kWh'), 'Long Range Dual Motor');
+    assert.equal(variantHint('2.0 TDI'), '2.0 TDI', 'an engine size is not a stray measurement');
+    // Long enough to be cut, and cut on a word boundary rather than mid-word.
+    const long = variantHint('Long Range Dual Motor Performance Launch Edition');
+    assert.ok(long.length <= 40);
+    assert.ok(!long.endsWith(' '));
+    assert.equal(long, 'Long Range Dual Motor Performance');
+  });
+
+  it('takes the powertrain from what the listing says it burns', () => {
+    assert.equal(powertrainOf({ fuelType: 'Sähkö' }), 'ev');
+    assert.equal(powertrainOf({ fuelType: 'Diesel' }), 'diesel');
+    assert.equal(powertrainOf({ fuelType: 'Bensiini' }), 'petrol');
+    assert.equal(powertrainOf({ fuelType: 'Lataushybridi' }), 'phev');
+    // A non-plug hybrid is fuelled with petrol, and the app has no other name
+    // for it.
+    assert.equal(powertrainOf({ fuelType: 'Hybridi' }), 'petrol');
+    assert.equal(powertrainOf({}, 'diesel'), 'diesel', 'falls back when the ad is silent');
+  });
+
+  it('gives a combustion car the fuel figures, not the electric ones', () => {
+    const car = toCarListing({ ...listing(), fuelType: 'Diesel' });
+    assert.equal(car.powertrain, 'diesel');
+    assert.equal(car.electricSharePct, 50);
+    assert.equal(car.fuelLPer100, config.tco.carDefaults.fuelLPer100);
   });
 });
 

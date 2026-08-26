@@ -1,0 +1,31 @@
+[
+  {
+    "id": "polestar2-lr-dm",
+    "name": "Polestar 2 LR DM",
+    "enabled": true,
+    "make": "polestar",
+    "model": "2",
+
+    "yearFrom": 2021,
+    "yearTo": 2023,
+    "maxMileage": 120000,
+    "minPrice": null,
+    "maxPrice": null,
+
+    "variantMust": ["long range", "dual motor"],
+    "variantMustNot": ["standard range", "single motor"],
+    "textMust": [],
+    "textMustNot": [],
+
+    "packages": ["pilot", "plus"],
+    "packageEvidence": "strong",
+    "acceptLesserPackages": false,
+
+    "implications": [
+      { "if": "neliveto", "then": "dual motor" },
+      { "if": "dual motor", "then": "long range" }
+    ],
+
+    "postExisting": true
+  }
+]

@@ -1,17 +1,38 @@
-// Deciding whether a listing meets the spec.
+// Deciding whether a listing meets a filter's spec.
 //
 // Nettiauto exposes no filter for battery size, drivetrain or option packages,
 // and the packages are never structured data - they live in seller free text.
-// So everything below the year/mileage line is text matching, and every verdict
-// carries the evidence that produced it so a human can sanity-check the call.
+// So everything below the year/mileage/price line is text matching, and every
+// verdict carries the evidence that produced it so a human can sanity-check
+// the call.
+//
+// Three kinds of text check, in increasing looseness:
+//
+//   variantMust / variantMustNot  the variant name and the spec chips only -
+//                                short, structured, trustworthy
+//   textMust / textMustNot        everything, the seller's free text included
+//   packages                      a name that has to read as an option
+//                                package, not a passing mention
+//
+// plus `implications`, which let a filter accept the shorthand sellers use:
+// "seeing Neliveto proves Dual Motor" is a fact about the car, not about the
+// advert, and stating it once beats teaching the matcher every model's range.
 
-import config from './config.js';
+import { normalizeFilter } from './filters.js';
 
 /** Words that mark a package name as an actual option package. */
 const PACKAGE_NOUN = /^(paket|pkt|pack|package|varuste)/;
 
 /** How many tokens apart two words may sit and still count as related. */
 const MAX_GAP = 3;
+
+/**
+ * Shortest phrase word that may match the *start* of a longer token. Finnish
+ * glues words together and inflects the tail, so "lasikatto" has to find
+ * "lasikattoluukku" - but a three-letter phrase matching by prefix would find
+ * something in every listing.
+ */
+const PREFIX_MIN = 5;
 
 /**
  * Words that turn a package name into something *smaller* than the package.
@@ -46,13 +67,66 @@ function namesThePackage(tokens, index, { acceptLite = false } = {}) {
  * Every separator sellers use becomes whitespace, so "Pilot- ja Plus-pkt.",
  * "Pilot&Plus" and "Pilot / Plus" all reduce to the same token sequence.
  */
-function tokenize(text) {
+export function tokenize(text) {
   return (text ?? '')
     .toLowerCase()
     .normalize('NFC')
     .replace(/[-–—/|*&+,.;:!?()[\]{}"'`~<>=#%\\]/g, ' ')
     .split(/\s+/)
     .filter(Boolean);
+}
+
+/**
+ * Is this phrase present in the tokenised text?
+ *
+ * The phrase is tokenised the same way as the text, so how the seller spelled
+ * the separators stops mattering: "long range" finds "Long-Range",
+ * "Long Range" and "LONG RANGE / 78kWh" alike.
+ */
+export function containsPhrase(tokens, phrase) {
+  const words = tokenize(phrase);
+  if (words.length === 0) return false;
+  const last = words.length - 1;
+
+  for (let start = 0; start + last < tokens.length; start += 1) {
+    let matched = true;
+    for (let offset = 0; offset <= last; offset += 1) {
+      const token = tokens[start + offset];
+      const word = words[offset];
+      if (token === word) continue;
+      // Only the final word may match a longer token, and only if it is long
+      // enough to mean something on its own. See PREFIX_MIN.
+      if (offset === last && word.length >= PREFIX_MIN && token.startsWith(word)) continue;
+      matched = false;
+      break;
+    }
+    if (matched) return true;
+  }
+  return false;
+}
+
+/**
+ * Work out which phrases the filter's implication rules prove.
+ *
+ * Rules chain - "Neliveto proves Dual Motor" plus "Dual Motor proves Long
+ * Range" together prove Long Range from an AWD badge alone - so this runs to a
+ * fixed point. Returns phrase -> the phrase it was inferred from.
+ */
+export function applyImplications(tokens, implications) {
+  const implied = new Map();
+  if (!implications.length) return implied;
+
+  for (let round = 0; round < implications.length; round += 1) {
+    let changed = false;
+    for (const rule of implications) {
+      if (implied.has(rule.then) || containsPhrase(tokens, rule.then)) continue;
+      if (!containsPhrase(tokens, rule.if) && !implied.has(rule.if)) continue;
+      implied.set(rule.then, rule.if);
+      changed = true;
+    }
+    if (!changed) break;
+  }
+  return implied;
 }
 
 /**
@@ -123,7 +197,7 @@ function findPackage(tokens, name, { others = [], acceptLite = false } = {}) {
 }
 
 /**
- * Pull the source fragment that mentions a package, for display.
+ * Pull the source fragment that mentions a phrase, for display.
  *
  * Sellers separate equipment with slashes, asterisks, pipes and newlines, so
  * splitting on those yields a short human-readable snippet like
@@ -135,8 +209,9 @@ function evidenceSnippet(text, name) {
     .split(/[\n/|*•]|\s{2,}|(?<=[a-zäöå])\s*[-–—]\s*(?=[A-ZÄÖÅ])/)
     .map((segment) => segment.trim())
     .filter(Boolean);
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\-–—/&+]*');
   const matching = segments
-    .filter((segment) => new RegExp(`\\b${name}`, 'i').test(segment))
+    .filter((segment) => new RegExp(`\\b${escaped}`, 'i').test(segment))
     .sort((a, b) => a.length - b.length);
   const best = matching[0];
   if (!best) return null;
@@ -145,115 +220,156 @@ function evidenceSnippet(text, name) {
 
 /** Text fields that describe the car's variant, in order of trustworthiness. */
 function variantText(listing, detail) {
-  return [detail?.schemaName, listing.subTitle, listing.title].filter(Boolean).join(' | ');
+  return [
+    detail?.schemaName,
+    listing.subTitle,
+    listing.title,
+    listing.driveType,
+    ...(listing.specs ?? []),
+  ]
+    .filter(Boolean)
+    .join(' | ');
 }
 
-/** Every field that could name an option package. */
-function packageText(listing, detail) {
-  return [listing.subTitle, listing.usp, detail?.usp, detail?.schemaName, detail?.description]
+/** Everything a listing says, the seller's own description included. */
+function fullText(listing, detail) {
+  return [variantText(listing, detail), listing.usp, detail?.usp, detail?.description]
     .filter(Boolean)
     .join('\n');
 }
 
 /**
- * Assess battery and drivetrain from the variant strings.
- *
- * A Polestar 2 Dual Motor was only ever sold as a Long Range car, and the only
- * all-wheel-drive Polestar 2 is the dual motor - so each fact can stand in for
- * the other when a listing spells out just one. Both inferences are opt-in via
- * config and reported in the reasoning.
- */
-function checkPowertrain(listing, detail, requirements) {
-  const text = variantText(listing, detail);
-  const notes = [];
-
-  const saysLongRange = /long\s*-?\s*range/i.test(text);
-  const saysStandardRange = /standard\s*-?\s*range/i.test(text);
-  const saysDualMotor = /dual\s*-?\s*motor/i.test(text);
-  const saysSingleMotor = /single\s*-?\s*motor/i.test(text);
-  const isAwd = /neliveto/i.test([listing.driveType, ...(listing.specs ?? [])].join(' '));
-
-  let dualMotor = saysDualMotor;
-  if (!dualMotor && !saysSingleMotor && isAwd && requirements.awdImpliesDualMotor) {
-    dualMotor = true;
-    notes.push('dual motor inferred from AWD (Neliveto)');
-  }
-
-  let longRange = saysLongRange;
-  if (!longRange && !saysStandardRange && dualMotor && requirements.dualMotorImpliesLongRange) {
-    longRange = true;
-    notes.push('long range inferred from dual motor');
-  }
-
-  const failures = [];
-  if (saysSingleMotor) failures.push('single motor');
-  else if (!dualMotor) failures.push('drivetrain not confirmed as dual motor');
-  if (saysStandardRange) failures.push('standard range');
-  else if (!longRange) failures.push('battery not confirmed as long range');
-
-  return { longRange, dualMotor, failures, notes };
-}
-
-/**
- * Decide whether a listing meets the spec.
+ * Decide whether a listing meets one filter's spec.
  *
  * `detail` is optional: pass the search-card data alone for a first pass, and
  * re-run with the listing page once fetched. `needsDetail` tells the caller
  * that a detail fetch could still change the verdict.
  */
-export function evaluate(listing, detail = null, requirements = config.require) {
+export function evaluate(listing, detail = null, filter) {
+  const spec = normalizeFilter(filter);
   const reasons = [];
   const notes = [];
   const warnings = [];
+  // Reasons a detail page could still overturn (`unproven`) versus ones no
+  // amount of extra text can (`settled`): numbers that miss, and phrases the
+  // listing flatly contradicts.
+  let unproven = 0;
+  let settled = 0;
 
   // --- Hard numbers first: these need no text interpretation. ---
-  if (listing.year === null) reasons.push('year unknown');
-  else if (listing.year < requirements.yearFrom || listing.year > requirements.yearTo) {
-    reasons.push(`year ${listing.year} outside ${requirements.yearFrom}-${requirements.yearTo}`);
+  if (spec.yearFrom !== null || spec.yearTo !== null) {
+    if (listing.year === null) reasons.push('year unknown');
+    else if (spec.yearFrom !== null && listing.year < spec.yearFrom) {
+      reasons.push(`year ${listing.year} before ${spec.yearFrom}`);
+    } else if (spec.yearTo !== null && listing.year > spec.yearTo) {
+      reasons.push(`year ${listing.year} after ${spec.yearTo}`);
+    }
+    settled = reasons.length;
   }
 
-  if (listing.mileage === null) reasons.push('mileage unknown');
-  else if (listing.mileage > requirements.maxMileage) {
-    reasons.push(`${listing.mileage.toLocaleString('fi-FI')} km over ${requirements.maxMileage.toLocaleString('fi-FI')} km`);
+  if (spec.maxMileage !== null) {
+    if (listing.mileage === null) reasons.push('mileage unknown');
+    else if (listing.mileage > spec.maxMileage) {
+      reasons.push(
+        `${listing.mileage.toLocaleString('fi-FI')} km over ${spec.maxMileage.toLocaleString('fi-FI')} km`,
+      );
+    }
+    settled = reasons.length;
   }
 
-  const powertrain = checkPowertrain(listing, detail, requirements);
-  reasons.push(...powertrain.failures);
-  notes.push(...powertrain.notes);
+  if (spec.minPrice !== null || spec.maxPrice !== null) {
+    if (listing.price === null) reasons.push('price unknown');
+    else if (spec.maxPrice !== null && listing.price > spec.maxPrice) {
+      reasons.push(
+        `${listing.price.toLocaleString('fi-FI')} € over ${spec.maxPrice.toLocaleString('fi-FI')} €`,
+      );
+    } else if (spec.minPrice !== null && listing.price < spec.minPrice) {
+      reasons.push(
+        `${listing.price.toLocaleString('fi-FI')} € under ${spec.minPrice.toLocaleString('fi-FI')} €`,
+      );
+    }
+    settled = reasons.length;
+  }
+
+  // --- Text requirements. ---
+  const variantTokens = tokenize(variantText(listing, detail));
+  const allText = fullText(listing, detail);
+  const allTokens = tokenize(allText);
+
+  // Inferences read the variant name and the spec chips only: that is where a
+  // fact about the car lives. A seller comparing their car to another one in
+  // the description must not accidentally prove anything.
+  const implied = applyImplications(variantTokens, spec.implications);
+  const inferred = [];
+
+  for (const phrase of spec.variantMust) {
+    if (containsPhrase(variantTokens, phrase)) continue;
+    const via = implied.get(phrase);
+    if (via) {
+      notes.push(`${phrase} inferred from ${via}`);
+      inferred.push(phrase);
+      continue;
+    }
+    reasons.push(`variant does not say ${phrase}`);
+    unproven += 1;
+  }
+
+  for (const phrase of spec.variantMustNot) {
+    if (!containsPhrase(variantTokens, phrase)) continue;
+    reasons.push(phrase);
+    settled += 1;
+  }
+
+  for (const phrase of spec.textMust) {
+    if (containsPhrase(allTokens, phrase)) continue;
+    const via = implied.get(phrase);
+    if (via) {
+      notes.push(`${phrase} inferred from ${via}`);
+      inferred.push(phrase);
+      continue;
+    }
+    reasons.push(`no mention of ${phrase}`);
+    unproven += 1;
+  }
+
+  for (const phrase of spec.textMustNot) {
+    if (!containsPhrase(allTokens, phrase)) continue;
+    reasons.push(`mentions ${phrase}`);
+    settled += 1;
+  }
 
   // --- Option packages: seller free text only. ---
-  const text = packageText(listing, detail);
-  const tokens = tokenize(text);
-  const wanted = requirements.packages;
-  const acceptWeak = requirements.packageEvidence !== 'strong';
-
+  const acceptWeak = spec.packageEvidence !== 'strong';
   const packages = {};
-  let packagesUnproven = false;
 
-  for (const name of wanted) {
-    const result = findPackage(tokens, name, {
-      others: wanted.filter((other) => other !== name),
-      acceptLite: name === 'pilot' ? Boolean(requirements.acceptPilotLite) : true,
+  for (const name of spec.packages) {
+    const result = findPackage(allTokens, name, {
+      others: spec.packages.filter((other) => other !== name),
+      acceptLite: spec.acceptLesserPackages,
     });
 
     const satisfied = result.found && (result.strength === 'strong' || acceptWeak);
     packages[name] = {
       ...result,
       satisfied,
-      snippet: result.found ? evidenceSnippet(text, name) : null,
+      snippet: result.found ? evidenceSnippet(allText, name) : null,
     };
 
     if (satisfied) {
-      if (result.sawLite && name === 'pilot') {
-        warnings.push('listing mentions both Pilot and Pilot Lite - worth confirming with the seller');
+      if (result.sawLite) {
+        const lesser = `${name} ${LESSER_VARIANT[name]?.[0] ?? 'lite'}`;
+        warnings.push(
+          `listing mentions both ${name} and ${lesser} - worth confirming with the seller`,
+        );
       }
       continue;
     }
-    packagesUnproven = true;
-    if (result.liteOnly && name === 'pilot') {
-      reasons.push('only Pilot Lite found, not the full Pilot package');
-    } else if (result.featureOnly && name === 'pilot') {
-      reasons.push('only "Pilot Assist" found - that feature ships with Pilot Lite too');
+    unproven += 1;
+    if (result.liteOnly) {
+      reasons.push(`only ${name} ${LESSER_VARIANT[name]?.[0] ?? 'lite'} found, not the full ${name} package`);
+    } else if (result.featureOnly) {
+      const feature = FEATURE_NOT_PACKAGE[name]?.[0] ?? '';
+      reasons.push(`only "${name} ${feature}" found - that feature ships without the package too`);
     } else if (result.found) {
       reasons.push(`${name} mentioned but not clearly as a package`);
     } else {
@@ -262,14 +378,11 @@ export function evaluate(listing, detail = null, requirements = config.require) 
   }
 
   // A detail fetch adds the seller's full description, which is where packages
-  // are most often named - so an unproven package is worth another look. There
-  // is no point re-fetching over a year or mileage that already disqualifies.
-  const disqualifiedOnFacts = powertrain.failures.some((failure) =>
-    /single motor|standard range/.test(failure),
-  );
-  const numbersFailed = reasons.some((reason) => /year|km|mileage/.test(reason));
-  const needsDetail =
-    !detail && !numbersFailed && !disqualifiedOnFacts && (packagesUnproven || !powertrain.dualMotor);
+  // and equipment are most often named - so an unproven requirement is worth
+  // another look. There is no point re-fetching over a number that already
+  // disqualifies the car, or over something the listing flatly contradicts:
+  // more text can only ever add contradictions, never remove them.
+  const needsDetail = !detail && settled === 0 && unproven > 0;
 
   return {
     matched: reasons.length === 0,
@@ -278,15 +391,6 @@ export function evaluate(listing, detail = null, requirements = config.require) 
     warnings,
     needsDetail,
     packages,
-    powertrain: { longRange: powertrain.longRange, dualMotor: powertrain.dualMotor },
+    inferred,
   };
-}
-
-/**
- * Cheap pre-screen used to decide which listings are worth a detail fetch:
- * true when the year and mileage are in range and nothing rules the car out.
- */
-export function worthInspecting(listing, requirements = config.require) {
-  const verdict = evaluate(listing, null, requirements);
-  return verdict.matched || verdict.needsDetail;
 }

@@ -1,20 +1,27 @@
 #!/usr/bin/env node
-// Nettiauto watcher: find listings matching the spec, announce the new ones.
+// Nettiauto watcher: find listings matching your filters, announce the new ones.
 //
 //   node src/index.js              check, and post anything new to Discord
 //   node src/index.js --dry-run    do everything except post
 //   node src/index.js --seed       record the current listings without posting
 //   node src/index.js --list       print the current matches and exit
 //
+// A filter is one saved search (see src/filters.js); there can be any number
+// of them, and filters over the same make and model share a single crawl.
+//
 // On the very first run there is no state file, so every match is recorded and
 // nothing is posted - otherwise the channel would fill with every car already
-// on the market. From then on only genuinely new listings are announced.
+// on the market. From then on only genuinely new listings are announced, per
+// filter. A filter added later starts posting what is on sale unless it says
+// postExisting: false, since seeing the current market is the point of adding
+// one.
 
 import { loadEnvFile } from './env.js';
 
 await loadEnvFile();
 
 const { default: config } = await import('./config.js');
+const { describeFilter, groupBySearch, loadFilters } = await import('./filters.js');
 const { fetchAllListings, fetchListingDetail } = await import('./nettiauto.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
@@ -22,14 +29,27 @@ const { fetchReactedListingIds } = await import('./reactions.js');
 const { addCarsToTco } = await import('./gist.js');
 const state = await import('./state.js');
 
+const FLAGS = ['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'];
+const FILTER_SOURCES = ['auto', 'gist', 'file'];
+
 function parseArgs(argv) {
-  const flags = new Set(argv.filter((arg) => arg.startsWith('--')));
-  const unknown = [...flags].filter(
-    (flag) =>
-      !['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'].includes(
-        flag,
-      ),
+  const flags = new Set(argv.filter((arg) => arg.startsWith('--') && !arg.includes('=')));
+  const options = new Map(
+    argv
+      .filter((arg) => arg.startsWith('--') && arg.includes('='))
+      .map((arg) => [arg.slice(0, arg.indexOf('=')), arg.slice(arg.indexOf('=') + 1)]),
   );
+
+  const unknown = [
+    ...[...flags].filter((flag) => !FLAGS.includes(flag)),
+    ...[...options.keys()].filter((option) => !['--filters', '--only'].includes(option)),
+  ];
+
+  const source = options.get('--filters') ?? config.filters.source;
+  if (!FILTER_SOURCES.includes(source)) {
+    unknown.push(`--filters=${source} (use ${FILTER_SOURCES.join(', ')})`);
+  }
+
   return {
     dryRun: flags.has('--dry-run'),
     seed: flags.has('--seed'),
@@ -37,6 +57,8 @@ function parseArgs(argv) {
     verbose: flags.has('--verbose'),
     notifyErrors: flags.has('--notify-errors'),
     help: flags.has('--help') || flags.has('-h'),
+    filterSource: source,
+    only: options.get('--only') ?? null,
     unknown,
   };
 }
@@ -51,22 +73,14 @@ Usage: node src/index.js [options]
   --list           Print every current match and exit. Touches no state.
   --verbose        Also show near misses and why they were rejected.
   --notify-errors  Post a message to Discord if the run fails.
+  --filters=SRC    Where to read filters from: auto (default), gist or file.
+  --only=NAME      Run just the filters whose name or id contains NAME.
   --help           This text.
 
-Configure the search in src/config.js and the webhook in DISCORD_WEBHOOK_URL
-(a scraper/.env file is read automatically). See README.md.`;
-
-function describeSpec() {
-  const { require: need } = config;
-  return [
-    `${config.search.make} ${config.search.model}`,
-    `${need.yearFrom}-${need.yearTo}`,
-    `max ${need.maxMileage.toLocaleString('fi-FI')} km`,
-    need.battery,
-    need.drivetrain,
-    `${need.packages.join(' + ')} packages`,
-  ].join(', ');
-}
+Filters are made in the calculator's UI and read from your gist; scraper/
+filters.json is the committed fallback. Runtime knobs live in src/config.js and
+the webhook in DISCORD_WEBHOOK_URL (a scraper/.env file is read automatically).
+See README.md.`;
 
 function formatListing(listing) {
   const price = listing.price === null ? '?' : listing.price.toLocaleString('fi-FI');
@@ -75,78 +89,99 @@ function formatListing(listing) {
 }
 
 /**
- * Work out which listings match.
+ * Work out which of a search's listings match which of its filters.
  *
  * Two passes on purpose: the search pages alone settle most listings, and only
- * the undecided ones cost a detail fetch. Verdicts for listings we have already
- * rejected are reused from state, so a steady-state run fetches very few pages.
+ * the undecided ones cost a detail fetch. Verdicts already in the record are
+ * reused, so a steady-state run fetches very few pages - and because the
+ * detail page is the same for every filter, one fetch settles all of them.
  */
-async function collectMatches(listings, store, { verbose }) {
-  const matches = [];
-  const rejected = [];
+async function collectMatches(search, listings, filters, store) {
+  const matches = new Map(filters.map((filter) => [filter.id, []]));
+  const rejected = new Map(filters.map((filter) => [filter.id, []]));
   let detailFetches = 0;
   let reusedVerdicts = 0;
 
   for (const listing of listings) {
-    let verdict = evaluate(listing);
+    const verdicts = new Map();
+    let wantsDetail = false;
+
+    for (const filter of filters) {
+      let verdict = evaluate(listing, null, filter);
+
+      // A cached verdict can stand in for a detail fetch when nothing about
+      // the listing has moved. A match that was never successfully announced
+      // is excluded: it still has to be posted, and building that message
+      // needs the detail page evidence.
+      const cached = state.verdictFor(store, listing.id, filter.id);
+      const canReuse =
+        verdict.needsDetail &&
+        cached &&
+        !state.needsRecheck(store, listing, filter.id) &&
+        (cached.status !== 'match' || state.wasAnnounced(store, listing.id, filter.id));
+
+      if (canReuse) {
+        reusedVerdicts += 1;
+        verdict =
+          cached.status === 'match'
+            ? { ...verdict, matched: true, needsDetail: false, reasons: [] }
+            : {
+                ...verdict,
+                matched: false,
+                needsDetail: false,
+                reasons: cached.reasons?.length ? cached.reasons : verdict.reasons,
+              };
+      } else if (verdict.needsDetail) {
+        wantsDetail = true;
+      }
+
+      verdicts.set(filter.id, verdict);
+    }
+
+    let detail = null;
     let detailChecked = false;
-
-    // A cached verdict can be reused when nothing about the listing has moved.
-    // A match that was never successfully announced is excluded: it still has
-    // to be posted, and building that message needs the detail page evidence.
-    const cached = store.listings[listing.id];
-    const canReuse =
-      verdict.needsDetail &&
-      cached &&
-      !state.needsRecheck(store, listing) &&
-      (cached.status !== 'match' || state.wasAnnounced(store, listing.id));
-
-    if (canReuse) {
-      reusedVerdicts += 1;
-      verdict =
-        cached.status === 'match'
-          ? { ...verdict, matched: true, needsDetail: false, reasons: [] }
-          : { ...verdict, matched: false, needsDetail: false, reasons: cached.reasons ?? verdict.reasons };
-    } else if (verdict.needsDetail) {
-      let detail = null;
+    if (wantsDetail) {
       try {
-        detail = await fetchListingDetail(listing.id);
+        detail = await fetchListingDetail(search, listing.id);
         detailFetches += 1;
       } catch (error) {
         console.warn(`  could not read listing ${listing.id}: ${error.message}`);
       }
-
       if (detail) {
         detailChecked = true;
-        verdict = evaluate(listing, detail);
-        if (detail.sold) {
-          verdict = { ...verdict, matched: false, reasons: [...verdict.reasons, 'no longer for sale'] };
+        for (const filter of filters) {
+          if (!verdicts.get(filter.id).needsDetail) continue;
+          let verdict = evaluate(listing, detail, filter);
+          if (detail.sold) {
+            verdict = {
+              ...verdict,
+              matched: false,
+              reasons: [...verdict.reasons, 'no longer for sale'],
+            };
+          }
+          verdicts.set(filter.id, verdict);
         }
       }
     }
 
-    if (verdict.matched) matches.push({ listing, verdict });
-    else rejected.push({ listing, verdict });
-
-    state.record(store, listing, verdict, { detailChecked });
-  }
-
-  if (verbose) {
-    const nearMisses = rejected.filter(
-      ({ verdict }) =>
-        verdict.reasons.length <= 2 &&
-        verdict.reasons.every((reason) => /package|Pilot Lite/.test(reason)),
-    );
-    if (nearMisses.length) {
-      console.log(`\nNear misses (${nearMisses.length}) - in spec but packages unproven:`);
-      for (const { listing, verdict } of nearMisses) {
-        console.log(`  ${formatListing(listing)}`);
-        console.log(`      ${verdict.reasons.join('; ')}`);
-      }
+    for (const filter of filters) {
+      const verdict = verdicts.get(filter.id);
+      const bucket = verdict.matched ? matches : rejected;
+      bucket.get(filter.id).push({ listing, verdict, filter });
+      state.record(store, listing, filter.id, verdict, { detailChecked });
     }
   }
 
   return { matches, rejected, detailFetches, reusedVerdicts };
+}
+
+/** In spec on the numbers, held back only by something unprovable. */
+function nearMisses(rejectedForFilter) {
+  return rejectedForFilter.filter(
+    ({ verdict }) =>
+      verdict.reasons.length <= 2 &&
+      verdict.reasons.every((reason) => /package|does not say|no mention of/.test(reason)),
+  );
 }
 
 /** Rebuild enough of a listing from the state record to make a car entry. */
@@ -200,11 +235,10 @@ async function pickUpReactions(listings, store, { dryRun }) {
   console.log(`Scanned ${scanned} Discord message(s); ${reacted.size} reacted listing(s).`);
   if (reacted.size === 0) return;
 
-  const live = new Map(listings.map((listing) => [listing.id, listing]));
   const wanted = [];
   for (const id of reacted.keys()) {
     if (!state.needsTcoAdd(store, id)) continue;
-    const listing = live.get(id) ?? listingFromRecord(id, store.listings[id]);
+    const listing = listings.get(id) ?? listingFromRecord(id, store.listings[id]);
     if (listing) wanted.push(listing);
     else console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
   }
@@ -246,52 +280,143 @@ async function main() {
     return 2;
   }
 
-  console.log(`Looking for: ${describeSpec()}`);
+  const { filters: allFilters, source } = await loadFilters({ source: args.filterSource });
+  const wanted = args.only
+    ? allFilters.filter(
+        (filter) =>
+          filter.id === args.only ||
+          filter.name.toLowerCase().includes(args.only.toLowerCase()),
+      )
+    : allFilters;
+  const filters = wanted.filter((filter) => filter.enabled);
+
+  const disabled = wanted.length - filters.length;
+  console.log(
+    `${allFilters.length} filter(s) from the ${source}` +
+      (args.only ? `, ${wanted.length} matching --only=${args.only}` : '') +
+      (disabled ? `, ${disabled} disabled` : '') +
+      ':',
+  );
+  for (const filter of filters) console.log(`  ${filter.name}: ${describeFilter(filter)}`);
+  if (filters.length === 0) {
+    console.log('Nothing to do.');
+    return 0;
+  }
 
   const store = args.list ? { ...(await state.loadState()) } : await state.loadState();
   const firstRun = store.isNew;
   if (firstRun && !args.list) {
-    console.log('No state file yet - this run records what is on sale and posts nothing.');
+    console.log('\nNo state file yet - this run records what is on sale and posts nothing.');
+  }
+  if (store.migrated) {
+    console.log(
+      '\nState file upgraded to per-filter records. Listings already posted stay posted; ' +
+        'verdicts are re-derived, so this run reads a few more listing pages than usual.',
+    );
   }
 
-  console.log('\nFetching search results...');
-  const { listings, total } = await fetchAllListings({
-    onProgress: ({ page, lastPage, fresh }) =>
-      console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
-  });
-  console.log(`Read ${listings.length} listings (site reports ${total ?? '?'}).`);
+  const groups = groupBySearch(filters);
+  const everyListing = new Map();
+  const perFilter = new Map();
+  let detailFetches = 0;
+  let reusedVerdicts = 0;
 
-  console.log('\nEvaluating...');
-  const { matches, detailFetches, reusedVerdicts } = await collectMatches(listings, store, {
-    verbose: args.verbose,
-  });
+  for (const group of groups) {
+    console.log(`\nFetching ${group.key} search results...`);
+    const { listings, total } = await fetchAllListings(group.search, {
+      onProgress: ({ page, lastPage, fresh }) =>
+        console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
+    });
+    console.log(`Read ${listings.length} listings (site reports ${total ?? '?'}).`);
+    for (const listing of listings) everyListing.set(listing.id, listing);
+
+    const result = await collectMatches(group.search, listings, group.filters, store);
+    detailFetches += result.detailFetches;
+    reusedVerdicts += result.reusedVerdicts;
+
+    for (const filter of group.filters) {
+      perFilter.set(filter.id, {
+        filter,
+        matches: result.matches.get(filter.id),
+        rejected: result.rejected.get(filter.id),
+      });
+    }
+  }
+
+  const totalMatches = [...perFilter.values()].reduce((sum, entry) => sum + entry.matches.length, 0);
   console.log(
-    `${matches.length} listing(s) meet the spec ` +
+    `\n${totalMatches} match(es) across ${filters.length} filter(s) ` +
       `(${detailFetches} detail page(s) fetched, ${reusedVerdicts} cached verdict(s) reused).`,
   );
 
+  if (args.verbose) {
+    for (const { filter, rejected } of perFilter.values()) {
+      const near = nearMisses(rejected);
+      if (!near.length) continue;
+      console.log(`\n${filter.name} - near misses (${near.length}), in spec but unproven:`);
+      for (const { listing, verdict } of near) {
+        console.log(`  ${formatListing(listing)}`);
+        console.log(`      ${verdict.reasons.join('; ')}`);
+      }
+    }
+  }
+
   if (args.list) {
-    console.log('');
-    for (const { listing } of matches.sort((a, b) => (a.listing.price ?? 0) - (b.listing.price ?? 0))) {
-      console.log(formatListing(listing));
+    for (const { filter, matches } of perFilter.values()) {
+      console.log(`\n${filter.name} (${matches.length}):`);
+      const sorted = [...matches].sort(
+        (a, b) => (a.listing.price ?? Infinity) - (b.listing.price ?? Infinity),
+      );
+      for (const { listing } of sorted) console.log(`  ${formatListing(listing)}`);
     }
     return 0;
   }
 
   if (config.tco.pickUpReactions) {
     console.log('\nChecking Discord reactions...');
-    await pickUpReactions(listings, store, { dryRun: args.dryRun });
+    await pickUpReactions(everyListing, store, { dryRun: args.dryRun });
   }
 
-  // Anything matching that we have never announced. On a first or seeded run
-  // these are recorded as announced without posting, so the channel starts
-  // quiet and only genuinely new listings show up later.
-  const unannounced = matches.filter(({ listing }) => !state.wasAnnounced(store, listing.id));
-  const silent = firstRun || args.seed;
+  // Anything matching that this filter has never announced. On a first or
+  // seeded run - or for a new filter that asked to start quiet - these are
+  // recorded as announced without posting, so the channel stays calm and only
+  // genuinely new listings show up later.
+  const pending = [];
+  for (const { filter, matches } of perFilter.values()) {
+    const unannounced = matches.filter(
+      ({ listing }) => !state.wasAnnounced(store, listing.id, filter.id),
+    );
+    const brandNew = state.isNewFilter(store, filter.id);
+    const silent = firstRun || args.seed || (brandNew && !filter.postExisting);
+
+    if (silent) {
+      for (const { listing } of unannounced) state.markAnnounced(store, listing.id, filter.id);
+      if (unannounced.length) {
+        console.log(
+          `\n${filter.name}: ${args.dryRun ? 'would record' : 'recorded'} ` +
+            `${unannounced.length} match(es) as already-seen. Nothing posted.`,
+        );
+      }
+      continue;
+    }
+
+    if (brandNew && unannounced.length) {
+      console.log(
+        `\n${filter.name} is new: posting the ${unannounced.length} car(s) it found ` +
+          'that are already on sale.',
+      );
+    }
+    pending.push(
+      unannounced.sort((a, b) => (a.listing.price ?? Infinity) - (b.listing.price ?? Infinity)),
+    );
+  }
+
+  const waiting = pending.reduce((sum, items) => sum + items.length, 0);
 
   // A dry run must leave no trace, so the next real run behaves exactly as it
   // would have without it - including seeding, if that has not happened yet.
   const persist = async (extra = {}) => {
+    for (const filter of filters) state.recordFilterRun(store, filter);
     if (args.dryRun) {
       console.log('  (dry run: state file not written)');
       return;
@@ -300,54 +425,98 @@ async function main() {
     await state.saveState({ ...store, runs: (store.runs ?? 0) + 1, ...extra });
   };
 
-  if (silent) {
-    for (const { listing } of unannounced) state.markAnnounced(store, listing.id);
-    console.log(
-      `\n${args.dryRun ? 'Would record' : 'Recorded'} ${unannounced.length} match(es) ` +
-        'as already-seen. Nothing posted.',
-    );
+  if (firstRun || args.seed) {
     await persist({ seeded: true, seededAt: new Date().toISOString() });
-    console.log('The next run will post anything that appears from now on.');
+    console.log('\nThe next run will post anything that appears from now on.');
     return 0;
   }
 
-  if (unannounced.length === 0) {
+  if (waiting === 0) {
     await persist();
-    // Two different populations, so name them separately: `matches` is what is
-    // on sale right now, while the record also remembers listings since sold.
+    // Two different populations, so name them separately: the matches are what
+    // is on sale right now, while the record also remembers listings since
+    // sold.
     const stats = state.summarise(store);
     console.log(
-      `\nNothing new. ${matches.length} match(es) currently on sale; ` +
+      `\nNothing new. ${totalMatches} match(es) currently on sale; ` +
         `remembering ${stats.tracked} listing(s).`,
     );
     return 0;
   }
 
-  const toPost = unannounced
-    .sort((a, b) => (a.listing.price ?? Infinity) - (b.listing.price ?? Infinity))
-    .slice(0, config.discord.maxPostsPerRun);
+  // The cap counts across every filter: it exists to stop a parser regression
+  // or a brand new, very broad filter from flooding the channel. Filters take
+  // turns filling it, cheapest first, so one filter with a long backlog cannot
+  // starve the others out of the run - everyone gets a share now, and the rest
+  // follows next run.
+  //
+  // A car matching two filters is posted once, not twice: a broad filter and a
+  // narrow one over the same model are a normal thing to have, and seeing the
+  // same advert twice in the channel would be noise. The other filters that
+  // wanted it are marked as having announced it, because they have - it is in
+  // the channel - and the run log names them.
+  const cap = config.discord.maxPostsPerRun;
+  const byFilter = new Map();
+  const alsoMatched = new Map();
+  const queuedIds = new Map();
+  let queued = 0;
+  let deduped = 0;
 
-  if (toPost.length < unannounced.length) {
+  for (let round = 0; queued < cap && pending.some((items) => items.length > round); round += 1) {
+    for (const items of pending) {
+      if (queued >= cap) break;
+      const item = items[round];
+      if (!item) continue;
+
+      const alreadyQueued = queuedIds.get(item.listing.id);
+      if (alreadyQueued) {
+        alsoMatched.get(alreadyQueued).push(item.filter);
+        deduped += 1;
+        continue;
+      }
+
+      const bucket = byFilter.get(item.filter.id);
+      if (bucket) bucket.push(item);
+      else byFilter.set(item.filter.id, [item]);
+      queuedIds.set(item.listing.id, item);
+      alsoMatched.set(item, []);
+      queued += 1;
+    }
+  }
+
+  if (queued + deduped < waiting) {
     console.warn(
-      `\nHolding back ${unannounced.length - toPost.length} listing(s): over the ` +
-        `${config.discord.maxPostsPerRun}-per-run cap. They will be posted next run.`,
+      `\nHolding back ${waiting - queued - deduped} listing(s): over the ` +
+        `${cap}-per-run cap. They will be posted next run.`,
     );
   }
 
-  console.log(`\nPosting ${toPost.length} new listing(s) to Discord...`);
-  const { announced, batches } = await announce(toPost, { dryRun: args.dryRun });
+  console.log(`\nPosting ${queued} new listing(s) to Discord...`);
+  let posted = 0;
+  let batches = 0;
+  for (const items of byFilter.values()) {
+    const { filter } = items[0];
+    const result = await announce(filter, items, { dryRun: args.dryRun });
+    batches += result.batches;
+    posted += result.announced.length;
+    const accepted = new Set(result.announced);
 
-  if (!args.dryRun) {
-    for (const id of announced) state.markAnnounced(store, id);
+    for (const item of items) {
+      const shared = alsoMatched.get(item) ?? [];
+      const names = [filter.name, ...shared.map((other) => other.name)].join(' + ');
+      console.log(`  ${names}  ${formatListing(item.listing)}`);
+      if (args.dryRun || !accepted.has(item.listing.id)) continue;
+      state.markAnnounced(store, item.listing.id, filter.id);
+      for (const other of shared) state.markAnnounced(store, item.listing.id, other.id);
+    }
   }
   await persist();
 
   console.log(
     args.dryRun
-      ? `Dry run: ${announced.length} listing(s) would have been posted in ${batches} message(s).`
-      : `Posted ${announced.length} listing(s) in ${batches} message(s).`,
+      ? `Dry run: ${posted} listing(s) would have been posted in ${batches} message(s).`
+      : `Posted ${posted} listing(s) in ${batches} message(s).`,
   );
-  for (const { listing } of toPost) console.log(`  ${formatListing(listing)}`);
 
   return 0;
 }

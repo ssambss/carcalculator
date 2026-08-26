@@ -4,6 +4,12 @@
 // first run while still remembering everything it found. The file is the only
 // thing that makes runs stateful, so it is written atomically - a half-written
 // state file would either replay old listings or lose new ones.
+//
+// Everything about a listing that a filter decides - the verdict, the reasons,
+// whether it was posted - is stored per filter, because two filters can
+// legitimately disagree about the same car. The listing's own facts (price,
+// mileage, when its page was last read) are shared: they are properties of the
+// advert, not of anyone's opinion of it.
 
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -14,7 +20,19 @@ import config from './config.js';
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_STATE_PATH = resolve(HERE, '..', 'data', 'seen.json');
 
-const VERSION = 1;
+const VERSION = 2;
+
+/**
+ * Where a version 1 record's verdict is filed on migration.
+ *
+ * Version 1 predates filters: there was one hardcoded spec, so its
+ * announcements cannot be attributed to any filter id in particular. They land
+ * under this key, and `wasAnnounced` honours it for every filter - so nothing
+ * the old single-spec watcher already posted is ever posted again, whatever
+ * the filters are called now. Its *verdicts* are not reused, since we no
+ * longer know which spec produced them.
+ */
+const LEGACY_KEY = '(pre-filters)';
 
 function emptyState() {
   return {
@@ -24,9 +42,28 @@ function emptyState() {
     updatedAt: null,
     runs: 0,
     listings: {},
+    // Filter id -> { name, firstRunAt, lastRunAt }. Knowing a filter has run
+    // before is what makes "post what is already on sale" a one-off.
+    filters: {},
     // Reaction pickups: listing id -> { addedAt, confirmedAt }. See recordTcoAdd.
     tco: {},
   };
+}
+
+/** Fold a version 1 record into the per-filter shape. */
+function migrateFrom1(parsed) {
+  const listings = {};
+  for (const [id, entry] of Object.entries(parsed.listings ?? {})) {
+    // `reasons` is dropped: it explained a spec no filter can claim now.
+    const { status, reasons: _reasons, announcedAt, ...shared } = entry;
+    listings[id] = {
+      ...shared,
+      filters: announcedAt
+        ? { [LEGACY_KEY]: { status: status ?? 'match', reasons: [], announcedAt } }
+        : {},
+    };
+  }
+  return { ...parsed, version: VERSION, listings, filters: {} };
 }
 
 /** Read the state file, or return a fresh empty state if there isn't one. */
@@ -49,6 +86,12 @@ export async function loadState(path = DEFAULT_STATE_PATH) {
     );
   }
 
+  let migrated = false;
+  if (parsed.version === 1) {
+    parsed = migrateFrom1(parsed);
+    migrated = true;
+  }
+
   if (parsed.version !== VERSION) {
     throw new Error(`State file ${path} has version ${parsed.version}, expected ${VERSION}.`);
   }
@@ -57,16 +100,19 @@ export async function loadState(path = DEFAULT_STATE_PATH) {
     ...emptyState(),
     ...parsed,
     listings: parsed.listings ?? {},
+    filters: parsed.filters ?? {},
     tco: parsed.tco ?? {},
     isNew: false,
+    migrated,
   };
 }
 
 /** Write the state file atomically: full write to a temp file, then rename. */
 export async function saveState(state, path = DEFAULT_STATE_PATH) {
   const persisted = { ...state };
-  // `isNew` is a signal to this run, not part of the record.
+  // Signals to this run, not part of the record.
   delete persisted.isNew;
+  delete persisted.migrated;
   persisted.version = VERSION;
   persisted.updatedAt = new Date().toISOString();
 
@@ -81,8 +127,21 @@ export function hasSeen(state, id) {
   return Object.hasOwn(state.listings, id);
 }
 
-export function wasAnnounced(state, id) {
-  return Boolean(state.listings[id]?.announcedAt);
+/** What a filter decided about a listing last time, if it ever did. */
+export function verdictFor(state, id, filterId) {
+  return state.listings[id]?.filters?.[filterId] ?? null;
+}
+
+/**
+ * Has this listing been posted for this filter?
+ *
+ * True also when the pre-filters watcher posted it: the point of the record is
+ * that a human has already seen the car in the channel, and renaming or
+ * rebuilding the filter it came from does not undo that.
+ */
+export function wasAnnounced(state, id, filterId) {
+  const filters = state.listings[id]?.filters ?? {};
+  return Boolean(filters[filterId]?.announcedAt || filters[LEGACY_KEY]?.announcedAt);
 }
 
 /**
@@ -90,11 +149,14 @@ export function wasAnnounced(state, id) {
  *
  * Yes if the price or mileage moved (the seller has been editing, so the
  * description may have changed too) or if the cached verdict has gone stale.
+ * The detail page is shared by every filter, so its age is too.
  */
-export function needsRecheck(state, listing, { recheckAfterDays = 14 } = {}) {
+export function needsRecheck(state, listing, filterId, { recheckAfterDays = 14 } = {}) {
   const record = state.listings[listing.id];
   if (!record) return true;
-  if (record.status === 'match') return false;
+  const verdict = record.filters?.[filterId];
+  if (!verdict) return true;
+  if (verdict.status === 'match') return false;
   if (!record.detailCheckedAt) return true;
   if (record.price !== null && listing.price !== null && record.price !== listing.price) return true;
   if (record.mileage !== null && listing.mileage !== null && record.mileage !== listing.mileage) {
@@ -104,21 +166,14 @@ export function needsRecheck(state, listing, { recheckAfterDays = 14 } = {}) {
   return !Number.isFinite(ageMs) || ageMs > recheckAfterDays * 24 * 60 * 60 * 1000;
 }
 
-/**
- * Record what we learned about a listing.
- *
- * `firstSeenAt` and `announcedAt` are never overwritten once set, so a listing
- * that resurfaces is not treated as new.
- */
-export function record(state, listing, verdict, { detailChecked = false, now = new Date() } = {}) {
+/** Note that the listing is still on sale, and what its advert says now. */
+export function touch(state, listing, { detailChecked = false, now = new Date() } = {}) {
   const timestamp = now.toISOString();
   const existing = state.listings[listing.id];
 
   state.listings[listing.id] = {
-    status: verdict.matched ? 'match' : 'rejected',
     firstSeenAt: existing?.firstSeenAt ?? timestamp,
     lastSeenAt: timestamp,
-    announcedAt: existing?.announcedAt ?? null,
     detailCheckedAt: detailChecked ? timestamp : (existing?.detailCheckedAt ?? null),
     url: listing.url,
     title: listing.subTitle || listing.title,
@@ -126,33 +181,88 @@ export function record(state, listing, verdict, { detailChecked = false, now = n
     mileage: listing.mileage,
     price: listing.price,
     seller: listing.seller,
-    reasons: verdict.matched ? [] : verdict.reasons,
+    filters: existing?.filters ?? {},
   };
 
   return state.listings[listing.id];
 }
 
-export function markAnnounced(state, id, now = new Date()) {
-  const entry = state.listings[id];
-  if (entry) entry.announcedAt = now.toISOString();
+/**
+ * Record what one filter learned about a listing.
+ *
+ * `announcedAt` is never overwritten once set, so a listing that resurfaces is
+ * not treated as new.
+ */
+export function record(state, listing, filterId, verdict, options = {}) {
+  const entry = touch(state, listing, options);
+  const existing = entry.filters[filterId];
+
+  entry.filters[filterId] = {
+    status: verdict.matched ? 'match' : 'rejected',
+    reasons: verdict.matched ? [] : verdict.reasons,
+    announcedAt: existing?.announcedAt ?? null,
+  };
+
+  return entry.filters[filterId];
+}
+
+export function markAnnounced(state, id, filterId, now = new Date()) {
+  const verdict = state.listings[id]?.filters?.[filterId];
+  if (verdict) verdict.announcedAt = verdict.announcedAt ?? now.toISOString();
+}
+
+/** Has this filter ever completed a run? */
+export function isNewFilter(state, filterId) {
+  return !state.filters[filterId]?.firstRunAt;
+}
+
+export function recordFilterRun(state, filter, now = new Date()) {
+  const timestamp = now.toISOString();
+  const entry = state.filters[filter.id] ?? (state.filters[filter.id] = { firstRunAt: null });
+  entry.name = filter.name;
+  entry.firstRunAt = entry.firstRunAt ?? timestamp;
+  entry.lastRunAt = timestamp;
+  return entry;
 }
 
 /**
- * Drop listings we haven't seen for a long time.
+ * Drop listings we haven't seen for a long time, and filters that stopped
+ * running long ago.
  *
  * Keeps the file from growing without bound, and means a car genuinely
  * relisted months later is treated as news again rather than silently skipped.
+ *
+ * Filters are aged out rather than diffed against the filters of this run on
+ * purpose: the filter list can come from the gist, and a token hiccup that
+ * made it unreadable for one run must not throw away what has been announced.
+ * A filter deleted in the UI simply stops being stamped and goes after the
+ * same 90 days.
  */
 export function prune(state, { forgetAfterDays = config.state.forgetAfterDays, now = Date.now() } = {}) {
   const cutoff = now - forgetAfterDays * 24 * 60 * 60 * 1000;
   let removed = 0;
+
+  const gone = new Set();
+  for (const [filterId, entry] of Object.entries(state.filters)) {
+    const lastRun = Date.parse(entry.lastRunAt ?? entry.firstRunAt ?? '');
+    if (Number.isFinite(lastRun) && lastRun < cutoff) {
+      delete state.filters[filterId];
+      gone.add(filterId);
+    }
+  }
+
   for (const [id, entry] of Object.entries(state.listings)) {
     const lastSeen = Date.parse(entry.lastSeenAt ?? '');
     if (Number.isFinite(lastSeen) && lastSeen < cutoff) {
       delete state.listings[id];
       removed += 1;
+      continue;
     }
+    // The legacy key belongs to no filter and outlives all of them, or cars
+    // from before per-filter tracking would be announced a second time.
+    for (const filterId of gone) delete entry.filters?.[filterId];
   }
+
   return removed;
 }
 
@@ -183,11 +293,25 @@ export function recordTcoConfirmed(state, id, now = new Date()) {
   entry.confirmedAt = entry.confirmedAt ?? now.toISOString();
 }
 
-export function summarise(state) {
+/** Counts for the run summary; per filter when asked for one. */
+export function summarise(state, filterId = null) {
   const entries = Object.values(state.listings);
+  const verdicts = entries
+    .map((entry) => (filterId ? entry.filters?.[filterId] : null))
+    .filter(Boolean);
+
+  if (filterId) {
+    return {
+      tracked: verdicts.length,
+      matches: verdicts.filter((verdict) => verdict.status === 'match').length,
+      announced: verdicts.filter((verdict) => verdict.announcedAt).length,
+    };
+  }
+
+  const all = entries.flatMap((entry) => Object.values(entry.filters ?? {}));
   return {
     tracked: entries.length,
-    matches: entries.filter((entry) => entry.status === 'match').length,
-    announced: entries.filter((entry) => entry.announcedAt).length,
+    matches: all.filter((verdict) => verdict.status === 'match').length,
+    announced: all.filter((verdict) => verdict.announcedAt).length,
   };
 }

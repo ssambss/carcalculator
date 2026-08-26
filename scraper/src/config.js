@@ -1,40 +1,23 @@
-// Search criteria and runtime knobs for the nettiauto watcher.
+// Runtime knobs for the nettiauto watcher.
 //
-// `search` picks which listing pages to read; `require` is the actual spec and
-// is checked locally against every listing. All the filtering lives locally on
-// purpose - nettiauto has no server-side filter for battery, drivetrain or
-// option packages, and its year/mileage filters break pagination when combined
-// with `page` (see the note on buildSearchUrl in nettiauto.js).
+// What to look for is no longer in here: that is a list of filters, created in
+// the calculator's UI and read from the app's gist, with scraper/filters.json
+// as the committed fallback. See src/filters.js.
+//
+// All the matching happens locally on purpose - nettiauto has no server-side
+// filter for battery, drivetrain or option packages, and its year/mileage
+// filters break pagination when combined with `page` (see the note on
+// buildSearchUrl in nettiauto.js).
 
 export const config = {
-  search: {
-    // Nettiauto's pretty listing path: /<make>/<model>
-    make: 'polestar',
-    model: '2',
-  },
-
-  require: {
-    yearFrom: 2021,
-    yearTo: 2023,
-    maxMileage: 120000,
-
-    battery: 'long-range',
-    drivetrain: 'dual-motor',
-    packages: ['pilot', 'plus'],
-
-    // Every Polestar 2 Dual Motor is a Long Range car — there was never a
-    // Standard Range dual motor. So an explicit "Dual Motor" is accepted as
-    // proof of Long Range when the listing doesn't spell the battery out.
-    dualMotorImpliesLongRange: true,
-
-    // Nettiauto reports AWD as "Neliveto". On a Polestar 2 that only ships
-    // with the dual motor powertrain, so it counts as drivetrain evidence.
-    awdImpliesDualMotor: true,
-
-    // Option packages live in seller free text only. "strong" demands the
-    // package word sit next to a paketti/pack/varuste word (or appear in a
-    // "Pilot- ja Plus-paketit" style pairing); "weak" accepts a bare mention.
-    packageEvidence: 'strong',
+  filters: {
+    // 'auto' tries the gist and falls back to the file; 'gist' or 'file'
+    // pins it to one. --filters=<source> overrides this for a single run.
+    source: 'auto',
+    // Committed default, relative to the scraper folder.
+    file: 'filters.json',
+    // Where the app syncs the filters it creates, inside the data gist.
+    gistFilename: 'car-tco-filters.json',
   },
 
   fetch: {
@@ -61,6 +44,9 @@ export const config = {
     // a whole message, so batching would make "react to add this one"
     // ambiguous. See tco.pickUpReactions.
     embedsPerMessage: 1,
+    // Anti-spam cap, counted across every filter in a run. A brand new filter
+    // usually has a backlog of cars already on sale; the overflow waits for
+    // the next run rather than arriving as a wall of messages.
     // Guard against a parser regression spamming the channel.
     maxPostsPerRun: 20,
   },
@@ -79,14 +65,16 @@ export const config = {
     // How far back through the channel to look for reactions, in messages.
     scanMessages: 300,
 
-    // What an added car looks like before you refine it in the app. Only the
-    // price and odometer come from the listing; everything below is an
+    // What an added car looks like before you refine it in the app. The price,
+    // odometer and powertrain come from the listing; everything below is an
     // assumption, so it all lives here where it is easy to change.
     carDefaults: {
+      // Fallback only - the listing's own fuel type decides when it says.
       powertrain: 'ev',
-      // Above the WLTP figure on purpose - roughly what a Polestar 2 uses in
-      // mixed Finnish driving.
+      // Above the WLTP figure on purpose - roughly what a mid-size EV uses in
+      // mixed Finnish driving. Same idea for the l/100 km of a combustion car.
       elecKwhPer100: 20,
+      fuelLPer100: 6.5,
       // Let the app estimate resale from age and mileage.
       autoResale: true,
       // A common baseline so candidates are comparable before you have a real

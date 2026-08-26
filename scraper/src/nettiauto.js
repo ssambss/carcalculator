@@ -7,7 +7,7 @@ import { decodeEntities, htmlToText, oneLine, parseInteger, pick } from './html.
 const ORIGIN = 'https://www.nettiauto.com';
 
 /**
- * Build a search results URL.
+ * Build a search results URL for one `{ make, model }` search.
  *
  * Deliberately unfiltered. Nettiauto does accept yearFrom/yearTo/kilometersTo
  * on this path, but combining them with `page` breaks pagination: every page
@@ -19,15 +19,13 @@ const ORIGIN = 'https://www.nettiauto.com';
  * locally in filter.js, which is also where the checks nettiauto has no filter
  * for (battery, drivetrain, option packages) have to happen anyway.
  */
-export function buildSearchUrl(page = 1) {
-  const { make, model } = config.search;
+export function buildSearchUrl(search, page = 1) {
   const suffix = page > 1 ? `?page=${page}` : '';
-  return `${ORIGIN}/${make}/${model}${suffix}`;
+  return `${ORIGIN}/${search.make}/${search.model}${suffix}`;
 }
 
-export function buildListingUrl(id) {
-  const { make, model } = config.search;
-  return `${ORIGIN}/${make}/${model}/${id}`;
+export function buildListingUrl(search, id) {
+  return `${ORIGIN}/${search.make}/${search.model}/${id}`;
 }
 
 /** Total number of results the search reports, or null if not found. */
@@ -127,7 +125,7 @@ function parseItemList(html) {
  * with the numeric facts already typed, which is far steadier to read than the
  * surrounding presentation markup.
  */
-function parseCards(html) {
+function parseCards(html, search) {
   const matches = [...html.matchAll(/data-datalayer="(\{[\s\S]*?\})"/g)];
   const cards = [];
 
@@ -161,7 +159,7 @@ function parseCards(html) {
 
     cards.push({
       id: String(data.item_id),
-      url: buildListingUrl(data.item_id),
+      url: buildListingUrl(search, data.item_id),
       title: data.item_name ? String(data.item_name) : '',
       subTitle,
       specs,
@@ -183,8 +181,8 @@ function parseCards(html) {
 }
 
 /** Parse one search results page into listings plus pagination info. */
-export function parseSearchPage(html) {
-  const cards = parseCards(html);
+export function parseSearchPage(html, search) {
+  const cards = parseCards(html, search);
   const extras = parseItemList(html);
   const listings = cards.map((card) => {
     const extra = extras.get(card.id) ?? {};
@@ -208,7 +206,7 @@ export function parseSearchPage(html) {
  * Walk every page of the search. Stops on an empty page, on a page that adds
  * no new ids (a guard against a pager that clamps), or at maxSearchPages.
  */
-export async function fetchAllListings({ onProgress } = {}) {
+export async function fetchAllListings(search, { onProgress } = {}) {
   const { maxSearchPages } = config.fetch;
   const listings = [];
   const seenIds = new Set();
@@ -217,10 +215,12 @@ export async function fetchAllListings({ onProgress } = {}) {
   let total = null;
 
   while (page <= maxSearchPages) {
-    const html = await fetchText(buildSearchUrl(page), { label: `search page ${page}` });
+    const html = await fetchText(buildSearchUrl(search, page), {
+      label: `${search.make}/${search.model} search page ${page}`,
+    });
     if (!html) break;
 
-    const parsed = parseSearchPage(html);
+    const parsed = parseSearchPage(html, search);
     if (page === 1) {
       total = parsed.total;
       lastPage = Math.min(parsed.lastPage, maxSearchPages);
@@ -292,8 +292,8 @@ export function parseDetailPage(html) {
  * canonical variant name and the seller's full description, which is the only
  * place option packages are ever named.
  */
-export async function fetchListingDetail(id) {
-  const html = await fetchText(buildListingUrl(id), { label: `listing ${id}` });
+export async function fetchListingDetail(search, id) {
+  const html = await fetchText(buildListingUrl(search, id), { label: `listing ${id}` });
   if (!html) return null;
   return parseDetailPage(html);
 }

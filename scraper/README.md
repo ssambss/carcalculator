@@ -1,20 +1,75 @@
 # Nettiauto watch
 
-Watches [nettiauto.com](https://www.nettiauto.com) for used cars matching a
-spec and posts new listings to a Discord channel. Runs as a standalone Node
+Watches [nettiauto.com](https://www.nettiauto.com) for used cars matching your
+filters and posts new listings to a Discord channel. Runs as a standalone Node
 script — it shares no code, build step or dependency with the TCO calculator in
 the repo root, and the Vite build never sees this folder.
 
-Current spec (in [src/config.js](src/config.js)):
+A **filter** is one saved search: which listing page to read, plus the spec
+every car on it is checked against. There can be any number of them, and
+filters over the same make and model share a single crawl.
+
+## Where the filters come from
+
+Make them in the calculator (funnel button in the header). They sync to
+`car-tco-filters.json` in the same secret gist the app already uses, and the
+watcher reads them there on every run — so a filter created on a phone is live
+within the half hour, with no commit and no deploy.
+
+Resolution order, first source with at least one filter wins:
+
+| | Source | Needs |
+|---|---|---|
+| 1 | `car-tco-filters.json` in the app's gist | `GIST_TOKEN` |
+| 2 | [filters.json](filters.json) in this folder | nothing — it is committed |
+
+`filters.json` is the fallback and the local default. It holds the spec this
+watcher was built for:
 
 | | |
 |---|---|
 | Car | Polestar 2 |
 | Year | 2021–2023 |
 | Odometer | max 120 000 km |
-| Battery | Long Range |
-| Drivetrain | Dual Motor |
+| Variant | says Long Range **and** Dual Motor |
+| Never | Standard Range, Single Motor |
 | Packages | Pilot **and** Plus |
+
+Pin a run to one source with `--filters=gist` or `--filters=file` — the latter
+is the one to use when trying a filter out locally, since it never touches the
+network for its config.
+
+## What a filter can ask for
+
+Everything except make and model is optional; a filter with no requirements
+matches the whole model's listing, which is what you want when scouting a car
+you have no fixed spec for.
+
+| Field | Checked against |
+|---|---|
+| `make`, `model` | the URL path: `/polestar/2` |
+| `yearFrom`, `yearTo`, `maxMileage`, `minPrice`, `maxPrice` | typed facts from the result card |
+| `variantMust`, `variantMustNot` | the variant name and the spec chips — short, structured text |
+| `textMust`, `textMustNot` | everything, the seller's own description included |
+| `packages` + `packageEvidence` | free text, but only where it reads as a package (see below) |
+| `implications` | "seeing A proves B", for facts a seller left implicit |
+| `postExisting` | whether its first run reports the cars already on sale |
+| `enabled` | pausing keeps the filter and its history |
+
+Phrases are matched on whitespace-flattened tokens, so `long range` finds
+`Long-Range`, `LONG RANGE / 78kWh` and `long/range` alike. The last word of a
+phrase may match the start of a longer token when it is at least five
+characters — Finnish glues words together, so `lasikatto` has to find
+`lasikattoluukku` — while shorter words are matched exactly, or `acc` would hit
+something in every advert.
+
+`implications` are what keep the spec honest without teaching the matcher every
+model's range. On a Polestar 2, `Neliveto` (AWD) proves Dual Motor, and Dual
+Motor was only ever sold as Long Range — so a `Launch Edition` advert naming
+neither battery nor drivetrain still matches, correctly, and the Discord post
+says which facts were inferred. Rules chain, and they read the variant name and
+spec chips only: a seller comparing their car to another one in the description
+cannot accidentally prove anything.
 
 ## Quick start
 
@@ -23,6 +78,8 @@ cd scraper
 cp .env.example .env          # then paste your Discord webhook URL into it
 npm run dry-run               # full check, posts nothing, saves nothing
 npm start                     # the real thing
+
+node src/index.js --list --filters=file   # what the committed filter matches
 ```
 
 There is nothing to install — no dependencies, Node 20+ only.
@@ -30,19 +87,39 @@ There is nothing to install — no dependencies, Node 20+ only.
 ## How announcing works
 
 The first run has no state file, so it **records every current match and posts
-nothing**. Without that, the channel would fill up with every Polestar 2
-already on the market. From then on, only listings that were not in the record
-get posted, and each is posted exactly once.
+nothing**. Without that, the channel would fill up with every car already on
+the market. From then on, only listings that were not in the record get posted,
+and each is posted exactly once *per filter*.
 
 The record lives in [data/seen.json](data/) and is the only thing that makes
 runs stateful. Delete it and the next run re-seeds silently.
 
+- Verdicts, reasons and posts are stored **per filter**, because two filters
+  can legitimately disagree about the same car. The listing's own facts (price,
+  odometer, when its page was last read) are shared — they belong to the
+  advert, not to anyone's opinion of it.
+- **A filter added later posts the cars already on sale**, once. That is the
+  point of adding one: you want to see the market. Turn it off per filter
+  (*Post the cars already on sale* in the editor's Advanced section) to have it
+  start quiet and report only what appears afterwards.
+- **A car matching two filters is posted once**, not twice — a broad filter and
+  a narrow one over the same model are a normal pair to have. The run log names
+  every filter that wanted it, and all of them count it as announced, because
+  it is in the channel.
 - A listing is only marked as announced *after* Discord accepts the message, so
   a failed post is retried next run rather than lost.
 - Listings not seen for 90 days are forgotten, so a car genuinely relisted
-  months later counts as news again.
-- `maxPostsPerRun` (default 20) caps how much a single run can post, so a
-  parsing regression can't spam the channel. The overflow goes out next run.
+  months later counts as news again. A filter that has not run for 90 days is
+  forgotten too, along with its verdicts — filters are aged out rather than
+  diffed against the current list, so a gist hiccup that hides them for one run
+  cannot throw away what has been posted.
+- `maxPostsPerRun` (default 20) caps how much a single run can post *across all
+  filters*, so neither a parsing regression nor one very broad new filter can
+  flood the channel. The overflow goes out next run.
+- Upgrading from the single-spec version: the state file is migrated in place,
+  and everything it had already announced stays announced whatever the filters
+  are now called. Its verdicts are dropped, since no filter can claim them, so
+  the first run afterwards reads a few more listing pages than usual.
 
 ## Commands
 
@@ -50,41 +127,46 @@ runs stateful. Delete it and the next run re-seeds silently.
 npm start                    # check and post anything new
 npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
-npm run list                 # print current matches, touch nothing
-npm test                     # unit tests (66 cases, no network)
+npm run list                 # print current matches per filter, touch nothing
+npm test                     # unit tests (98 cases, no network)
 
-node src/index.js --verbose  # also show near misses and why they missed
+node src/index.js --verbose          # also show near misses and why they missed
+node src/index.js --only=polestar    # run one filter, by name or id
+node src/index.js --filters=file     # ignore the gist, use filters.json
 node src/index.js --help
 ```
 
-`--verbose` is the one to reach for when tuning the spec: it prints the cars
-that were in spec on year, mileage and drivetrain but whose packages could not
-be confirmed.
+`--verbose` is the one to reach for when tuning a filter: it prints, per
+filter, the cars that were in spec on the numbers but whose phrases or packages
+could not be confirmed. `--only` keeps that output to the filter you are
+working on.
 
 ## Configuration
 
-Everything lives in [src/config.js](src/config.js). The webhook is the one
-thing kept out of it — it is a write-capable secret, so it comes from the
-`DISCORD_WEBHOOK_URL` environment variable, read from `scraper/.env` (gitignored)
-if present. Real environment variables always win over the file, so CI secrets
-override it.
-
-Useful knobs:
+The filters are the spec; [src/config.js](src/config.js) holds the runtime
+knobs around them. The webhook is the one thing kept out of both — it is a
+write-capable secret, so it comes from the `DISCORD_WEBHOOK_URL` environment
+variable, read from `scraper/.env` (gitignored) if present. Real environment
+variables always win over the file, so CI secrets override it.
 
 | Key | Default | Notes |
 |---|---|---|
-| `require.*` | see table above | The spec itself |
-| `require.packageEvidence` | `'strong'` | `'weak'` accepts a bare mention of a package name |
-| `require.acceptPilotLite` | *unset* | Set `true` to let **Pilot Lite** satisfy Pilot |
-| `require.awdImpliesDualMotor` | `true` | AWD ("Neliveto") counts as dual motor evidence |
-| `require.dualMotorImpliesLongRange` | `true` | Dual motor counts as long range evidence |
+| `filters.source` | `'auto'` | `'gist'` or `'file'` to pin it; `--filters=` overrides per run |
+| `filters.file` | `'filters.json'` | The committed fallback |
+| `filters.gistFilename` | `'car-tco-filters.json'` | Where the app syncs filters |
 | `fetch.delayMs` | `1500` | Gap between requests |
-| `discord.maxPostsPerRun` | `20` | Anti-spam cap |
-| `state.forgetAfterDays` | `90` | When a vanished listing is forgotten |
+| `fetch.maxSearchPages` | `40` | Per search, not per run |
+| `discord.maxPostsPerRun` | `20` | Anti-spam cap, across all filters |
+| `state.forgetAfterDays` | `90` | When a vanished listing or a dormant filter is forgotten |
 
-To watch a different car, change `search.make` / `search.model` to match the
-nettiauto URL path (`/polestar/2` → `make: 'polestar', model: '2'`) and adjust
-`require`. The package matching is Polestar-specific; see below.
+Per-filter settings — including `packageEvidence` (`'weak'` accepts a bare
+mention of a package name), `acceptLesserPackages` (let **Pilot Lite** satisfy
+Pilot) and `postExisting` — live on the filter itself, in the app's editor or
+in `filters.json`.
+
+To watch a different car, add a filter in the app, or copy the entry in
+`filters.json` and change `make` / `model` to match the nettiauto URL path
+(`/polestar/2` → `"make": "polestar", "model": "2"`).
 
 ## Running it on a schedule
 
@@ -94,7 +176,10 @@ the record survives between runs. Set up:
 
 1. Repo **Settings → Secrets and variables → Actions → New repository secret**,
    named `DISCORD_WEBHOOK_URL`.
-2. Commit `scraper/data/seen.json` (it must **not** be gitignored — it is how
+2. Add `GIST_TOKEN` too, if you want the filters made in the app to reach the
+   scheduled runs. Without it they run on the committed `filters.json`, quietly
+   and correctly, but a filter created in the UI never arrives.
+3. Commit `scraper/data/seen.json` (it must **not** be gitignored — it is how
    runs remember each other).
 
 Locally instead, any scheduler works — Windows Task Scheduler or cron calling
@@ -104,7 +189,8 @@ Locally instead, any scheduler works — Windows Task Scheduler or cron calling
 
 React to any posted listing in Discord (any emoji, from anyone in the channel)
 and within a cycle the car is added to the Car TCO calculator's comparison.
-It arrives with the price and odometer from the listing, the nettiauto link in
+It arrives with the price, odometer and powertrain from the listing (a diesel
+is added as a diesel — filters can watch anything now), the nettiauto link in
 its notes, and an agreed financing baseline — 0 € down, 6 % interest, 72
 months — so candidates are comparable before any dealer has quoted a real
 rate. Everything else (insurance, tax, maintenance) is left at zero for you to
@@ -120,8 +206,10 @@ with neither set the pickup is skipped and posting works as before):
 
 - `DISCORD_BOT_TOKEN` — webhooks can post but not read reactions, so this
   needs a minimal bot: [discord.com/developers/applications](https://discord.com/developers/applications)
-  → **New Application** → **Bot** → *Reset Token* (no privileged intents
-  needed). Invite it to the server via **OAuth2 → URL Generator**, scope
+  → **New Application** → **Bot** → *Reset Token*, and enable **Message
+  Content Intent** under *Privileged Gateway Intents* — without it Discord
+  strips the embeds from what the bot reads, so a reacted post cannot be
+  matched back to its car. Invite it to the server via **OAuth2 → URL Generator**, scope
   `bot`, permissions *View Channels* + *Read Message History*, and make sure
   it can see the channel the webhook posts into.
 - `GIST_TOKEN` — a classic GitHub token with **only the `gist` scope**, same
@@ -185,7 +273,8 @@ either a `paketti`/`pkt`/`pack`/`varuste` word or the other required package.
 Two Polestar-specific exclusions matter:
 
 - **Pilot Lite** is a smaller, separately sold package, so it does *not*
-  satisfy Pilot. Set `require.acceptPilotLite = true` if you want it to.
+  satisfy Pilot. Tick *Accept the smaller version of a package* (or set
+  `acceptLesserPackages: true`) if you want it to.
 - **Pilot Assist** is a feature that ships in *both* Pilot and Pilot Lite, so
   seeing it proves nothing about which pack the car has, and it is ignored.
   (A listing naming both "Pilot Assist" and Pilot properly still matches.)
@@ -195,26 +284,32 @@ matched on**, so the verdict can be checked at a glance instead of trusted. If
 a listing contradicts itself — say `Pilot&Plus` in the title but `Pilot Lite`
 in the highlights — the post carries a "worth confirming with the seller" note.
 
-Two harmless inferences fill gaps in seller text, both reported in the post:
-a Polestar 2 Dual Motor was only ever sold as Long Range, and the only AWD
-Polestar 2 is the dual motor. So `Launch Edition` + `Neliveto`, with no battery
-named anywhere, still matches — correctly.
+The two inferences that fill gaps in seller text are not hardcoded: they are
+the filter's own `implications` rules, and both are reported in the post. See
+*What a filter can ask for* above.
 
 ## Being a polite guest
 
 One request at a time, 1.5 s apart, a real browser User-Agent, and retries with
-backoff on 429/5xx. A full first run is roughly 16 search pages plus a listing
-page for each undecided car; later runs are mostly just the 16 search pages.
+backoff on 429/5xx — global, so adding filters never means more requests in
+flight, only a longer run. A full first run over the Polestar 2 listing is
+roughly 16 search pages plus a listing page for each undecided car; later runs
+are mostly just the 16 search pages. Filters watching the same make and model
+share that crawl; each additional make/model adds its own pages.
 
 ## Layout
 
 ```
-src/config.js     the spec and all the knobs
+filters.json      the committed default filter (the gist wins when it has any)
+src/filters.js    loading and normalising filters; grouping them by search
+src/config.js     the runtime knobs
 src/index.js      orchestration and CLI
 src/nettiauto.js  fetching and parsing search + listing pages
-src/filter.js     the spec check, including package matching
-src/state.js      the record of what has been seen and announced
+src/filter.js     the spec check: numbers, phrases, implications, packages
+src/state.js      the record of what has been seen and announced, per filter
 src/discord.js    webhook payloads
+src/gist.js       reading the gist; adding reacted cars to the calculator
+src/reactions.js  reading reactions off our own posts
 src/http.js       paced, retrying fetch
 src/html.js       entity decoding and text extraction
 src/env.js        reads .env
