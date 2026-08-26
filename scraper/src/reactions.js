@@ -108,6 +108,8 @@ export async function fetchReactedListingIds({
   const reacted = new Map();
   let scanned = 0;
   let before = null;
+  // Reacted posts of ours whose embeds came back empty - see the throw below.
+  let strippedEmbeds = 0;
 
   while (scanned < scanMessages) {
     const batch = Math.min(100, scanMessages - scanned);
@@ -125,7 +127,14 @@ export async function fetchReactedListingIds({
       // not a listing we announced.
       if (ourWebhookId && message.webhook_id && message.webhook_id !== ourWebhookId) continue;
       if (!hasQualifyingReaction(message, requiredEmoji)) continue;
-      for (const id of listingIdsIn(message)) {
+      const ids = listingIdsIn(message);
+      // Every post of ours carries an embed. A reacted post of ours with none
+      // means Discord stripped them from the response, not that they're gone.
+      if (ids.length === 0 && (message.embeds ?? []).length === 0) {
+        strippedEmbeds += 1;
+        continue;
+      }
+      for (const id of ids) {
         if (!reacted.has(id)) reacted.set(id, message.id);
       }
     }
@@ -134,6 +143,15 @@ export async function fetchReactedListingIds({
     before = messages[messages.length - 1].id;
     onProgress?.({ scanned, found: reacted.size });
     if (messages.length < batch) break;
+  }
+
+  if (strippedEmbeds > 0) {
+    throw new Error(
+      `${strippedEmbeds} reacted post(s) came back without their embeds, so the cars on them ` +
+        'cannot be identified. Discord strips embeds from bot reads (REST included) unless the ' +
+        'bot has the Message Content Intent: developer portal -> your app -> Bot -> ' +
+        'Privileged Gateway Intents -> enable "Message Content Intent", then rerun.',
+    );
   }
 
   return { reacted, scanned, channelId };
