@@ -5,6 +5,7 @@ import {
   filterTitle,
   isRunnable,
   newScraperFilter,
+  parseFilterJson,
   parseNettiautoUrl,
 } from '../scraperFilters'
 import type { ScraperFilterStore } from '../useScraperFilters'
@@ -33,6 +34,9 @@ const CloseIcon = () => (
 
 export function ScraperFilterDialog({ store, connected, onClose }: Props) {
   const [draft, setDraft] = useState<{ filter: ScraperFilter; isNew: boolean } | null>(null)
+  const [json, setJson] = useState<string | null>(null)
+  const [jsonError, setJsonError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -46,6 +50,28 @@ export function ScraperFilterDialog({ store, connected, onClose }: Props) {
   }, [draft, onClose])
 
   const filters = store.set.filters
+
+  function addPasted() {
+    try {
+      const pasted = parseFilterJson(json ?? '')
+      store.saveMany(pasted)
+      setJson(null)
+      setJsonError('')
+    } catch (e) {
+      setJsonError(e instanceof Error ? e.message : 'Could not read that JSON.')
+    }
+  }
+
+  async function copyAll() {
+    const text = JSON.stringify(filters, null, 2)
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      window.prompt('Copy the filter JSON:', text)
+    }
+  }
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true">
@@ -100,6 +126,34 @@ export function ScraperFilterDialog({ store, connected, onClose }: Props) {
               </p>
             )}
 
+            {json !== null && (
+              <div className="field">
+                <span className="field-label">Filter JSON</span>
+                <textarea
+                  className="json-box"
+                  value={json}
+                  spellCheck={false}
+                  autoFocus
+                  placeholder={'[{ "name": "Polestar 2", "make": "polestar", "model": "2" }]'}
+                  onChange={(e) => setJson(e.target.value)}
+                />
+                {jsonError && <span className="field-hint field-error">{jsonError}</span>}
+                <span className="field-hint">
+                  One filter, a list of them, or the contents of{' '}
+                  <code>scraper/filters.json</code>. An <code>id</code> in the text is kept, so
+                  a filter carries on with the posting history the watcher already has for it.
+                </span>
+                <div className="filter-tools">
+                  <button className="inline-link" onClick={() => setJson(null)}>
+                    Cancel
+                  </button>
+                  <button className="btn btn-primary" onClick={addPasted} disabled={!json.trim()}>
+                    Add from JSON
+                  </button>
+                </div>
+              </div>
+            )}
+
             {filters.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-title display">No filters yet</div>
@@ -136,6 +190,25 @@ export function ScraperFilterDialog({ store, connected, onClose }: Props) {
                 ))}
               </div>
             )}
+
+            <div className="filter-tools">
+              {json === null && (
+                <button
+                  className="inline-link"
+                  onClick={() => {
+                    setJson('')
+                    setJsonError('')
+                  }}
+                >
+                  Paste JSON
+                </button>
+              )}
+              {filters.length > 0 && (
+                <button className="inline-link" onClick={copyAll}>
+                  {copied ? 'Copied!' : 'Copy all as JSON'}
+                </button>
+              )}
+            </div>
 
             <div className="modal-footer">
               <button className="btn" onClick={onClose}>
@@ -302,7 +375,7 @@ function FilterEditor({ filter, isNew, onSave, onDelete, onCancel }: EditorProps
           value={draft.packages}
           onChange={(packages) => set({ packages })}
           suggestions={['pilot', 'plus', 'performance']}
-          hint="Counted only where the text reads as a package, not as a passing mention."
+          hint="For packages named only in the seller's free text, and counted only where that text reads as a package rather than a passing mention. A trim name that rides along in the model name — BMW's M Sport, say — belongs under variant name above instead."
         />
         {draft.packages.length > 0 && (
           <>

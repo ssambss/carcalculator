@@ -1267,6 +1267,32 @@ a.dialog-text {
   color: var(--ink-3);
 }
 
+.filter-tools {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.json-box {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-input);
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.json-box:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 @media (max-width: 640px) {
   .app {
     padding: 18px 16px 110px;

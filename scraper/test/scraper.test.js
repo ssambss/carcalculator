@@ -266,6 +266,73 @@ describe('option package matching', () => {
   });
 });
 
+describe('packages whose name is more than one word', () => {
+  // Regression: the matcher used to compare a whole package name against a
+  // single token, so "m sport" - and every other two-word or hyphenated pack -
+  // silently matched nothing at all, on every listing.
+  const bmw = (usp, extra = {}) => ({
+    id: '15900002',
+    url: 'https://www.nettiauto.com/bmw/320/15900002',
+    title: 'BMW 320',
+    subTitle: '2,0, G20 Sedan 320i A xDrive Business',
+    specs: ['2021', '89 000 km', 'Bensiini', 'Automaatti', 'Neliveto'],
+    usp,
+    year: 2021,
+    mileage: 89000,
+    price: 29580,
+    driveType: 'Neliveto',
+    ...extra,
+  });
+  const wants = (packages, patch = {}) =>
+    normalizeFilter({ id: 'bmw', make: 'bmw', model: '320', packages, ...patch });
+
+  it('finds a two-word package however it is punctuated', () => {
+    for (const usp of ['M-Sport-paketti', 'M Sport -paketti', 'M-Sport pkt.', 'M Sport paketti']) {
+      const verdict = evaluate(bmw(usp), null, wants(['m sport']));
+      assert.equal(verdict.matched, true, usp);
+      assert.equal(verdict.packages['m sport'].strength, 'strong', usp);
+    }
+  });
+
+  it('reads a hyphenated requirement as the same package', () => {
+    const verdict = evaluate(bmw('M-Sport-varustepaketti'), null, wants(['m-sport']));
+    assert.equal(verdict.matched, true);
+    assert.equal(verdict.packages['m-sport'].snippet, 'M-Sport-varustepaketti');
+  });
+
+  it('still wants evidence: a bare trim mention is weak, not a package', () => {
+    // How BMW dealers actually write it - a suffix on the variant name, with no
+    // paketti/pack word anywhere near it.
+    const trim = bmw('', { subTitle: '2,0, G20 Sedan 320i A xDrive Business M Sport' });
+    assert.equal(evaluate(trim, null, wants(['m sport'])).matched, false);
+    assert.equal(
+      evaluate(trim, null, wants(['m sport'], { packageEvidence: 'weak' })).matched,
+      true,
+    );
+    // Which is why a trim name belongs in variantMust, where it is exactly the
+    // kind of claim that field is for.
+    assert.equal(
+      evaluate(trim, null, wants([], { variantMust: ['m sport'] })).matched,
+      true,
+    );
+  });
+
+  it('pairs two multi-word packages to corroborate each other', () => {
+    const verdict = evaluate(
+      bmw('M Sport ja Tech Pack mukana'),
+      null,
+      wants(['m sport', 'tech pack']),
+    );
+    assert.equal(verdict.matched, true);
+    assert.equal(verdict.packages['m sport'].pairedWith, 'tech pack');
+  });
+
+  it('ignores a package name that is only punctuation', () => {
+    const verdict = evaluate(bmw('M-Sport-paketti'), null, wants(['-']));
+    assert.equal(verdict.matched, false);
+  });
+});
+
 describe('powertrain and limits', () => {
   const withPackages = (overrides) => listing({ usp: 'Pilot- ja Plus-paketit', ...overrides });
 

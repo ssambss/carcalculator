@@ -10,6 +10,7 @@ export interface ScraperFilterStore {
   status: FilterSyncStatus
   error: string
   save: (filter: ScraperFilter) => void
+  saveMany: (filters: ScraperFilter[]) => void
   remove: (id: string) => void
   toggle: (id: string) => void
   syncNow: () => void
@@ -79,6 +80,30 @@ export function useScraperFilters(config: SyncConfig | null): ScraperFilterStore
     [mutate],
   )
 
+  /**
+   * Add or replace several filters at once, for a paste.
+   *
+   * One mutation, so a pasted list costs a single push instead of one per
+   * filter. A pasted id that had been deleted loses its tombstone: pasting it
+   * back is as deliberate an act as deleting it was.
+   */
+  const saveMany = useCallback(
+    (incoming: ScraperFilter[]) => {
+      if (incoming.length === 0) return
+      const now = new Date().toISOString()
+      mutate((current) => {
+        const byId = new Map(current.filters.map((f) => [f.id, f]))
+        const tombstones = { ...current.tombstones }
+        for (const filter of incoming) {
+          byId.set(filter.id, { ...filter, updatedAt: now })
+          delete tombstones[filter.id]
+        }
+        return { ...current, filters: [...byId.values()], tombstones }
+      })
+    },
+    [mutate],
+  )
+
   const remove = useCallback(
     (id: string) => {
       mutate((current) => ({
@@ -108,5 +133,5 @@ export function useScraperFilters(config: SyncConfig | null): ScraperFilterStore
     if (config) void sync(config)
   }, [config, sync])
 
-  return { set, status, error, save, remove, toggle, syncNow }
+  return { set, status, error, save, saveMany, remove, toggle, syncNow }
 }

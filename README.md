@@ -35,6 +35,8 @@ color-coded cost breakdown and a side-by-side comparison table.
   must or must not contain, and required option packages. They sync to their
   own file in the same gist (`car-tco-filters.json`), so a filter made on a
   phone is live on the watcher's next run, with no commit and no deploy.
+  *Paste JSON* / *Copy all as JSON* move filters in and out without retyping —
+  the format is the same one `scraper/filters.json` uses.
   Deliberately *not* part of the car-data file: the app rewrites that
   wholesale on every edit, so a device on an older cached bundle would strip a
   key it has never heard of.

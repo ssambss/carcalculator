@@ -52,13 +52,42 @@ const FEATURE_NOT_PACKAGE = { pilot: ['assist'] };
  * True when the token at `index` names the package itself, rather than a
  * lesser variant of it ("Pilot Lite") or a feature from it ("Pilot Assist").
  */
-function namesThePackage(tokens, index, { acceptLite = false } = {}) {
-  const name = tokens[index];
-  const next = tokens[index + 1];
+function namesThePackage(tokens, span, name, { acceptLite = false } = {}) {
+  const next = tokens[span.end + 1];
   if (!next) return true;
   if ((FEATURE_NOT_PACKAGE[name] ?? []).includes(next)) return false;
   if (!acceptLite && (LESSER_VARIANT[name] ?? []).includes(next)) return false;
   return true;
+}
+
+/**
+ * Every place a package name appears, as `{ start, end }` token spans.
+ *
+ * A package name is not always one word - "M Sport" and "Tech Pack" are two,
+ * and sellers hyphenate them as freely as anything else, so the name is
+ * tokenised the same way the text is. Matching stays exact word for word: a
+ * package is a claim about equipment, and `plus` must not be satisfied by
+ * `plussa`.
+ */
+function spansOf(tokens, words) {
+  const spans = [];
+  if (words.length === 0) return spans;
+  for (let start = 0; start + words.length - 1 < tokens.length; start += 1) {
+    let matched = true;
+    for (let offset = 0; offset < words.length; offset += 1) {
+      if (tokens[start + offset] !== words[offset]) {
+        matched = false;
+        break;
+      }
+    }
+    if (matched) spans.push({ start, end: start + words.length - 1 });
+  }
+  return spans;
+}
+
+/** Token distance between two spans; 1 means they are adjacent. */
+function gapBetween(a, b) {
+  return a.start > b.end ? a.start - b.end : b.start - a.end;
 }
 
 /**
@@ -138,15 +167,18 @@ export function applyImplications(tokens, implications) {
  * requirement for Pilot unless the caller opts in.
  */
 function findPackage(tokens, name, { others = [], acceptLite = false } = {}) {
+  const words = tokenize(name);
   const lesser = LESSER_VARIANT[name] ?? [];
   const featureOnly = FEATURE_NOT_PACKAGE[name] ?? [];
+  // Where each of the other required packages sits, so a pairing can be
+  // spotted whatever either of them is called.
+  const partners = others.map((other) => ({ name: other, spans: spansOf(tokens, tokenize(other)) }));
   const hits = [];
   let sawLite = false;
   let sawFeature = false;
 
-  for (let index = 0; index < tokens.length; index += 1) {
-    if (tokens[index] !== name) continue;
-    const next = tokens[index + 1];
+  for (const span of spansOf(tokens, words)) {
+    const next = tokens[span.end + 1];
     const isLite = Boolean(next && lesser.includes(next));
     const isFeature = Boolean(next && featureOnly.includes(next));
     if (isLite) sawLite = true;
@@ -158,19 +190,23 @@ function findPackage(tokens, name, { others = [], acceptLite = false } = {}) {
     // paired with another required package ("Pilot ja Plus", "Plus&Pilot").
     let nearNoun = false;
     let nearPartner = null;
-    for (let offset = -MAX_GAP; offset <= MAX_GAP; offset += 1) {
-      if (offset === 0) continue;
-      const token = tokens[index + offset];
-      if (!token) continue;
-      if (PACKAGE_NOUN.test(token)) nearNoun = true;
-      // A partner that is itself a "Lite" or feature mention is not the
-      // partner package, so it cannot corroborate this one.
-      if (others.includes(token) && namesThePackage(tokens, index + offset, { acceptLite })) {
-        nearPartner = token;
+    for (let offset = 1; offset <= MAX_GAP; offset += 1) {
+      for (const token of [tokens[span.start - offset], tokens[span.end + offset]]) {
+        if (token && PACKAGE_NOUN.test(token)) nearNoun = true;
       }
     }
+    for (const partner of partners) {
+      // A partner that is itself a "Lite" or feature mention is not the
+      // partner package, so it cannot corroborate this one.
+      const near = partner.spans.find(
+        (other) =>
+          gapBetween(span, other) <= MAX_GAP &&
+          namesThePackage(tokens, other, partner.name, { acceptLite }),
+      );
+      if (near) nearPartner = partner.name;
+    }
 
-    hits.push({ index, nearNoun, nearPartner, isLite });
+    hits.push({ index: span.start, nearNoun, nearPartner, isLite });
   }
 
   if (hits.length === 0) {
@@ -209,7 +245,11 @@ function evidenceSnippet(text, name) {
     .split(/[\n/|*•]|\s{2,}|(?<=[a-zäöå])\s*[-–—]\s*(?=[A-ZÄÖÅ])/)
     .map((segment) => segment.trim())
     .filter(Boolean);
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '[\\s\\-–—/&+]*');
+  // Built word by word, so a two-word name quotes the fragment however the
+  // seller punctuated it: "M Sport", "M-Sport" and "M&Sport" all show up.
+  const escaped = tokenize(name)
+    .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('[\\s\\-–—/&+]*');
   const matching = segments
     .filter((segment) => new RegExp(`\\b${escaped}`, 'i').test(segment))
     .sort((a, b) => a.length - b.length);

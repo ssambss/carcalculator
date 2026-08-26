@@ -23,6 +23,13 @@ Resolution order, first source with at least one filter wins:
 | 1 | `car-tco-filters.json` in the app's gist | `GIST_TOKEN` |
 | 2 | [filters.json](filters.json) in this folder | nothing — it is committed |
 
+**The gist shadows the file.** As soon as the app has one filter, `filters.json`
+stops being read — so a filter that exists only in the file quietly stops
+running. Once you start making filters in the app, keep every filter you care
+about there. *Copy all as JSON* in the filter dialog gives you the list back in
+this file's format, which is the easy way to keep the committed fallback in step
+with reality.
+
 `filters.json` is the fallback and the local default. It holds the spec this
 watcher was built for:
 
@@ -37,7 +44,10 @@ watcher was built for:
 
 Pin a run to one source with `--filters=gist` or `--filters=file` — the latter
 is the one to use when trying a filter out locally, since it never touches the
-network for its config.
+network for its config. Every run prints which source it used and what it found
+there, so `node src/index.js --only=nothing` is a quick way to ask "what would
+you run right now?". Reading the gist needs `GIST_TOKEN` in `scraper/.env`
+locally, exactly as in CI; without it a local run always uses the file.
 
 ## What a filter can ask for
 
@@ -62,6 +72,17 @@ phrase may match the start of a longer token when it is at least five
 characters — Finnish glues words together, so `lasikatto` has to find
 `lasikattoluukku` — while shorter words are matched exactly, or `acc` would hit
 something in every advert.
+
+A package name may be more than one word (`m sport`, `tech pack`), and how the
+seller punctuates it does not matter. But `packages` is for packages *named in
+the free text*: it wants the name next to a `paketti`/`pack`/`varuste` word, or
+paired with another required package. A trim that rides along in the model name
+— BMW writes `320i A xDrive Business M Sport` — is not that, and asking for it
+as a package finds nothing on the strong setting. Put a trim under
+`variantMust`, where it is exactly the kind of claim that field is for. Real
+example, on the 560 BMW 320 adverts live in August 2026: of the 28 that name M
+Sport, **not one** writes it as a package, and several mean `M Sport ratti` —
+the steering wheel, not the car.
 
 `implications` are what keep the spec honest without teaching the matcher every
 model's range. On a Polestar 2, `Neliveto` (AWD) proves Dual Motor, and Dual

@@ -172,6 +172,41 @@ export function normalizeFilter(raw: unknown): ScraperFilter {
   }
 }
 
+/**
+ * Read filters out of pasted JSON.
+ *
+ * Accepts everything someone might reasonably paste: a bare array, a single
+ * filter object, the `{ filters: [...] }` envelope the gist file uses, or the
+ * `scraper/filters.json` file verbatim. Throws with something readable when the
+ * text is not JSON or holds no filter that names a page to crawl.
+ *
+ * An `id` in the pasted text is kept: it is what ties a filter to the watcher's
+ * record of what it has already posted, so pasting the committed default back
+ * in resumes that history rather than starting a new one.
+ */
+export function parseFilterJson(text: string): ScraperFilter[] {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new Error('That is not valid JSON.')
+  }
+
+  const list = Array.isArray(parsed)
+    ? parsed
+    : isRecord(parsed) && Array.isArray(parsed.filters)
+      ? parsed.filters
+      : isRecord(parsed)
+        ? [parsed]
+        : []
+
+  const filters = list.map(normalizeFilter).filter(isRunnable)
+  if (filters.length === 0) {
+    throw new Error('No filter in there with a make and model — nothing to add.')
+  }
+  return filters
+}
+
 export function normalizeFilterSet(raw: unknown): FilterSet {
   const obj = isRecord(raw) ? raw : {}
   const filters = Array.isArray(obj.filters) ? obj.filters.map(normalizeFilter) : []
