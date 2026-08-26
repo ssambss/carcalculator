@@ -65,7 +65,8 @@ export function stampEditedAt(iso?: string): void {
   }
 }
 
-async function github(path: string, token: string, init?: RequestInit): Promise<Response> {
+/** Shared by filterSync.ts, which keeps its own file in the same gist. */
+export async function github(path: string, token: string, init?: RequestInit): Promise<Response> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
@@ -123,9 +124,7 @@ export async function connectGist(token: string, current: AppData): Promise<Sync
   return { token, gistId: created.id }
 }
 
-export async function pullGist(cfg: SyncConfig): Promise<RemoteData | null> {
-  const res = await github(`/gists/${cfg.gistId}`, cfg.token)
-  const gist = (await res.json()) as GistPayload
+async function parseRemote(gist: GistPayload): Promise<RemoteData | null> {
   const file = gist.files?.[GIST_FILENAME]
   if (!file) return null
   let content = file.content ?? ''
@@ -141,6 +140,27 @@ export async function pullGist(cfg: SyncConfig): Promise<RemoteData | null> {
       : ''
   const data = normalizeData((parsed as { data?: unknown } | null)?.data)
   return { savedAt, data }
+}
+
+export async function pullGist(cfg: SyncConfig): Promise<RemoteData | null> {
+  const res = await github(`/gists/${cfg.gistId}`, cfg.token)
+  return parseRemote((await res.json()) as GistPayload)
+}
+
+/**
+ * Read the data gist WITHOUT authentication — works because "secret" gists
+ * are unlisted but readable by anyone holding the id. Powers the view-only
+ * share link (60 requests/hour per IP is plenty for viewing).
+ */
+export async function pullGistPublic(gistId: string): Promise<RemoteData | null> {
+  const res = await fetch(`${API_BASE}/gists/${gistId}`, {
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+  if (res.status === 404) {
+    throw new Error('Nothing found behind this share link — it may have been deleted.')
+  }
+  if (!res.ok) throw new Error(`GitHub API error ${res.status}`)
+  return parseRemote((await res.json()) as GistPayload)
 }
 
 const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000

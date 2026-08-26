@@ -1,8 +1,10 @@
 name: Nettiauto watch
 
-# Checks nettiauto for new listings matching the spec in scraper/src/config.js
-# and posts anything new to Discord. Independent of the Pages deploy workflow -
-# it touches nothing the frontend build uses.
+# Checks nettiauto for new listings matching the filters and posts anything new
+# to Discord. The filters come from the app's gist (created in the calculator's
+# UI) when GIST_TOKEN is set, and from the committed scraper/filters.json
+# otherwise. Independent of the Pages deploy workflow - it touches nothing the
+# frontend build uses.
 
 on:
   schedule:
@@ -42,8 +44,10 @@ jobs:
         working-directory: scraper
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # Reaction pickup (react to a post -> car lands in the calculator).
-          # Optional: with neither secret set the step is skipped.
+          # GIST_TOKEN does double duty: it is how the run reads the filters
+          # made in the app, and half of the reaction pickup (react to a post
+          # -> car lands in the calculator). Without it the run falls back to
+          # scraper/filters.json and skips the pickup.
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |

@@ -21,3 +21,11 @@ export const fmtEurExact = (v: number): string => eur2.format(v)
 
 /** plain number with fi grouping */
 export const fmtNum = (v: number): string => num.format(v)
+
+const dateTime = new Intl.DateTimeFormat('fi-FI', { dateStyle: 'short', timeStyle: 'short' })
+
+/** "26.8.2026 klo 19.05" style short timestamp; empty string for bad input */
+export const fmtDateTime = (iso: string): string => {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? '' : dateTime.format(d)
+}

@@ -832,6 +832,31 @@ a.dialog-text {
   color: var(--danger);
 }
 
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-url {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.viewer-assumptions {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
 .modal-head {
   display: flex;
   align-items: center;
@@ -1008,6 +1033,240 @@ a.dialog-text {
 }
 
 /* ————— Mobile ————— */
+/* --- Scraper filters ------------------------------------------------- */
+
+.btn-count {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+
+.icon-btn {
+  position: relative;
+}
+
+.filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--surface-input);
+}
+
+.filter-row.off {
+  opacity: 0.55;
+}
+
+.filter-row-switch {
+  display: flex;
+  align-items: center;
+}
+
+.filter-row-switch input,
+.check-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.filter-row-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  min-width: 0;
+}
+
+.filter-row-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filter-row-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.filter-row-tag.warn {
+  color: var(--danger);
+  border-color: currentColor;
+}
+
+.filter-row-summary {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.chip-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-input);
+}
+
+.chip-input:focus-within {
+  border-color: var(--accent);
+}
+
+.chip-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 4px 0 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  font-size: 12px;
+}
+
+.chip-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.chip-x:hover {
+  color: var(--ink-1);
+}
+
+.chip-entry {
+  flex: 1;
+  min-width: 90px;
+  height: 26px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: inherit;
+  outline: none;
+  padding: 0 2px;
+}
+
+.chip-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-suggest {
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  background: none;
+  color: var(--ink-3);
+  font-size: 11px;
+  padding: 2px 7px;
+  cursor: pointer;
+}
+
+.chip-suggest:hover {
+  color: var(--ink-1);
+  border-style: solid;
+}
+
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.check-row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.check-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+
+.advanced > summary {
+  cursor: pointer;
+}
+
+.advanced[open] {
+  gap: 14px;
+}
+
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rule-row input {
+  flex: 1;
+  min-width: 100px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-input);
+  color: inherit;
+  font-size: 13px;
+}
+
+.rule-arrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
 @media (max-width: 640px) {
   .app {
     padding: 18px 16px 110px;
@@ -1098,5 +1357,13 @@ a.dialog-text {
 
   .span-2 {
     grid-column: span 1;
+  }
+
+  .filter-row {
+    padding: 12px;
+  }
+
+  .rule-row input {
+    height: 40px;
   }
 }

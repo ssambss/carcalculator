@@ -35,6 +35,21 @@ export function SyncDialog({
   const [token, setToken] = useState('')
   const [busy, setBusy] = useState(false)
   const [connectError, setConnectError] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
+
+  const shareUrl = config
+    ? `${window.location.origin}${window.location.pathname}?view=${config.gistId}`
+    : ''
+
+  async function copyShareLink() {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch {
+      window.prompt('Copy the link:', shareUrl)
+    }
+  }
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -98,6 +113,19 @@ export function SyncDialog({
             >
               View the data gist on GitHub ↗
             </a>
+            <div className="field">
+              <span className="field-label">View-only share link</span>
+              <div className="share-row">
+                <span className="share-url">{shareUrl}</span>
+                <button className="btn" onClick={copyShareLink}>
+                  {linkCopied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <span className="field-hint">
+                Anyone with the link can view the cars (not edit) — no GitHub account or
+                token needed.
+              </span>
+            </div>
             <div className="modal-footer">
               <button className="btn" onClick={onDisconnect}>
                 Disconnect

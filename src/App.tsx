@@ -22,11 +22,13 @@ import {
   stampEditedAt,
 } from './sync'
 import { useTheme } from './theme'
+import { useScraperFilters } from './useScraperFilters'
 import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
 import { ComparisonTable } from './components/ComparisonTable'
 import { FilterBar } from './components/FilterBar'
+import { ScraperFilterDialog } from './components/ScraperFilterDialog'
 import { SettingsPanel } from './components/SettingsPanel'
 import { SyncDialog, type SyncStatus } from './components/SyncDialog'
 
@@ -45,6 +47,10 @@ export default function App() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(syncConfig ? 'syncing' : 'off')
   const [syncError, setSyncError] = useState('')
   const [syncOpen, setSyncOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  // The nettiauto watcher's saved searches: kept in their own gist file, so
+  // they ride along with sync without being part of the car data.
+  const scraperFilters = useScraperFilters(syncConfig)
   const dataRef = useRef(data)
   const syncConfigRef = useRef(syncConfig)
   // The last data object that came from a non-edit source (initial load or a
@@ -265,6 +271,8 @@ export default function App() {
 
   const addCar = () => setDraft({ car: newCar(), isNew: true })
 
+  const activeFilterCount = scraperFilters.set.filters.filter((f) => f.enabled).length
+
   return (
     <div className="app">
       <header className="app-header">
@@ -297,6 +305,26 @@ export default function App() {
                 <path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z" />
               </svg>
             )}
+          </button>
+          <button
+            className="btn icon-btn"
+            onClick={() => setFiltersOpen(true)}
+            aria-label="Scraper filters"
+            title={`Scraper filters (${activeFilterCount} active)`}
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2.4 3.4h11.2L9.4 8.5v4.6l-2.8-1.5V8.5z" />
+            </svg>
+            {activeFilterCount > 0 && <span className="btn-count">{activeFilterCount}</span>}
           </button>
           <button
             className="btn icon-btn sync-btn"
@@ -446,6 +474,14 @@ export default function App() {
           settings={data.settings}
           onSave={saveCar}
           onCancel={() => setDraft(null)}
+        />
+      )}
+
+      {filtersOpen && (
+        <ScraperFilterDialog
+          store={scraperFilters}
+          connected={Boolean(syncConfig)}
+          onClose={() => setFiltersOpen(false)}
         />
       )}
 
