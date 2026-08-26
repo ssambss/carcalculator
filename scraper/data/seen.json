@@ -2,13 +2,13 @@
   "version": 1,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-08-26T17:24:49.467Z",
-  "runs": 9,
+  "updatedAt": "2026-08-26T18:55:38.245Z",
+  "runs": 10,
   "listings": {
     "12959170": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/12959170",
@@ -22,7 +22,7 @@
     "13046482": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/13046482",
@@ -36,7 +36,7 @@
     "15381360": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15381360",
@@ -50,7 +50,7 @@
     "15435263": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:26.047Z",
       "url": "https://www.nettiauto.com/polestar/2/15435263",
@@ -67,7 +67,7 @@
     "15437102": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:03.925Z",
-      "lastSeenAt": "2026-08-26T17:24:47.581Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15437102",
@@ -86,7 +86,7 @@
     "15459470": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15459470",
@@ -104,7 +104,7 @@
     "15488276": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:14.166Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:14.166Z",
       "url": "https://www.nettiauto.com/polestar/2/15488276",
@@ -121,7 +121,7 @@
     "15650422": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15650422",
@@ -135,7 +135,7 @@
     "15680653": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:40.657Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15680653",
@@ -152,7 +152,7 @@
     "15695973": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:02.484Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15695973",
@@ -166,7 +166,7 @@
     "15696122": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15696122",
@@ -184,7 +184,7 @@
     "15698248": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:39.985Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15698248",
@@ -202,7 +202,7 @@
     "15701268": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15701268",
@@ -220,7 +220,7 @@
     "15703526": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:49.982Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:49.982Z",
       "url": "https://www.nettiauto.com/polestar/2/15703526",
@@ -236,7 +236,7 @@
     "15707898": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-08-26T17:24:47.581Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15707898",
@@ -250,7 +250,7 @@
     "15714170": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15714170",
@@ -266,7 +266,7 @@
     "15717753": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:52.688Z",
       "url": "https://www.nettiauto.com/polestar/2/15717753",
@@ -283,7 +283,7 @@
     "15718885": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15718885",
@@ -301,7 +301,7 @@
     "15719303": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:12.606Z",
       "url": "https://www.nettiauto.com/polestar/2/15719303",
@@ -318,7 +318,7 @@
     "15719900": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15719900",
@@ -336,7 +336,7 @@
     "15727392": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:41.777Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:41.777Z",
       "url": "https://www.nettiauto.com/polestar/2/15727392",
@@ -352,7 +352,7 @@
     "15727705": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15727705",
@@ -370,7 +370,7 @@
     "15732732": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:09.926Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15732732",
@@ -389,7 +389,7 @@
     "15733294": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:27.041Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:27.041Z",
       "url": "https://www.nettiauto.com/polestar/2/15733294",
@@ -406,7 +406,7 @@
     "15736132": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:48.104Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:48.104Z",
       "url": "https://www.nettiauto.com/polestar/2/15736132",
@@ -423,7 +423,7 @@
     "15738748": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15738748",
@@ -437,7 +437,7 @@
     "15738962": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15738962",
@@ -451,7 +451,7 @@
     "15739559": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15739559",
@@ -467,7 +467,7 @@
     "15740027": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15740027",
@@ -483,7 +483,7 @@
     "15741103": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15741103",
@@ -499,7 +499,7 @@
     "15742078": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:42.449Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:42.449Z",
       "url": "https://www.nettiauto.com/polestar/2/15742078",
@@ -516,7 +516,7 @@
     "15742232": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15742232",
@@ -532,7 +532,7 @@
     "15744740": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15744740",
@@ -548,7 +548,7 @@
     "15744938": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15744938",
@@ -567,7 +567,7 @@
     "15746364": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15746364",
@@ -585,7 +585,7 @@
     "15747959": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15747959",
@@ -601,7 +601,7 @@
     "15748681": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15748681",
@@ -615,7 +615,7 @@
     "15748717": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.298Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15748717",
@@ -629,7 +629,7 @@
     "15748832": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:06.979Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:06.979Z",
       "url": "https://www.nettiauto.com/polestar/2/15748832",
@@ -645,7 +645,7 @@
     "15750831": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:57.886Z",
       "url": "https://www.nettiauto.com/polestar/2/15750831",
@@ -661,7 +661,7 @@
     "15750885": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15750885",
@@ -677,7 +677,7 @@
     "15751161": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15751161",
@@ -693,7 +693,7 @@
     "15751596": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15751596",
@@ -710,7 +710,7 @@
     "15752066": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:03.925Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15752066",
@@ -742,7 +742,7 @@
     "15752936": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:48.104Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15752936",
@@ -756,7 +756,7 @@
     "15754154": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15754154",
@@ -770,7 +770,7 @@
     "15754296": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:05.424Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:05.424Z",
       "url": "https://www.nettiauto.com/polestar/2/15754296",
@@ -786,7 +786,7 @@
     "15755196": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15755196",
@@ -800,7 +800,7 @@
     "15755351": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15755351",
@@ -814,14 +814,14 @@
     "15757202": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15757202",
       "title": "78 kWh, Launch Edition, 300kW, 78kWh",
       "year": 2021,
       "mileage": 125000,
-      "price": 27990,
+      "price": 27950,
       "seller": "LänsiAuto Helsinki",
       "reasons": [
         "125 000 km over 120 000 km"
@@ -830,7 +830,7 @@
     "15757497": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:02.484Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:02.484Z",
       "url": "https://www.nettiauto.com/polestar/2/15757497",
@@ -846,7 +846,7 @@
     "15757545": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15757545",
@@ -862,7 +862,7 @@
     "15757871": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15757871",
@@ -876,7 +876,7 @@
     "15758514": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15758514",
@@ -892,7 +892,7 @@
     "15758894": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:39.985Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:12:39.985Z",
       "url": "https://www.nettiauto.com/polestar/2/15758894",
@@ -906,7 +906,7 @@
     "15759311": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15759311",
@@ -923,7 +923,7 @@
     "15760010": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15760010",
@@ -937,7 +937,7 @@
     "15760037": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15760037",
@@ -955,7 +955,7 @@
     "15760394": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15760394",
@@ -969,7 +969,7 @@
     "15761801": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15761801",
@@ -987,7 +987,7 @@
     "15765258": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15765258",
@@ -1005,7 +1005,7 @@
     "15765481": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:06.666Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15765481",
@@ -1019,7 +1019,7 @@
     "15765911": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15765911",
@@ -1037,7 +1037,7 @@
     "15766321": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:51.461Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:51.461Z",
       "url": "https://www.nettiauto.com/polestar/2/15766321",
@@ -1054,7 +1054,7 @@
     "15766619": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15766619",
@@ -1068,7 +1068,7 @@
     "15766800": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15766800",
@@ -1084,7 +1084,7 @@
     "15767728": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15767728",
@@ -1102,7 +1102,7 @@
     "15767852": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15767852",
@@ -1120,7 +1120,7 @@
     "15767880": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15767880",
@@ -1138,7 +1138,7 @@
     "15768508": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15768508",
@@ -1157,7 +1157,7 @@
     "15768948": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:14.166Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15768948",
@@ -1175,7 +1175,7 @@
     "15770420": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15770420",
@@ -1193,7 +1193,7 @@
     "15770821": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15770821",
@@ -1209,7 +1209,7 @@
     "15770822": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:51.461Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15770822",
@@ -1226,7 +1226,7 @@
     "15771173": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15771173",
@@ -1240,7 +1240,7 @@
     "15772124": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15772124",
@@ -1257,7 +1257,7 @@
     "15772125": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:44.303Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:44.303Z",
       "url": "https://www.nettiauto.com/polestar/2/15772125",
@@ -1273,7 +1273,7 @@
     "15772843": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15772843",
@@ -1291,7 +1291,7 @@
     "15773487": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15773487",
@@ -1307,7 +1307,7 @@
     "15773772": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15773772",
@@ -1323,7 +1323,7 @@
     "15775091": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:36.194Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:36.194Z",
       "url": "https://www.nettiauto.com/polestar/2/15775091",
@@ -1339,7 +1339,7 @@
     "15777833": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15777833",
@@ -1358,7 +1358,7 @@
     "15779777": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:33.454Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15779777",
@@ -1377,7 +1377,7 @@
     "15780285": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:56.495Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:56.495Z",
       "url": "https://www.nettiauto.com/polestar/2/15780285",
@@ -1394,14 +1394,14 @@
     "15781804": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15781804",
       "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh",
       "year": 2021,
       "mileage": 121000,
-      "price": 26790,
+      "price": 26750,
       "seller": "LänsiAuto Helsinki",
       "reasons": [
         "121 000 km over 120 000 km"
@@ -1410,7 +1410,7 @@
     "15782360": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15782360",
@@ -1429,21 +1429,21 @@
     "15782398": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:02.484Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15782398",
       "title": "78 kWh, Launch Edition, 300kW, 78kWh",
       "year": 2021,
       "mileage": 120000,
-      "price": 28390,
+      "price": 28350,
       "seller": "LänsiAuto Helsinki",
       "reasons": []
     },
     "15782421": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15782421",
@@ -1461,7 +1461,7 @@
     "15782422": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:25.151Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15782422",
@@ -1475,7 +1475,7 @@
     "15782808": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:03.013Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:03.013Z",
       "url": "https://www.nettiauto.com/polestar/2/15782808",
@@ -1491,7 +1491,7 @@
     "15783085": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15783085",
@@ -1511,7 +1511,7 @@
     "15783110": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15783110",
@@ -1529,7 +1529,7 @@
     "15784212": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:28.881Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15784212",
@@ -1545,7 +1545,7 @@
     "15785254": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:04.602Z",
-      "lastSeenAt": "2026-08-26T17:24:47.573Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15785254",
@@ -1559,7 +1559,7 @@
     "15786812": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15786812",
@@ -1577,7 +1577,7 @@
     "15786832": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15786832",
@@ -1595,7 +1595,7 @@
     "15788349": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15788349",
@@ -1613,7 +1613,7 @@
     "15788422": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.666Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:06.666Z",
       "url": "https://www.nettiauto.com/polestar/2/15788422",
@@ -1629,7 +1629,7 @@
     "15789002": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15789002",
@@ -1643,7 +1643,7 @@
     "15789552": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15789552",
@@ -1662,7 +1662,7 @@
     "15789736": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:08.374Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:08.374Z",
       "url": "https://www.nettiauto.com/polestar/2/15789736",
@@ -1678,7 +1678,7 @@
     "15789930": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:42.817Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:42.817Z",
       "url": "https://www.nettiauto.com/polestar/2/15789930",
@@ -1695,7 +1695,7 @@
     "15790112": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:00.898Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:00.898Z",
       "url": "https://www.nettiauto.com/polestar/2/15790112",
@@ -1712,7 +1712,7 @@
     "15790567": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15790567",
@@ -1729,7 +1729,7 @@
     "15791077": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15791077",
@@ -1743,7 +1743,7 @@
     "15791523": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15791523",
@@ -1761,7 +1761,7 @@
     "15791550": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:03.925Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:03.925Z",
       "url": "https://www.nettiauto.com/polestar/2/15791550",
@@ -1777,7 +1777,7 @@
     "15791609": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15791609",
@@ -1796,7 +1796,7 @@
     "15792349": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15792349",
@@ -1810,7 +1810,7 @@
     "15793040": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:11.322Z",
       "url": "https://www.nettiauto.com/polestar/2/15793040",
@@ -1826,7 +1826,7 @@
     "15794229": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:11.945Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15794229",
@@ -1842,7 +1842,7 @@
     "15794287": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:22.068Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:22.068Z",
       "url": "https://www.nettiauto.com/polestar/2/15794287",
@@ -1858,7 +1858,7 @@
     "15794414": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15794414",
@@ -1872,7 +1872,7 @@
     "15794476": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15794476",
@@ -1891,7 +1891,7 @@
     "15794985": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:09.926Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15794985",
@@ -1905,7 +1905,7 @@
     "15797648": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15797648",
@@ -1919,7 +1919,7 @@
     "15797762": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15797762",
@@ -1935,7 +1935,7 @@
     "15798573": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15798573",
@@ -1951,7 +1951,7 @@
     "15798695": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15798695",
@@ -1968,7 +1968,7 @@
     "15798745": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15798745",
@@ -1987,7 +1987,7 @@
     "15799122": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15799122",
@@ -2005,7 +2005,7 @@
     "15799261": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15799261",
@@ -2019,7 +2019,7 @@
     "15799402": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:11.945Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:11.945Z",
       "url": "https://www.nettiauto.com/polestar/2/15799402",
@@ -2036,7 +2036,7 @@
     "15799998": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:05.360Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:05.360Z",
       "url": "https://www.nettiauto.com/polestar/2/15799998",
@@ -2052,7 +2052,7 @@
     "15800091": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:02.443Z",
       "url": "https://www.nettiauto.com/polestar/2/15800091",
@@ -2069,7 +2069,7 @@
     "15800715": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15800715",
@@ -2086,7 +2086,7 @@
     "15801201": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15801201",
@@ -2105,7 +2105,7 @@
     "15801456": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:08.395Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:08.395Z",
       "url": "https://www.nettiauto.com/polestar/2/15801456",
@@ -2121,7 +2121,7 @@
     "15803060": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:11:59.337Z",
       "url": "https://www.nettiauto.com/polestar/2/15803060",
@@ -2138,7 +2138,7 @@
     "15803115": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:29.217Z",
       "url": "https://www.nettiauto.com/polestar/2/15803115",
@@ -2155,7 +2155,7 @@
     "15803141": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15803141",
@@ -2171,7 +2171,7 @@
     "15803627": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15803627",
@@ -2189,7 +2189,7 @@
     "15803761": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:23.187Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15803761",
@@ -2205,7 +2205,7 @@
     "15804011": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15804011",
@@ -2221,7 +2221,7 @@
     "15804445": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.782Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15804445",
@@ -2238,7 +2238,7 @@
     "15805026": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15805026",
@@ -2254,7 +2254,7 @@
     "15805468": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15805468",
@@ -2268,7 +2268,7 @@
     "15807115": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15807115",
@@ -2285,7 +2285,7 @@
     "15807819": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15807819",
@@ -2303,7 +2303,7 @@
     "15807844": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15807844",
@@ -2321,7 +2321,7 @@
     "15808511": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15808511",
@@ -2339,7 +2339,7 @@
     "15809488": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15809488",
@@ -2355,7 +2355,7 @@
     "15810095": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15810095",
@@ -2373,7 +2373,7 @@
     "15810538": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15810538",
@@ -2389,7 +2389,7 @@
     "15811755": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:48.104Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15811755",
@@ -2408,7 +2408,7 @@
     "15811856": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15811856",
@@ -2427,7 +2427,7 @@
     "15811934": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15811934",
@@ -2445,7 +2445,7 @@
     "15811949": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:54.876Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:54.876Z",
       "url": "https://www.nettiauto.com/polestar/2/15811949",
@@ -2462,7 +2462,7 @@
     "15812764": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:57.886Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15812764",
@@ -2476,7 +2476,7 @@
     "15812953": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15812953",
@@ -2494,7 +2494,7 @@
     "15813060": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15813060",
@@ -2511,7 +2511,7 @@
     "15813159": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:23.270Z",
       "url": "https://www.nettiauto.com/polestar/2/15813159",
@@ -2527,7 +2527,7 @@
     "15813348": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:25.151Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:25.151Z",
       "url": "https://www.nettiauto.com/polestar/2/15813348",
@@ -2544,7 +2544,7 @@
     "15813436": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15813436",
@@ -2562,7 +2562,7 @@
     "15814607": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15814607",
@@ -2581,7 +2581,7 @@
     "15815075": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15815075",
@@ -2599,7 +2599,7 @@
     "15815466": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:17.109Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:17.109Z",
       "url": "https://www.nettiauto.com/polestar/2/15815466",
@@ -2615,7 +2615,7 @@
     "15816005": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15816005",
@@ -2631,7 +2631,7 @@
     "15818906": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15818906",
@@ -2647,7 +2647,7 @@
     "15819400": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15819400",
@@ -2665,7 +2665,7 @@
     "15820427": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15820427",
@@ -2683,7 +2683,7 @@
     "15820714": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15820714",
@@ -2702,7 +2702,7 @@
     "15820857": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15820857",
@@ -2719,7 +2719,7 @@
     "15821109": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:23.187Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:23.187Z",
       "url": "https://www.nettiauto.com/polestar/2/15821109",
@@ -2735,7 +2735,7 @@
     "15821253": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15821253",
@@ -2754,7 +2754,7 @@
     "15821459": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15821459",
@@ -2774,7 +2774,7 @@
     "15821623": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15821623",
@@ -2792,7 +2792,7 @@
     "15822480": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15822480",
@@ -2810,7 +2810,7 @@
     "15823251": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15823251",
@@ -2829,7 +2829,7 @@
     "15823327": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:40.657Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15823327",
@@ -2843,7 +2843,7 @@
     "15823496": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15823496",
@@ -2859,7 +2859,7 @@
     "15823880": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15823880",
@@ -2877,7 +2877,7 @@
     "15824861": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15824861",
@@ -2895,7 +2895,7 @@
     "15825004": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15825004",
@@ -2912,7 +2912,7 @@
     "15825206": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15825206",
@@ -2930,7 +2930,7 @@
     "15825282": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15825282",
@@ -2944,7 +2944,7 @@
     "15825873": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15825873",
@@ -2958,7 +2958,7 @@
     "15826207": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:26.931Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15826207",
@@ -2972,7 +2972,7 @@
     "15826470": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:26.409Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:26.409Z",
       "url": "https://www.nettiauto.com/polestar/2/15826470",
@@ -2988,7 +2988,7 @@
     "15827310": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:33.454Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:33.454Z",
       "url": "https://www.nettiauto.com/polestar/2/15827310",
@@ -3005,7 +3005,7 @@
     "15827653": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15827653",
@@ -3021,7 +3021,7 @@
     "15828486": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15828486",
@@ -3035,7 +3035,7 @@
     "15828718": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15828718",
@@ -3053,7 +3053,7 @@
     "15829420": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15829420",
@@ -3069,7 +3069,7 @@
     "15830526": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15830526",
@@ -3085,7 +3085,7 @@
     "15831224": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15831224",
@@ -3101,7 +3101,7 @@
     "15831827": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15831827",
@@ -3118,7 +3118,7 @@
     "15832725": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:00.544Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:00.544Z",
       "url": "https://www.nettiauto.com/polestar/2/15832725",
@@ -3135,7 +3135,7 @@
     "15834568": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15834568",
@@ -3151,7 +3151,7 @@
     "15834589": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15834589",
@@ -3169,7 +3169,7 @@
     "15835013": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15835013",
@@ -3185,7 +3185,7 @@
     "15835252": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:11.945Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15835252",
@@ -3202,7 +3202,7 @@
     "15835926": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:18.958Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:18.958Z",
       "url": "https://www.nettiauto.com/polestar/2/15835926",
@@ -3218,7 +3218,7 @@
     "15836126": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15836126",
@@ -3232,7 +3232,7 @@
     "15836176": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:23.187Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15836176",
@@ -3252,7 +3252,7 @@
     "15836981": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15836981",
@@ -3268,21 +3268,21 @@
     "15837867": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:03.013Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15837867",
       "title": "78 kWh, Long Range Dual Motor Performance, 350kW, 78kWh",
       "year": 2021,
       "mileage": 32000,
-      "price": 37590,
+      "price": 37490,
       "seller": "LänsiAuto Helsinki",
       "reasons": []
     },
     "15839241": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15839241",
@@ -3300,7 +3300,7 @@
     "15839690": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15839690",
@@ -3316,7 +3316,7 @@
     "15839829": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15839829",
@@ -3332,7 +3332,7 @@
     "15841406": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15841406",
@@ -3348,7 +3348,7 @@
     "15841628": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15841628",
@@ -3367,7 +3367,7 @@
     "15841853": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15841853",
@@ -3383,7 +3383,7 @@
     "15842000": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:35.247Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:35.247Z",
       "url": "https://www.nettiauto.com/polestar/2/15842000",
@@ -3400,7 +3400,7 @@
     "15845107": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15845107",
@@ -3418,7 +3418,7 @@
     "15846055": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15846055",
@@ -3432,7 +3432,7 @@
     "15846150": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15846150",
@@ -3451,7 +3451,7 @@
     "15848033": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15848033",
@@ -3470,7 +3470,7 @@
     "15848365": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15848365",
@@ -3488,7 +3488,7 @@
     "15849907": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15849907",
@@ -3507,7 +3507,7 @@
     "15850182": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15850182",
@@ -3526,7 +3526,7 @@
     "15850513": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15850513",
@@ -3545,7 +3545,7 @@
     "15850681": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15850681",
@@ -3563,7 +3563,7 @@
     "15851190": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15851190",
@@ -3577,7 +3577,7 @@
     "15851361": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15851361",
@@ -3596,7 +3596,7 @@
     "15851612": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:20:20.221Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:20:20.585Z",
       "detailCheckedAt": "2026-08-26T15:20:20.221Z",
       "url": "https://www.nettiauto.com/polestar/2/15851612",
@@ -3610,7 +3610,7 @@
     "15852647": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:12.037Z",
       "url": "https://www.nettiauto.com/polestar/2/15852647",
@@ -3627,7 +3627,7 @@
     "15853239": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15853239",
@@ -3641,7 +3641,7 @@
     "15853241": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:28.193Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15853241",
@@ -3655,7 +3655,7 @@
     "15854491": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15854491",
@@ -3669,7 +3669,7 @@
     "15855320": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15855320",
@@ -3687,7 +3687,7 @@
     "15855322": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15855322",
@@ -3701,7 +3701,7 @@
     "15855487": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:09.926Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:09.926Z",
       "url": "https://www.nettiauto.com/polestar/2/15855487",
@@ -3718,7 +3718,7 @@
     "15855524": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:31.344Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:31.344Z",
       "url": "https://www.nettiauto.com/polestar/2/15855524",
@@ -3735,7 +3735,7 @@
     "15857118": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:14.166Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15857118",
@@ -3751,7 +3751,7 @@
     "15858558": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15858558",
@@ -3765,7 +3765,7 @@
     "15858755": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15858755",
@@ -3783,7 +3783,7 @@
     "15859146": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15859146",
@@ -3800,7 +3800,7 @@
     "15859185": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15859185",
@@ -3814,7 +3814,7 @@
     "15859464": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15859464",
@@ -3832,7 +3832,7 @@
     "15859846": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15859846",
@@ -3849,7 +3849,7 @@
     "15860713": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15860713",
@@ -3866,7 +3866,7 @@
     "15860839": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15860839",
@@ -3899,7 +3899,7 @@
     "15861114": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:05.360Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15861114",
@@ -3918,7 +3918,7 @@
     "15861904": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15861904",
@@ -3936,7 +3936,7 @@
     "15862075": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:46.919Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15862075",
@@ -3953,7 +3953,7 @@
     "15862316": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:51.461Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15862316",
@@ -3971,7 +3971,7 @@
     "15862567": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:36.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:36.783Z",
       "url": "https://www.nettiauto.com/polestar/2/15862567",
@@ -3987,7 +3987,7 @@
     "15862693": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15862693",
@@ -4003,7 +4003,7 @@
     "15863358": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15863358",
@@ -4021,7 +4021,7 @@
     "15863385": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15863385",
@@ -4039,7 +4039,7 @@
     "15863447": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15863447",
@@ -4057,7 +4057,7 @@
     "15863534": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:22.224Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:22.224Z",
       "url": "https://www.nettiauto.com/polestar/2/15863534",
@@ -4073,7 +4073,7 @@
     "15863828": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15863828",
@@ -4092,7 +4092,7 @@
     "15863864": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:44.265Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:44.265Z",
       "url": "https://www.nettiauto.com/polestar/2/15863864",
@@ -4108,7 +4108,7 @@
     "15864078": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:26.469Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15864078",
@@ -4122,7 +4122,7 @@
     "15865388": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15865388",
@@ -4140,7 +4140,7 @@
     "15865741": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15865741",
@@ -4158,7 +4158,7 @@
     "15866266": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:49.542Z",
       "url": "https://www.nettiauto.com/polestar/2/15866266",
@@ -4175,7 +4175,7 @@
     "15866383": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15866383",
@@ -4194,7 +4194,7 @@
     "15866702": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:30.749Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:30.749Z",
       "url": "https://www.nettiauto.com/polestar/2/15866702",
@@ -4211,7 +4211,7 @@
     "15866868": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15866868",
@@ -4227,7 +4227,7 @@
     "15867000": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:08.395Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15867000",
@@ -4241,7 +4241,7 @@
     "15867027": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:13.012Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15867027",
@@ -4258,7 +4258,7 @@
     "15868446": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:28.881Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15868446",
@@ -4272,7 +4272,7 @@
     "15868660": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15868660",
@@ -4289,7 +4289,7 @@
     "15869044": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:02.484Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15869044",
@@ -4303,7 +4303,7 @@
     "15871413": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15871413",
@@ -4319,7 +4319,7 @@
     "15871691": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.666Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15871691",
@@ -4335,7 +4335,7 @@
     "15871785": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15871785",
@@ -4353,7 +4353,7 @@
     "15871788": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15871788",
@@ -4371,7 +4371,7 @@
     "15871961": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15871961",
@@ -4385,7 +4385,7 @@
     "15872473": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15872473",
@@ -4401,7 +4401,7 @@
     "15872794": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15872794",
@@ -4420,7 +4420,7 @@
     "15875727": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15875727",
@@ -4438,7 +4438,7 @@
     "15876141": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:25.151Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15876141",
@@ -4452,7 +4452,7 @@
     "15876894": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:23.548Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:23.548Z",
       "url": "https://www.nettiauto.com/polestar/2/15876894",
@@ -4468,7 +4468,7 @@
     "15876981": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:59.358Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:59.358Z",
       "url": "https://www.nettiauto.com/polestar/2/15876981",
@@ -4484,7 +4484,7 @@
     "15879452": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:13.012Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15879452",
@@ -4498,7 +4498,7 @@
     "15879478": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:03.925Z",
-      "lastSeenAt": "2026-08-26T17:24:47.581Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15879478",
@@ -4512,7 +4512,7 @@
     "15879960": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:20:19.498Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": "2026-08-26T15:20:20.585Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15879960",
@@ -4526,7 +4526,7 @@
     "15880429": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15880429",
@@ -4544,7 +4544,7 @@
     "15880961": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:00.758Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15880961",
@@ -4562,7 +4562,7 @@
     "15880983": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:14.416Z",
       "url": "https://www.nettiauto.com/polestar/2/15880983",
@@ -4578,7 +4578,7 @@
     "15882674": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15882674",
@@ -4594,7 +4594,7 @@
     "15883701": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:48.417Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:13:48.417Z",
       "url": "https://www.nettiauto.com/polestar/2/15883701",
@@ -4608,7 +4608,7 @@
     "15883809": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15883809",
@@ -4625,7 +4625,7 @@
     "15883879": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:00.544Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15883879",
@@ -4639,7 +4639,7 @@
     "15885285": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:10.809Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:10.809Z",
       "url": "https://www.nettiauto.com/polestar/2/15885285",
@@ -4655,7 +4655,7 @@
     "15885526": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15885526",
@@ -4672,7 +4672,7 @@
     "15885696": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15885696",
@@ -4686,7 +4686,7 @@
     "15885752": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:14.166Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15885752",
@@ -4702,7 +4702,7 @@
     "15885952": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15885952",
@@ -4718,7 +4718,7 @@
     "15887857": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15887857",
@@ -4732,7 +4732,7 @@
     "15888866": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:31.685Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:31.685Z",
       "url": "https://www.nettiauto.com/polestar/2/15888866",
@@ -4749,7 +4749,7 @@
     "15888937": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15888937",
@@ -4766,7 +4766,7 @@
     "15889090": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15889090",
@@ -4783,7 +4783,7 @@
     "15889389": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15889389",
@@ -4801,7 +4801,7 @@
     "15890179": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15890179",
@@ -4820,7 +4820,7 @@
     "15890291": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:08.374Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15890291",
@@ -4834,7 +4834,7 @@
     "15890659": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:03.972Z",
       "url": "https://www.nettiauto.com/polestar/2/15890659",
@@ -4851,7 +4851,7 @@
     "15890733": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15890733",
@@ -4869,7 +4869,7 @@
     "15892929": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:59.051Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15892929",
@@ -4887,7 +4887,7 @@
     "15893007": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15893007",
@@ -4904,7 +4904,7 @@
     "15893357": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:45.535Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:13:45.535Z",
       "url": "https://www.nettiauto.com/polestar/2/15893357",
@@ -4918,7 +4918,7 @@
     "15893420": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:04.602Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:04.602Z",
       "url": "https://www.nettiauto.com/polestar/2/15893420",
@@ -4935,7 +4935,7 @@
     "15893553": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:19.398Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15893553",
@@ -4954,7 +4954,7 @@
     "15893654": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:35.302Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:35.302Z",
       "url": "https://www.nettiauto.com/polestar/2/15893654",
@@ -4970,7 +4970,7 @@
     "15894837": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15894837",
@@ -4987,7 +4987,7 @@
     "15894982": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:20.272Z",
       "url": "https://www.nettiauto.com/polestar/2/15894982",
@@ -5003,7 +5003,7 @@
     "15895449": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15895449",
@@ -5021,7 +5021,7 @@
     "15895451": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15895451",
@@ -5039,7 +5039,7 @@
     "15895825": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:40.657Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:40.657Z",
       "url": "https://www.nettiauto.com/polestar/2/15895825",
@@ -5055,7 +5055,7 @@
     "15895963": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:54.495Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15895963",
@@ -5074,7 +5074,7 @@
     "15896355": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:05.424Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15896355",
@@ -5088,7 +5088,7 @@
     "15896406": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:44.266Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15896406",
@@ -5102,7 +5102,7 @@
     "15896598": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15896598",
@@ -5116,7 +5116,7 @@
     "15897379": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15897379",
@@ -5134,7 +5134,7 @@
     "15897621": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:41.514Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15897621",
@@ -5148,7 +5148,7 @@
     "15897750": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15897750",
@@ -5162,7 +5162,7 @@
     "15898483": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:31.685Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15898483",
@@ -5176,7 +5176,7 @@
     "15898729": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15898729",
@@ -5192,7 +5192,7 @@
     "15899533": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:54.495Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15899533",
@@ -5210,7 +5210,7 @@
     "15899753": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15899753",
@@ -5228,7 +5228,7 @@
     "15899779": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:13.178Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:13:13.178Z",
       "url": "https://www.nettiauto.com/polestar/2/15899779",
@@ -5242,7 +5242,7 @@
     "15900388": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.666Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15900388",
@@ -5260,7 +5260,7 @@
     "15900712": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:09.926Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15900712",
@@ -5278,7 +5278,7 @@
     "15900928": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15900928",
@@ -5295,7 +5295,7 @@
     "15901461": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15901461",
@@ -5309,7 +5309,7 @@
     "15902133": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15902133",
@@ -5327,7 +5327,7 @@
     "15902171": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:21.826Z",
       "url": "https://www.nettiauto.com/polestar/2/15902171",
@@ -5343,7 +5343,7 @@
     "15902784": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:03.013Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15902784",
@@ -5361,7 +5361,7 @@
     "15903249": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15903249",
@@ -5377,7 +5377,7 @@
     "15903925": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:20.906Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:20.906Z",
       "url": "https://www.nettiauto.com/polestar/2/15903925",
@@ -5394,7 +5394,7 @@
     "15904387": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:14.693Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:14.693Z",
       "url": "https://www.nettiauto.com/polestar/2/15904387",
@@ -5410,7 +5410,7 @@
     "15904465": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:46.919Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:46.919Z",
       "url": "https://www.nettiauto.com/polestar/2/15904465",
@@ -5426,7 +5426,7 @@
     "15904987": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15904987",
@@ -5445,7 +5445,7 @@
     "15905041": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:41.514Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15905041",
@@ -5463,7 +5463,7 @@
     "15905450": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15905450",
@@ -5477,7 +5477,7 @@
     "15905480": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15905480",
@@ -5491,7 +5491,7 @@
     "15905719": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15905719",
@@ -5507,7 +5507,7 @@
     "15906637": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15906637",
@@ -5525,7 +5525,7 @@
     "15907588": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:08.801Z",
       "url": "https://www.nettiauto.com/polestar/2/15907588",
@@ -5541,7 +5541,7 @@
     "15907812": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:48.104Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15907812",
@@ -5559,7 +5559,7 @@
     "15907930": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15907930",
@@ -5575,7 +5575,7 @@
     "15908894": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:13.012Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15908894",
@@ -5592,7 +5592,7 @@
     "15908976": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:00.507Z",
       "url": "https://www.nettiauto.com/polestar/2/15908976",
@@ -5608,7 +5608,7 @@
     "15909315": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:00.544Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15909315",
@@ -5622,7 +5622,7 @@
     "15909912": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15909912",
@@ -5636,7 +5636,7 @@
     "15910271": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15910271",
@@ -5650,7 +5650,7 @@
     "15910301": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:07.079Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:07.079Z",
       "url": "https://www.nettiauto.com/polestar/2/15910301",
@@ -5667,7 +5667,7 @@
     "15910579": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:28.193Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:28.193Z",
       "url": "https://www.nettiauto.com/polestar/2/15910579",
@@ -5684,7 +5684,7 @@
     "15910888": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15910888",
@@ -5702,7 +5702,7 @@
     "15913029": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:41.514Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15913029",
@@ -5720,7 +5720,7 @@
     "15913057": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15913057",
@@ -5734,7 +5734,7 @@
     "15913117": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:06.352Z",
       "url": "https://www.nettiauto.com/polestar/2/15913117",
@@ -5751,7 +5751,7 @@
     "15913386": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:53.065Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:53.065Z",
       "url": "https://www.nettiauto.com/polestar/2/15913386",
@@ -5767,7 +5767,7 @@
     "15913547": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:20.906Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15913547",
@@ -5787,7 +5787,7 @@
     "15914250": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:50.358Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:12:50.358Z",
       "url": "https://www.nettiauto.com/polestar/2/15914250",
@@ -5801,7 +5801,7 @@
     "15914476": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15914476",
@@ -5817,7 +5817,7 @@
     "15915814": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15915814",
@@ -5833,7 +5833,7 @@
     "15915854": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15915854",
@@ -5851,7 +5851,7 @@
     "15915861": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15915861",
@@ -5869,7 +5869,7 @@
     "15916134": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:00.758Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:00.758Z",
       "url": "https://www.nettiauto.com/polestar/2/15916134",
@@ -5885,7 +5885,7 @@
     "15916197": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15916197",
@@ -5902,7 +5902,7 @@
     "15917021": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:50.358Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15917021",
@@ -5918,7 +5918,7 @@
     "15917901": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:09.591Z",
       "url": "https://www.nettiauto.com/polestar/2/15917901",
@@ -5935,7 +5935,7 @@
     "15918145": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15918145",
@@ -5952,7 +5952,7 @@
     "15918379": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:44.265Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15918379",
@@ -5970,7 +5970,7 @@
     "15918715": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15918715",
@@ -5989,7 +5989,7 @@
     "15918775": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15918775",
@@ -6005,7 +6005,7 @@
     "15918825": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:14.166Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15918825",
@@ -6023,7 +6023,7 @@
     "15919222": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15919222",
@@ -6041,7 +6041,7 @@
     "15919246": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:18.527Z",
       "url": "https://www.nettiauto.com/polestar/2/15919246",
@@ -6057,7 +6057,7 @@
     "15919264": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.527Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15919264",
@@ -6074,7 +6074,7 @@
     "15921386": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.793Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:18.793Z",
       "url": "https://www.nettiauto.com/polestar/2/15921386",
@@ -6091,7 +6091,7 @@
     "15922127": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:28.881Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:28.881Z",
       "url": "https://www.nettiauto.com/polestar/2/15922127",
@@ -6108,7 +6108,7 @@
     "15922482": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15922482",
@@ -6127,7 +6127,7 @@
     "15923878": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15923878",
@@ -6141,7 +6141,7 @@
     "15923895": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15923895",
@@ -6157,7 +6157,7 @@
     "15923923": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:32.469Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:32.469Z",
       "url": "https://www.nettiauto.com/polestar/2/15923923",
@@ -6173,7 +6173,7 @@
     "15924224": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:18.095Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": "2026-08-26T15:13:18.095Z",
       "url": "https://www.nettiauto.com/polestar/2/15924224",
@@ -6187,7 +6187,7 @@
     "15924871": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:11.945Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15924871",
@@ -6201,7 +6201,7 @@
     "15924990": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:44.303Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15924990",
@@ -6219,7 +6219,7 @@
     "15925045": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:28.193Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15925045",
@@ -6233,7 +6233,7 @@
     "15925114": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15925114",
@@ -6249,7 +6249,7 @@
     "15925274": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:03.925Z",
-      "lastSeenAt": "2026-08-26T17:24:47.581Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15925274",
@@ -6266,7 +6266,7 @@
     "15926866": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15926866",
@@ -6284,7 +6284,7 @@
     "15927143": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:42.817Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15927143",
@@ -6302,7 +6302,7 @@
     "15927309": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15927309",
@@ -6318,7 +6318,7 @@
     "15927479": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:28.193Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15927479",
@@ -6335,7 +6335,7 @@
     "15927586": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:31.685Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15927586",
@@ -6349,7 +6349,7 @@
     "15927593": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15927593",
@@ -6363,7 +6363,7 @@
     "15929324": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15929324",
@@ -6379,7 +6379,7 @@
     "15929527": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15929527",
@@ -6397,7 +6397,7 @@
     "15929668": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:00.544Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15929668",
@@ -6413,7 +6413,7 @@
     "15930159": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:59.051Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:59.051Z",
       "url": "https://www.nettiauto.com/polestar/2/15930159",
@@ -6430,7 +6430,7 @@
     "15930162": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15930162",
@@ -6448,7 +6448,7 @@
     "15930263": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:12.606Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15930263",
@@ -6464,7 +6464,7 @@
     "15930660": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15930660",
@@ -6482,7 +6482,7 @@
     "15931614": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:36.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15931614",
@@ -6499,7 +6499,7 @@
     "15932114": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15932114",
@@ -6518,7 +6518,7 @@
     "15932193": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15932193",
@@ -6534,7 +6534,7 @@
     "15932237": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:26.469Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:26.469Z",
       "url": "https://www.nettiauto.com/polestar/2/15932237",
@@ -6551,7 +6551,7 @@
     "15932444": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.794Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15932444",
@@ -6568,7 +6568,7 @@
     "15932579": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15932579",
@@ -6588,7 +6588,7 @@
     "15932602": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:53.800Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:53.800Z",
       "url": "https://www.nettiauto.com/polestar/2/15932602",
@@ -6604,7 +6604,7 @@
     "15932839": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15932839",
@@ -6621,7 +6621,7 @@
     "15932920": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:13.012Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:13.012Z",
       "url": "https://www.nettiauto.com/polestar/2/15932920",
@@ -6638,7 +6638,7 @@
     "15933078": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15933078",
@@ -6655,7 +6655,7 @@
     "15933399": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15933399",
@@ -6672,7 +6672,7 @@
     "15933470": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:16.136Z",
       "url": "https://www.nettiauto.com/polestar/2/15933470",
@@ -6688,7 +6688,7 @@
     "15933487": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15933487",
@@ -6708,7 +6708,7 @@
     "15933603": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15933603",
@@ -6727,7 +6727,7 @@
     "15934192": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:08.395Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15934192",
@@ -6741,7 +6741,7 @@
     "15934263": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15934263",
@@ -6757,7 +6757,7 @@
     "15934635": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:41.514Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:41.514Z",
       "url": "https://www.nettiauto.com/polestar/2/15934635",
@@ -6773,7 +6773,7 @@
     "15934696": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:28.881Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15934696",
@@ -6787,7 +6787,7 @@
     "15934944": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:19.398Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:19.398Z",
       "url": "https://www.nettiauto.com/polestar/2/15934944",
@@ -6804,7 +6804,7 @@
     "15935077": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935077",
@@ -6820,7 +6820,7 @@
     "15935098": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935098",
@@ -6839,7 +6839,7 @@
     "15935120": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935120",
@@ -6856,7 +6856,7 @@
     "15935141": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:23.187Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935141",
@@ -6873,7 +6873,7 @@
     "15935155": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935155",
@@ -6891,7 +6891,7 @@
     "15935214": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:33.769Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:33.769Z",
       "url": "https://www.nettiauto.com/polestar/2/15935214",
@@ -6908,7 +6908,7 @@
     "15935334": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.298Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935334",
@@ -6924,7 +6924,7 @@
     "15935554": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:21.216Z",
       "url": "https://www.nettiauto.com/polestar/2/15935554",
@@ -6941,7 +6941,7 @@
     "15935556": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:10.809Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935556",
@@ -6960,7 +6960,7 @@
     "15935660": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15935660",
@@ -6978,7 +6978,7 @@
     "15936663": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15936663",
@@ -6996,7 +6996,7 @@
     "15936879": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15936879",
@@ -7014,7 +7014,7 @@
     "15937006": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15937006",
@@ -7030,7 +7030,7 @@
     "15937122": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:38.497Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:38.497Z",
       "url": "https://www.nettiauto.com/polestar/2/15937122",
@@ -7047,7 +7047,7 @@
     "15937141": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15937141",
@@ -7065,7 +7065,7 @@
     "15937514": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:03.972Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15937514",
@@ -7079,7 +7079,7 @@
     "15937846": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15937846",
@@ -7095,7 +7095,7 @@
     "15937861": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15937861",
@@ -7109,7 +7109,7 @@
     "15938238": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:12:38.497Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15938238",
@@ -7123,7 +7123,7 @@
     "15938258": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:16.136Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15938258",
@@ -7137,7 +7137,7 @@
     "15939011": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.931Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939011",
@@ -7155,7 +7155,7 @@
     "15939022": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939022",
@@ -7173,7 +7173,7 @@
     "15939063": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939063",
@@ -7190,7 +7190,7 @@
     "15939263": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939263",
@@ -7206,7 +7206,7 @@
     "15939307": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939307",
@@ -7220,7 +7220,7 @@
     "15939449": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.574Z",
+      "lastSeenAt": "2026-08-26T18:55:37.299Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939449",
@@ -7237,7 +7237,7 @@
     "15939575": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15939575",
@@ -7251,7 +7251,7 @@
     "15940191": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:44.266Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15940191",
@@ -7269,7 +7269,7 @@
     "15941037": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:14:26.930Z",
       "url": "https://www.nettiauto.com/polestar/2/15941037",
@@ -7285,7 +7285,7 @@
     "15941040": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:46.045Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:12:46.045Z",
       "url": "https://www.nettiauto.com/polestar/2/15941040",
@@ -7302,7 +7302,7 @@
     "15941304": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15941304",
@@ -7321,7 +7321,7 @@
     "15941442": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-08-26T17:24:47.585Z",
+      "lastSeenAt": "2026-08-26T18:55:37.309Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15941442",
@@ -7339,7 +7339,7 @@
     "15941674": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-08-26T17:24:47.583Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15941674",
@@ -7353,7 +7353,7 @@
     "15942441": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15942441",
@@ -7369,7 +7369,7 @@
     "15942601": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.578Z",
+      "lastSeenAt": "2026-08-26T18:55:37.303Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15942601",
@@ -7387,7 +7387,7 @@
     "15942656": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15942656",
@@ -7403,7 +7403,7 @@
     "15942755": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:08.395Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.307Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15942755",
@@ -7417,7 +7417,7 @@
     "15942861": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:13:54.495Z",
-      "lastSeenAt": "2026-08-26T17:24:47.584Z",
+      "lastSeenAt": "2026-08-26T18:55:37.308Z",
       "announcedAt": null,
       "detailCheckedAt": "2026-08-26T15:13:54.495Z",
       "url": "https://www.nettiauto.com/polestar/2/15942861",
@@ -7433,7 +7433,7 @@
     "15942966": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-08-26T17:24:47.577Z",
+      "lastSeenAt": "2026-08-26T18:55:37.302Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15942966",
@@ -7452,7 +7452,7 @@
     "15943835": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15943835",
@@ -7468,7 +7468,7 @@
     "15943865": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-08-26T17:24:47.587Z",
+      "lastSeenAt": "2026-08-26T18:55:37.311Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15943865",
@@ -7486,7 +7486,7 @@
     "15943921": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:13:05.424Z",
-      "lastSeenAt": "2026-08-26T17:24:47.582Z",
+      "lastSeenAt": "2026-08-26T18:55:37.306Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15943921",
@@ -7500,7 +7500,7 @@
     "15944465": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-26T17:24:47.575Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15944465",
@@ -7518,7 +7518,7 @@
     "15944573": {
       "status": "match",
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": "2026-08-26T15:14:27.845Z",
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15944573",
@@ -7532,7 +7532,7 @@
     "15944865": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.931Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15944865",
@@ -7548,7 +7548,7 @@
     "15944924": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:18.794Z",
-      "lastSeenAt": "2026-08-26T17:24:47.586Z",
+      "lastSeenAt": "2026-08-26T18:55:37.310Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15944924",
@@ -7566,7 +7566,7 @@
     "15945347": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15945347",
@@ -7585,7 +7585,7 @@
     "15945698": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:25.151Z",
-      "lastSeenAt": "2026-08-26T17:24:47.579Z",
+      "lastSeenAt": "2026-08-26T18:55:37.304Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15945698",
@@ -7603,7 +7603,7 @@
     "15946748": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:12:44.303Z",
-      "lastSeenAt": "2026-08-26T17:24:47.580Z",
+      "lastSeenAt": "2026-08-26T18:55:37.305Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15946748",
@@ -7620,7 +7620,7 @@
     "15946928": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.313Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15946928",
@@ -7636,7 +7636,7 @@
     "15947539": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.300Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15947539",
@@ -7655,7 +7655,7 @@
     "15947639": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-26T17:24:47.588Z",
+      "lastSeenAt": "2026-08-26T18:55:37.312Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15947639",
@@ -7671,7 +7671,7 @@
     "15947967": {
       "status": "rejected",
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-26T17:24:47.576Z",
+      "lastSeenAt": "2026-08-26T18:55:37.301Z",
       "announcedAt": null,
       "detailCheckedAt": null,
       "url": "https://www.nettiauto.com/polestar/2/15947967",
@@ -7690,7 +7690,7 @@
   "tco": {
     "15748717": {
       "addedAt": "2026-08-26T17:24:49.466Z",
-      "confirmedAt": null
+      "confirmedAt": "2026-08-26T18:55:38.244Z"
     }
   }
 }
