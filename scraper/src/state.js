@@ -17,7 +17,16 @@ export const DEFAULT_STATE_PATH = resolve(HERE, '..', 'data', 'seen.json');
 const VERSION = 1;
 
 function emptyState() {
-  return { version: VERSION, seeded: false, seededAt: null, updatedAt: null, runs: 0, listings: {} };
+  return {
+    version: VERSION,
+    seeded: false,
+    seededAt: null,
+    updatedAt: null,
+    runs: 0,
+    listings: {},
+    // Reaction pickups: listing id -> { addedAt, confirmedAt }. See recordTcoAdd.
+    tco: {},
+  };
 }
 
 /** Read the state file, or return a fresh empty state if there isn't one. */
@@ -44,7 +53,13 @@ export async function loadState(path = DEFAULT_STATE_PATH) {
     throw new Error(`State file ${path} has version ${parsed.version}, expected ${VERSION}.`);
   }
 
-  return { ...emptyState(), ...parsed, listings: parsed.listings ?? {}, isNew: false };
+  return {
+    ...emptyState(),
+    ...parsed,
+    listings: parsed.listings ?? {},
+    tco: parsed.tco ?? {},
+    isNew: false,
+  };
 }
 
 /** Write the state file atomically: full write to a temp file, then rename. */
@@ -139,6 +154,33 @@ export function prune(state, { forgetAfterDays = config.state.forgetAfterDays, n
     }
   }
   return removed;
+}
+
+/**
+ * Which of the reacted listings should be (re)written to the calculator?
+ *
+ * The app's sync is last-write-wins, so an append can be overwritten by a
+ * device pushing older data moments later. The rule that makes this safe in
+ * both directions:
+ *
+ *  - never added -> add it;
+ *  - added but not yet seen present in the gist -> add again (a race ate it);
+ *  - seen present once (`confirmedAt`) -> leave it alone forever, so a car
+ *    the user deliberately deletes in the app stays deleted.
+ */
+export function needsTcoAdd(state, id) {
+  const entry = state.tco[id];
+  return !entry || !entry.confirmedAt;
+}
+
+export function recordTcoAdd(state, id, now = new Date()) {
+  const entry = state.tco[id] ?? (state.tco[id] = { addedAt: null, confirmedAt: null });
+  entry.addedAt = entry.addedAt ?? now.toISOString();
+}
+
+export function recordTcoConfirmed(state, id, now = new Date()) {
+  const entry = state.tco[id] ?? (state.tco[id] = { addedAt: null, confirmedAt: null });
+  entry.confirmedAt = entry.confirmedAt ?? now.toISOString();
 }
 
 export function summarise(state) {

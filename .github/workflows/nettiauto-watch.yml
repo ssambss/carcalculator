@@ -42,6 +42,10 @@ jobs:
         working-directory: scraper
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # Reaction pickup (react to a post -> car lands in the calculator).
+          # Optional: with neither secret set the step is skipped.
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
           node src/index.js \
             --notify-errors \

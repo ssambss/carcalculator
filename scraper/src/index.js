@@ -18,6 +18,8 @@ const { default: config } = await import('./config.js');
 const { fetchAllListings, fetchListingDetail } = await import('./nettiauto.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
+const { fetchReactedListingIds } = await import('./reactions.js');
+const { addCarsToTco } = await import('./gist.js');
 const state = await import('./state.js');
 
 function parseArgs(argv) {
@@ -147,6 +149,91 @@ async function collectMatches(listings, store, { verbose }) {
   return { matches, rejected, detailFetches, reusedVerdicts };
 }
 
+/** Rebuild enough of a listing from the state record to make a car entry. */
+function listingFromRecord(id, entry) {
+  if (!entry) return null;
+  return {
+    id,
+    url: entry.url,
+    title: entry.title ?? '',
+    subTitle: entry.title ?? '',
+    year: entry.year ?? null,
+    mileage: entry.mileage ?? null,
+    price: entry.price ?? null,
+    seller: entry.seller ?? null,
+    color: null,
+    location: null,
+  };
+}
+
+/**
+ * React to a posted listing in Discord -> the car appears in the calculator.
+ *
+ * Runs every cycle. The gist is read once; ids already present get confirmed
+ * (see state.needsTcoAdd for how that interacts with the app's last-write-wins
+ * sync), missing ones get written.
+ */
+async function pickUpReactions(listings, store, { dryRun }) {
+  const { botToken, webhookUrl } = config.discord;
+  const gistToken = config.tco.gistToken;
+
+  // Neither token set: the feature simply is not configured yet - skip with a
+  // visible note instead of failing the run, so posting keeps working while
+  // the secrets are being set up. Exactly one set is a half-finished setup or
+  // a typo in a secret name, and that deserves a loud failure.
+  if (!botToken && !gistToken) {
+    console.log(
+      'Reaction pickup is on but DISCORD_BOT_TOKEN and GIST_TOKEN are not set - skipping. ' +
+        'Add both secrets to enable it (see README.md).',
+    );
+    return;
+  }
+  if (!botToken || !gistToken) {
+    const missing = !botToken ? 'DISCORD_BOT_TOKEN' : 'GIST_TOKEN';
+    throw new Error(
+      `Reaction pickup is half-configured: ${missing} is not set while the other token is. ` +
+        'Add it, or set tco.pickUpReactions = false in src/config.js.',
+    );
+  }
+
+  const { reacted, scanned } = await fetchReactedListingIds({ botToken, webhookUrl });
+  console.log(`Scanned ${scanned} Discord message(s); ${reacted.size} reacted listing(s).`);
+  if (reacted.size === 0) return;
+
+  const live = new Map(listings.map((listing) => [listing.id, listing]));
+  const wanted = [];
+  for (const id of reacted.keys()) {
+    if (!state.needsTcoAdd(store, id)) continue;
+    const listing = live.get(id) ?? listingFromRecord(id, store.listings[id]);
+    if (listing) wanted.push(listing);
+    else console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
+  }
+  if (wanted.length === 0) {
+    console.log('All reacted listings are already in the calculator.');
+    return;
+  }
+
+  if (dryRun) {
+    for (const listing of wanted) {
+      console.log(`  [dry-run] would add to the calculator: ${formatListing(listing)}`);
+    }
+    return;
+  }
+
+  const { added, skipped } = await addCarsToTco(wanted);
+  for (const id of added) state.recordTcoAdd(store, id);
+  for (const id of skipped) {
+    // Already in the gist: whoever put it there, it is confirmed present.
+    state.recordTcoAdd(store, id);
+    state.recordTcoConfirmed(store, id);
+  }
+  if (added.length) {
+    console.log(`Added ${added.length} car(s) to the calculator:`);
+    for (const id of added) console.log(`  ${formatListing(wanted.find((l) => l.id === id))}`);
+  }
+  if (skipped.length) console.log(`${skipped.length} reacted car(s) were already in the calculator.`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -189,6 +276,11 @@ async function main() {
       console.log(formatListing(listing));
     }
     return 0;
+  }
+
+  if (config.tco.pickUpReactions) {
+    console.log('\nChecking Discord reactions...');
+    await pickUpReactions(listings, store, { dryRun: args.dryRun });
   }
 
   // Anything matching that we have never announced. On a first or seeded run

@@ -51,7 +51,7 @@ npm start                    # check and post anything new
 npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches, touch nothing
-npm test                     # unit tests (52 cases, no network)
+npm test                     # unit tests (66 cases, no network)
 
 node src/index.js --verbose  # also show near misses and why they missed
 node src/index.js --help
@@ -99,6 +99,47 @@ the record survives between runs. Set up:
 
 Locally instead, any scheduler works — Windows Task Scheduler or cron calling
 `node src/index.js` in this directory.
+
+## React to a post → the car lands in the calculator
+
+React to any posted listing in Discord (any emoji, from anyone in the channel)
+and within a cycle the car is added to the Car TCO calculator's comparison.
+It arrives with the price and odometer from the listing, the nettiauto link in
+its notes, and an agreed financing baseline — 0 € down, 6 % interest, 72
+months — so candidates are comparable before any dealer has quoted a real
+rate. Everything else (insurance, tax, maintenance) is left at zero for you to
+fill in; the defaults live in `tco.carDefaults` in [src/config.js](src/config.js).
+
+No frontend changes are involved: the scraper appends to the same secret gist
+the app's GitHub sync already uses, and the app pulls it on load and tab focus.
+The app must therefore be connected to GitHub sync first (cloud button in the
+header) — the scraper joins an existing sync, it never starts one.
+
+Setup needs two more secrets (as env vars locally, or Actions secrets in CI;
+with neither set the pickup is skipped and posting works as before):
+
+- `DISCORD_BOT_TOKEN` — webhooks can post but not read reactions, so this
+  needs a minimal bot: [discord.com/developers/applications](https://discord.com/developers/applications)
+  → **New Application** → **Bot** → *Reset Token* (no privileged intents
+  needed). Invite it to the server via **OAuth2 → URL Generator**, scope
+  `bot`, permissions *View Channels* + *Read Message History*, and make sure
+  it can see the channel the webhook posts into.
+- `GIST_TOKEN` — a classic GitHub token with **only the `gist` scope**, same
+  kind the app's sync dialog asks for, on the account that owns the data gist.
+
+Worth knowing:
+
+- A car is added once. Removing the reaction later does nothing — delete the
+  car in the app instead, and it stays deleted (the scraper re-adds a car only
+  until it has verified the write survived the app's last-write-wins sync,
+  never after).
+- The car's id is derived from the nettiauto id, so reacting twice, or both of
+  you reacting, cannot create duplicates.
+- Reactions are found by scanning recent channel history (`tco.scanMessages`,
+  default 300 messages) and mapping embeds back to listings via their URLs, so
+  it works on posts made before this feature existed too.
+- To require a specific emoji instead of any reaction, set
+  `tco.requiredEmoji` (e.g. `'✅'`) in [src/config.js](src/config.js).
 
 ## How it reads nettiauto
 
