@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS: Settings = {
 }
 
 export function newCar(): CarListing {
+  const now = new Date().toISOString()
   return {
     id: crypto.randomUUID(),
     name: '',
@@ -36,7 +37,8 @@ export function newCar(): CarListing {
     maintenancePerYear: 0,
     tiresPerYear: 0,
     otherPerYear: 0,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   }
 }
 
@@ -47,7 +49,7 @@ export function loadData(): AppData {
   } catch {
     // corrupt or unavailable storage — start fresh
   }
-  return { version: 1, settings: { ...DEFAULT_SETTINGS }, cars: [] }
+  return { version: 1, settings: { ...DEFAULT_SETTINGS }, cars: [], tombstones: {} }
 }
 
 export function saveData(data: AppData): void {
@@ -78,7 +80,13 @@ export function normalizeData(raw: unknown): AppData {
   const obj = isRecord(raw) ? raw : {}
   const settings = normalizeSettings(obj.settings)
   const cars = Array.isArray(obj.cars) ? obj.cars.map(normalizeCar) : []
-  return { version: 1, settings, cars }
+  const tombstones: Record<string, string> = {}
+  if (isRecord(obj.tombstones)) {
+    for (const [id, at] of Object.entries(obj.tombstones)) {
+      if (typeof at === 'string') tombstones[id] = at
+    }
+  }
+  return { version: 1, settings, cars, tombstones }
 }
 
 function normalizeSettings(raw: unknown): Settings {
@@ -116,6 +124,12 @@ function normalizeCar(raw: unknown): CarListing {
     tiresPerYear: toNum(c.tiresPerYear, 0),
     otherPerYear: toNum(c.otherPerYear, 0),
     createdAt: typeof c.createdAt === 'string' ? c.createdAt : base.createdAt,
+    updatedAt:
+      typeof c.updatedAt === 'string'
+        ? c.updatedAt
+        : typeof c.createdAt === 'string'
+          ? c.createdAt
+          : base.createdAt,
   }
 }
 

@@ -348,7 +348,7 @@ button:disabled {
 
 /* Styled selects can detach the native option popup from the page theme
    (near-white ink on a white popup in dark mode) — pin option colors. */
-.field-input-wrap select option {
+select option {
   background: var(--surface-input);
   color: var(--ink);
 }
@@ -365,6 +365,90 @@ button:disabled {
 
 .field-compact {
   width: 128px;
+}
+
+/* ————— Filter bar ————— */
+.filter-bar {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-search,
+.filter-select {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-input);
+  color: var(--ink);
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.filter-search {
+  width: 210px;
+}
+
+.filter-search:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.filter-chip:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+
+.filter-chip.active {
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-bg);
+  color: var(--btn-primary-ink);
+}
+
+.filter-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.select-box {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.select-box input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.car-card.selected {
+  border-color: var(--accent);
 }
 
 /* ————— Legend ————— */
@@ -961,6 +1045,16 @@ a.dialog-text {
 
   .field-compact {
     width: calc(50% - 8px);
+  }
+
+  .filter-search {
+    width: 100%;
+  }
+
+  .filter-search,
+  .filter-select,
+  .filter-chip {
+    height: 44px;
   }
 
   .hero-value {

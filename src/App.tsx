@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData, CarListing } from './types'
 import { calcTco } from './calc'
+import {
+  type Filters,
+  NO_FILTERS,
+  listMakes,
+  loadSelection,
+  matchesFilters,
+  saveSelection,
+} from './filtering'
 import { exportJson, importJson, loadData, newCar, saveData } from './storage'
 import {
   type SyncConfig,
   connectGist,
   getEditedAt,
   loadSyncConfig,
+  mergeData,
   pullGist,
   pushGist,
   saveSyncConfig,
@@ -17,6 +26,7 @@ import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
 import { ComparisonTable } from './components/ComparisonTable'
+import { FilterBar } from './components/FilterBar'
 import { SettingsPanel } from './components/SettingsPanel'
 import { SyncDialog, type SyncStatus } from './components/SyncDialog'
 
@@ -68,13 +78,24 @@ export default function App() {
     try {
       const remote = await pullGist(cfg)
       lastPullRef.current = Date.now()
-      const localEditedAt = getEditedAt()
-      if (remote && remote.savedAt && remote.savedAt > localEditedAt) {
-        stampEditedAt(remote.savedAt)
-        nonEditDataRef.current = remote.data
-        setData(remote.data)
-      } else if (remote && localEditedAt && remote.savedAt < localEditedAt) {
-        await pushGist(cfg, dataRef.current)
+      if (remote) {
+        const localEditedAt = getEditedAt()
+        const remoteNewer = remote.savedAt > localEditedAt
+        // Merge per car instead of replacing wholesale, so writes from other
+        // devices and the Discord bot survive concurrent edits
+        const merged = remoteNewer
+          ? mergeData(remote.data, dataRef.current)
+          : mergeData(dataRef.current, remote.data)
+        const mergedJson = JSON.stringify(merged)
+        const differsFromLocal = mergedJson !== JSON.stringify(dataRef.current)
+        const differsFromRemote = mergedJson !== JSON.stringify(remote.data)
+        if (differsFromRemote) stampEditedAt()
+        else if (remote.savedAt) stampEditedAt(remote.savedAt)
+        if (differsFromLocal) {
+          nonEditDataRef.current = merged
+          setData(merged)
+        }
+        if (differsFromRemote) await pushGist(cfg, merged)
       }
       setSyncStatus('synced')
       setSyncError('')
@@ -105,7 +126,21 @@ export default function App() {
     const timer = setTimeout(async () => {
       setSyncStatus('syncing')
       try {
-        await pushGist(cfg, dataRef.current)
+        // Read-merge-write: pick up anything written since our last pull
+        // (another device, the Discord bot) before overwriting the gist
+        let payload = dataRef.current
+        const remote = await pullGist(cfg).catch(() => null)
+        lastPullRef.current = Date.now()
+        if (remote) {
+          const merged = mergeData(dataRef.current, remote.data)
+          if (JSON.stringify(merged) !== JSON.stringify(dataRef.current)) {
+            nonEditDataRef.current = merged
+            setData(merged)
+          }
+          payload = merged
+        }
+        stampEditedAt()
+        await pushGist(cfg, payload)
         setSyncStatus('synced')
         setSyncError('')
       } catch (e) {
@@ -142,17 +177,38 @@ export default function App() {
     [data.cars, results],
   )
 
+  const [filters, setFilters] = useState<Filters>({ ...NO_FILTERS })
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(loadSelection)
+
+  const visibleCars = useMemo(
+    () => sortedCars.filter((c) => matchesFilters(c, filters, selectedIds)),
+    [sortedCars, filters, selectedIds],
+  )
+
   const cheapestId =
-    sortedCars.length > 1 && (results.get(sortedCars[0].id)?.total ?? 0) > 0
-      ? sortedCars[0].id
+    visibleCars.length > 1 && (results.get(visibleCars[0].id)?.total ?? 0) > 0
+      ? visibleCars[0].id
       : null
 
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      saveSelection(next)
+      return next
+    })
+  }
+
   function saveCar(car: CarListing) {
+    const stamped = { ...car, updatedAt: new Date().toISOString() }
     updateData((d) => {
-      const exists = d.cars.some((c) => c.id === car.id)
+      const exists = d.cars.some((c) => c.id === stamped.id)
       return {
         ...d,
-        cars: exists ? d.cars.map((c) => (c.id === car.id ? car : c)) : [...d.cars, car],
+        cars: exists
+          ? d.cars.map((c) => (c.id === stamped.id ? stamped : c))
+          : [...d.cars, stamped],
       }
     })
     setDraft(null)
@@ -160,16 +216,29 @@ export default function App() {
 
   function deleteCar(car: CarListing) {
     if (!window.confirm(`Delete "${car.name || 'this car'}"?`)) return
-    updateData((d) => ({ ...d, cars: d.cars.filter((c) => c.id !== car.id) }))
+    updateData((d) => ({
+      ...d,
+      cars: d.cars.filter((c) => c.id !== car.id),
+      tombstones: { ...d.tombstones, [car.id]: new Date().toISOString() },
+    }))
+    setSelectedIds((prev) => {
+      if (!prev.has(car.id)) return prev
+      const next = new Set(prev)
+      next.delete(car.id)
+      saveSelection(next)
+      return next
+    })
   }
 
   function duplicateCar(car: CarListing) {
+    const now = new Date().toISOString()
     const copy: CarListing = {
       ...car,
       financing: { ...car.financing },
       id: crypto.randomUUID(),
       name: `${car.name} (copy)`,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     }
     updateData((d) => ({ ...d, cars: [...d.cars, copy] }))
   }
@@ -304,26 +373,48 @@ export default function App() {
         </div>
       ) : (
         <>
-          <Legend breakdowns={sortedCars.map((c) => results.get(c.id)!.breakdown)} />
-          <div className="card-grid">
-            {sortedCars.map((car) => (
-              <CarCard
-                key={car.id}
-                car={car}
-                tco={results.get(car.id)!}
-                years={data.settings.ownershipYears}
-                cheapest={car.id === cheapestId}
-                onEdit={() => setDraft({ car, isNew: false })}
-                onDuplicate={() => duplicateCar(car)}
-                onDelete={() => deleteCar(car)}
-              />
-            ))}
-          </div>
-          <ComparisonTable
-            cars={sortedCars}
-            results={results}
-            years={data.settings.ownershipYears}
+          <FilterBar
+            filters={filters}
+            onChange={setFilters}
+            makes={listMakes(data.cars)}
+            selectedCount={selectedIds.size}
+            shownCount={visibleCars.length}
+            totalCount={data.cars.length}
           />
+          {visibleCars.length === 0 ? (
+            <div className="card empty-state">
+              <div className="empty-title display">No cars match</div>
+              <p className="empty-text">Adjust or clear the filters to see your cars.</p>
+              <button className="btn" onClick={() => setFilters({ ...NO_FILTERS })}>
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <>
+              <Legend breakdowns={visibleCars.map((c) => results.get(c.id)!.breakdown)} />
+              <div className="card-grid">
+                {visibleCars.map((car) => (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    tco={results.get(car.id)!}
+                    years={data.settings.ownershipYears}
+                    cheapest={car.id === cheapestId}
+                    selected={selectedIds.has(car.id)}
+                    onToggleSelect={() => toggleSelected(car.id)}
+                    onEdit={() => setDraft({ car, isNew: false })}
+                    onDuplicate={() => duplicateCar(car)}
+                    onDelete={() => deleteCar(car)}
+                  />
+                ))}
+              </div>
+              <ComparisonTable
+                cars={visibleCars}
+                results={results}
+                years={data.settings.ownershipYears}
+              />
+            </>
+          )}
         </>
       )}
 

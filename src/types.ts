@@ -40,6 +40,8 @@ export interface CarListing {
   tiresPerYear: number
   otherPerYear: number
   createdAt: string
+  /** last time this car itself was edited — used for per-car sync merging */
+  updatedAt: string
 }
 
 export interface Settings {
@@ -57,4 +59,6 @@ export interface AppData {
   version: 1
   settings: Settings
   cars: CarListing[]
+  /** deleted car ids → deletion time; lets deletes win over stale copies when syncing */
+  tombstones: Record<string, string>
 }

@@ -1,4 +1,4 @@
-import type { AppData } from './types'
+import type { AppData, CarListing } from './types'
 import { normalizeData } from './storage'
 
 const CONFIG_KEY = 'carcalculator.sync.v1'
@@ -141,6 +141,63 @@ export async function pullGist(cfg: SyncConfig): Promise<RemoteData | null> {
       : ''
   const data = normalizeData((parsed as { data?: unknown } | null)?.data)
   return { savedAt, data }
+}
+
+const TOMBSTONE_TTL_MS = 90 * 24 * 60 * 60 * 1000
+
+function carStamp(car: CarListing): string {
+  return car.updatedAt || car.createdAt
+}
+
+/**
+ * Per-car merge of two datasets, so concurrent writers (other devices, the
+ * Discord bot) add up instead of clobbering each other. For a car present on
+ * both sides the newer `updatedAt` wins (ties go to `preferred`); a tombstone
+ * beats a car unless the car was edited after the deletion. Output ordering is
+ * canonical so identical merges from any device serialize identically.
+ */
+export function mergeData(preferred: AppData, other: AppData): AppData {
+  const tombstones: Record<string, string> = {}
+  for (const source of [other.tombstones, preferred.tombstones]) {
+    for (const [id, at] of Object.entries(source)) {
+      if (!tombstones[id] || tombstones[id] < at) tombstones[id] = at
+    }
+  }
+
+  const byId = new Map<string, CarListing>()
+  for (const car of other.cars) byId.set(car.id, car)
+  for (const car of preferred.cars) {
+    const existing = byId.get(car.id)
+    if (!existing || carStamp(car) >= carStamp(existing)) byId.set(car.id, car)
+  }
+
+  const cars = [...byId.values()].filter((car) => {
+    const deletedAt = tombstones[car.id]
+    if (!deletedAt) return true
+    if (carStamp(car) > deletedAt) {
+      delete tombstones[car.id] // edited after the deletion → resurrected
+      return true
+    }
+    return false
+  })
+  cars.sort((a, b) =>
+    a.createdAt === b.createdAt
+      ? a.id.localeCompare(b.id)
+      : a.createdAt.localeCompare(b.createdAt),
+  )
+
+  const cutoff = new Date(Date.now() - TOMBSTONE_TTL_MS).toISOString()
+  const sortedTombstones: Record<string, string> = {}
+  for (const id of Object.keys(tombstones).sort()) {
+    if (tombstones[id] >= cutoff) sortedTombstones[id] = tombstones[id]
+  }
+
+  return {
+    version: 1,
+    settings: preferred.settings,
+    cars,
+    tombstones: sortedTombstones,
+  }
 }
 
 export async function pushGist(cfg: SyncConfig, data: AppData): Promise<void> {

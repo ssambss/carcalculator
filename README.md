@@ -17,7 +17,13 @@ color-coded cost breakdown and a side-by-side comparison table.
   GitHub token with only the `gist` scope (the dialog links to a prefilled
   token page) and paste it in once per device. Sync is last-write-wins by
   edit time; the app pulls on load and on tab focus, and pushes a couple of
-  seconds after each change.
+  seconds after each change. Sync merges **per car** (with deletion
+  tombstones), so several devices — and external writers like a bot adding
+  cars to the gist — can write concurrently without overwriting each other.
+- Filtering: search across name/notes, a make dropdown (derived from the
+  first word of the car's name), powertrain chips, and per-card selection
+  with a "Selected only" toggle. Filters narrow the cards, legend, lowest-cost
+  badge and the comparison table together; selection is device-local.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

@@ -9,16 +9,31 @@ interface Props {
   tco: TcoResult
   years: number
   cheapest: boolean
+  selected: boolean
+  onToggleSelect: () => void
   onEdit: () => void
   onDuplicate: () => void
   onDelete: () => void
 }
 
-export function CarCard({ car, tco, years, cheapest, onEdit, onDuplicate, onDelete }: Props) {
+export function CarCard({
+  car,
+  tco,
+  years,
+  cheapest,
+  selected,
+  onToggleSelect,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}: Props) {
   const isLoan = car.financing.method === 'loan'
   return (
-    <div className="card car-card">
+    <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
+        <label className="select-box" title="Select for comparison">
+          <input type="checkbox" checked={selected} onChange={onToggleSelect} />
+        </label>
         <div className="car-name display">{car.name || 'Unnamed car'}</div>
         <span className="chip">{POWERTRAIN_LABEL[car.powertrain]}</span>
       </div>
