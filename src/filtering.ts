@@ -7,6 +7,7 @@ export interface Filters {
   /** empty = all powertrains */
   powertrains: Powertrain[]
   selectedOnly: boolean
+  favoritesOnly: boolean
 }
 
 export const NO_FILTERS: Filters = {
@@ -14,6 +15,7 @@ export const NO_FILTERS: Filters = {
   make: 'all',
   powertrains: [],
   selectedOnly: false,
+  favoritesOnly: false,
 }
 
 /** Make is derived from the name's first word ("Škoda Octavia…" → "Škoda"). */
@@ -31,7 +33,13 @@ export function listMakes(cars: CarListing[]): string[] {
 }
 
 export function isFilterActive(f: Filters): boolean {
-  return f.query.trim() !== '' || f.make !== 'all' || f.powertrains.length > 0 || f.selectedOnly
+  return (
+    f.query.trim() !== '' ||
+    f.make !== 'all' ||
+    f.powertrains.length > 0 ||
+    f.selectedOnly ||
+    f.favoritesOnly
+  )
 }
 
 export function matchesFilters(
@@ -39,6 +47,7 @@ export function matchesFilters(
   f: Filters,
   selected: ReadonlySet<string>,
 ): boolean {
+  if (f.favoritesOnly && !car.favorite) return false
   if (f.selectedOnly && !selected.has(car.id)) return false
   if (f.powertrains.length > 0 && !f.powertrains.includes(car.powertrain)) return false
   if (f.make !== 'all' && makeOf(car) !== f.make) return false

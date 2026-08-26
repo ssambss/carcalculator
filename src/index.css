@@ -451,6 +451,33 @@ select option {
   border-color: var(--accent);
 }
 
+.fav-btn {
+  border: none;
+  background: none;
+  color: var(--ink-3);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin: -6px -4px;
+  flex-shrink: 0;
+}
+
+.fav-btn:hover {
+  color: var(--ink);
+}
+
+.fav-btn.active {
+  color: var(--ink);
+}
+
+.filter-chip svg {
+  vertical-align: -1px;
+  margin-right: 5px;
+}
+
 /* ————— Legend ————— */
 .legend {
   margin-top: 20px;

@@ -21,9 +21,10 @@ color-coded cost breakdown and a side-by-side comparison table.
   tombstones), so several devices — and external writers like a bot adding
   cars to the gist — can write concurrently without overwriting each other.
 - Filtering: search across name/notes, a make dropdown (derived from the
-  first word of the car's name), powertrain chips, and per-card selection
-  with a "Selected only" toggle. Filters narrow the cards, legend, lowest-cost
-  badge and the comparison table together; selection is device-local.
+  first word of the car's name), powertrain chips, a synced ★ favorites
+  shortlist, and per-card selection with a "Selected only" toggle. Filters
+  narrow the cards, legend, lowest-cost badge and the comparison table
+  together; selection is device-local while favorites travel with the data.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

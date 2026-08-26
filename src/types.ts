@@ -19,6 +19,8 @@ export interface CarListing {
   id: string
   name: string
   notes: string
+  /** part of the curated shortlist — synced, unlike the device-local compare selection */
+  favorite: boolean
   powertrain: Powertrain
   purchasePrice: number
   /** km on the clock when bought */

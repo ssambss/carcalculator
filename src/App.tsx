@@ -190,6 +190,14 @@ export default function App() {
       ? visibleCars[0].id
       : null
 
+  function toggleFavorite(car: CarListing) {
+    const stamped = { ...car, favorite: !car.favorite, updatedAt: new Date().toISOString() }
+    updateData((d) => ({
+      ...d,
+      cars: d.cars.map((c) => (c.id === stamped.id ? stamped : c)),
+    }))
+  }
+
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -378,6 +386,7 @@ export default function App() {
             onChange={setFilters}
             makes={listMakes(data.cars)}
             selectedCount={selectedIds.size}
+            favoriteCount={data.cars.filter((c) => c.favorite).length}
             shownCount={visibleCars.length}
             totalCount={data.cars.length}
           />
@@ -402,6 +411,7 @@ export default function App() {
                     cheapest={car.id === cheapestId}
                     selected={selectedIds.has(car.id)}
                     onToggleSelect={() => toggleSelected(car.id)}
+                    onToggleFavorite={() => toggleFavorite(car)}
                     onEdit={() => setDraft({ car, isNew: false })}
                     onDuplicate={() => duplicateCar(car)}
                     onDelete={() => deleteCar(car)}

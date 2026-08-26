@@ -7,6 +7,7 @@ interface Props {
   onChange: (f: Filters) => void
   makes: string[]
   selectedCount: number
+  favoriteCount: number
   shownCount: number
   totalCount: number
 }
@@ -18,6 +19,7 @@ export function FilterBar({
   onChange,
   makes,
   selectedCount,
+  favoriteCount,
   shownCount,
   totalCount,
 }: Props) {
@@ -64,6 +66,23 @@ export function FilterBar({
             {POWERTRAIN_LABEL[p]}
           </button>
         ))}
+        <button
+          className={`filter-chip${filters.favoritesOnly ? ' active' : ''}`}
+          disabled={favoriteCount === 0 && !filters.favoritesOnly}
+          onClick={() => set({ favoritesOnly: !filters.favoritesOnly })}
+        >
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            stroke="none"
+            aria-hidden="true"
+          >
+            <path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.2L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" />
+          </svg>
+          Favorites{favoriteCount > 0 ? ` (${favoriteCount})` : ''}
+        </button>
         <button
           className={`filter-chip${filters.selectedOnly ? ' active' : ''}`}
           disabled={selectedCount === 0 && !filters.selectedOnly}
