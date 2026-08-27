@@ -60,6 +60,10 @@ color-coded cost breakdown and a side-by-side comparison table.
   accrued interest and lease terms included) so totals compare directly —
   note that a manually entered resale value is not re-estimated for the
   shorter window, so auto-estimated cars normalize more faithfully.
+- **Out of pocket / mo** (cards, table, form previews): the loan or lease
+  payment plus running costs — what actually leaves the account each month
+  during the term. The budget line, distinct from the economic €/month,
+  which nets out resale value and only counts interest and depreciation.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

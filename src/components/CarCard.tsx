@@ -121,6 +121,12 @@ export function CarCard({
                 : 'Cash'}
           </span>
         </div>
+        {(isLoan || isLease) && (
+          <div className="stat">
+            <span className="stat-label">Out of pocket / mo</span>
+            <span className="stat-value">{fmtEur(tco.outOfPocketPerMonth)}</span>
+          </div>
+        )}
       </div>
 
       <BreakdownBar breakdown={tco.breakdown} total={tco.total} />

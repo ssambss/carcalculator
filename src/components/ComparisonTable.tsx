@@ -190,6 +190,19 @@ export function ComparisonTable({ cars, results, settings }: Props) {
                 )}
               </tr>
             )}
+            {(anyLoan || anyLease) && (
+              <tr>
+                <th className="rowhead">Out of pocket / mo</th>
+                {cars.map((c, i) => (
+                  <td
+                    key={c.id}
+                    className={`num${c.financing.method === 'cash' ? ' muted' : ''}`}
+                  >
+                    {fmtEur(tcos[i].outOfPocketPerMonth)}
+                  </td>
+                ))}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

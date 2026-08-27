@@ -57,6 +57,12 @@ export interface TcoResult {
   perKm: number
   /** monthly outlay to keep the car on the road: energy, insurance, tax, maintenance, other */
   runningPerMonth: number
+  /**
+   * What actually leaves the account each month during the financing term:
+   * the loan/lease payment plus running costs. The budget line — unlike
+   * `perMonth`, which is the economic cost with resale netted out.
+   */
+  outOfPocketPerMonth: number
   loan: LoanInfo
   lease: LeaseInfo
 }
@@ -271,13 +277,21 @@ export function calcTco(car: CarListing, settings: Settings, yearsOverride?: num
   const total = CATEGORIES.reduce((sum, c) => sum + breakdown[c.key], 0)
   const running =
     breakdown.energy + breakdown.insurance + breakdown.tax + breakdown.maintenance + breakdown.other
+  const runningPerMonth = months > 0 ? running / months : 0
+  const financedMonthly =
+    car.financing.method === 'loan'
+      ? loan.monthlyPayment
+      : isLeased(car)
+        ? lease.monthlyPayment
+        : 0
   return {
     breakdown,
     years,
     total,
     perMonth: months > 0 ? total / months : 0,
     perKm: totalKm > 0 ? total / totalKm : 0,
-    runningPerMonth: months > 0 ? running / months : 0,
+    runningPerMonth,
+    outOfPocketPerMonth: financedMonthly + runningPerMonth,
     loan,
     lease,
   }

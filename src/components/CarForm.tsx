@@ -315,7 +315,20 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                       the total
                     </span>
                   )}
+                  <span className="preview-side">
+                    · {fmtEur(loan.monthlyPayment + runningPerMonth)} / mo out of pocket
+                    with running costs
+                  </span>
                 </div>
+              )}
+              {Math.abs(years * 12 - draft.financing.termMonths) > 0.5 && (
+                <button
+                  className="inline-link"
+                  onClick={() => set({ keepYears: draft.financing.termMonths / 12 })}
+                >
+                  Compare this car over the loan term only (
+                  {fmtNum(draft.financing.termMonths)} months)
+                </button>
               )}
             </>
           )}
@@ -405,6 +418,10 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                     <span className="preview-side">
                       · everything the contract costs, over {fmtNum(years)}{' '}
                       {years === 1 ? 'year' : 'years'}
+                    </span>
+                    <span className="preview-side">
+                      · {fmtEur(lease.monthlyPayment + runningPerMonth)} / mo out of pocket
+                      with running costs
                     </span>
                   </div>
                   {leaseNotes.length > 0 && (
