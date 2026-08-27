@@ -1,4 +1,12 @@
-import type { AppData, CarListing, Financing, Powertrain, Settings } from './types'
+import type {
+  AppData,
+  CarListing,
+  Financing,
+  FinancingMethod,
+  Lease,
+  Powertrain,
+  Settings,
+} from './types'
 
 const STORAGE_KEY = 'carcalculator.data.v1'
 
@@ -8,6 +16,21 @@ export const DEFAULT_SETTINGS: Settings = {
   petrolPrice: 1.85,
   dieselPrice: 1.75,
   electricityPrice: 0.15,
+}
+
+/* A 36-month contract with a 20 000 km/yr allowance is the common Finnish
+ * private-lease shape; nothing is assumed to be included in the price. */
+export const DEFAULT_LEASE: Lease = {
+  monthlyPayment: 0,
+  upfront: 0,
+  termMonths: 36,
+  includedKmPerYear: 20000,
+  excessKmFee: 0,
+  includes: { insurance: false, tax: false, maintenance: false, tires: false },
+}
+
+export function cloneLease(lease: Lease): Lease {
+  return { ...lease, includes: { ...lease.includes } }
 }
 
 export function newCar(): CarListing {
@@ -30,6 +53,7 @@ export function newCar(): CarListing {
       autoBalloon: true,
       balloon: 0,
     },
+    lease: cloneLease(DEFAULT_LEASE),
     fuelLPer100: 6.5,
     elecKwhPer100: 17,
     electricSharePct: 50,
@@ -117,6 +141,7 @@ function normalizeCar(raw: unknown): CarListing {
       typeof c.autoResale === 'boolean' ? c.autoResale : !(toNum(c.expectedResaleValue, 0) > 0),
     expectedResaleValue: toNum(c.expectedResaleValue, 0),
     financing: normalizeFinancing(c.financing),
+    lease: normalizeLease(c.lease),
     fuelLPer100: toNum(c.fuelLPer100, base.fuelLPer100),
     elecKwhPer100: toNum(c.elecKwhPer100, base.elecKwhPer100),
     electricSharePct: toNum(c.electricSharePct, base.electricSharePct),
@@ -138,7 +163,7 @@ function normalizeCar(raw: unknown): CarListing {
 function normalizeFinancing(raw: unknown): Financing {
   const f = isRecord(raw) ? raw : {}
   return {
-    method: f.method === 'loan' ? 'loan' : 'cash',
+    method: isFinancingMethod(f.method) ? f.method : 'cash',
     downPayment: toNum(f.downPayment, 0),
     annualRatePct: toNum(f.annualRatePct, 0),
     termMonths: toNum(f.termMonths, 60),
@@ -148,12 +173,34 @@ function normalizeFinancing(raw: unknown): Financing {
   }
 }
 
+function normalizeLease(raw: unknown): Lease {
+  const l = isRecord(raw) ? raw : {}
+  const inc = isRecord(l.includes) ? l.includes : {}
+  return {
+    monthlyPayment: toNum(l.monthlyPayment, 0),
+    upfront: toNum(l.upfront, 0),
+    termMonths: Math.max(1, toNum(l.termMonths, DEFAULT_LEASE.termMonths)),
+    includedKmPerYear: Math.max(0, toNum(l.includedKmPerYear, DEFAULT_LEASE.includedKmPerYear)),
+    excessKmFee: Math.max(0, toNum(l.excessKmFee, 0)),
+    includes: {
+      insurance: inc.insurance === true,
+      tax: inc.tax === true,
+      maintenance: inc.maintenance === true,
+      tires: inc.tires === true,
+    },
+  }
+}
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null
 }
 
 function isPowertrain(v: unknown): v is Powertrain {
   return v === 'petrol' || v === 'diesel' || v === 'ev' || v === 'phev'
+}
+
+function isFinancingMethod(v: unknown): v is FinancingMethod {
+  return v === 'cash' || v === 'loan' || v === 'lease'
 }
 
 function toNum(v: unknown, fallback: number): number {

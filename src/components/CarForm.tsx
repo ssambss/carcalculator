@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
-import type { CarListing, Powertrain, Settings } from '../types'
-import {
-  STANDARD_BALLOON_SHARE,
-  calcLoan,
-  energyCostPerYear,
-  estimateResaleValue,
-} from '../calc'
+import type {
+  CarListing,
+  FinancingMethod,
+  Lease,
+  LeaseIncludes,
+  Powertrain,
+  Settings,
+} from '../types'
+import { STANDARD_BALLOON_SHARE, calcLease, calcLoan, calcTco, estimateResaleValue } from '../calc'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
-import { POWERTRAIN_LABEL } from '../labels'
+import {
+  FINANCING_LABEL,
+  LEASE_INCLUDE_KEYS,
+  LEASE_INCLUDE_LABEL,
+  POWERTRAIN_LABEL,
+} from '../labels'
 import { NumberField } from './NumberField'
 
 interface Props {
@@ -19,6 +26,13 @@ interface Props {
 }
 
 const POWERTRAINS: Powertrain[] = ['petrol', 'diesel', 'ev', 'phev']
+const METHODS: FinancingMethod[] = ['cash', 'loan', 'lease']
+
+/** "a", "a and b", "a, b and c" */
+function joinWords(words: string[]): string {
+  if (words.length <= 1) return words[0] ?? ''
+  return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
+}
 
 export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
   const [draft, setDraft] = useState<CarListing>(initial)
@@ -35,21 +49,46 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
   const set = (patch: Partial<CarListing>) => setDraft((d) => ({ ...d, ...patch }))
   const setFin = (patch: Partial<CarListing['financing']>) =>
     setDraft((d) => ({ ...d, financing: { ...d.financing, ...patch } }))
+  const setLease = (patch: Partial<Lease>) =>
+    setDraft((d) => ({ ...d, lease: { ...d.lease, ...patch } }))
+  const toggleIncluded = (key: keyof LeaseIncludes) =>
+    setDraft((d) => ({
+      ...d,
+      lease: { ...d.lease, includes: { ...d.lease.includes, [key]: !d.lease.includes[key] } },
+    }))
 
   const usesFuel = draft.powertrain !== 'ev'
   const usesElectricity = draft.powertrain === 'ev' || draft.powertrain === 'phev'
-  const isLoan = draft.financing.method === 'loan'
+  const method = draft.financing.method
+  const isLoan = method === 'loan'
+  const isLease = method === 'lease'
   const loan = calcLoan(draft)
+  const lease = calcLease(draft, settings)
+  const hasKmCap = draft.lease.includedKmPerYear > 0
   const standardBalloon = Math.round(draft.purchasePrice * STANDARD_BALLOON_SHARE)
   const resaleEstimate = estimateResaleValue(draft, settings)
-  const runningPerMonth =
-    (energyCostPerYear(draft, settings) +
-      draft.insurancePerYear +
-      draft.taxPerYear +
-      draft.maintenancePerYear +
-      draft.tiresPerYear +
-      draft.otherPerYear) /
-    12
+  // The real calculation, so the preview honours whatever the lease covers
+  const runningPerMonth = calcTco(draft, settings).runningPerMonth
+  const covered = isLease ? LEASE_INCLUDE_KEYS.filter((k) => draft.lease.includes[k]) : []
+  const showsYearly = (key: keyof LeaseIncludes) => !covered.includes(key)
+  const coveredNote = covered.length
+    ? `The lease covers ${joinWords(covered.map((k) => LEASE_INCLUDE_LABEL[k].toLowerCase()))} — not counted again here.`
+    : ''
+
+  const leaseNotes: string[] = []
+  if (draft.lease.upfront > 0) {
+    leaseNotes.push(`${fmtEur(draft.lease.upfront)} at signing, counted ${lease.termsStarted}×`)
+  }
+  if (lease.excessKmCost > 0) {
+    leaseNotes.push(
+      `${fmtEur(lease.excessKmCost)} for the ${fmtNum(lease.excessKmPerYear)} km/yr past the allowance`,
+    )
+  }
+  if (lease.termsStarted > 1) {
+    leaseNotes.push(
+      `the term ends before the ${fmtNum(years)}-year comparison does, so it is costed as leasing again on the same terms`,
+    )
+  }
 
   function save() {
     onSave({ ...draft, name: draft.name.trim() || 'Unnamed car' })
@@ -120,74 +159,75 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
           </div>
         </div>
 
-        <div className="form-section">
-          <div className="section-title">Purchase &amp; value</div>
-          <div className="form-grid">
-            <NumberField
-              label="Purchase price"
-              value={draft.purchasePrice}
-              onChange={(n) => set({ purchasePrice: n })}
-              unit="€"
-            />
-            <NumberField
-              label="Odometer"
-              value={draft.odometerKm}
-              onChange={(n) => set({ odometerKm: Math.max(0, n) })}
-              unit="km"
-            />
-            {draft.autoResale ? (
-              <div className="field span-2">
-                <span className="field-label">Expected value after {years} years</span>
-                <div className="preview-row">
-                  <span className="preview-main display">{fmtEur(resaleEstimate)}</span>
-                  <span className="preview-side">· estimated from age &amp; mileage</span>
-                  <button
-                    className="inline-link"
-                    onClick={() =>
-                      set({ autoResale: false, expectedResaleValue: resaleEstimate })
-                    }
-                  >
-                    Enter manually
-                  </button>
+        {/* Nothing here applies to a lease: it is handed back, so there is no
+            purchase price to lose value and no resale to estimate. */}
+        {!isLease && (
+          <div className="form-section">
+            <div className="section-title">Purchase &amp; value</div>
+            <div className="form-grid">
+              <NumberField
+                label="Purchase price"
+                value={draft.purchasePrice}
+                onChange={(n) => set({ purchasePrice: n })}
+                unit="€"
+              />
+              <NumberField
+                label="Odometer"
+                value={draft.odometerKm}
+                onChange={(n) => set({ odometerKm: Math.max(0, n) })}
+                unit="km"
+              />
+              {draft.autoResale ? (
+                <div className="field span-2">
+                  <span className="field-label">Expected value after {years} years</span>
+                  <div className="preview-row">
+                    <span className="preview-main display">{fmtEur(resaleEstimate)}</span>
+                    <span className="preview-side">· estimated from age &amp; mileage</span>
+                    <button
+                      className="inline-link"
+                      onClick={() =>
+                        set({ autoResale: false, expectedResaleValue: resaleEstimate })
+                      }
+                    >
+                      Enter manually
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <>
-                <NumberField
-                  label={`Expected value after ${years} years`}
-                  value={draft.expectedResaleValue}
-                  onChange={(n) => set({ expectedResaleValue: n })}
-                  unit="€"
-                />
-                <div className="field">
-                  <span className="field-label">&nbsp;</span>
-                  <button
-                    className="inline-link field-side-link"
-                    onClick={() => set({ autoResale: true })}
-                  >
-                    Use estimate ({fmtEur(resaleEstimate)})
-                  </button>
-                </div>
-              </>
-            )}
+              ) : (
+                <>
+                  <NumberField
+                    label={`Expected value after ${years} years`}
+                    value={draft.expectedResaleValue}
+                    onChange={(n) => set({ expectedResaleValue: n })}
+                    unit="€"
+                  />
+                  <div className="field">
+                    <span className="field-label">&nbsp;</span>
+                    <button
+                      className="inline-link field-side-link"
+                      onClick={() => set({ autoResale: true })}
+                    >
+                      Use estimate ({fmtEur(resaleEstimate)})
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="form-section">
           <div className="section-title">Financing</div>
           <div className="segmented">
-            <button
-              className={isLoan ? '' : 'active'}
-              onClick={() => setFin({ method: 'cash' })}
-            >
-              Cash
-            </button>
-            <button
-              className={isLoan ? 'active' : ''}
-              onClick={() => setFin({ method: 'loan' })}
-            >
-              Loan
-            </button>
+            {METHODS.map((m) => (
+              <button
+                key={m}
+                className={method === m ? 'active' : ''}
+                onClick={() => setFin({ method: m })}
+              >
+                {FINANCING_LABEL[m]}
+              </button>
+            ))}
           </div>
           {isLoan && (
             <>
@@ -255,6 +295,92 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
               )}
             </>
           )}
+          {isLease && (
+            <>
+              <div className="form-grid">
+                <NumberField
+                  label="Monthly payment"
+                  value={draft.lease.monthlyPayment}
+                  onChange={(n) => setLease({ monthlyPayment: Math.max(0, n) })}
+                  unit="€ / month"
+                />
+                <NumberField
+                  label="Term"
+                  value={draft.lease.termMonths}
+                  onChange={(n) => setLease({ termMonths: Math.max(1, n) })}
+                  unit="months"
+                />
+                <NumberField
+                  label="Paid at signing"
+                  value={draft.lease.upfront}
+                  onChange={(n) => setLease({ upfront: Math.max(0, n) })}
+                  unit="€"
+                  hint="Enlarged first installment, delivery and registration fees."
+                />
+                <NumberField
+                  label="Mileage allowance"
+                  value={draft.lease.includedKmPerYear}
+                  onChange={(n) => setLease({ includedKmPerYear: Math.max(0, n) })}
+                  unit="km / yr"
+                  hint="Leave at 0 if the contract sets no limit."
+                />
+                {hasKmCap && (
+                  <>
+                    <NumberField
+                      label="Excess kilometre fee"
+                      value={draft.lease.excessKmFee}
+                      onChange={(n) => setLease({ excessKmFee: Math.max(0, n) })}
+                      unit="€ / km"
+                    />
+                    <div className="field">
+                      <span className="field-label">Past the allowance</span>
+                      <span className="field-input-wrap field-static">
+                        <span className="field-static-value">
+                          {lease.excessKmPerYear > 0
+                            ? `${fmtNum(lease.excessKmPerYear)} km / yr`
+                            : 'nothing'}
+                        </span>
+                        <span className="field-unit">at {fmtNum(settings.annualKm)} km/yr</span>
+                      </span>
+                    </div>
+                  </>
+                )}
+                <div className="field span-2">
+                  <span className="field-label">Included in the lease</span>
+                  <div className="filter-chips">
+                    {LEASE_INCLUDE_KEYS.map((k) => (
+                      <button
+                        key={k}
+                        className={`filter-chip${draft.lease.includes[k] ? ' active' : ''}`}
+                        aria-pressed={draft.lease.includes[k]}
+                        onClick={() => toggleIncluded(k)}
+                      >
+                        {LEASE_INCLUDE_LABEL[k]}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="field-hint">
+                    What the price already covers, the way full-service leasing does — these
+                    drop out of the yearly costs below instead of being paid twice.
+                  </span>
+                </div>
+              </div>
+              {lease.total > 0 && (
+                <>
+                  <div className="preview-row">
+                    <span className="preview-main display">{fmtEur(lease.perMonth)} / month</span>
+                    <span className="preview-side">
+                      · everything the contract costs, over {fmtNum(years)}{' '}
+                      {years === 1 ? 'year' : 'years'}
+                    </span>
+                  </div>
+                  {leaseNotes.length > 0 && (
+                    <span className="field-hint">{leaseNotes.join(' · ')}</span>
+                  )}
+                </>
+              )}
+            </>
+          )}
         </div>
 
         <div className="form-section">
@@ -291,30 +417,38 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
         <div className="form-section">
           <div className="section-title">Costs per year</div>
           <div className="form-grid">
-            <NumberField
-              label="Insurance"
-              value={draft.insurancePerYear}
-              onChange={(n) => set({ insurancePerYear: n })}
-              unit="€ / yr"
-            />
-            <NumberField
-              label="Vehicle tax"
-              value={draft.taxPerYear}
-              onChange={(n) => set({ taxPerYear: n })}
-              unit="€ / yr"
-            />
-            <NumberField
-              label="Maintenance"
-              value={draft.maintenancePerYear}
-              onChange={(n) => set({ maintenancePerYear: n })}
-              unit="€ / yr"
-            />
-            <NumberField
-              label="Tires"
-              value={draft.tiresPerYear}
-              onChange={(n) => set({ tiresPerYear: n })}
-              unit="€ / yr"
-            />
+            {showsYearly('insurance') && (
+              <NumberField
+                label="Insurance"
+                value={draft.insurancePerYear}
+                onChange={(n) => set({ insurancePerYear: n })}
+                unit="€ / yr"
+              />
+            )}
+            {showsYearly('tax') && (
+              <NumberField
+                label="Vehicle tax"
+                value={draft.taxPerYear}
+                onChange={(n) => set({ taxPerYear: n })}
+                unit="€ / yr"
+              />
+            )}
+            {showsYearly('maintenance') && (
+              <NumberField
+                label="Maintenance"
+                value={draft.maintenancePerYear}
+                onChange={(n) => set({ maintenancePerYear: n })}
+                unit="€ / yr"
+              />
+            )}
+            {showsYearly('tires') && (
+              <NumberField
+                label="Tires"
+                value={draft.tiresPerYear}
+                onChange={(n) => set({ tiresPerYear: n })}
+                unit="€ / yr"
+              />
+            )}
             <NumberField
               label="Other"
               value={draft.otherPerYear}
@@ -322,6 +456,7 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
               unit="€ / yr"
             />
           </div>
+          {coveredNote && <span className="field-hint">{coveredNote}</span>}
           {runningPerMonth > 0 && (
             <div className="preview-row">
               <span className="preview-main display">

@@ -2,8 +2,12 @@ import type { CarListing, Settings } from './types'
 
 /**
  * Cost categories in fixed display order. The `series` number maps to the
- * CSS custom properties --series-1..7 (validated categorical palette),
+ * CSS custom properties --series-1..8 (validated categorical palette),
  * so a category keeps its color everywhere it appears.
+ *
+ * Lease sits last on purpose: a leased car has no depreciation or loan
+ * interest, so its bar starts at Energy, and red-next-to-aqua is the one
+ * adjacency in this palette that drops into the colorblind-warning band.
  */
 export const CATEGORIES = [
   { key: 'depreciation', label: 'Depreciation', series: 1 },
@@ -13,6 +17,7 @@ export const CATEGORIES = [
   { key: 'tax', label: 'Vehicle tax', series: 5 },
   { key: 'maintenance', label: 'Maintenance & tires', series: 6 },
   { key: 'other', label: 'Other', series: 7 },
+  { key: 'lease', label: 'Lease payments', series: 8 },
 ] as const
 
 export type CategoryKey = (typeof CATEGORIES)[number]['key']
@@ -25,6 +30,23 @@ export interface LoanInfo {
   totalInterest: number
 }
 
+export interface LeaseInfo {
+  /** the contract's monthly rate */
+  monthlyPayment: number
+  /** upfront payments falling inside the comparison period (one per term started) */
+  termsStarted: number
+  /** rates + upfronts over the comparison period */
+  payments: number
+  /** km / yr driven past the contract's allowance */
+  excessKmPerYear: number
+  /** cost of those kilometres over the comparison period */
+  excessKmCost: number
+  /** payments + excess kilometres — what lands in the breakdown */
+  total: number
+  /** everything above spread over the comparison period */
+  perMonth: number
+}
+
 export interface TcoResult {
   breakdown: Breakdown
   /** total cost of ownership over the whole period */
@@ -34,6 +56,7 @@ export interface TcoResult {
   /** monthly outlay to keep the car on the road: energy, insurance, tax, maintenance, other */
   runningPerMonth: number
   loan: LoanInfo
+  lease: LeaseInfo
 }
 
 /*
@@ -104,6 +127,55 @@ export function calcLoan(car: CarListing): LoanInfo {
   }
 }
 
+const NO_LEASE: LeaseInfo = {
+  monthlyPayment: 0,
+  termsStarted: 0,
+  payments: 0,
+  excessKmPerYear: 0,
+  excessKmCost: 0,
+  total: 0,
+  perMonth: 0,
+}
+
+export function isLeased(car: CarListing): boolean {
+  return car.financing.method === 'lease'
+}
+
+/**
+ * Cost of a lease over the comparison period. Where the period outlasts the
+ * contract the assumption is that you lease again on the same terms, so the
+ * rate runs for the whole period and the signing payment is charged once per
+ * term started — that keeps a 36-month lease comparable with a car you keep
+ * for five years instead of making its last two years look free.
+ *
+ * Driving past the mileage allowance is billed per kilometre. An allowance of
+ * 0 means the contract sets no cap, not that every kilometre costs extra.
+ */
+export function calcLease(car: CarListing, settings: Settings): LeaseInfo {
+  if (!isLeased(car)) return NO_LEASE
+  const lease = car.lease
+  const years = Math.max(0, settings.ownershipYears)
+  const months = years * 12
+  const term = Math.max(1, Math.round(lease.termMonths))
+  const termsStarted = Math.ceil(months / term)
+  const payments =
+    Math.max(0, lease.monthlyPayment) * months + Math.max(0, lease.upfront) * termsStarted
+  const allowance = Math.max(0, lease.includedKmPerYear)
+  const excessKmPerYear =
+    allowance > 0 ? Math.max(0, Math.max(0, settings.annualKm) - allowance) : 0
+  const excessKmCost = excessKmPerYear * Math.max(0, lease.excessKmFee) * years
+  const total = payments + excessKmCost
+  return {
+    monthlyPayment: Math.max(0, lease.monthlyPayment),
+    termsStarted,
+    payments,
+    excessKmPerYear,
+    excessKmCost,
+    total,
+    perMonth: months > 0 ? total / months : 0,
+  }
+}
+
 export function energyCostPerYear(car: CarListing, settings: Settings): number {
   const km = Math.max(0, settings.annualKm)
   switch (car.powertrain) {
@@ -127,14 +199,25 @@ export function calcTco(car: CarListing, settings: Settings): TcoResult {
   const months = years * 12
   const totalKm = Math.max(0, settings.annualKm) * years
   const loan = calcLoan(car)
+  const lease = calcLease(car, settings)
+  // A full-service lease can already cover some yearly costs; those are held in
+  // the car (so unticking a box brings the figure back) but cost nothing here.
+  const covered = isLeased(car) ? car.lease.includes : null
+  const yearly = (value: number, includedInLease: boolean) =>
+    (covered && includedInLease ? 0 : value) * years
   const breakdown: Breakdown = {
-    depreciation: Math.max(0, car.purchasePrice - Math.max(0, resolveResaleValue(car, settings))),
+    depreciation: isLeased(car)
+      ? 0 // a lease is handed back — no purchase price to lose value
+      : Math.max(0, car.purchasePrice - Math.max(0, resolveResaleValue(car, settings))),
     financing: loan.totalInterest,
     energy: energyCostPerYear(car, settings) * years,
-    insurance: car.insurancePerYear * years,
-    tax: car.taxPerYear * years,
-    maintenance: (car.maintenancePerYear + car.tiresPerYear) * years,
+    insurance: yearly(car.insurancePerYear, Boolean(covered?.insurance)),
+    tax: yearly(car.taxPerYear, Boolean(covered?.tax)),
+    maintenance:
+      yearly(car.maintenancePerYear, Boolean(covered?.maintenance)) +
+      yearly(car.tiresPerYear, Boolean(covered?.tires)),
     other: car.otherPerYear * years,
+    lease: lease.total,
   }
   const total = CATEGORIES.reduce((sum, c) => sum + breakdown[c.key], 0)
   const running =
@@ -146,5 +229,6 @@ export function calcTco(car: CarListing, settings: Settings): TcoResult {
     perKm: totalKm > 0 ? total / totalKm : 0,
     runningPerMonth: months > 0 ? running / months : 0,
     loan,
+    lease,
   }
 }

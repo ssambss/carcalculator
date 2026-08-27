@@ -1,14 +1,24 @@
 # Car TCO
 
-A total-cost-of-ownership calculator for comparing car purchase candidates —
-built to be used at home and at the dealership (works well on a phone).
+A total-cost-of-ownership calculator for comparing the cars you might buy or
+lease — built to be used at home and at the dealership (works well on a phone).
 
 Each car gets a listing with purchase price, expected resale value, financing
-(cash, or an annuity loan with optional balloon payment), energy use
+(cash, an annuity loan with optional balloon payment, or a lease), energy use
 (petrol / diesel / EV / plug-in hybrid) and yearly costs. The app boils it all
 down to **€ / month**, **€ / km** and a total over the ownership period, with a
 color-coded cost breakdown and a side-by-side comparison table.
 
+- **Leasing** is the third way to pay for a car, next to cash and a loan:
+  monthly rate, term, payment at signing, mileage allowance and the
+  excess-kilometre fee, plus toggles for whatever the price already covers
+  (insurance, vehicle tax, maintenance, tires) so those are not counted twice.
+  A lease is handed back, so it has no depreciation and no resale value to
+  estimate — the contract gets its own cost category instead, and the purchase
+  fields disappear from the form. Where the ownership period outlasts the
+  contract the cost assumes you lease again on the same terms, with the signing
+  payment charged once per term started; that keeps a 36-month lease comparable
+  with a car kept for five years instead of making its last two years free.
 - Data lives in the browser's `localStorage` by default — nothing is sent
   anywhere. Use **Export** to download a JSON backup, **Import** to restore.
 - Optional **GitHub sync** (cloud button in the header): the app auto-syncs

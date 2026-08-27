@@ -15,6 +15,13 @@ export function ComparisonTable({ cars, results, years }: Props) {
     tcos.some((t) => t.breakdown[cat.key] > 0),
   )
   const anyLoan = cars.some((c) => c.financing.method === 'loan')
+  const anyLease = cars.some((c) => c.financing.method === 'lease')
+  const financedLabel =
+    anyLoan && anyLease
+      ? 'Loan / lease per mo'
+      : anyLease
+        ? 'Lease payment / mo'
+        : 'Loan payment / mo'
 
   function minClass(values: number[], i: number): string {
     if (!highlight) return ''
@@ -115,17 +122,21 @@ export function ComparisonTable({ cars, results, years }: Props) {
                 </td>
               ))}
             </tr>
-            {anyLoan && (
+            {(anyLoan || anyLease) && (
               <tr>
-                <th className="rowhead">Loan payment / mo</th>
+                <th className="rowhead">{financedLabel}</th>
                 {cars.map((c, i) =>
-                  c.financing.method === 'loan' ? (
-                    <td key={c.id} className="num">
-                      {fmtEurExact(tcos[i].loan.monthlyPayment)}
-                    </td>
-                  ) : (
+                  c.financing.method === 'cash' ? (
                     <td key={c.id} className="num muted">
                       —
+                    </td>
+                  ) : (
+                    <td key={c.id} className="num">
+                      {fmtEurExact(
+                        c.financing.method === 'lease'
+                          ? tcos[i].lease.monthlyPayment
+                          : tcos[i].loan.monthlyPayment,
+                      )}
                     </td>
                   ),
                 )}

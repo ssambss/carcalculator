@@ -9,7 +9,7 @@ import {
   matchesFilters,
   saveSelection,
 } from './filtering'
-import { exportJson, importJson, loadData, newCar, saveData } from './storage'
+import { cloneLease, exportJson, importJson, loadData, newCar, saveData } from './storage'
 import {
   type SyncConfig,
   connectGist,
@@ -249,6 +249,7 @@ export default function App() {
     const copy: CarListing = {
       ...car,
       financing: { ...car.financing },
+      lease: cloneLease(car.lease),
       id: crypto.randomUUID(),
       name: `${car.name} (copy)`,
       createdAt: now,

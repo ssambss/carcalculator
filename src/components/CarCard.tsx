@@ -1,7 +1,7 @@
 import type { CarListing } from '../types'
 import type { TcoResult } from '../calc'
 import { fmtEur, fmtEurExact } from '../format'
-import { POWERTRAIN_LABEL } from '../labels'
+import { FINANCING_LABEL, POWERTRAIN_LABEL } from '../labels'
 import { BreakdownBar } from './BreakdownBar'
 
 interface Props {
@@ -33,6 +33,7 @@ export function CarCard({
   onDelete,
 }: Props) {
   const isLoan = car.financing.method === 'loan'
+  const isLease = car.financing.method === 'lease'
   return (
     <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
@@ -69,6 +70,7 @@ export function CarCard({
             </svg>
           </button>
         )}
+        {isLease && <span className="chip">{FINANCING_LABEL.lease}</span>}
         <span className="chip">{POWERTRAIN_LABEL[car.powertrain]}</span>
       </div>
 
@@ -110,9 +112,15 @@ export function CarCard({
           <span className="stat-value">{fmtEur(tco.runningPerMonth)}</span>
         </div>
         <div className="stat">
-          <span className="stat-label">{isLoan ? 'Loan / mo' : 'Financing'}</span>
+          <span className="stat-label">
+            {isLoan ? 'Loan / mo' : isLease ? 'Lease / mo' : 'Financing'}
+          </span>
           <span className="stat-value">
-            {isLoan ? fmtEurExact(tco.loan.monthlyPayment) : 'Cash'}
+            {isLoan
+              ? fmtEurExact(tco.loan.monthlyPayment)
+              : isLease
+                ? fmtEurExact(tco.lease.monthlyPayment)
+                : 'Cash'}
           </span>
         </div>
       </div>
