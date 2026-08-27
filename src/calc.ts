@@ -49,6 +49,8 @@ export interface LeaseInfo {
 
 export interface TcoResult {
   breakdown: Breakdown
+  /** the comparison period this car was costed over (its own, or the shared assumption) */
+  years: number
   /** total cost of ownership over the whole period */
   total: number
   perMonth: number
@@ -69,8 +71,18 @@ const RESALE_AGE_RATE = 0.04 // value lost per year regardless of driving
 const RESALE_KM_OFFSET = 30000 // km — softens the curve for low-odometer cars
 const RESALE_KM_EXP = 0.4 // mileage elasticity of value
 
+/**
+ * The period this car is compared over: its own `keepYears` when set (a lease
+ * kept for its 18-month term, a purchase held for 6 years), otherwise the
+ * shared assumption. €/month and €/km stay comparable across periods; totals
+ * are each over the car's own period.
+ */
+export function resolveYears(car: CarListing, settings: Settings): number {
+  return car.keepYears > 0 ? car.keepYears : Math.max(0, settings.ownershipYears)
+}
+
 export function estimateResaleValue(car: CarListing, settings: Settings): number {
-  const years = Math.max(0, settings.ownershipYears)
+  const years = resolveYears(car, settings)
   const kmStart = Math.max(0, car.odometerKm)
   const kmEnd = kmStart + Math.max(0, settings.annualKm) * years
   const ageFactor = Math.pow(1 - RESALE_AGE_RATE, years)
@@ -103,8 +115,12 @@ export function resolveBalloon(car: CarListing): number {
  * term. With monthly rate i over n months and balloon B, the payment is
  *   ((P - B/(1+i)^n) * i) / (1 - (1+i)^-n)
  * and the interest cost is everything paid beyond the principal.
+ *
+ * With `horizonMonths` set, `totalInterest` is only the interest actually
+ * accrued by then — selling at that point settles the remaining principal
+ * (balloon included), which is capital, not cost. Without it, the full term.
  */
-export function calcLoan(car: CarListing): LoanInfo {
+export function calcLoan(car: CarListing, horizonMonths?: number): LoanInfo {
   const fin = car.financing
   if (fin.method !== 'loan') return NO_LOAN
   const principal = Math.max(0, car.purchasePrice - Math.max(0, fin.downPayment))
@@ -120,10 +136,24 @@ export function calcLoan(car: CarListing): LoanInfo {
     payment = ((principal - balloon / growth) * i) / (1 - 1 / growth)
   }
   const totalPaid = payment * n + balloon
+  let totalInterest = Math.max(0, totalPaid - principal)
+  if (horizonMonths !== undefined) {
+    const m = Math.min(n, Math.max(0, Math.round(horizonMonths)))
+    if (m < n) {
+      if (i === 0) {
+        totalInterest = 0
+      } else {
+        const grownToM = Math.pow(1 + i, m)
+        const remaining = principal * grownToM - (payment * (grownToM - 1)) / i
+        const principalRepaid = principal - remaining
+        totalInterest = Math.max(0, payment * m - principalRepaid)
+      }
+    }
+  }
   return {
     loanAmount: principal,
     monthlyPayment: payment,
-    totalInterest: Math.max(0, totalPaid - principal),
+    totalInterest,
   }
 }
 
@@ -154,7 +184,7 @@ export function isLeased(car: CarListing): boolean {
 export function calcLease(car: CarListing, settings: Settings): LeaseInfo {
   if (!isLeased(car)) return NO_LEASE
   const lease = car.lease
-  const years = Math.max(0, settings.ownershipYears)
+  const years = resolveYears(car, settings)
   const months = years * 12
   const term = Math.max(1, Math.round(lease.termMonths))
   const termsStarted = Math.ceil(months / term)
@@ -195,10 +225,10 @@ export function energyCostPerYear(car: CarListing, settings: Settings): number {
 }
 
 export function calcTco(car: CarListing, settings: Settings): TcoResult {
-  const years = Math.max(0, settings.ownershipYears)
+  const years = resolveYears(car, settings)
   const months = years * 12
   const totalKm = Math.max(0, settings.annualKm) * years
-  const loan = calcLoan(car)
+  const loan = calcLoan(car, months)
   const lease = calcLease(car, settings)
   // A full-service lease can already cover some yearly costs; those are held in
   // the car (so unticking a box brings the figure back) but cost nothing here.
@@ -224,6 +254,7 @@ export function calcTco(car: CarListing, settings: Settings): TcoResult {
     breakdown.energy + breakdown.insurance + breakdown.tax + breakdown.maintenance + breakdown.other
   return {
     breakdown,
+    years,
     total,
     perMonth: months > 0 ? total / months : 0,
     perKm: totalKm > 0 ? total / totalKm : 0,

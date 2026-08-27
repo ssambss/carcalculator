@@ -44,6 +44,8 @@ export interface CarListing {
   notes: string
   /** part of the curated shortlist — synced, unlike the device-local compare selection */
   favorite: boolean
+  /** how long THIS car would be kept, in years; 0 = use the shared assumption */
+  keepYears: number
   powertrain: Powertrain
   purchasePrice: number
   /** km on the clock when bought */

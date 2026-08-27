@@ -7,7 +7,14 @@ import type {
   Powertrain,
   Settings,
 } from '../types'
-import { STANDARD_BALLOON_SHARE, calcLease, calcLoan, calcTco, estimateResaleValue } from '../calc'
+import {
+  STANDARD_BALLOON_SHARE,
+  calcLease,
+  calcLoan,
+  calcTco,
+  estimateResaleValue,
+  resolveYears,
+} from '../calc'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
 import {
   FINANCING_LABEL,
@@ -36,7 +43,7 @@ function joinWords(words: string[]): string {
 
 export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
   const [draft, setDraft] = useState<CarListing>(initial)
-  const years = settings.ownershipYears
+  const years = resolveYears(draft, settings)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -156,6 +163,17 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                 />
               </span>
             </label>
+            <NumberField
+              label="Comparison period"
+              value={draft.keepYears}
+              onChange={(n) => set({ keepYears: Math.max(0, n) })}
+              unit="years"
+              hint={
+                draft.keepYears > 0
+                  ? `This car is costed over its own ${fmtNum(draft.keepYears)}-year period.`
+                  : `0 = the shared assumption (${fmtNum(settings.ownershipYears)} yrs).`
+              }
+            />
           </div>
         </div>
 
@@ -291,6 +309,12 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                   <span className="preview-side">
                     · {fmtEur(loan.totalInterest)} interest over the term
                   </span>
+                  {years * 12 < draft.financing.termMonths && (
+                    <span className="preview-side">
+                      · only the {fmtNum(years)} yrs of interest accrued by then count in
+                      the total
+                    </span>
+                  )}
                 </div>
               )}
             </>
@@ -365,6 +389,15 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                   </span>
                 </div>
               </div>
+              {Math.abs(years * 12 - draft.lease.termMonths) > 0.5 && (
+                <button
+                  className="inline-link"
+                  onClick={() => set({ keepYears: draft.lease.termMonths / 12 })}
+                >
+                  Compare this car over the contract term only (
+                  {fmtNum(draft.lease.termMonths)} months)
+                </button>
+              )}
               {lease.total > 0 && (
                 <>
                   <div className="preview-row">

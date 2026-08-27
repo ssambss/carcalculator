@@ -1,13 +1,12 @@
 import type { CarListing } from '../types'
 import type { TcoResult } from '../calc'
-import { fmtEur, fmtEurExact } from '../format'
+import { fmtEur, fmtEurExact, fmtNum } from '../format'
 import { FINANCING_LABEL, POWERTRAIN_LABEL } from '../labels'
 import { BreakdownBar } from './BreakdownBar'
 
 interface Props {
   car: CarListing
   tco: TcoResult
-  years: number
   cheapest: boolean
   selected: boolean
   /** shared-view mode: no editing affordances, favorite star is display-only */
@@ -22,7 +21,6 @@ interface Props {
 export function CarCard({
   car,
   tco,
-  years,
   cheapest,
   selected,
   readOnly,
@@ -104,7 +102,7 @@ export function CarCard({
           <span className="stat-value">{fmtEurExact(tco.perKm)}</span>
         </div>
         <div className="stat">
-          <span className="stat-label">Over {years} yrs</span>
+          <span className="stat-label">Over {fmtNum(tco.years)} yrs</span>
           <span className="stat-value">{fmtEur(tco.total)}</span>
         </div>
         <div className="stat">

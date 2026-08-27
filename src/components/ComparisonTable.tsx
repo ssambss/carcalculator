@@ -1,6 +1,6 @@
 import type { CarListing } from '../types'
 import { CATEGORIES, type TcoResult } from '../calc'
-import { fmtEur, fmtEurExact } from '../format'
+import { fmtEur, fmtEurExact, fmtNum } from '../format'
 
 interface Props {
   cars: CarListing[]
@@ -11,6 +11,9 @@ interface Props {
 export function ComparisonTable({ cars, results, years }: Props) {
   const tcos = cars.map((c) => results.get(c.id)!)
   const highlight = cars.length > 1
+  // Cars costed over different periods: absolute sums aren't comparable across
+  // columns, so highlighting stays on the normalized per-month/per-km rows only
+  const mixedPeriods = new Set(tcos.map((t) => Math.round(t.years * 12))).size > 1
   const visibleCategories = CATEGORIES.filter((cat) =>
     tcos.some((t) => t.breakdown[cat.key] > 0),
   )
@@ -23,8 +26,9 @@ export function ComparisonTable({ cars, results, years }: Props) {
         ? 'Lease payment / mo'
         : 'Loan payment / mo'
 
-  function minClass(values: number[], i: number): string {
+  function minClass(values: number[], i: number, absolute = false): string {
     if (!highlight) return ''
+    if (absolute && mixedPeriods) return ''
     return values[i] === Math.min(...values) ? ' min' : ''
   }
 
@@ -33,7 +37,10 @@ export function ComparisonTable({ cars, results, years }: Props) {
       <div className="cmp-head">
         <div className="cmp-title display">Side by side</div>
         <div className="cmp-caption">
-          over {years} years{highlight ? ' · lowest in each row highlighted' : ''}
+          {mixedPeriods
+            ? 'each car over its own period — compare per month and per kilometre'
+            : `over ${fmtNum(years)} years`}
+          {highlight ? ' · lowest in each row highlighted' : ''}
         </div>
       </div>
       <div className="cmp-scroll">
@@ -41,8 +48,13 @@ export function ComparisonTable({ cars, results, years }: Props) {
           <thead>
             <tr>
               <th className="rowhead">Cost</th>
-              {cars.map((c) => (
-                <th key={c.id}>{c.name || 'Unnamed car'}</th>
+              {cars.map((c, i) => (
+                <th key={c.id}>
+                  {c.name || 'Unnamed car'}
+                  {mixedPeriods && (
+                    <div className="cmp-horizon">over {fmtNum(tcos[i].years)} yrs</div>
+                  )}
+                </th>
               ))}
             </tr>
           </thead>
@@ -59,7 +71,7 @@ export function ComparisonTable({ cars, results, years }: Props) {
                     {cat.label}
                   </th>
                   {cars.map((c, i) => (
-                    <td key={c.id} className={`num${minClass(values, i)}`}>
+                    <td key={c.id} className={`num${minClass(values, i, true)}`}>
                       {fmtEur(values[i])}
                     </td>
                   ))}
@@ -67,13 +79,16 @@ export function ComparisonTable({ cars, results, years }: Props) {
               )
             })}
             <tr className="total-row">
-              <th className="rowhead">Total over {years} years</th>
+              <th className="rowhead">
+                {mixedPeriods ? 'Total over own period' : `Total over ${fmtNum(years)} years`}
+              </th>
               {cars.map((c, i) => (
                 <td
                   key={c.id}
                   className={`num${minClass(
                     tcos.map((t) => t.total),
                     i,
+                    true,
                   )}`}
                 >
                   {fmtEur(tcos[i].total)}

@@ -732,6 +732,12 @@ select option {
   color: var(--ink-2);
 }
 
+.cmp-horizon {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
 .cmp th.rowhead {
   text-align: left;
   font-weight: 600;

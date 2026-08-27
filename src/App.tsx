@@ -436,7 +436,6 @@ export default function App() {
                     key={car.id}
                     car={car}
                     tco={results.get(car.id)!}
-                    years={data.settings.ownershipYears}
                     cheapest={car.id === cheapestId}
                     selected={selectedIds.has(car.id)}
                     onToggleSelect={() => toggleSelected(car.id)}

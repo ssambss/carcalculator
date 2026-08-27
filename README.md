@@ -50,6 +50,11 @@ color-coded cost breakdown and a side-by-side comparison table.
   Deliberately *not* part of the car-data file: the app rewrites that
   wholesale on every edit, so a device on an older cached bundle would strip a
   key it has never heard of.
+- **Per-car comparison period**: each car can override the shared ownership
+  assumption (an 18-month lease vs a purchase kept for six years). €/month and
+  €/km stay comparable across periods; absolute totals are shown over each
+  car's own period and lose the lowest-value highlight when periods differ.
+  A loan longer than the period only counts the interest accrued by then.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

@@ -184,7 +184,6 @@ export function ViewerApp({ gistId }: { gistId: string }) {
                     key={car.id}
                     car={car}
                     tco={results.get(car.id)!}
-                    years={data.settings.ownershipYears}
                     cheapest={car.id === cheapestId}
                     selected={selectedIds.has(car.id)}
                     readOnly
