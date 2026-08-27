@@ -198,7 +198,7 @@ export function ViewerApp({ gistId }: { gistId: string }) {
               <ComparisonTable
                 cars={visibleCars}
                 results={results}
-                years={data.settings.ownershipYears}
+                settings={data.settings}
               />
             </>
           )}

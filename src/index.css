@@ -708,6 +708,17 @@ select option {
   color: var(--ink-3);
 }
 
+.cmp-toggle {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.cmp-toggle .filter-chip {
+  height: 30px;
+  font-size: 12px;
+}
+
 .cmp-scroll {
   overflow-x: auto;
 }

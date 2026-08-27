@@ -55,6 +55,11 @@ color-coded cost breakdown and a side-by-side comparison table.
   €/km stay comparable across periods; absolute totals are shown over each
   car's own period and lose the lowest-value highlight when periods differ.
   A loan longer than the period only counts the interest accrued by then.
+  When periods differ, the comparison table offers a **Same period** toggle
+  that recomputes every car over the shortest window (early-exit depreciation,
+  accrued interest and lease terms included) so totals compare directly —
+  note that a manually entered resale value is not re-estimated for the
+  shorter window, so auto-estimated cars normalize more faithfully.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

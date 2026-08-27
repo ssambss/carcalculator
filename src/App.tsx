@@ -449,7 +449,7 @@ export default function App() {
               <ComparisonTable
                 cars={visibleCars}
                 results={results}
-                years={data.settings.ownershipYears}
+                settings={data.settings}
               />
             </>
           )}

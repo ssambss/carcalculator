@@ -81,8 +81,12 @@ export function resolveYears(car: CarListing, settings: Settings): number {
   return car.keepYears > 0 ? car.keepYears : Math.max(0, settings.ownershipYears)
 }
 
-export function estimateResaleValue(car: CarListing, settings: Settings): number {
-  const years = resolveYears(car, settings)
+export function estimateResaleValue(
+  car: CarListing,
+  settings: Settings,
+  yearsOverride?: number,
+): number {
+  const years = yearsOverride ?? resolveYears(car, settings)
   const kmStart = Math.max(0, car.odometerKm)
   const kmEnd = kmStart + Math.max(0, settings.annualKm) * years
   const ageFactor = Math.pow(1 - RESALE_AGE_RATE, years)
@@ -93,8 +97,14 @@ export function estimateResaleValue(car: CarListing, settings: Settings): number
   return Math.round(car.purchasePrice * ageFactor * kmFactor)
 }
 
-export function resolveResaleValue(car: CarListing, settings: Settings): number {
-  return car.autoResale ? estimateResaleValue(car, settings) : car.expectedResaleValue
+export function resolveResaleValue(
+  car: CarListing,
+  settings: Settings,
+  yearsOverride?: number,
+): number {
+  return car.autoResale
+    ? estimateResaleValue(car, settings, yearsOverride)
+    : car.expectedResaleValue
 }
 
 const NO_LOAN: LoanInfo = { loanAmount: 0, monthlyPayment: 0, totalInterest: 0 }
@@ -181,10 +191,14 @@ export function isLeased(car: CarListing): boolean {
  * Driving past the mileage allowance is billed per kilometre. An allowance of
  * 0 means the contract sets no cap, not that every kilometre costs extra.
  */
-export function calcLease(car: CarListing, settings: Settings): LeaseInfo {
+export function calcLease(
+  car: CarListing,
+  settings: Settings,
+  yearsOverride?: number,
+): LeaseInfo {
   if (!isLeased(car)) return NO_LEASE
   const lease = car.lease
-  const years = resolveYears(car, settings)
+  const years = yearsOverride ?? resolveYears(car, settings)
   const months = years * 12
   const term = Math.max(1, Math.round(lease.termMonths))
   const termsStarted = Math.ceil(months / term)
@@ -224,12 +238,14 @@ export function energyCostPerYear(car: CarListing, settings: Settings): number {
   }
 }
 
-export function calcTco(car: CarListing, settings: Settings): TcoResult {
-  const years = resolveYears(car, settings)
+/** `yearsOverride` costs the car over a different window than its own (e.g. the
+ *  comparison table's same-period view) — everything recomputes for that window. */
+export function calcTco(car: CarListing, settings: Settings, yearsOverride?: number): TcoResult {
+  const years = yearsOverride ?? resolveYears(car, settings)
   const months = years * 12
   const totalKm = Math.max(0, settings.annualKm) * years
   const loan = calcLoan(car, months)
-  const lease = calcLease(car, settings)
+  const lease = calcLease(car, settings, yearsOverride)
   // A full-service lease can already cover some yearly costs; those are held in
   // the car (so unticking a box brings the figure back) but cost nothing here.
   const covered = isLeased(car) ? car.lease.includes : null
@@ -238,7 +254,10 @@ export function calcTco(car: CarListing, settings: Settings): TcoResult {
   const breakdown: Breakdown = {
     depreciation: isLeased(car)
       ? 0 // a lease is handed back — no purchase price to lose value
-      : Math.max(0, car.purchasePrice - Math.max(0, resolveResaleValue(car, settings))),
+      : Math.max(
+          0,
+          car.purchasePrice - Math.max(0, resolveResaleValue(car, settings, yearsOverride)),
+        ),
     financing: loan.totalInterest,
     energy: energyCostPerYear(car, settings) * years,
     insurance: yearly(car.insurancePerYear, Boolean(covered?.insurance)),
