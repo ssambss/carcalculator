@@ -28,6 +28,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import config from './config.js';
+import { describeRanges } from './fields.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_FILTERS_PATH = resolve(HERE, '..', config.filters.file);
@@ -51,6 +52,114 @@ function integer(value) {
     if (Number.isFinite(parsed)) return parsed;
   }
   return null;
+}
+
+/**
+ * The single-purpose numeric fields a filter used to carry, and the range slot
+ * each one now fills.
+ *
+ * Read forever, not for one release: the gist is hand-edited, a phone can hold
+ * a cached app bundle for months, and a filter typed in before this change is
+ * still a filter someone means to run.
+ */
+const LEGACY_RANGES = {
+  yearFrom: ['year', 'min'],
+  yearTo: ['year', 'max'],
+  maxMileage: ['mileage', 'max'],
+  minPrice: ['price', 'min'],
+  maxPrice: ['price', 'max'],
+};
+
+/**
+ * Numeric limits, as `{ field: { min, max } }`.
+ *
+ * Accepts the declared `ranges` bag and the five legacy fields together, and
+ * **the legacy field wins where both say something.** That is the direction
+ * that survives an old app bundle: it edits `maxPrice`, knows nothing about
+ * `ranges`, and copies the stale one through untouched - so trusting `ranges`
+ * there would quietly ignore the edit. A new bundle writes both in step, so
+ * they agree and the rule never fires.
+ *
+ * The failure this cannot avoid is an old bundle *removing* a limit, which
+ * leaves the range in place and is honoured as still-narrow. That errs toward
+ * a filter that posts too little rather than one that floods the channel, and a
+ * filter that has gone quiet is the easier of the two to notice.
+ *
+ * Keys come out sorted so two devices serialize an identical set identically.
+ */
+function ranges(raw) {
+  const out = {};
+  const put = (key, side, value) => {
+    if (value === null) return;
+    out[key] ??= { min: null, max: null };
+    out[key][side] = value;
+  };
+
+  if (raw?.ranges && typeof raw.ranges === 'object') {
+    for (const [key, range] of Object.entries(raw.ranges)) {
+      if (!key || typeof range !== 'object' || range === null) continue;
+      put(key, 'min', integer(range.min));
+      put(key, 'max', integer(range.max));
+    }
+  }
+
+  for (const [legacy, [key, side]] of Object.entries(LEGACY_RANGES)) {
+    put(key, side, integer(raw?.[legacy]));
+  }
+
+  const sorted = {};
+  for (const key of Object.keys(out).sort()) {
+    // A field mentioned with neither bound asks for nothing; drop it so an
+    // empty range cannot masquerade as a requirement.
+    if (out[key].min === null && out[key].max === null) continue;
+    sorted[key] = out[key];
+  }
+  return sorted;
+}
+
+/**
+ * Package qualifiers applied when a filter names none of its own.
+ *
+ * These two were constants in filter.js, so every filter carried one car's
+ * vocabulary. Moving them onto the filter is the generalisation; keeping them
+ * as a default is what stops that being a silent behaviour change for a filter
+ * already in the gist, which has never heard of the field and would otherwise
+ * start letting Pilot Lite satisfy Pilot.
+ *
+ * They are inert unless a filter asks for a package literally named "pilot", so
+ * a filter watching a BMW or a flat never meets them. Once the live filters
+ * carry their own, this can go - it is the last car-specific thing left in the
+ * matcher.
+ */
+export const DEFAULT_PACKAGE_QUALIFIERS = [
+  { package: 'pilot', word: 'lite', means: 'lesser' },
+  { package: 'pilot', word: 'assist', means: 'feature' },
+];
+
+/**
+ * "This word after that package name changes what it means."
+ *
+ * An **absent** field takes the defaults above; an explicitly empty list means
+ * exactly that and clears them. The distinction is what lets a filter say "no
+ * qualifiers, I mean it" without a magic value.
+ */
+function qualifiers(value) {
+  if (value === undefined || value === null) return [...DEFAULT_PACKAGE_QUALIFIERS];
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const rule of value) {
+    if (!rule || typeof rule !== 'object') continue;
+    const name = typeof rule.package === 'string' ? rule.package.trim().toLowerCase() : '';
+    const word = typeof rule.word === 'string' ? rule.word.trim().toLowerCase() : '';
+    if (!name || !word || /\s/.test(word)) continue;
+    const means = rule.means === 'feature' ? 'feature' : 'lesser';
+    const key = `${name}|${word}|${means}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ package: name, word, means });
+  }
+  return out;
 }
 
 /** A URL path segment: lowercase, no slashes, no spaces. */
@@ -94,11 +203,11 @@ export function normalizeFilter(raw, index = 0) {
     make,
     model,
 
-    yearFrom: integer(filter.yearFrom),
-    yearTo: integer(filter.yearTo),
-    maxMileage: integer(filter.maxMileage),
-    minPrice: integer(filter.minPrice),
-    maxPrice: integer(filter.maxPrice),
+    // Numeric limits, keyed by field: { year: { min, max }, mileage: { max } }.
+    // The legacy yearFrom/maxMileage/maxPrice spellings are read in here and
+    // not re-emitted - inside the scraper this is the one source of truth. The
+    // app still writes both, where an older bundle might read them.
+    ranges: ranges(filter),
 
     // Phrases checked against the variant name and the spec chips - short,
     // structured text, so a hit here is worth trusting.
@@ -114,6 +223,8 @@ export function normalizeFilter(raw, index = 0) {
     packageEvidence: filter.packageEvidence === 'weak' ? 'weak' : 'strong',
     // Let a smaller variant of a package satisfy it (Pilot Lite for Pilot).
     acceptLesserPackages: filter.acceptLesserPackages === true,
+    // Which words make a package name mean something else. See qualifiers().
+    packageQualifiers: qualifiers(filter.packageQualifiers),
 
     // "Seeing A proves B": lets a filter accept the shorthand sellers use.
     implications,
@@ -133,17 +244,7 @@ export function normalizeFilters(raw) {
 
 /** One line describing what a filter looks for, for the run log and --list. */
 export function describeFilter(filter) {
-  const parts = [`${filter.make}/${filter.model}`];
-
-  if (filter.yearFrom !== null && filter.yearTo !== null) parts.push(`${filter.yearFrom}-${filter.yearTo}`);
-  else if (filter.yearFrom !== null) parts.push(`${filter.yearFrom}-`);
-  else if (filter.yearTo !== null) parts.push(`-${filter.yearTo}`);
-
-  if (filter.maxMileage !== null) parts.push(`max ${filter.maxMileage.toLocaleString('fi-FI')} km`);
-  if (filter.minPrice !== null && filter.maxPrice !== null) {
-    parts.push(`${filter.minPrice.toLocaleString('fi-FI')}-${filter.maxPrice.toLocaleString('fi-FI')} €`);
-  } else if (filter.maxPrice !== null) parts.push(`max ${filter.maxPrice.toLocaleString('fi-FI')} €`);
-  else if (filter.minPrice !== null) parts.push(`min ${filter.minPrice.toLocaleString('fi-FI')} €`);
+  const parts = [`${filter.make}/${filter.model}`, ...describeRanges(filter.ranges)];
 
   if (filter.variantMust.length) parts.push(filter.variantMust.join(' + '));
   if (filter.textMust.length) parts.push(filter.textMust.join(' + '));

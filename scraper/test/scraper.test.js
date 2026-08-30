@@ -11,7 +11,13 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 
 import { decodeEntities, htmlToText, oneLine, parseInteger } from '../src/html.js';
-import { applyImplications, containsPhrase, evaluate, tokenize } from '../src/filter.js';
+import {
+  applyImplications,
+  containsPhrase,
+  evaluate,
+  tokenize,
+  vocabularyOf,
+} from '../src/filter.js';
 import {
   describeFilter,
   groupBySearch,
@@ -20,6 +26,7 @@ import {
   normalizeFilters,
 } from '../src/filters.js';
 import { parseDetailPage, parseSearchPage, buildSearchUrl, buildListingUrl } from '../src/nettiauto.js';
+import { checkRanges, describeRanges, factOf } from '../src/fields.js';
 import { accentColour, buildEmbed } from '../src/discord.js';
 import { needsPosting, postingReadiness } from '../src/preflight.js';
 import {
@@ -397,8 +404,8 @@ describe('filter definitions', () => {
     assert.equal(filter.postExisting, true);
     assert.equal(filter.packageEvidence, 'strong');
     assert.deepEqual(filter.variantMust, []);
-    assert.equal(filter.yearFrom, null);
-    assert.equal(filter.maxPrice, null);
+    // No limits at all, rather than five fields spelled out as null.
+    assert.deepEqual(filter.ranges, {});
   });
 
   it('is idempotent, so it can guard every entry point', () => {
@@ -421,8 +428,11 @@ describe('filter definitions', () => {
     });
     assert.equal(filter.make, 'polestar');
     assert.equal(filter.model, '');
-    assert.equal(filter.yearFrom, 2021);
-    assert.equal(filter.maxMileage, 120000);
+    // The single-purpose spellings are still read, and land in the range bag.
+    assert.deepEqual(filter.ranges, {
+      mileage: { min: null, max: 120000 },
+      year: { min: 2021, max: null },
+    });
     assert.deepEqual(filter.variantMust, ['long range']);
     assert.deepEqual(filter.implications, [{ if: 'neliveto', then: 'dual motor' }]);
   });
@@ -481,7 +491,11 @@ describe('filter definitions', () => {
     const filter = normalizeFilter(fromApp);
     assert.equal(filter.id, fromApp.id);
     assert.equal(filter.make, 'toyota');
-    assert.equal(filter.maxPrice, 18000);
+    assert.deepEqual(filter.ranges, {
+      mileage: { min: null, max: 150000 },
+      price: { min: null, max: 18000 },
+      year: { min: 2019, max: null },
+    });
     assert.deepEqual(filter.textMust, ['touring sports', 'vetokoukku']);
     assert.equal(buildSearchUrl(filter, 1), 'https://www.nettiauto.com/toyota/corolla');
 
@@ -1002,5 +1016,269 @@ describe('a fresh fork that nobody has configured', () => {
       postingReadiness({ webhookUrl: 'https://discord.com/api/webhooks/1/x', isNew: true, runs: 0 }),
       'ready',
     );
+  });
+});
+
+describe('numeric limits, on any kind of listing', () => {
+  // The point of the range bag: the matcher stopped knowing what a car is.
+  // Nothing below mentions one, and it all runs through the same evaluate().
+
+  const APARTMENT_FIELDS = [
+    { key: 'price', label: 'price', unit: '€' },
+    { key: 'sizeM2', label: 'size', unit: 'm²' },
+    { key: 'rooms', label: 'rooms' },
+  ];
+
+  it('bounds a field it has never heard of', () => {
+    const flat = { id: 'oikotie-1', facts: { price: 219000, sizeM2: 68, rooms: 3 } };
+    const wanted = { price: { max: 250000 }, sizeM2: { min: 55 }, rooms: { min: 3 } };
+    assert.deepEqual(checkRanges(flat, wanted, APARTMENT_FIELDS), []);
+
+    const tooSmall = { id: 'oikotie-2', facts: { price: 219000, sizeM2: 48, rooms: 2 } };
+    const reasons = checkRanges(tooSmall, wanted, APARTMENT_FIELDS).join(' | ').replace(/\s/g, ' ');
+    // A unit names the number for you; without one the field has to say its name.
+    assert.match(reasons, /48 m² under 55 m²/);
+    assert.match(reasons, /rooms 2 under 3/);
+  });
+
+  it('runs a filter with no car fields at all through evaluate()', () => {
+    const rental = normalizeFilter({
+      id: 'kamppi',
+      make: 'helsinki',
+      model: 'kamppi',
+      ranges: { rooms: { min: 2 } },
+      textMust: ['parveke'],
+      textMustNot: ['putkiremontti tulossa'],
+    });
+    const listed = { id: '900', facts: { rooms: 3 }, usp: 'Parveke, hyva kunto' };
+    assert.equal(evaluate(listed, null, rental).matched, true);
+    assert.equal(evaluate({ ...listed, facts: { rooms: 1 } }, null, rental).matched, false);
+    assert.equal(
+      evaluate({ ...listed, usp: 'Parveke. Putkiremontti tulossa 2027' }, null, rental).matched,
+      false,
+    );
+  });
+
+  it('reads a fact off the bag or off the listing itself', () => {
+    // The nettiauto parser types its facts flat; a later source may collect
+    // them. The matcher must not care which.
+    assert.equal(factOf({ facts: { year: 2022 } }, 'year'), 2022);
+    assert.equal(factOf({ year: 2022 }, 'year'), 2022);
+    assert.equal(factOf({ year: null }, 'year'), null);
+    assert.equal(factOf({ year: 'lots' }, 'year'), null);
+    assert.equal(factOf({}, 'nope'), null);
+  });
+
+  it('accepts the range bag directly, not just the old spellings', () => {
+    const filter = normalizeFilter({
+      make: 'polestar',
+      model: '2',
+      ranges: { year: { min: 2021, max: 2023 }, mileage: { max: 120000 } },
+    });
+    assert.deepEqual(filter.ranges, {
+      mileage: { min: null, max: 120000 },
+      year: { min: 2021, max: 2023 },
+    });
+  });
+
+  it('lets the old spelling win where the two disagree', () => {
+    // Only a bundle that has never heard of ranges writes one and not the
+    // other: it edits maxPrice and copies the stale range through untouched.
+    // Trusting the range there would silently discard the edit.
+    const filter = normalizeFilter({
+      make: 'polestar',
+      model: '2',
+      ranges: { price: { min: null, max: 29000 } },
+      maxPrice: 24000,
+    });
+    assert.equal(filter.ranges.price.max, 24000);
+  });
+
+  it('drops a field that asks for nothing', () => {
+    // An empty range must not read as a requirement - it would reject every
+    // listing whose facts do not mention the field.
+    const filter = normalizeFilter({
+      make: 'polestar',
+      model: '2',
+      ranges: { year: {}, mileage: { min: null, max: null }, price: { max: 30000 } },
+    });
+    assert.deepEqual(Object.keys(filter.ranges), ['price']);
+  });
+
+  it('orders keys canonically, so two devices serialize the same set alike', () => {
+    const one = normalizeFilter({ make: 'a', model: 'b', ranges: { price: { max: 1 }, mileage: { max: 2 } } });
+    const two = normalizeFilter({ make: 'a', model: 'b', ranges: { mileage: { max: 2 }, price: { max: 1 } } });
+    assert.equal(JSON.stringify(one.ranges), JSON.stringify(two.ranges));
+  });
+
+  it('rejects a listing that cannot support the claim, rather than passing it', () => {
+    // "under 120 000 km" is a fact about the car. An advert that does not say
+    // has not met it.
+    const filter = normalizeFilter({ make: 'polestar', model: '2', ranges: { mileage: { max: 120000 } } });
+    const verdict = evaluate({ id: '1', mileage: null }, null, filter);
+    assert.equal(verdict.matched, false);
+    assert.ok(verdict.reasons.includes('mileage unknown'));
+    // Settled, not unproven: no listing page can supply a number the card lacks.
+    assert.equal(verdict.needsDetail, false);
+  });
+
+  it('keeps years unformatted and picks before/after over under/over', () => {
+    const reasons = checkRanges({ year: 2019 }, { year: { min: 2021 } }).join(' ');
+    assert.match(reasons, /year 2019 before 2021/);
+    assert.match(checkRanges({ year: 2024 }, { year: { max: 2023 } }).join(' '), /year 2024 after 2023/);
+  });
+
+  it('describes a closed range with its unit once', () => {
+    assert.deepEqual(
+      describeRanges({ year: { min: 2021, max: 2023 } }).map((p) => p.replace(/\s/g, ' ')),
+      ['2021-2023'],
+    );
+    assert.deepEqual(
+      describeRanges({ price: { min: 20000, max: 29000 } }).map((p) => p.replace(/\s/g, ' ')),
+      ['20 000-29 000 €'],
+    );
+  });
+});
+
+describe('package vocabulary belongs to the filter', () => {
+  // "Pilot Lite is smaller than Pilot" and "Pilot Assist is a feature, not the
+  // pack" were constants in the matcher, so every filter carried one car's
+  // vocabulary. Now a filter states its own.
+
+  const pilots = (extra) =>
+    normalizeFilter({ make: 'polestar', model: '2', packages: ['pilot'], ...extra });
+
+  it('keeps the old behaviour for a filter that names no qualifiers', () => {
+    // A filter already in the gist has never heard of the field. It must not
+    // quietly start accepting the smaller pack.
+    const verdict = evaluate(listing({ usp: 'Pilot Lite -paketti' }), null, pilots());
+    assert.equal(verdict.matched, false);
+    assert.ok(verdict.reasons.some((r) => /only pilot lite found/.test(r)));
+  });
+
+  it('lets a filter clear the vocabulary with an explicit empty list', () => {
+    // Empty is a statement, unlike absent: with no qualifier saying otherwise,
+    // "Pilot Lite" is simply a mention of Pilot next to a package word.
+    const verdict = evaluate(
+      listing({ usp: 'Pilot Lite -paketti' }),
+      null,
+      pilots({ packageQualifiers: [] }),
+    );
+    assert.equal(verdict.matched, true);
+  });
+
+  it('carries a vocabulary for a package it invents', () => {
+    const filter = normalizeFilter({
+      make: 'bmw',
+      model: '320',
+      packages: ['tech'],
+      packageQualifiers: [{ package: 'tech', word: 'ready', means: 'feature' }],
+    });
+    // "Tech Ready" is declared to be a feature, so it proves nothing.
+    assert.equal(evaluate(listing({ usp: 'Tech Ready -varuste' }), null, filter).matched, false);
+    assert.equal(evaluate(listing({ usp: 'Tech-paketti' }), null, filter).matched, true);
+  });
+
+  it('names the qualifier the filter gave, not a hardcoded one', () => {
+    const filter = normalizeFilter({
+      make: 'vw',
+      model: 'id4',
+      packages: ['comfort'],
+      packageQualifiers: [{ package: 'comfort', word: 'basic', means: 'lesser' }],
+    });
+    const verdict = evaluate(listing({ usp: 'Comfort Basic -paketti' }), null, filter);
+    assert.ok(verdict.reasons.some((r) => /only comfort basic found/.test(r)));
+  });
+
+  it('cleans up hand-typed qualifiers', () => {
+    const filter = normalizeFilter({
+      make: 'a',
+      model: 'b',
+      packageQualifiers: [
+        { package: '  Pilot ', word: 'LITE', means: 'lesser' },
+        { package: 'pilot', word: 'lite', means: 'lesser' },
+        { package: 'pilot', word: 'two words', means: 'feature' },
+        { package: '', word: 'x' },
+        null,
+      ],
+    });
+    // Deduplicated, lowercased, and a multi-word qualifier dropped - it has to
+    // be the single token that follows the package name.
+    assert.deepEqual(filter.packageQualifiers, [{ package: 'pilot', word: 'lite', means: 'lesser' }]);
+  });
+
+  it('builds an empty vocabulary that answers for any name', () => {
+    const vocab = vocabularyOf([]);
+    assert.deepEqual(vocab.lesser('anything'), []);
+    assert.deepEqual(vocab.featureOnly('anything'), []);
+  });
+});
+
+describe('the wire shape the app writes', () => {
+  // The contract between src/scraperFilters.ts (writes) and src/filters.js
+  // (reads). Both normalize independently and neither trusts the other, so it
+  // is worth pinning what actually crosses.
+
+  /** What toWire() produces: the range bag plus every old spelling it can express. */
+  const fromApp = {
+    id: 'b2c3d4e5-0000-4000-8000-000000000001',
+    name: 'Kamppi 2h+',
+    enabled: true,
+    make: 'polestar',
+    model: '2',
+    ranges: { mileage: { min: null, max: 150000 }, year: { min: 2019, max: null } },
+    // Mirrored for a reader that predates the range bag. Same numbers.
+    yearFrom: 2019,
+    yearTo: null,
+    maxMileage: 150000,
+    minPrice: null,
+    maxPrice: null,
+    variantMust: [],
+    variantMustNot: [],
+    textMust: [],
+    textMustNot: [],
+    packages: [],
+    packageEvidence: 'strong',
+    acceptLesserPackages: false,
+    packageQualifiers: [
+      { package: 'pilot', word: 'lite', means: 'lesser' },
+      { package: 'pilot', word: 'assist', means: 'feature' },
+    ],
+    implications: [],
+    postExisting: true,
+    createdAt: '2026-08-30T10:00:00.000Z',
+    updatedAt: '2026-08-30T10:00:00.000Z',
+  };
+
+  it('reads the range bag and the mirrored fields as one answer', () => {
+    const filter = normalizeFilter(fromApp);
+    assert.deepEqual(filter.ranges, {
+      mileage: { min: null, max: 150000 },
+      year: { min: 2019, max: null },
+    });
+    // The mirror is not re-emitted: inside the scraper, ranges is the only
+    // source of truth.
+    assert.equal(filter.yearFrom, undefined);
+    assert.equal(filter.maxMileage, undefined);
+  });
+
+  it('carries the package qualifiers across intact', () => {
+    const filter = normalizeFilter(fromApp);
+    assert.deepEqual(filter.packageQualifiers, fromApp.packageQualifiers);
+  });
+
+  it('still runs it', () => {
+    const filter = normalizeFilter(fromApp);
+    const car = { id: '1', year: 2021, mileage: 90000, price: 24000 };
+    assert.equal(evaluate(car, null, filter).matched, true);
+    assert.equal(evaluate({ ...car, year: 2018 }, null, filter).matched, false);
+    assert.equal(evaluate({ ...car, mileage: 160000 }, null, filter).matched, false);
+  });
+
+  it('survives the round trip through normalizeFilter twice', () => {
+    // The gist is read, merged and written repeatedly; drift across those
+    // passes would be a slow corruption rather than a visible failure.
+    const once = normalizeFilter(fromApp);
+    assert.deepEqual(normalizeFilter(once), once);
   });
 });

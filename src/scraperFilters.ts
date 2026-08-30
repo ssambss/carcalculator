@@ -8,10 +8,33 @@
  * new scraper, or the reverse, still work.
  */
 
+import {
+  type Range,
+  type Ranges,
+  NETTIAUTO_FIELDS,
+  describeRanges,
+} from './listingFields'
+
 export interface Implication {
   /** phrase whose presence proves the other one */
   if: string
   then: string
+}
+
+/**
+ * "This word, after that package name, changes what it means."
+ *
+ * `lesser`: "Pilot Lite" is a smaller pack sold separately, so it must not
+ * satisfy a requirement for Pilot. `feature`: "Pilot Assist" ships in both, so
+ * seeing it proves nothing about which one the car has.
+ *
+ * These were hardcoded in the scraper's matcher, which meant every filter
+ * carried one car's vocabulary. They belong to the filter that needs them.
+ */
+export interface PackageQualifier {
+  package: string
+  word: string
+  means: 'lesser' | 'feature'
 }
 
 export interface ScraperFilter {
@@ -21,11 +44,13 @@ export interface ScraperFilter {
   /** nettiauto URL path segments: /<make>/<model> */
   make: string
   model: string
-  yearFrom: number | null
-  yearTo: number | null
-  maxMileage: number | null
-  minPrice: number | null
-  maxPrice: number | null
+  /**
+   * Numeric limits, keyed by field: { year: { min, max }, mileage: { max } }.
+   * The single source of truth in the app. The old yearFrom/maxMileage/maxPrice
+   * spellings are read on the way in and written back out alongside this (see
+   * toWire), so a device on an older bundle still sees the limits.
+   */
+  ranges: Ranges
   /** phrases required in the variant name and spec chips */
   variantMust: string[]
   variantMustNot: string[]
@@ -37,6 +62,8 @@ export interface ScraperFilter {
   packageEvidence: 'strong' | 'weak'
   /** let a smaller variant of a package satisfy it (Pilot Lite for Pilot) */
   acceptLesserPackages: boolean
+  /** words that change what a package name means when they follow it */
+  packageQualifiers: PackageQualifier[]
   implications: Implication[]
   /** post the cars already on sale when this filter first runs */
   postExisting: boolean
@@ -54,6 +81,21 @@ export interface FilterSet {
 
 export const EMPTY_FILTER_SET: FilterSet = { version: 1, filters: [], tombstones: {} }
 
+/**
+ * Package qualifiers a new filter starts with.
+ *
+ * Inert unless the filter asks for a package literally named "pilot", so a
+ * filter for a BMW or a flat never meets them - which is what makes shipping
+ * them by default harmless rather than a hidden car assumption. They are here
+ * so a Polestar filter behaves correctly without the user having to discover
+ * the feature; keeping them matches what the scraper defaults to for filters
+ * written before the field existed.
+ */
+export const DEFAULT_PACKAGE_QUALIFIERS: PackageQualifier[] = [
+  { package: 'pilot', word: 'lite', means: 'lesser' },
+  { package: 'pilot', word: 'assist', means: 'feature' },
+]
+
 export function newScraperFilter(): ScraperFilter {
   const now = new Date().toISOString()
   return {
@@ -62,11 +104,7 @@ export function newScraperFilter(): ScraperFilter {
     enabled: true,
     make: '',
     model: '',
-    yearFrom: null,
-    yearTo: null,
-    maxMileage: null,
-    minPrice: null,
-    maxPrice: null,
+    ranges: {},
     variantMust: [],
     variantMustNot: [],
     textMust: [],
@@ -74,6 +112,7 @@ export function newScraperFilter(): ScraperFilter {
     packages: [],
     packageEvidence: 'strong',
     acceptLesserPackages: false,
+    packageQualifiers: [...DEFAULT_PACKAGE_QUALIFIERS],
     implications: [],
     postExisting: true,
     createdAt: now,
@@ -133,6 +172,99 @@ export function parseNettiautoUrl(text: string): { make: string; model: string }
   return { make, model }
 }
 
+/** The old single-purpose fields, and the range slot each one fills. */
+const LEGACY_RANGES: Record<string, [string, 'min' | 'max']> = {
+  yearFrom: ['year', 'min'],
+  yearTo: ['year', 'max'],
+  maxMileage: ['mileage', 'max'],
+  minPrice: ['price', 'min'],
+  maxPrice: ['price', 'max'],
+}
+
+/**
+ * Numeric limits, from the range bag and the old spellings together.
+ *
+ * **The old spelling wins where the two disagree.** Only a bundle that has
+ * never heard of `ranges` writes one and not the other: it edits `maxPrice` and
+ * copies the stale range straight through, so trusting the range there would
+ * silently discard the edit. A current bundle writes both in step (see toWire),
+ * so they agree and this never fires.
+ *
+ * Keys come out sorted so two devices serialize an identical set identically.
+ */
+export function normalizeRanges(raw: Record<string, unknown>): Ranges {
+  const out: Ranges = {}
+  const put = (key: string, side: 'min' | 'max', value: number | null) => {
+    if (value === null) return
+    const current: Range = out[key] ?? { min: null, max: null }
+    out[key] = { ...current, [side]: value }
+  }
+
+  if (isRecord(raw.ranges)) {
+    for (const [key, range] of Object.entries(raw.ranges)) {
+      if (!key || !isRecord(range)) continue
+      put(key, 'min', toIntOrNull(range.min))
+      put(key, 'max', toIntOrNull(range.max))
+    }
+  }
+  for (const [legacy, [key, side]] of Object.entries(LEGACY_RANGES)) {
+    put(key, side, toIntOrNull(raw[legacy]))
+  }
+
+  const sorted: Ranges = {}
+  for (const key of Object.keys(out).sort()) {
+    // A field with neither bound asks for nothing; dropping it stops an empty
+    // range reading as a requirement the scraper would reject every listing on.
+    if (out[key].min === null && out[key].max === null) continue
+    sorted[key] = out[key]
+  }
+  return sorted
+}
+
+/**
+ * Package qualifiers, cleaned up.
+ *
+ * An **absent** field takes the defaults, matching the scraper; an explicitly
+ * empty list means exactly that and clears them.
+ */
+export function normalizeQualifiers(value: unknown): PackageQualifier[] {
+  if (value === undefined || value === null) return [...DEFAULT_PACKAGE_QUALIFIERS]
+  if (!Array.isArray(value)) return []
+  const seen = new Set<string>()
+  const out: PackageQualifier[] = []
+  for (const rule of value) {
+    if (!isRecord(rule)) continue
+    const pkg = typeof rule.package === 'string' ? rule.package.trim().toLowerCase() : ''
+    const word = typeof rule.word === 'string' ? rule.word.trim().toLowerCase() : ''
+    // A qualifier is the single token following the package name, so a phrase
+    // cannot be one.
+    if (!pkg || !word || /\s/.test(word)) continue
+    const means: PackageQualifier['means'] = rule.means === 'feature' ? 'feature' : 'lesser'
+    const key = `${pkg}|${word}|${means}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push({ package: pkg, word, means })
+  }
+  return out
+}
+
+/**
+ * A filter as it goes onto the wire - localStorage or the gist.
+ *
+ * Writes `ranges` *and* the five old spellings it can express. The app itself
+ * reads only `ranges`; the copies exist for a reader that predates it - a phone
+ * holding a cached bundle for a few months, or the gist opened by hand. Without
+ * them such a reader sees a filter with no limits at all, and could push that
+ * widened version back.
+ */
+export function toWire(filter: ScraperFilter): Record<string, unknown> {
+  const legacy: Record<string, number | null> = {}
+  for (const [name, [key, side]] of Object.entries(LEGACY_RANGES)) {
+    legacy[name] = filter.ranges?.[key]?.[side] ?? null
+  }
+  return { ...filter, ...legacy }
+}
+
 export function normalizeFilter(raw: unknown): ScraperFilter {
   const f = isRecord(raw) ? raw : {}
   const base = newScraperFilter()
@@ -153,11 +285,7 @@ export function normalizeFilter(raw: unknown): ScraperFilter {
     enabled: f.enabled !== false,
     make: toSegment(f.make),
     model: toSegment(f.model),
-    yearFrom: toIntOrNull(f.yearFrom),
-    yearTo: toIntOrNull(f.yearTo),
-    maxMileage: toIntOrNull(f.maxMileage),
-    minPrice: toIntOrNull(f.minPrice),
-    maxPrice: toIntOrNull(f.maxPrice),
+    ranges: normalizeRanges(f),
     variantMust: normalizePhrases(f.variantMust),
     variantMustNot: normalizePhrases(f.variantMustNot),
     textMust: normalizePhrases(f.textMust),
@@ -165,6 +293,7 @@ export function normalizeFilter(raw: unknown): ScraperFilter {
     packages: normalizePhrases(f.packages),
     packageEvidence: f.packageEvidence === 'weak' ? 'weak' : 'strong',
     acceptLesserPackages: f.acceptLesserPackages === true,
+    packageQualifiers: normalizeQualifiers(f.packageQualifiers),
     implications,
     postExisting: f.postExisting !== false,
     createdAt,
@@ -228,23 +357,12 @@ export function filterTitle(filter: ScraperFilter): string {
   return filter.name.trim() || [filter.make, filter.model].filter(Boolean).join(' ') || 'New filter'
 }
 
-const fi = new Intl.NumberFormat('fi-FI')
-
 /** The same one-line summary the scraper logs, for the filter list. */
 export function describeFilter(filter: ScraperFilter): string {
   const parts: string[] = []
   if (filter.make && filter.model) parts.push(`${filter.make}/${filter.model}`)
 
-  if (filter.yearFrom !== null && filter.yearTo !== null) {
-    parts.push(`${filter.yearFrom}–${filter.yearTo}`)
-  } else if (filter.yearFrom !== null) parts.push(`${filter.yearFrom} →`)
-  else if (filter.yearTo !== null) parts.push(`→ ${filter.yearTo}`)
-
-  if (filter.maxMileage !== null) parts.push(`≤ ${fi.format(filter.maxMileage)} km`)
-  if (filter.minPrice !== null && filter.maxPrice !== null) {
-    parts.push(`${fi.format(filter.minPrice)}–${fi.format(filter.maxPrice)} €`)
-  } else if (filter.maxPrice !== null) parts.push(`≤ ${fi.format(filter.maxPrice)} €`)
-  else if (filter.minPrice !== null) parts.push(`≥ ${fi.format(filter.minPrice)} €`)
+  parts.push(...describeRanges(filter.ranges, NETTIAUTO_FIELDS))
 
   const must = [...filter.variantMust, ...filter.textMust]
   if (must.length) parts.push(`says ${must.join(' + ')}`)

@@ -108,7 +108,7 @@ export function buildEmbed(listing, verdict, filter = null) {
   return {
     title: clamp(headline || listing.title || 'Ilmoitus', LIMITS.title),
     url: listing.url,
-    color: accentColour(listing.price, filter?.maxPrice ?? null),
+    color: accentColour(listing.price, filter?.ranges?.price?.max ?? null),
     fields,
     image: listing.image ? { url: listing.image } : undefined,
     footer: { text: clamp(footer, LIMITS.footer) },
