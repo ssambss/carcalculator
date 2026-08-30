@@ -5,10 +5,12 @@ people can actually use — including people who do not write software — and
 (2) a watcher whose **source** is a pluggable module, so it can follow
 apartments, rentals or anything else with listing pages.
 
-> **Where we stand:** Phases 0 and 1 done. The matcher no longer knows what a
-> car is, and the filter editor generates itself from field declarations.
-> 130 scraper tests pass; app build and lint clean.
-> **Next: Phase 2**, the source seam.
+> **Where we stand:** Phases 0, 1 and 2 done. The matcher no longer knows what
+> a car is; nettiauto is one adapter behind a registry, with a conformance suite
+> every future adapter must pass; sinks are pluggable, so a source watching flats
+> ships without a car calculator existing. 148 scraper tests pass; app build and
+> lint clean.
+> **Next: Phase 3**, state behind a storage adapter.
 >
 > **Decided 2026-08-30:** this gets hosted (Phase 6, Tier 2), because
 > fork-per-user does not reach a non-programmer. Sharing now outranks the
@@ -22,9 +24,9 @@ apartments, rentals or anything else with listing pages.
 |---|---|---|
 | [0 · Hygiene](#phase-0--hygiene) | The repo is safe to hand to someone else | ✅ done |
 | [1 · Declarative ranges](#phase-1--declarative-ranges) | `filter.js` stops being about cars | ✅ done |
-| [2 · Source seam](#phase-2--source-seam) | nettiauto becomes one adapter of many | ⬜ not started |
+| [2 · Source seam](#phase-2--source-seam) | nettiauto becomes one adapter of many | ✅ done |
 | [3 · State adapter](#phase-3--state-behind-a-storage-adapter) | State is per-user, destination not baked in | ⬜ not started |
-| [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | ⬜ not started |
+| [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | 🔨 started in Phase 2 |
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
 | [6 · Hosted sharing](#phase-6--hosted-for-people-who-cannot-fork) | Non-technical people actually using it | ⬜ decided, not started |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; push | ⬜ recommended over native |
@@ -286,7 +288,7 @@ Estimate was ~2 days; came in around that.
 
 ---
 
-## Phase 2 · Source seam
+## Phase 2 · Source seam ✅
 
 *nettiauto becomes one adapter behind an interface.*
 
@@ -301,20 +303,49 @@ the matcher already distinguishes) plus a `facts` bag.
 The interface is **already right**: `fetchAllListings` returns normalized
 listings, not HTML, so an API-backed source drops in as easily as an HTML one.
 
-- [ ] `sources/` registry; extract nettiauto behind it with no behaviour change
-- [ ] Per-host pacing — the pacer in `http.js` is module-global, so one slow
-      site would throttle every other
-- [ ] **Sink** made optional and pluggable. Source *and* sink are independent
-      axes; a source declaring no sink gets filters and Discord posts, and
-      reactions simply do nothing. This is what lets apartments ship without
-      Phase 7.
-- [ ] Source-supplied Discord presentation (labels, accent) — drop the fixed
-      28k/32k price bands
-- [ ] Source-aware reaction id recovery (`reactions.js` hardcodes a nettiauto
-      URL regex)
-- [ ] Rename the package off `carcalculator-scraper`
+- [x] `src/sources/` registry; nettiauto moved behind it (`git mv`, so history
+      survives) with no behaviour change
+- [x] A filter names its `source` and its `search` — a bag whose keys are the
+      source's business, so another site's search can be a region and a property
+      type. Top-level `make`/`model` fold in and still win on conflict, the same
+      rule the ranges use
+- [x] Field declarations moved out of `fields.js` and onto the source; the
+      matcher resolves them from the filter's source
+- [x] Per-host pacing in `http.js` — was one module-global clock, so a second
+      source would have waited out the first's politeness budget
+- [x] **Sink** made optional and pluggable (`src/sinks/`), split out of
+      `gist.js`, which keeps only the GitHub plumbing. A source declaring
+      `sink: null` gets filters and Discord posts and its reactions do nothing —
+      which is what lets apartments ship without Phase 7
+- [x] Source-supplied Discord presentation: one embed row per declared field, in
+      the source's own labels. Dropped the fixed 28k/32k accent bands — they were
+      the price of a used Polestar and meant nothing for a van, let alone a flat
+- [x] Source-aware reaction recovery: every adapter gets a look at each link, so
+      one channel can carry several sites. The footer marker is now
+      `<source> <id>`, and the older Finnish `ilmoitus <id>` form is still read
+      off posts made before the change
+- [x] Package renamed to `listing-watch`; User-Agents and CLI help no longer
+      name one site
+- [x] `test/sources.test.js` — 18 new tests (148 total), the conformance suite
+      every adapter must pass. This is Phase 4 begun early, because it is what
+      made the extraction verifiable
+- [ ] **Deferred to Phase 5:** a source picker in the filter editor. With one
+      source it would be UI noise, and the app's `make`/`model` inputs already
+      fold into `search` correctly. The app still writes the pre-source shape,
+      which the scraper reads — worth closing when a second source lands
 
-Estimate: ~5 days.
+Estimate was ~5 days.
+
+### What proves it
+
+The orchestration, the matcher, the state record and the Discord posting no
+longer name a site. `src/index.js` crawls through `group.source`, and the only
+file that mentions nettiauto is the adapter and the tests written against it.
+
+Left deliberately: the workflow is still `nettiauto-watch.yml` and the Discord
+bot is still called `Nettiauto-vahti`. Renaming the workflow file orphans its
+Actions run history, and the bot name is user-visible branding in a live
+channel — neither is worth churning for tidiness.
 
 ---
 
@@ -506,6 +537,11 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **Phase 2 done.** nettiauto behind an adapter and a registry;
+  per-host pacing; sinks pluggable and optional; embeds labelled by the source;
+  reaction recovery source-aware; package renamed to `listing-watch`. 148 tests.
+  Source picker in the editor deferred to Phase 5, when a second source makes it
+  meaningful.
 - **2026-08-30** — **Phase 1 done.** `fields.js` + `listingFields.ts`; `filter.js`
   no longer names a car fact; package vocabulary moved onto the filter; the
   filter editor generates its numeric inputs. 130 scraper tests, app build and

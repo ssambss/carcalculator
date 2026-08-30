@@ -1,5 +1,9 @@
 #!/usr/bin/env node
-// Nettiauto watcher: find listings matching your filters, announce the new ones.
+// Listing watcher: find listings matching your filters, announce the new ones.
+//
+// Which site a filter reads is its source's business (see src/sources/), and
+// nothing in this file names one. Filters sharing a source and a search share a
+// single crawl, so adding filters costs almost nothing.
 //
 //   node src/index.js              check, and post anything new to Discord
 //   node src/index.js --dry-run    do everything except post
@@ -7,7 +11,7 @@
 //   node src/index.js --list       print the current matches and exit
 //
 // A filter is one saved search (see src/filters.js); there can be any number
-// of them, and filters over the same make and model share a single crawl.
+// of them.
 //
 // On the very first run there is no state file, so every match is recorded and
 // nothing is posted - otherwise the channel would fill with every car already
@@ -22,12 +26,12 @@ await loadEnvFile();
 
 const { default: config } = await import('./config.js');
 const { describeFilter, groupBySearch, loadFilters } = await import('./filters.js');
-const { fetchAllListings, fetchListingDetail } = await import('./nettiauto.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
 const { needsPosting, postingReadiness } = await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
-const { addCarsToTco } = await import('./gist.js');
+const { sinkFor } = await import('./sinks/index.js');
+const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
 
 const FLAGS = ['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'];
@@ -64,7 +68,7 @@ function parseArgs(argv) {
   };
 }
 
-const HELP = `Nettiauto watcher
+const HELP = `Listing watcher
 
 Usage: node src/index.js [options]
 
@@ -79,9 +83,10 @@ Usage: node src/index.js [options]
   --help           This text.
 
 Filters are made in the calculator's UI and read from your gist; scraper/
-filters.json is the committed fallback. Runtime knobs live in src/config.js and
-the webhook in DISCORD_WEBHOOK_URL (a scraper/.env file is read automatically).
-See README.md.`;
+filters.json is the committed fallback. Each filter names a source - the site it
+reads - and src/sources/ is where those live. Runtime knobs are in src/config.js
+and the webhook in DISCORD_WEBHOOK_URL (a scraper/.env file is read
+automatically). See README.md.`;
 
 /** Shown when every filter is off, or there are none - including a fresh fork. */
 const NOTHING_TO_WATCH = `Nothing to watch.
@@ -121,7 +126,7 @@ function formatListing(listing) {
  * reused, so a steady-state run fetches very few pages - and because the
  * detail page is the same for every filter, one fetch settles all of them.
  */
-async function collectMatches(search, listings, filters, store) {
+async function collectMatches(source, search, listings, filters, store) {
   const matches = new Map(filters.map((filter) => [filter.id, []]));
   const rejected = new Map(filters.map((filter) => [filter.id, []]));
   let detailFetches = 0;
@@ -167,7 +172,7 @@ async function collectMatches(search, listings, filters, store) {
     let detailChecked = false;
     if (wantsDetail) {
       try {
-        detail = await fetchListingDetail(search, listing.id);
+        detail = await source.fetchListingDetail(search, listing.id);
         detailFetches += 1;
       } catch (error) {
         console.warn(`  could not read listing ${listing.id}: ${error.message}`);
@@ -233,9 +238,23 @@ function listingFromRecord(id, entry) {
  * (see state.needsTcoAdd for how that interacts with the app's last-write-wins
  * sync), missing ones get written.
  */
-async function pickUpReactions(listings, store, { dryRun }) {
+async function pickUpReactions(listings, store, { dryRun, sources }) {
   const { botToken, webhookUrl } = config.discord;
   const gistToken = config.tco.gistToken;
+
+  // A source that declares no sink has nowhere to send a reacted listing, and
+  // that is a legitimate answer rather than a gap: a filter watching flats has
+  // no car calculator to add to, so reactions on its posts simply do nothing.
+  // With every source in this run like that, the whole scan is pointless.
+  const sinks = new Map();
+  for (const source of sources) {
+    const sink = sinkFor(source);
+    if (sink) sinks.set(source.id, sink);
+  }
+  if (sinks.size === 0) {
+    console.log('No source in this run sends reacted listings anywhere - skipping the scan.');
+    return;
+  }
 
   // Neither token set: the feature simply is not configured yet - skip with a
   // visible note instead of failing the run, so posting keeps working while
@@ -260,37 +279,49 @@ async function pickUpReactions(listings, store, { dryRun }) {
   console.log(`Scanned ${scanned} Discord message(s); ${reacted.size} reacted listing(s).`);
   if (reacted.size === 0) return;
 
-  const wanted = [];
-  for (const id of reacted.keys()) {
+  // Grouped by destination: a channel can carry posts from several sources, and
+  // each one's listings go where its own source says.
+  const wanted = new Map();
+  for (const [id, entry] of reacted) {
     if (!state.needsTcoAdd(store, id)) continue;
+    const sink = sinks.get(entry.sourceId);
+    if (!sink) continue;
     const listing = listings.get(id) ?? listingFromRecord(id, store.listings[id]);
-    if (listing) wanted.push(listing);
-    else console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
-  }
-  if (wanted.length === 0) {
-    console.log('All reacted listings are already in the calculator.');
-    return;
-  }
-
-  if (dryRun) {
-    for (const listing of wanted) {
-      console.log(`  [dry-run] would add to the calculator: ${formatListing(listing)}`);
+    if (!listing) {
+      console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
+      continue;
     }
+    if (wanted.has(sink.id)) wanted.get(sink.id).listings.push(listing);
+    else wanted.set(sink.id, { sink, listings: [listing] });
+  }
+  if (wanted.size === 0) {
+    console.log('Every reacted listing has already been picked up.');
     return;
   }
 
-  const { added, skipped } = await addCarsToTco(wanted);
-  for (const id of added) state.recordTcoAdd(store, id);
-  for (const id of skipped) {
-    // Already in the gist: whoever put it there, it is confirmed present.
-    state.recordTcoAdd(store, id);
-    state.recordTcoConfirmed(store, id);
+  for (const { sink, listings: batch } of wanted.values()) {
+    if (dryRun) {
+      for (const listing of batch) {
+        console.log(`  [dry-run] would add to ${sink.label}: ${formatListing(listing)}`);
+      }
+      continue;
+    }
+
+    const { added, skipped } = await sink.add(batch);
+    for (const id of added) state.recordTcoAdd(store, id);
+    for (const id of skipped) {
+      // Already there: whoever put it there, it is confirmed present.
+      state.recordTcoAdd(store, id);
+      state.recordTcoConfirmed(store, id);
+    }
+    if (added.length) {
+      console.log(`Added ${added.length} listing(s) to ${sink.label}:`);
+      for (const id of added) console.log(`  ${formatListing(batch.find((l) => l.id === id))}`);
+    }
+    if (skipped.length) {
+      console.log(`${skipped.length} reacted listing(s) were already in ${sink.label}.`);
+    }
   }
-  if (added.length) {
-    console.log(`Added ${added.length} car(s) to the calculator:`);
-    for (const id of added) console.log(`  ${formatListing(wanted.find((l) => l.id === id))}`);
-  }
-  if (skipped.length) console.log(`${skipped.length} reacted car(s) were already in the calculator.`);
 }
 
 async function main() {
@@ -374,14 +405,20 @@ async function main() {
 
   for (const group of groups) {
     console.log(`\nFetching ${group.key} search results...`);
-    const { listings, total } = await fetchAllListings(group.search, {
+    const { listings, total } = await group.source.fetchAllListings(group.search, {
       onProgress: ({ page, lastPage, fresh }) =>
         console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
     });
     console.log(`Read ${listings.length} listings (site reports ${total ?? '?'}).`);
     for (const listing of listings) everyListing.set(listing.id, listing);
 
-    const result = await collectMatches(group.search, listings, group.filters, store);
+    const result = await collectMatches(
+      group.source,
+      group.search,
+      listings,
+      group.filters,
+      store,
+    );
     detailFetches += result.detailFetches;
     reusedVerdicts += result.reusedVerdicts;
 
@@ -424,8 +461,9 @@ async function main() {
   }
 
   if (config.tco.pickUpReactions) {
+    const sources = [...new Map(groups.map((group) => [group.source.id, group.source])).values()];
     console.log('\nChecking Discord reactions...');
-    await pickUpReactions(everyListing, store, { dryRun: args.dryRun });
+    await pickUpReactions(everyListing, store, { dryRun: args.dryRun, sources });
   }
 
   // Anything matching that this filter has never announced. On a first or
@@ -547,7 +585,10 @@ async function main() {
   let batches = 0;
   for (const items of byFilter.values()) {
     const { filter } = items[0];
-    const result = await announce(filter, items, { dryRun: args.dryRun });
+    const result = await announce(filter, items, {
+      dryRun: args.dryRun,
+      source: sourceOf(filter),
+    });
     batches += result.batches;
     posted += result.announced.length;
     const accepted = new Set(result.announced);
@@ -578,7 +619,7 @@ try {
   console.error(`\nRun failed: ${error.message}`);
   if (process.env.DEBUG) console.error(error.stack);
   if (process.argv.includes('--notify-errors')) {
-    await announceText(`⚠️ Nettiauto-vahti failed: ${error.message}`, {
+    await announceText(`⚠️ ${config.discord.username} failed: ${error.message}`, {
       dryRun: process.argv.includes('--dry-run'),
     }).catch(() => {});
   }

@@ -1,7 +1,13 @@
 // Posting new listings to a Discord channel via webhook.
+//
+// What a post says about a listing comes from the source: its field labels, in
+// its own language, and the numeric fields it declares. Nothing here is written
+// for cars - a flat's post is the same code with different labels.
 
 import config from './config.js';
 import { postJson, sleep } from './http.js';
+import { factOf } from './fields.js';
+import { sourceOf } from './sources/index.js';
 
 const EUR = new Intl.NumberFormat('fi-FI', {
   style: 'currency',
@@ -19,31 +25,37 @@ function clamp(text, limit) {
   return value.length <= limit ? value : `${value.slice(0, limit - 1)}…`;
 }
 
-function euros(value) {
-  return value === null || value === undefined ? 'hinta ?' : EUR.format(value);
-}
-
-function kilometres(value) {
-  return value === null || value === undefined ? '? km' : `${KM.format(value)} km`;
+/**
+ * One numeric fact, formatted the way its field declares.
+ *
+ * A price gets its currency, a measurement gets its unit, a year gets neither
+ * and no thousands separator. An unknown value still prints as "?" - a row
+ * missing from half the posts reads as a layout bug rather than as missing data.
+ */
+function formatFact(value, field) {
+  // An unknown value keeps its unit ("? km") but invents no label: the field's
+  // own name is right above it, so the old "hinta ?" said price twice.
+  if (value === null || value === undefined) return field.unit ? `? ${field.unit}` : '?';
+  if (field.key === 'price') return EUR.format(value);
+  if (field.style === 'year') return String(value);
+  return field.unit ? `${KM.format(value)} ${field.unit}` : KM.format(value);
 }
 
 /**
- * Colour by price, so a cheap find is visually obvious in the channel.
+ * Colour by how a price sits against the filter's own ceiling.
  *
- * Read against the filter's own ceiling where it has one - what counts as
- * cheap depends entirely on what you are shopping for - and against fixed
- * bands only when the filter sets no maximum.
+ * What counts as cheap depends entirely on what you are shopping for, so the
+ * filter's maximum is the only meaningful yardstick. There used to be fixed
+ * fallback bands at 28 000 and 32 000 euros for a filter that set no maximum -
+ * they were the price of a used Polestar and meant nothing for a van, let alone
+ * a flat. A filter with no ceiling now simply gets the neutral colour.
  */
 export function accentColour(price, maxPrice = null) {
   if (price === null || price === undefined) return 0x8a8a8a;
-  if (maxPrice) {
-    const share = price / maxPrice;
-    if (share <= 0.85) return 0x2ecc71;
-    if (share <= 0.95) return 0x3498db;
-    return 0x9b59b6;
-  }
-  if (price < 28000) return 0x2ecc71;
-  if (price < 32000) return 0x3498db;
+  if (!maxPrice) return 0x5865f2;
+  const share = price / maxPrice;
+  if (share <= 0.85) return 0x2ecc71;
+  if (share <= 0.95) return 0x3498db;
   return 0x9b59b6;
 }
 
@@ -54,22 +66,39 @@ export function accentColour(price, maxPrice = null) {
  * seller free text, so showing the phrase we matched on lets the reader judge
  * the call themselves instead of trusting the scraper.
  */
-export function buildEmbed(listing, verdict, filter = null) {
+export function buildEmbed(listing, verdict, filter = null, source = null) {
+  const from = source ?? (filter ? sourceOf(filter) : null);
+  const labels = from?.presentation?.labels ?? {};
   const headline = [listing.year, listing.subTitle || listing.title].filter(Boolean).join(' ');
 
-  const fields = [
-    { name: 'Hinta', value: euros(listing.price), inline: true },
-    { name: 'Mittarilukema', value: kilometres(listing.mileage), inline: true },
-    { name: 'Vuosimalli', value: String(listing.year ?? '?'), inline: true },
+  // One row per numeric field the source declares, in its declared order, so a
+  // flat shows its size and room count where a car shows odometer and year.
+  // `price` leads because it is the number everyone reads first.
+  const fields = [];
+  const ordered = [
+    ...(from?.fields ?? []).filter((field) => field.key === 'price'),
+    ...(from?.fields ?? []).filter((field) => field.key !== 'price'),
   ];
+  for (const field of ordered) {
+    const value = factOf(listing, field.key);
+    fields.push({
+      name: labels[field.key] ?? field.label ?? field.key,
+      value: formatFact(value, field),
+      inline: true,
+    });
+  }
 
   const specs = [listing.driveType, listing.color, listing.bodyType].filter(Boolean);
-  if (specs.length) {
-    fields.push({ name: 'Tiedot', value: clamp(specs.join(' · '), LIMITS.fieldValue), inline: true });
+  if (specs.length && labels.specs) {
+    fields.push({
+      name: labels.specs,
+      value: clamp(specs.join(' · '), LIMITS.fieldValue),
+      inline: true,
+    });
   }
   if (listing.location || listing.seller) {
     fields.push({
-      name: 'Myyjä',
+      name: labels.seller ?? 'Seller',
       value: clamp(listing.location || listing.seller, LIMITS.fieldValue),
       inline: true,
     });
@@ -83,7 +112,7 @@ export function buildEmbed(listing, verdict, filter = null) {
     });
   if (evidence.length) {
     fields.push({
-      name: 'Varustepaketit (myyjän teksti)',
+      name: labels.packages ?? 'Packages',
       value: clamp(evidence.join('\n'), LIMITS.fieldValue),
       inline: false,
     });
@@ -92,18 +121,19 @@ export function buildEmbed(listing, verdict, filter = null) {
   const caveats = [...(verdict?.warnings ?? []), ...(verdict?.notes ?? [])];
   if (caveats.length) {
     fields.push({
-      name: 'Huom',
+      name: labels.caveats ?? 'Note',
       value: clamp(caveats.map((caveat) => `• ${caveat}`).join('\n'), LIMITS.fieldValue),
       inline: false,
     });
   }
 
-  // The footer names the filter that matched, so a channel carrying several
-  // searches stays readable. The listing id has to stay in it verbatim:
-  // reactions.js maps a reacted post back to its car through this line.
-  const footer = ['nettiauto.com', filter?.name, `ilmoitus ${listing.id}`]
-    .filter(Boolean)
-    .join(' · ');
+  // The footer names the site and the filter that matched, so a channel
+  // carrying several searches - and now possibly several sites - stays
+  // readable. The source and the id have to stay in it verbatim: reactions.js
+  // falls back to this line when an embed's link cannot be read. See
+  // FOOTER_ID_RE there.
+  const marker = `${from?.id ?? ''} ${listing.id}`.trim();
+  const footer = [from?.presentation?.footer, filter?.name, marker].filter(Boolean).join(' · ');
 
   return {
     title: clamp(headline || listing.title || 'Ilmoitus', LIMITS.title),
@@ -125,7 +155,7 @@ export function buildEmbed(listing, verdict, filter = null) {
 export async function announce(
   filter,
   items,
-  { webhookUrl = config.discord.webhookUrl, dryRun = false } = {},
+  { webhookUrl = config.discord.webhookUrl, dryRun = false, source = null } = {},
 ) {
   if (items.length === 0) return { announced: [], batches: 0 };
   if (!dryRun && !webhookUrl) {
@@ -150,7 +180,7 @@ export async function announce(
     const payload = {
       username,
       content: isFirstBatch ? heading : undefined,
-      embeds: batch.map(({ listing, verdict }) => buildEmbed(listing, verdict, filter)),
+      embeds: batch.map(({ listing, verdict }) => buildEmbed(listing, verdict, filter, source)),
       // Suppress link previews: the embeds already carry the images.
       allowed_mentions: { parse: [] },
     };

@@ -11,25 +11,12 @@
 // carry and what to call them; the checking below is the same either way, and
 // `price` is just another field rather than a special case.
 //
-// The declarations live in this module for now. They belong to the source, and
-// move into it when there is more than one (see PLAN.md, phase 2).
-
-/**
- * Fields on a nettiauto listing that a filter can bound.
- *
- * `unit` labels the number where one reads naturally ("120 000 km"), and its
- * absence is what makes the message name the field instead ("rooms 2 under 3").
- * `style: 'year'` picks before/after over under/over and leaves the digits
- * ungrouped, because "year 2 019" is not a year.
- */
-export const NETTIAUTO_FIELDS = [
-  { key: 'year', label: 'year', style: 'year' },
-  { key: 'mileage', label: 'mileage', unit: 'km' },
-  { key: 'price', label: 'price', unit: '€' },
-];
+// The declarations themselves belong to the source - see
+// `sources/nettiauto.js`. What is here is the checking, which is the same
+// whatever the fields are called.
 
 /** Field declarations by key, for whichever source is in play. */
-export function fieldMap(fields = NETTIAUTO_FIELDS) {
+export function fieldMap(fields) {
   return new Map(fields.map((field) => [field.key, field]));
 }
 
@@ -74,7 +61,7 @@ function outOfRange(field, value, bound, side) {
  * can turn a number that misses into one that hits - which is what lets the
  * caller skip the detail fetch entirely.
  */
-export function checkRanges(listing, ranges, fields = NETTIAUTO_FIELDS) {
+export function checkRanges(listing, ranges, fields = []) {
   const known = fieldMap(fields);
   const reasons = [];
 
@@ -105,7 +92,7 @@ export function checkRanges(listing, ranges, fields = NETTIAUTO_FIELDS) {
  * ranges happen to be stored in, so two filters over the same source read the
  * same way.
  */
-export function describeRanges(ranges, fields = NETTIAUTO_FIELDS) {
+export function describeRanges(ranges, fields = []) {
   const parts = [];
   const entries = Object.entries(ranges ?? {});
   const order = new Map(fields.map((field, index) => [field.key, index]));

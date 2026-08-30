@@ -1,13 +1,26 @@
 // Reading reactions off the listings we posted to Discord.
 //
 // Webhooks are send-only, so this needs a bot token. The bot reads the channel
-// and maps each embed back to its listing through the nettiauto URL, which
+// and maps each embed back to its listing through the link it points at, which
 // means it works on messages posted before this feature existed, and needs no
 // record of message ids.
+//
+// Every registered source gets a look at each link, because one channel can
+// legitimately carry posts from several - so a reaction on a flat and a reaction
+// on a car are told apart by which source claimed the URL.
 
 import config from './config.js';
+import { DEFAULT_SOURCE_ID, identifyUrl, sourceIds } from './sources/index.js';
 
 const API = 'https://discord.com/api/v10';
+
+/**
+ * Matches the id marker a footer ends with: "<source> 15900001".
+ *
+ * The bare "ilmoitus <id>" alternative is the older form, from before there was
+ * more than one source - every post carrying it is a nettiauto post.
+ */
+const FOOTER_ID_RE = new RegExp(`(?:(${sourceIds().join('|')})\\s+|ilmoitus\\s+)(\\d+)`);
 
 /** The webhook's own id, used to tell our posts apart from anyone else's. */
 export function webhookIdFrom(url) {
@@ -16,7 +29,7 @@ export function webhookIdFrom(url) {
 
 async function discord(path, { botToken, label }) {
   const response = await fetch(`${API}${path}`, {
-    headers: { Authorization: `Bot ${botToken}`, 'User-Agent': 'nettiauto-watch (carcalculator)' },
+    headers: { Authorization: `Bot ${botToken}`, 'User-Agent': 'listing-watch (carcalculator)' },
   });
 
   if (response.status === 401) {
@@ -51,20 +64,32 @@ export async function resolveChannelId({
   return body.channel_id;
 }
 
-/** Pull the listing ids out of a message's embeds. */
-function listingIdsIn(message) {
-  const ids = new Set();
+/**
+ * Pull the listings out of a message's embeds, as `{ sourceId, id }`.
+ *
+ * The embed's own link is the good answer, and the only one that identifies the
+ * source. The footer is the fallback for a post whose embed layout has since
+ * changed - it carries "<source> <id>" now, and the older Finnish "ilmoitus
+ * <id>" form is still read, from before there was more than one source.
+ */
+export function listingsIn(message) {
+  const found = new Map();
+
   for (const embed of message.embeds ?? []) {
-    const fromUrl = /nettiauto\.com\/[^/]+\/[^/]+\/(\d+)/.exec(embed.url ?? '')?.[1];
+    const fromUrl = identifyUrl(embed.url);
     if (fromUrl) {
-      ids.add(fromUrl);
+      found.set(`${fromUrl.sourceId}:${fromUrl.id}`, fromUrl);
       continue;
     }
-    // Older posts, or a changed embed layout: the footer carries the id too.
-    const fromFooter = /ilmoitus\s+(\d+)/.exec(embed.footer?.text ?? '')?.[1];
-    if (fromFooter) ids.add(fromFooter);
+    const match = FOOTER_ID_RE.exec(embed.footer?.text ?? '');
+    if (match) {
+      // No source named means a post from before sources existed, and every
+      // one of those was nettiauto.
+      const entry = { sourceId: match[1] || DEFAULT_SOURCE_ID, id: match[2] };
+      found.set(`${entry.sourceId}:${entry.id}`, entry);
+    }
   }
-  return [...ids];
+  return [...found.values()];
 }
 
 /**
@@ -123,19 +148,21 @@ export async function fetchReactedListingIds({
     if (!Array.isArray(messages) || messages.length === 0) break;
 
     for (const message of messages) {
-      // Only our own posts; someone else's message with a nettiauto link is
-      // not a listing we announced.
+      // Only our own posts; someone else's message linking a listing is not a
+      // listing we announced.
       if (ourWebhookId && message.webhook_id && message.webhook_id !== ourWebhookId) continue;
       if (!hasQualifyingReaction(message, requiredEmoji)) continue;
-      const ids = listingIdsIn(message);
+      const listings = listingsIn(message);
       // Every post of ours carries an embed. A reacted post of ours with none
       // means Discord stripped them from the response, not that they're gone.
-      if (ids.length === 0 && (message.embeds ?? []).length === 0) {
+      if (listings.length === 0 && (message.embeds ?? []).length === 0) {
         strippedEmbeds += 1;
         continue;
       }
-      for (const id of ids) {
-        if (!reacted.has(id)) reacted.set(id, message.id);
+      for (const listing of listings) {
+        if (!reacted.has(listing.id)) {
+          reacted.set(listing.id, { messageId: message.id, sourceId: listing.sourceId });
+        }
       }
     }
 

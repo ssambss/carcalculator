@@ -1,10 +1,10 @@
 // Deciding whether a listing meets a filter's spec.
 //
-// Nettiauto exposes no filter for battery size, drivetrain or option packages,
-// and the packages are never structured data - they live in seller free text.
-// So everything below the year/mileage/price line is text matching, and every
-// verdict carries the evidence that produced it so a human can sanity-check
-// the call.
+// Sites do not offer server-side filters for the things that actually decide a
+// listing - a car's battery size or drivetrain, an option package - and those
+// are rarely structured data at all: they live in seller free text. So
+// everything below the numeric line is text matching, and every verdict carries
+// the evidence that produced it so a human can sanity-check the call.
 //
 // Three kinds of text check, in increasing looseness:
 //
@@ -20,6 +20,7 @@
 
 import { checkRanges } from './fields.js';
 import { normalizeFilter } from './filters.js';
+import { sourceOf } from './sources/index.js';
 
 /** Words that mark a package name as an actual option package. */
 const PACKAGE_NOUN = /^(paket|pkt|pack|package|varuste)/;
@@ -299,8 +300,11 @@ function fullText(listing, detail) {
  * `detail` is optional: pass the search-card data alone for a first pass, and
  * re-run with the listing page once fetched. `needsDetail` tells the caller
  * that a detail fetch could still change the verdict.
+ *
+ * `fields` overrides the source's own declarations, which is only useful for
+ * testing a field set that no registered source has.
  */
-export function evaluate(listing, detail = null, filter) {
+export function evaluate(listing, detail = null, filter, { fields = null } = {}) {
   const spec = normalizeFilter(filter);
   const reasons = [];
   const notes = [];
@@ -317,7 +321,10 @@ export function evaluate(listing, detail = null, filter) {
   // metres and a room count. Every one of these is settled: no amount of extra
   // text from a listing page turns a number that misses into one that hits, so
   // a car ruled out here never costs a detail fetch.
-  reasons.push(...checkRanges(listing, spec.ranges));
+  // The field declarations decide how a missed number is worded, and they
+  // belong to the source - so an apartment's "48 m² under 55 m²" reads as
+  // naturally as a car's "year 2019 before 2021".
+  reasons.push(...checkRanges(listing, spec.ranges, fields ?? sourceOf(spec).fields));
   settled = reasons.length;
 
   // --- Text requirements. ---

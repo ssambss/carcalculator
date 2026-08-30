@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 
 import config from '../src/config.js';
-import { carName, powertrainOf, toCarListing, variantHint } from '../src/gist.js';
+import { carName, powertrainOf, toCarListing, variantHint } from '../src/sinks/car-tco.js';
 import { webhookIdFrom } from '../src/reactions.js';
 import { loadState, needsTcoAdd, recordTcoAdd, recordTcoConfirmed, saveState } from '../src/state.js';
 

@@ -5,8 +5,9 @@ lease — built to be used at home and at the dealership (works well on a phone)
 
 Running your own copy — the app, sync and the listing watcher, with your data
 and your searches — is [SETUP.md](SETUP.md). Where the project is headed
-(generalizing the watcher's source so it can follow apartments or rentals, and
-making it fork-and-run for anyone) is [PLAN.md](PLAN.md).
+(making the watcher's source pluggable so it can follow apartments or rentals,
+and hosting it so people who do not write software can use it) is
+[PLAN.md](PLAN.md).
 
 Each car gets a listing with purchase price, expected resale value, financing
 (cash, an annuity loan with optional balloon payment, or a lease), energy use
@@ -101,9 +102,14 @@ base so any repo name works).
 
 ## Listing watcher (separate tool)
 
-[scraper/](scraper/) holds a companion: a Node script that watches
-nettiauto.com for used cars matching your filters and posts new listings to a
-Discord channel. React to a post there and the car appears in this calculator.
+[scraper/](scraper/) holds a companion: a Node script that watches listing sites
+for things matching your filters and posts anything new to a Discord channel.
+React to a post there and the car appears in this calculator.
+
+Which site a filter reads is its **source** — an adapter under
+[scraper/src/sources/](scraper/src/sources/). `nettiauto` is the only one so
+far; nothing outside that folder names a site, so following flats or rentals
+means writing another adapter rather than changing the watcher.
 
 It runs any number of filters — the ones you make in the app, with
 [scraper/filters.json](scraper/filters.json) as the committed fallback. That
@@ -119,5 +125,8 @@ The code stays independent of the calculator — its own folder, no dependencies
 no shared code, and nothing the Vite build touches. The only thing the two
 share is the shape of a filter: [src/scraperFilters.ts](src/scraperFilters.ts)
 writes it, [scraper/src/filters.js](scraper/src/filters.js) reads it, and each
-normalises it without trusting the other. See
+normalises it without trusting the other. The numeric fields a filter can bound
+travel the same way — [src/listingFields.ts](src/listingFields.ts) mirrors the
+source's own declarations, so the filter editor builds its inputs from them
+rather than hardcoding year, odometer and price. See
 [scraper/README.md](scraper/README.md).

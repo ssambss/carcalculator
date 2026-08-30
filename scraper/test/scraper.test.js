@@ -25,7 +25,13 @@ import {
   normalizeFilter,
   normalizeFilters,
 } from '../src/filters.js';
-import { parseDetailPage, parseSearchPage, buildSearchUrl, buildListingUrl } from '../src/nettiauto.js';
+import {
+  buildListingUrl,
+  buildSearchUrl,
+  nettiauto,
+  parseDetailPage,
+  parseSearchPage,
+} from '../src/sources/nettiauto.js';
 import { checkRanges, describeRanges, factOf } from '../src/fields.js';
 import { accentColour, buildEmbed } from '../src/discord.js';
 import { needsPosting, postingReadiness } from '../src/preflight.js';
@@ -397,8 +403,10 @@ describe('powertrain and limits', () => {
 describe('filter definitions', () => {
   it('fills in every field a source left out', () => {
     const filter = normalizeFilter({ make: 'Tesla', model: 'Model 3' });
-    assert.equal(filter.make, 'tesla');
-    assert.equal(filter.model, 'model-3');
+    // The top-level make/model spellings fold into the search bag, whose keys
+    // are the source's business rather than this module's.
+    assert.deepEqual(filter.search, { make: 'tesla', model: 'model-3' });
+    assert.equal(filter.source, 'nettiauto');
     assert.equal(filter.name, 'tesla model-3');
     assert.equal(filter.enabled, true);
     assert.equal(filter.postExisting, true);
@@ -426,8 +434,7 @@ describe('filter definitions', () => {
         { then: 'no if' },
       ],
     });
-    assert.equal(filter.make, 'polestar');
-    assert.equal(filter.model, '');
+    assert.deepEqual(filter.search, { make: 'polestar' });
     // The single-purpose spellings are still read, and land in the range bag.
     assert.deepEqual(filter.ranges, {
       mileage: { min: null, max: 120000 },
@@ -449,7 +456,7 @@ describe('filter definitions', () => {
 
   it('reads the committed default filter', () => {
     assert.equal(POLESTAR.id, 'polestar2-lr-dm');
-    assert.equal(POLESTAR.make, 'polestar');
+    assert.deepEqual(POLESTAR.search, { make: 'polestar', model: '2' });
     assert.deepEqual(POLESTAR.packages, ['pilot', 'plus']);
     // Intl groups thousands with a non-breaking space; compare normalised.
     const described = describeFilter(POLESTAR).replace(/\s/g, ' ');
@@ -490,14 +497,14 @@ describe('filter definitions', () => {
 
     const filter = normalizeFilter(fromApp);
     assert.equal(filter.id, fromApp.id);
-    assert.equal(filter.make, 'toyota');
+    assert.deepEqual(filter.search, { make: 'toyota', model: 'corolla' });
     assert.deepEqual(filter.ranges, {
       mileage: { min: null, max: 150000 },
       price: { min: null, max: 18000 },
       year: { min: 2019, max: null },
     });
     assert.deepEqual(filter.textMust, ['touring sports', 'vetokoukku']);
-    assert.equal(buildSearchUrl(filter, 1), 'https://www.nettiauto.com/toyota/corolla');
+    assert.equal(buildSearchUrl(filter.search, 1), 'https://www.nettiauto.com/toyota/corolla');
 
     const corolla = {
       id: '16000001',
@@ -532,13 +539,19 @@ describe('filter definitions', () => {
     const tesla = normalizeFilter({ id: 't', make: 'tesla', model: 'model-3' });
     const groups = groupBySearch([POLESTAR, cheap, tesla]);
     assert.equal(groups.length, 2);
+    // The key carries the source: two sites can legitimately use the same
+    // search key, and merging their crawls would fetch one and report both.
     assert.deepEqual(
       groups.map((group) => [group.key, group.filters.length]),
       [
-        ['polestar/2', 2],
-        ['tesla/model-3', 1],
+        ['nettiauto:polestar/2', 2],
+        ['nettiauto:tesla/model-3', 1],
       ],
     );
+    // Each group carries the adapter that will crawl it, so the orchestration
+    // never has to know which site it is talking to.
+    assert.equal(groups[0].source.id, 'nettiauto');
+    assert.deepEqual(groups[0].search, { make: 'polestar', model: '2' });
   });
 });
 
@@ -862,7 +875,10 @@ describe('discord embed', () => {
     const item = listing({ usp: 'Pilot- ja Plus-paketit' });
     const embed = buildEmbed(item, evaluate(item, null, POLESTAR), POLESTAR);
     assert.match(embed.footer.text, /Polestar 2 LR DM/);
-    assert.match(embed.footer.text, /ilmoitus 15900001/);
+    // The marker names the source now, so a channel carrying more than one
+    // site stays unambiguous. reactions.js still reads the old "ilmoitus <id>"
+    // form off posts made before this change - see FOOTER_ID_RE there.
+    assert.match(embed.footer.text, /nettiauto 15900001/);
   });
 
   it('reads the price against the filter\'s own ceiling', () => {
@@ -883,8 +899,11 @@ describe('discord embed', () => {
     const item = listing({ price: null, mileage: null, usp: 'Pilot- ja Plus-paketit' });
     const embed = buildEmbed(item, evaluate(item, null, POLESTAR), POLESTAR);
     const fieldText = embed.fields.map((field) => field.value).join(' ').replace(/\s/g, ' ');
-    assert.match(fieldText, /hinta \?/);
+    // An unknown value keeps its unit but not a made-up label: the field's own
+    // name sits right above it, so the old "hinta ?" said price twice.
     assert.match(fieldText, /\? km/);
+    const price = embed.fields.find((field) => field.name === 'Hinta');
+    assert.equal(price.value, '? €');
   });
 });
 
@@ -1123,18 +1142,23 @@ describe('numeric limits, on any kind of listing', () => {
   });
 
   it('keeps years unformatted and picks before/after over under/over', () => {
-    const reasons = checkRanges({ year: 2019 }, { year: { min: 2021 } }).join(' ');
+    const F = nettiauto.fields;
+    const reasons = checkRanges({ year: 2019 }, { year: { min: 2021 } }, F).join(' ');
     assert.match(reasons, /year 2019 before 2021/);
-    assert.match(checkRanges({ year: 2024 }, { year: { max: 2023 } }).join(' '), /year 2024 after 2023/);
+    assert.match(
+      checkRanges({ year: 2024 }, { year: { max: 2023 } }, F).join(' '),
+      /year 2024 after 2023/,
+    );
   });
 
   it('describes a closed range with its unit once', () => {
+    const F = nettiauto.fields;
     assert.deepEqual(
-      describeRanges({ year: { min: 2021, max: 2023 } }).map((p) => p.replace(/\s/g, ' ')),
+      describeRanges({ year: { min: 2021, max: 2023 } }, F).map((p) => p.replace(/\s/g, ' ')),
       ['2021-2023'],
     );
     assert.deepEqual(
-      describeRanges({ price: { min: 20000, max: 29000 } }).map((p) => p.replace(/\s/g, ' ')),
+      describeRanges({ price: { min: 20000, max: 29000 } }, F).map((p) => p.replace(/\s/g, ' ')),
       ['20 000-29 000 €'],
     );
   });
@@ -1260,6 +1284,7 @@ describe('the wire shape the app writes', () => {
     // source of truth.
     assert.equal(filter.yearFrom, undefined);
     assert.equal(filter.maxMileage, undefined);
+    assert.deepEqual(filter.search, { make: 'polestar', model: '2' });
   });
 
   it('carries the package qualifiers across intact', () => {

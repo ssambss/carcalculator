@@ -1,13 +1,42 @@
-# Nettiauto watch
+# Listing watch
 
-Watches [nettiauto.com](https://www.nettiauto.com) for used cars matching your
-filters and posts new listings to a Discord channel. Runs as a standalone Node
-script — it shares no code, build step or dependency with the TCO calculator in
-the repo root, and the Vite build never sees this folder.
+Watches listing sites for things matching your filters and posts anything new to
+a Discord channel. [nettiauto.com](https://www.nettiauto.com) is the source it
+was built for and so far the only one; adding another is writing an adapter.
 
-A **filter** is one saved search: which listing page to read, plus the spec
-every car on it is checked against. There can be any number of them, and
-filters over the same make and model share a single crawl.
+Runs as a standalone Node script — it shares no code, build step or dependency
+with the TCO calculator in the repo root, and the Vite build never sees this
+folder.
+
+A **filter** is one saved search: a source, which of its listing pages to read,
+and the spec every listing on it is checked against. There can be any number of
+them, and filters sharing a source and a search share a single crawl.
+
+## Sources
+
+A **source** is one site. Everything site-specific lives in an adapter under
+[src/sources/](src/sources/) - how to page through a search, how to parse a
+card, which numeric facts its listings carry, how to recover a listing id from
+a link. Nothing outside that folder names a site: the orchestration in
+`src/index.js`, the matcher in `src/filter.js` and the Discord posting all work
+against the interface.
+
+`nettiauto` is the only one so far, and a filter that names no source gets it.
+To follow something else - flats, rentals, anything with listing pages - write
+another adapter, register it in [src/sources/index.js](src/sources/index.js),
+and make it pass `test/sources.test.js`, which is the specification.
+
+Two things a source decides that are worth knowing about:
+
+- **Its fields.** A filter's numeric limits are a bag keyed by field
+  (`ranges: { year: { max: 2023 }, mileage: { max: 120000 } }`), and the source
+  declares which fields exist and what to call them. `price` is just another
+  field. A flat's source would declare `sizeM2` and `rooms` and everything from
+  the matcher to the Discord embed to the filter editor would follow.
+- **Its sink**, meaning where a listing goes when someone reacts to it. Cars go
+  to the calculator; a source watching flats declares no sink, and reactions on
+  its posts do nothing. That is deliberate - it lets a new source ship without a
+  second calculator having to exist first.
 
 ## Where the filters come from
 
@@ -55,20 +84,40 @@ locally, exactly as in CI; without it a local run always uses the file.
 
 ## What a filter can ask for
 
-Everything except make and model is optional; a filter with no requirements
-matches the whole model's listing, which is what you want when scouting a car
-you have no fixed spec for.
+The only thing a filter cannot leave out is the search — the page to read.
+Everything else is optional, and a filter with no requirements at all matches
+that whole listing page, which is what you want when scouting something you have
+no fixed spec for.
 
 | Field | Checked against |
 |---|---|
-| `make`, `model` | the URL path: `/polestar/2` |
-| `yearFrom`, `yearTo`, `maxMileage`, `minPrice`, `maxPrice` | typed facts from the result card |
+| `source` | which site; omitted means `nettiauto` |
+| `search` | which of its pages. For nettiauto, `{ make, model }` → `/polestar/2` |
+| `ranges` | typed facts from the result card, keyed by field (see below) |
 | `variantMust`, `variantMustNot` | the variant name and the spec chips — short, structured text |
 | `textMust`, `textMustNot` | everything, the seller's own description included |
 | `packages` + `packageEvidence` | free text, but only where it reads as a package (see below) |
+| `packageQualifiers` | words that change what a package name means (see below) |
 | `implications` | "seeing A proves B", for facts a seller left implicit |
-| `postExisting` | whether its first run reports the cars already on sale |
+| `postExisting` | whether its first run reports the listings already on sale |
 | `enabled` | pausing keeps the filter and its history |
+
+`ranges` is how every numeric limit is expressed, and which fields exist is the
+source's declaration rather than anything hardcoded:
+
+```json
+"ranges": { "year": { "min": 2021, "max": 2023 }, "mileage": { "max": 120000 } }
+```
+
+Both bounds are inclusive, and a range over a field the listing does not state
+*fails* — "under 120 000 km" is a claim about the car, and an advert that does
+not say cannot support it. The older `yearFrom` / `yearTo` / `maxMileage` /
+`minPrice` / `maxPrice` spellings are still read, and still win where they
+disagree with `ranges`: only a writer that has never heard of the range bag sets
+one without the other, so trusting the bag there would discard its edit.
+
+Likewise `make` and `model` are still read from the filter's top level and fold
+into `search`.
 
 Phrases are matched on whitespace-flattened tokens, so `long range` finds
 `Long-Range`, `LONG RANGE / 78kWh` and `long/range` alike. The last word of a
@@ -163,7 +212,7 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (110 cases, no network)
+npm test                     # unit tests (148 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
@@ -201,7 +250,8 @@ in `filters.json`.
 
 To watch a different car, add a filter in the app, or copy the entry in
 `filters.json` and change `make` / `model` to match the nettiauto URL path
-(`/polestar/2` → `"make": "polestar", "model": "2"`).
+(`/polestar/2` → `"make": "polestar", "model": "2"`). To watch something that is
+not a car at all, that is a new source — see *Sources* above.
 
 ## Running it on a schedule
 
@@ -264,7 +314,11 @@ Worth knowing:
 - To require a specific emoji instead of any reaction, set
   `tco.requiredEmoji` (e.g. `'✅'`) in [src/config.js](src/config.js).
 
-## How it reads nettiauto
+## How the nettiauto source reads nettiauto
+
+Everything below is one adapter's business, in
+[src/sources/nettiauto.js](src/sources/nettiauto.js). It is the worked example
+for writing another.
 
 There is no public API, so this parses the server-rendered HTML. Two details
 are worth knowing before changing anything:
@@ -305,7 +359,8 @@ The text is tokenised with every separator sellers use flattened to
 whitespace, then a package counts when the name sits within three tokens of
 either a `paketti`/`pkt`/`pack`/`varuste` word or the other required package.
 
-Two Polestar-specific exclusions matter:
+Two Polestar-specific exclusions matter, and they are the filter's own
+`packageQualifiers` rather than anything the matcher knows:
 
 - **Pilot Lite** is a smaller, separately sold package, so it does *not*
   satisfy Pilot. Tick *Accept the smaller version of a package* (or set
@@ -313,6 +368,20 @@ Two Polestar-specific exclusions matter:
 - **Pilot Assist** is a feature that ships in *both* Pilot and Pilot Lite, so
   seeing it proves nothing about which pack the car has, and it is ignored.
   (A listing naming both "Pilot Assist" and Pilot properly still matches.)
+
+Both are expressed as `{ package, word, means }`, where `means` is `lesser` or
+`feature`:
+
+```json
+"packageQualifiers": [
+  { "package": "pilot", "word": "lite", "means": "lesser" },
+  { "package": "pilot", "word": "assist", "means": "feature" }
+]
+```
+
+A filter that says nothing gets those two by default, so nothing written before
+the field existed changed behaviour. They are inert unless a filter asks for a
+package literally named `pilot`. An explicitly empty list clears them.
 
 Because this is fuzzy by nature, **every Discord post quotes the seller text it
 matched on**, so the verdict can be checked at a glance instead of trusted. If
@@ -325,9 +394,11 @@ the filter's own `implications` rules, and both are reported in the post. See
 
 ## Being a polite guest
 
-One request at a time, 1.5 s apart, a real browser User-Agent, and retries with
-backoff on 429/5xx — global, so adding filters never means more requests in
-flight, only a longer run. A full first run over the Polestar 2 listing is
+One request at a time **per host**, 1.5 s apart, a real browser User-Agent, and
+retries with backoff on 429/5xx. Per host rather than globally, so a run over
+several sources does not make each one wait out the others' politeness budget —
+within a site it is still strictly one request at a time, which is the part that
+matters. Adding filters never means more requests in flight, only a longer run. A full first run over the Polestar 2 listing is
 roughly 16 search pages plus a listing page for each undecided car; later runs
 are mostly just the 16 search pages. Filters watching the same make and model
 share that crawl; each additional make/model adds its own pages.
@@ -335,21 +406,26 @@ share that crawl; each additional make/model adds its own pages.
 ## Layout
 
 ```
-filters.json      the committed example, disabled (the gist wins when it has any)
-src/filters.js    loading and normalising filters; grouping them by search
-src/config.js     the runtime knobs
-src/index.js      orchestration and CLI
-src/preflight.js  whether a run can post, and whose problem it is if not
-src/doctor.js     the setup report (npm run doctor)
-src/nettiauto.js  fetching and parsing search + listing pages
-src/filter.js     the spec check: numbers, phrases, implications, packages
-src/state.js      the record of what has been seen and announced, per filter
-src/discord.js    webhook payloads
-src/gist.js       reading the gist; adding reacted cars to the calculator
-src/reactions.js  reading reactions off our own posts
-src/http.js       paced, retrying fetch
-src/html.js       entity decoding and text extraction
-src/env.js        reads .env
-test/             unit tests, no network
-data/seen.json    the record (commit this)
+filters.json           the committed example, disabled (the gist wins when it has any)
+src/index.js           orchestration and CLI - names no site
+src/filters.js          loading and normalising filters; grouping them into crawls
+src/filter.js           the spec check: numbers, phrases, implications, packages
+src/fields.js           checking numeric limits, whatever the fields are called
+src/sources/index.js    the source registry
+src/sources/nettiauto.js  everything nettiauto-specific
+src/sinks/index.js      where a reacted listing goes
+src/sinks/car-tco.js    ...into the calculator, as a car
+src/state.js            what has been seen and announced, per filter
+src/discord.js          webhook payloads, labelled by the source
+src/reactions.js        reading reactions off our own posts
+src/gist.js             the GitHub gist plumbing
+src/http.js             paced (per host), retrying fetch
+src/html.js             entity decoding and text extraction
+src/config.js           the runtime knobs
+src/preflight.js        whether a run can post, and whose problem it is if not
+src/doctor.js           the setup report (npm run doctor)
+src/env.js              reads .env
+test/                   unit tests, no network
+test/sources.test.js    conformance: what every adapter has to get right
+data/seen.json          the record (commit this)
 ```
