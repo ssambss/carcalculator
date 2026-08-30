@@ -1,8 +1,8 @@
 {
-  "name": "carcalculator-scraper",
+  "name": "listing-watch",
   "private": true,
   "version": "1.0.0",
-  "description": "Watches nettiauto.com for new car listings matching a spec and announces them to Discord",
+  "description": "Watches listing sites for new listings matching a spec and announces them to Discord. One adapter per site; nettiauto.com is the first.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -13,6 +13,7 @@
     "dry-run": "node src/index.js --dry-run",
     "seed": "node src/index.js --seed",
     "list": "node src/index.js --list",
+    "doctor": "node src/doctor.js",
     "test": "node --test test/*.test.js"
   }
 }

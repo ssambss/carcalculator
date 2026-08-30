@@ -7,32 +7,57 @@
 //
 // Everything about a listing that a filter decides - the verdict, the reasons,
 // whether it was posted - is stored per filter, because two filters can
-// legitimately disagree about the same car. The listing's own facts (price,
+// legitimately disagree about the same listing. The listing's own facts (price,
 // mileage, when its page was last read) are shared: they are properties of the
 // advert, not of anyone's opinion of it.
-
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+//
+// Records are keyed `sourceId:id`, because a site's ids are only unique within
+// that site - see keyOf(). Where the bytes live is src/storage/'s business; this
+// module only reads and writes text.
 
 import config from './config.js';
+import { DEFAULT_STATE_PATH, storeFor } from './storage/index.js';
+import { fileStore } from './storage/file.js';
+import { DEFAULT_SOURCE_ID } from './sources/index.js';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-export const DEFAULT_STATE_PATH = resolve(HERE, '..', 'data', 'seen.json');
+export { DEFAULT_STATE_PATH };
 
-const VERSION = 2;
+const VERSION = 3;
 
 /**
  * Where a version 1 record's verdict is filed on migration.
  *
  * Version 1 predates filters: there was one hardcoded spec, so its
  * announcements cannot be attributed to any filter id in particular. They land
- * under this key, and `wasAnnounced` honours it for every filter - so nothing
- * the old single-spec watcher already posted is ever posted again, whatever
- * the filters are called now. Its *verdicts* are not reused, since we no
- * longer know which spec produced them.
+ * under this key, and the first filter to form a verdict on such a listing
+ * copies the timestamp into its own record (see `record`) - so nothing the old
+ * single-spec watcher already posted is posted again, while every filter still
+ * keeps its own answer and can supersede it. Its *verdicts* are not reused,
+ * since we no longer know which spec produced them.
  */
 const LEGACY_KEY = '(pre-filters)';
+
+/**
+ * A listing's key in the record: `sourceId:id`.
+ *
+ * Site ids are only unique within a site. Two sources will eventually both
+ * number a listing 900, and a bare key would have them share one record - the
+ * price of one overwriting the other's, and a reaction on one adding the other
+ * to the calculator. Namespacing costs nothing and removes the whole class.
+ */
+export function keyOf(sourceId, id) {
+  return `${sourceId ?? DEFAULT_SOURCE_ID}:${id}`;
+}
+
+/** The key for a listing, which carries its own source once parsed. */
+export function keyFor(listing) {
+  return keyOf(listing.sourceId, listing.id);
+}
+
+/** A path string is shorthand for a file store at that path. */
+function asStore(where) {
+  return typeof where === 'string' ? fileStore({ path: where }) : where;
+}
 
 function emptyState() {
   return {
@@ -63,37 +88,67 @@ function migrateFrom1(parsed) {
         : {},
     };
   }
-  return { ...parsed, version: VERSION, listings, filters: {} };
+  // Version 2, not VERSION: the migrations chain, and this record still has to
+  // go through the re-keying below. Jumping to the newest version here left a
+  // v1 file with bare, unnamespaced keys.
+  return { ...parsed, version: 2, listings, filters: {} };
 }
 
-/** Read the state file, or return a fresh empty state if there isn't one. */
-export async function loadState(path = DEFAULT_STATE_PATH) {
-  let raw;
-  try {
-    raw = await readFile(path, 'utf8');
-  } catch (error) {
-    if (error.code === 'ENOENT') return { ...emptyState(), isNew: true };
-    throw error;
+/**
+ * Fold a version 2 record into namespaced keys.
+ *
+ * Every listing in a version 2 file is a nettiauto listing, because that is all
+ * there was - so the whole record moves under that prefix and nothing is lost.
+ * Announcements survive, which is the part that matters: a re-keying that
+ * dropped them would repost the entire current market.
+ */
+function migrateFrom2(parsed) {
+  const listings = {};
+  for (const [id, entry] of Object.entries(parsed.listings ?? {})) {
+    listings[keyOf(DEFAULT_SOURCE_ID, id)] = entry;
   }
+  const tco = {};
+  for (const [id, entry] of Object.entries(parsed.tco ?? {})) {
+    tco[keyOf(DEFAULT_SOURCE_ID, id)] = entry;
+  }
+  return { ...parsed, version: VERSION, listings, tco };
+}
+
+/**
+ * Read the stored record, or a fresh empty state if there is nothing yet.
+ *
+ * `where` is anything from src/storage/ — a local file by default, a gist when
+ * configured. A plain path string is accepted as shorthand for a file there,
+ * which is what a test or a one-off inspection wants.
+ *
+ * Older versions are migrated in memory on the way through, and written back in
+ * the new shape by the next save.
+ */
+export async function loadState(where = storeFor()) {
+  const store = asStore(where);
+  const raw = await store.read();
+  if (raw === null) return { ...emptyState(), isNew: true, store };
 
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch (error) {
     throw new Error(
-      `State file ${path} is not valid JSON (${error.message}). ` +
+      `The state in ${store.describe()} is not valid JSON (${error.message}). ` +
         'Fix or delete it - deleting means the next run re-seeds and announces nothing.',
     );
   }
 
-  let migrated = false;
-  if (parsed.version === 1) {
-    parsed = migrateFrom1(parsed);
-    migrated = true;
-  }
+  const from = parsed.version;
+  if (parsed.version === 1) parsed = migrateFrom1(parsed);
+  if (parsed.version === 2) parsed = migrateFrom2(parsed);
+  const migrated = from !== VERSION;
 
   if (parsed.version !== VERSION) {
-    throw new Error(`State file ${path} has version ${parsed.version}, expected ${VERSION}.`);
+    throw new Error(
+      `The state in ${store.describe()} has version ${parsed.version}, expected ${VERSION}. ` +
+        'A newer version of the watcher wrote it; upgrade rather than downgrade.',
+    );
   }
 
   return {
@@ -104,44 +159,52 @@ export async function loadState(path = DEFAULT_STATE_PATH) {
     tco: parsed.tco ?? {},
     isNew: false,
     migrated,
+    migratedFrom: migrated ? from : null,
+    store,
   };
 }
 
-/** Write the state file atomically: full write to a temp file, then rename. */
-export async function saveState(state, path = DEFAULT_STATE_PATH) {
+/** Write the record back wherever it came from. */
+export async function saveState(state, where = state.store ?? storeFor()) {
+  const store = asStore(where);
   const persisted = { ...state };
   // Signals to this run, not part of the record.
   delete persisted.isNew;
   delete persisted.migrated;
+  delete persisted.migratedFrom;
+  delete persisted.store;
   persisted.version = VERSION;
   persisted.updatedAt = new Date().toISOString();
 
-  await mkdir(dirname(path), { recursive: true });
-  const temp = `${path}.tmp`;
-  await writeFile(temp, `${JSON.stringify(persisted, null, 2)}\n`, 'utf8');
-  await rename(temp, path);
+  // Indentation is a third of the bytes, and worth it only where a human opens
+  // the file. The backend decides; see src/storage/.
+  const text = store.pretty
+    ? `${JSON.stringify(persisted, null, 2)}\n`
+    : JSON.stringify(persisted);
+  await store.write(text);
   return persisted;
 }
 
-export function hasSeen(state, id) {
-  return Object.hasOwn(state.listings, id);
+export function hasSeen(state, key) {
+  return Object.hasOwn(state.listings, key);
 }
 
 /** What a filter decided about a listing last time, if it ever did. */
-export function verdictFor(state, id, filterId) {
-  return state.listings[id]?.filters?.[filterId] ?? null;
+export function verdictFor(state, key, filterId) {
+  return state.listings[key]?.filters?.[filterId] ?? null;
 }
 
 /**
  * Has this listing been posted for this filter?
  *
- * True also when the pre-filters watcher posted it: the point of the record is
- * that a human has already seen the car in the channel, and renaming or
- * rebuilding the filter it came from does not undo that.
+ * Only the filter's own record answers. What the pre-filters watcher posted is
+ * inherited once, when the filter first forms a verdict on the listing (see
+ * `record`). Reading the legacy key here instead made it a blanket mute: it
+ * belongs to no filter, so nothing ever supersedes it, and every filter made
+ * in the UI stayed permanently silent on those cars whatever its spec.
  */
-export function wasAnnounced(state, id, filterId) {
-  const filters = state.listings[id]?.filters ?? {};
-  return Boolean(filters[filterId]?.announcedAt || filters[LEGACY_KEY]?.announcedAt);
+export function wasAnnounced(state, key, filterId) {
+  return Boolean(state.listings[key]?.filters?.[filterId]?.announcedAt);
 }
 
 /**
@@ -152,7 +215,7 @@ export function wasAnnounced(state, id, filterId) {
  * The detail page is shared by every filter, so its age is too.
  */
 export function needsRecheck(state, listing, filterId, { recheckAfterDays = 14 } = {}) {
-  const record = state.listings[listing.id];
+  const record = state.listings[keyFor(listing)];
   if (!record) return true;
   const verdict = record.filters?.[filterId];
   if (!verdict) return true;
@@ -169,12 +232,16 @@ export function needsRecheck(state, listing, filterId, { recheckAfterDays = 14 }
 /** Note that the listing is still on sale, and what its advert says now. */
 export function touch(state, listing, { detailChecked = false, now = new Date() } = {}) {
   const timestamp = now.toISOString();
-  const existing = state.listings[listing.id];
+  const key = keyFor(listing);
+  const existing = state.listings[key];
 
-  state.listings[listing.id] = {
+  state.listings[key] = {
     firstSeenAt: existing?.firstSeenAt ?? timestamp,
     lastSeenAt: timestamp,
     detailCheckedAt: detailChecked ? timestamp : (existing?.detailCheckedAt ?? null),
+    // Kept so a reacted listing can be rebuilt from the record alone, long
+    // after it has dropped off the current crawl.
+    sourceId: listing.sourceId ?? DEFAULT_SOURCE_ID,
     url: listing.url,
     title: listing.subTitle || listing.title,
     year: listing.year,
@@ -184,14 +251,18 @@ export function touch(state, listing, { detailChecked = false, now = new Date() 
     filters: existing?.filters ?? {},
   };
 
-  return state.listings[listing.id];
+  return state.listings[key];
 }
 
 /**
  * Record what one filter learned about a listing.
  *
  * `announcedAt` is never overwritten once set, so a listing that resurfaces is
- * not treated as new.
+ * not treated as new. A filter meeting a listing the pre-filters watcher had
+ * already posted inherits that timestamp here: a human has seen the car in the
+ * channel, and rebuilding the filter it came from does not undo that. The
+ * inheritance is written per filter, so from then on it behaves like any other
+ * announcement instead of muting everyone at once.
  */
 export function record(state, listing, filterId, verdict, options = {}) {
   const entry = touch(state, listing, options);
@@ -200,14 +271,14 @@ export function record(state, listing, filterId, verdict, options = {}) {
   entry.filters[filterId] = {
     status: verdict.matched ? 'match' : 'rejected',
     reasons: verdict.matched ? [] : verdict.reasons,
-    announcedAt: existing?.announcedAt ?? null,
+    announcedAt: existing?.announcedAt ?? entry.filters[LEGACY_KEY]?.announcedAt ?? null,
   };
 
   return entry.filters[filterId];
 }
 
-export function markAnnounced(state, id, filterId, now = new Date()) {
-  const verdict = state.listings[id]?.filters?.[filterId];
+export function markAnnounced(state, key, filterId, now = new Date()) {
+  const verdict = state.listings[key]?.filters?.[filterId];
   if (verdict) verdict.announcedAt = verdict.announcedAt ?? now.toISOString();
 }
 
@@ -251,10 +322,10 @@ export function prune(state, { forgetAfterDays = config.state.forgetAfterDays, n
     }
   }
 
-  for (const [id, entry] of Object.entries(state.listings)) {
+  for (const [key, entry] of Object.entries(state.listings)) {
     const lastSeen = Date.parse(entry.lastSeenAt ?? '');
     if (Number.isFinite(lastSeen) && lastSeen < cutoff) {
-      delete state.listings[id];
+      delete state.listings[key];
       removed += 1;
       continue;
     }
@@ -278,18 +349,18 @@ export function prune(state, { forgetAfterDays = config.state.forgetAfterDays, n
  *  - seen present once (`confirmedAt`) -> leave it alone forever, so a car
  *    the user deliberately deletes in the app stays deleted.
  */
-export function needsTcoAdd(state, id) {
-  const entry = state.tco[id];
+export function needsTcoAdd(state, key) {
+  const entry = state.tco[key];
   return !entry || !entry.confirmedAt;
 }
 
-export function recordTcoAdd(state, id, now = new Date()) {
-  const entry = state.tco[id] ?? (state.tco[id] = { addedAt: null, confirmedAt: null });
+export function recordTcoAdd(state, key, now = new Date()) {
+  const entry = state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
   entry.addedAt = entry.addedAt ?? now.toISOString();
 }
 
-export function recordTcoConfirmed(state, id, now = new Date()) {
-  const entry = state.tco[id] ?? (state.tco[id] = { addedAt: null, confirmedAt: null });
+export function recordTcoConfirmed(state, key, now = new Date()) {
+  const entry = state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
   entry.confirmedAt = entry.confirmedAt ?? now.toISOString();
 }
 

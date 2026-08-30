@@ -8,9 +8,12 @@ name: Nettiauto watch
 
 on:
   schedule:
-    # Every 30 minutes. GitHub queues cron runs on shared capacity, so the
-    # actual time drifts; that is fine, the scraper is idempotent.
-    - cron: '*/30 * * * *'
+    # Every 30 minutes, deliberately offset off :00/:30. GitHub runs schedules
+    # on best-effort shared capacity and silently drops firings under load, and
+    # the top and half of the hour are the most oversubscribed minutes of all -
+    # on '*/30' this job was losing roughly nine firings in ten. Drift is still
+    # fine, the scraper is idempotent; never firing at all is not.
+    - cron: '7,37 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -33,6 +36,11 @@ permissions:
 jobs:
   watch:
     runs-on: ubuntu-latest
+    # A normal run takes ~2 minutes and the slowest seen was 7. Without a
+    # ceiling, a run wedged on an unresponsive nettiauto holds the concurrency
+    # group for GitHub's default six hours and every schedule behind it is
+    # dropped - one stuck run costs a whole morning of checks.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -43,13 +51,22 @@ jobs:
       - name: Check for new listings
         working-directory: scraper
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # GIST_TOKEN does double duty: it is how the run reads the filters
-          # made in the app, and half of the reaction pickup (react to a post
-          # -> car lands in the calculator). Without it the run falls back to
-          # scraper/filters.json and skips the pickup.
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          # The whole secret set, in one variable, parsed by src/tenants.js.
+          #
+          # Actions only puts a secret in the environment if the workflow names
+          # it, so naming them individually would mean editing this file - and
+          # committing - every time somebody is added. This way onboarding is
+          # two secrets in the settings UI and nothing else:
+          #
+          #   TENANT_<NAME>_GIST_TOKEN   their gist token
+          #   TENANT_<NAME>_WEBHOOK      the webhook for their channel
+          #   TENANT_<NAME>_LABEL        optional, for names a secret cannot spell
+          #
+          # Your own stay as DISCORD_WEBHOOK_URL and GIST_TOKEN. GIST_TOKEN does
+          # double duty: reading the filters made in the app, and half of the
+          # reaction pickup. DISCORD_BOT_TOKEN is shared - one bot reads every
+          # channel in the server.
+          SECRETS_JSON: ${{ toJSON(secrets) }}
         run: |
           node src/index.js \
             --notify-errors \

@@ -1,10 +1,10 @@
 // Deciding whether a listing meets a filter's spec.
 //
-// Nettiauto exposes no filter for battery size, drivetrain or option packages,
-// and the packages are never structured data - they live in seller free text.
-// So everything below the year/mileage/price line is text matching, and every
-// verdict carries the evidence that produced it so a human can sanity-check
-// the call.
+// Sites do not offer server-side filters for the things that actually decide a
+// listing - a car's battery size or drivetrain, an option package - and those
+// are rarely structured data at all: they live in seller free text. So
+// everything below the numeric line is text matching, and every verdict carries
+// the evidence that produced it so a human can sanity-check the call.
 //
 // Three kinds of text check, in increasing looseness:
 //
@@ -18,7 +18,9 @@
 // "seeing Neliveto proves Dual Motor" is a fact about the car, not about the
 // advert, and stating it once beats teaching the matcher every model's range.
 
+import { checkRanges } from './fields.js';
 import { normalizeFilter } from './filters.js';
+import { sourceOf } from './sources/index.js';
 
 /** Words that mark a package name as an actual option package. */
 const PACKAGE_NOUN = /^(paket|pkt|pack|package|varuste)/;
@@ -35,28 +37,42 @@ const MAX_GAP = 3;
 const PREFIX_MIN = 5;
 
 /**
- * Words that turn a package name into something *smaller* than the package.
- * "Pilot Lite" is a reduced version of the Pilot pack and is sold as its own
- * option, so it must not satisfy a requirement for Pilot.
+ * Sort a filter's package qualifiers into two lookups.
+ *
+ * A qualifier is a word that changes what a package name means when it follows
+ * it, and there are two kinds. `lesser`: "Pilot Lite" is a reduced version of
+ * the Pilot pack, sold as its own option, so it must not satisfy a requirement
+ * for Pilot. `feature`: "Pilot Assist" ships in both Pilot and Pilot Lite, so
+ * seeing it says nothing about which of the two a car has.
+ *
+ * These used to be constants in this module, which made the matcher carry one
+ * car's vocabulary for every filter. They belong to the filter that needs them
+ * - the same argument that already puts `implications` there.
  */
-const LESSER_VARIANT = { pilot: ['lite'] };
+export function vocabularyOf(qualifiers = []) {
+  const lesser = new Map();
+  const featureOnly = new Map();
+  for (const rule of qualifiers) {
+    const into = rule.means === 'feature' ? featureOnly : lesser;
+    into.set(rule.package, [...(into.get(rule.package) ?? []), rule.word]);
+  }
+  return {
+    lesser: (name) => lesser.get(name) ?? [],
+    featureOnly: (name) => featureOnly.get(name) ?? [],
+  };
+}
+
+const NO_VOCABULARY = vocabularyOf([]);
 
 /**
- * Words that turn a package name into an individual feature rather than the
- * package. "Pilot Assist" ships in both Pilot and Pilot Lite, so seeing it
- * says nothing about which of the two a car actually has.
+ * True when the token after `span` leaves the package name meaning the package
+ * itself, rather than a lesser variant or a feature out of it.
  */
-const FEATURE_NOT_PACKAGE = { pilot: ['assist'] };
-
-/**
- * True when the token at `index` names the package itself, rather than a
- * lesser variant of it ("Pilot Lite") or a feature from it ("Pilot Assist").
- */
-function namesThePackage(tokens, span, name, { acceptLite = false } = {}) {
+function namesThePackage(tokens, span, name, { acceptLite = false, vocab = NO_VOCABULARY } = {}) {
   const next = tokens[span.end + 1];
   if (!next) return true;
-  if ((FEATURE_NOT_PACKAGE[name] ?? []).includes(next)) return false;
-  if (!acceptLite && (LESSER_VARIANT[name] ?? []).includes(next)) return false;
+  if (vocab.featureOnly(name).includes(next)) return false;
+  if (!acceptLite && vocab.lesser(name).includes(next)) return false;
   return true;
 }
 
@@ -166,10 +182,10 @@ export function applyImplications(tokens, implications) {
  * immediately followed by `lite` is recorded separately and does not satisfy a
  * requirement for Pilot unless the caller opts in.
  */
-function findPackage(tokens, name, { others = [], acceptLite = false } = {}) {
+function findPackage(tokens, name, { others = [], acceptLite = false, vocab = NO_VOCABULARY } = {}) {
   const words = tokenize(name);
-  const lesser = LESSER_VARIANT[name] ?? [];
-  const featureOnly = FEATURE_NOT_PACKAGE[name] ?? [];
+  const lesser = vocab.lesser(name);
+  const featureOnly = vocab.featureOnly(name);
   // Where each of the other required packages sits, so a pairing can be
   // spotted whatever either of them is called.
   const partners = others.map((other) => ({ name: other, spans: spansOf(tokens, tokenize(other)) }));
@@ -201,7 +217,7 @@ function findPackage(tokens, name, { others = [], acceptLite = false } = {}) {
       const near = partner.spans.find(
         (other) =>
           gapBetween(span, other) <= MAX_GAP &&
-          namesThePackage(tokens, other, partner.name, { acceptLite }),
+          namesThePackage(tokens, other, partner.name, { acceptLite, vocab }),
       );
       if (near) nearPartner = partner.name;
     }
@@ -284,8 +300,11 @@ function fullText(listing, detail) {
  * `detail` is optional: pass the search-card data alone for a first pass, and
  * re-run with the listing page once fetched. `needsDetail` tells the caller
  * that a detail fetch could still change the verdict.
+ *
+ * `fields` overrides the source's own declarations, which is only useful for
+ * testing a field set that no registered source has.
  */
-export function evaluate(listing, detail = null, filter) {
+export function evaluate(listing, detail = null, filter, { fields = null } = {}) {
   const spec = normalizeFilter(filter);
   const reasons = [];
   const notes = [];
@@ -297,39 +316,16 @@ export function evaluate(listing, detail = null, filter) {
   let settled = 0;
 
   // --- Hard numbers first: these need no text interpretation. ---
-  if (spec.yearFrom !== null || spec.yearTo !== null) {
-    if (listing.year === null) reasons.push('year unknown');
-    else if (spec.yearFrom !== null && listing.year < spec.yearFrom) {
-      reasons.push(`year ${listing.year} before ${spec.yearFrom}`);
-    } else if (spec.yearTo !== null && listing.year > spec.yearTo) {
-      reasons.push(`year ${listing.year} after ${spec.yearTo}`);
-    }
-    settled = reasons.length;
-  }
-
-  if (spec.maxMileage !== null) {
-    if (listing.mileage === null) reasons.push('mileage unknown');
-    else if (listing.mileage > spec.maxMileage) {
-      reasons.push(
-        `${listing.mileage.toLocaleString('fi-FI')} km over ${spec.maxMileage.toLocaleString('fi-FI')} km`,
-      );
-    }
-    settled = reasons.length;
-  }
-
-  if (spec.minPrice !== null || spec.maxPrice !== null) {
-    if (listing.price === null) reasons.push('price unknown');
-    else if (spec.maxPrice !== null && listing.price > spec.maxPrice) {
-      reasons.push(
-        `${listing.price.toLocaleString('fi-FI')} € over ${spec.maxPrice.toLocaleString('fi-FI')} €`,
-      );
-    } else if (spec.minPrice !== null && listing.price < spec.minPrice) {
-      reasons.push(
-        `${listing.price.toLocaleString('fi-FI')} € under ${spec.minPrice.toLocaleString('fi-FI')} €`,
-      );
-    }
-    settled = reasons.length;
-  }
+  //
+  // Whatever the source, and whether they are years and kilometres or square
+  // metres and a room count. Every one of these is settled: no amount of extra
+  // text from a listing page turns a number that misses into one that hits, so
+  // a car ruled out here never costs a detail fetch.
+  // The field declarations decide how a missed number is worded, and they
+  // belong to the source - so an apartment's "48 m² under 55 m²" reads as
+  // naturally as a car's "year 2019 before 2021".
+  reasons.push(...checkRanges(listing, spec.ranges, fields ?? sourceOf(spec).fields));
+  settled = reasons.length;
 
   // --- Text requirements. ---
   const variantTokens = tokenize(variantText(listing, detail));
@@ -380,12 +376,14 @@ export function evaluate(listing, detail = null, filter) {
 
   // --- Option packages: seller free text only. ---
   const acceptWeak = spec.packageEvidence !== 'strong';
+  const vocab = vocabularyOf(spec.packageQualifiers);
   const packages = {};
 
   for (const name of spec.packages) {
     const result = findPackage(allTokens, name, {
       others: spec.packages.filter((other) => other !== name),
       acceptLite: spec.acceptLesserPackages,
+      vocab,
     });
 
     const satisfied = result.found && (result.strength === 'strong' || acceptWeak);
@@ -397,7 +395,7 @@ export function evaluate(listing, detail = null, filter) {
 
     if (satisfied) {
       if (result.sawLite) {
-        const lesser = `${name} ${LESSER_VARIANT[name]?.[0] ?? 'lite'}`;
+        const lesser = `${name} ${vocab.lesser(name)[0] ?? 'lite'}`;
         warnings.push(
           `listing mentions both ${name} and ${lesser} - worth confirming with the seller`,
         );
@@ -406,9 +404,9 @@ export function evaluate(listing, detail = null, filter) {
     }
     unproven += 1;
     if (result.liteOnly) {
-      reasons.push(`only ${name} ${LESSER_VARIANT[name]?.[0] ?? 'lite'} found, not the full ${name} package`);
+      reasons.push(`only ${name} ${vocab.lesser(name)[0] ?? 'lite'} found, not the full ${name} package`);
     } else if (result.featureOnly) {
-      const feature = FEATURE_NOT_PACKAGE[name]?.[0] ?? '';
+      const feature = vocab.featureOnly(name)[0] ?? '';
       reasons.push(`only "${name} ${feature}" found - that feature ships without the package too`);
     } else if (result.found) {
       reasons.push(`${name} mentioned but not clearly as a package`);

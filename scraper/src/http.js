@@ -1,16 +1,32 @@
-// Minimal polite HTTP client: sequential, paced, retried.
+// Minimal polite HTTP client: one request at a time per host, paced, retried.
 
 import config from './config.js';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-let lastRequestAt = 0;
+/**
+ * When we last spoke to each host.
+ *
+ * Per host rather than one global clock: a run over several sources should not
+ * make each one wait out the others' politeness budget, and pacing nettiauto
+ * has nothing to do with being a good guest somewhere else. Within a host it is
+ * still strictly one request at a time, which is the part that matters.
+ */
+const lastRequestAt = new Map();
 
-/** Space requests out so we never hammer nettiauto. */
-async function pace(delayMs) {
-  const wait = lastRequestAt + delayMs - Date.now();
+function hostOf(url) {
+  try {
+    return new URL(url).host;
+  } catch {
+    return 'unknown';
+  }
+}
+
+/** Space requests out so we never hammer a site. */
+async function pace(host, delayMs) {
+  const wait = (lastRequestAt.get(host) ?? 0) + delayMs - Date.now();
   if (wait > 0) await sleep(wait);
-  lastRequestAt = Date.now();
+  lastRequestAt.set(host, Date.now());
 }
 
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -19,12 +35,14 @@ const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
  * Fetch a URL as text, retrying transient failures with linear backoff.
  * Returns null on a 404 (a listing that vanished mid-run is not an error).
  */
-export async function fetchText(url, { label = url } = {}) {
+export async function fetchText(url, { label = url, delayMs: perSource = null } = {}) {
   const { userAgent, delayMs, timeoutMs, retries, retryBackoffMs } = config.fetch;
+  const host = hostOf(url);
+  const gap = perSource ?? delayMs;
   let lastError;
 
   for (let attempt = 1; attempt <= retries; attempt += 1) {
-    await pace(delayMs);
+    await pace(host, gap);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {

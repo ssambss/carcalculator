@@ -37,8 +37,6 @@ export const config = {
     webhookUrl: process.env.DISCORD_WEBHOOK_URL ?? '',
     // Only needed for the reaction pickup below; posting works without it.
     botToken: process.env.DISCORD_BOT_TOKEN ?? '',
-    // Left empty, it is read off the webhook at runtime.
-    channelId: process.env.DISCORD_CHANNEL_ID ?? '',
     username: 'Nettiauto-vahti',
     // One car per message. Discord allows 10 embeds, but a reaction applies to
     // a whole message, so batching would make "react to add this one"
@@ -65,9 +63,19 @@ export const config = {
     // How far back through the channel to look for reactions, in messages.
     scanMessages: 300,
 
-    // What an added car looks like before you refine it in the app. The price,
-    // odometer and powertrain come from the listing; everything below is an
-    // assumption, so it all lives here where it is easy to change.
+    // The *fallback* baseline for an added car, not the baseline.
+    //
+    // The financing and consumption figures now come from whoever owns the
+    // calculator the car is going into - settings.newCar in their own data,
+    // which the app's Assumptions panel writes. This watcher runs for several
+    // people, and a rate and term fixed here would have put one person's
+    // assumptions about borrowing into everybody else's calculator.
+    //
+    // What is left here answers the case where their app predates that setting:
+    // a car financed at 0 % over 0 months would be worse than an assumption.
+    // See newCarDefaults() in src/sinks/car-tco.js.
+    //
+    // The price, odometer and powertrain always come from the listing itself.
     carDefaults: {
       // Fallback only - the listing's own fuel type decides when it says.
       powertrain: 'ev',
@@ -98,6 +106,17 @@ export const config = {
   },
 
   state: {
+    // Where the record of what has been seen lives: 'file' (data/seen.json,
+    // needs no credential) or 'gist' (per user, needs GIST_TOKEN).
+    //
+    // Switching is deliberate, never automatic. A run that quietly looked
+    // somewhere else would find no state, conclude it was a first run, and
+    // silently re-baseline the whole market - so moving the record is a
+    // one-off `--migrate-state=<backend>`, not a side effect of setting a
+    // token. See src/storage/.
+    store: 'file',
+    // Where the gist backend keeps it, beside the app's data and filters.
+    gistFilename: 'car-tco-seen.json',
     // Listings unseen for this long are forgotten, so a genuine relisting
     // months later is announced again instead of being silently swallowed.
     forgetAfterDays: 90,

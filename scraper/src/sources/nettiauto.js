@@ -1,8 +1,13 @@
-// Fetching and parsing nettiauto.com search results and listing pages.
+// The nettiauto.com source: what its listings look like, and how to read them.
+//
+// One adapter of possibly many. Everything site-specific lives behind the
+// object exported at the bottom of this file - the orchestration in index.js
+// never names nettiauto, and the matcher in filter.js does not know what a car
+// is. To follow something else, write another one of these.
 
-import config from './config.js';
-import { fetchText } from './http.js';
-import { decodeEntities, htmlToText, oneLine, parseInteger, pick } from './html.js';
+import config from '../config.js';
+import { fetchText } from '../http.js';
+import { decodeEntities, htmlToText, oneLine, parseInteger, pick } from '../html.js';
 
 const ORIGIN = 'https://www.nettiauto.com';
 
@@ -297,3 +302,94 @@ export async function fetchListingDetail(search, id) {
   if (!html) return null;
   return parseDetailPage(html);
 }
+
+/**
+ * Numeric facts a nettiauto listing carries, and what to call them.
+ *
+ * `unit` labels the number where one reads naturally ("120 000 km"), and its
+ * absence is what makes a rejection name the field instead ("rooms 2 under 3").
+ * `style: 'year'` picks before/after over under/over and leaves the digits
+ * ungrouped, because "year 2 019" is not a year.
+ */
+export const FIELDS = [
+  { key: 'year', label: 'year', style: 'year' },
+  { key: 'mileage', label: 'mileage', unit: 'km' },
+  { key: 'price', label: 'price', unit: '€' },
+];
+
+/** Path segments identifying a nettiauto search: /<make>/<model>. */
+const SEARCH_KEYS = ['make', 'model'];
+
+/**
+ * The nettiauto adapter.
+ *
+ * `searchFrom` is the one place that knows a nettiauto search is a make and a
+ * model. Another source's search might be a region and a property type, and
+ * nothing outside this file would need to change.
+ */
+export const nettiauto = {
+  id: 'nettiauto',
+  label: 'Nettiauto',
+  /** Everything this source fetches shares one politeness budget. */
+  host: 'www.nettiauto.com',
+  fields: FIELDS,
+  searchKeys: SEARCH_KEYS,
+
+  /** What the editor asks for, so the app can build the form from this. */
+  searchInputs: [
+    { key: 'make', label: 'Make', placeholder: 'polestar' },
+    { key: 'model', label: 'Model', placeholder: '2' },
+  ],
+
+  searchFrom(filter) {
+    const search = {};
+    for (const key of SEARCH_KEYS) search[key] = filter.search?.[key] ?? '';
+    return search;
+  },
+
+  /** Filters over the same search share one crawl, so this is their group key. */
+  searchKey(search) {
+    return SEARCH_KEYS.map((key) => search[key]).join('/');
+  },
+
+  describeSearch(search) {
+    return this.searchKey(search);
+  },
+
+  /** A search this incomplete names no page to read, so it cannot run. */
+  canRun(search) {
+    return SEARCH_KEYS.every((key) => Boolean(search[key]));
+  },
+
+  fetchAllListings,
+  fetchListingDetail,
+
+  /** Recover a listing id from a posted link, for the reaction pickup. */
+  listingIdFromUrl(url) {
+    return /nettiauto\.com\/[^/]+\/[^/]+\/(\d+)/.exec(url ?? '')?.[1] ?? null;
+  },
+
+  /**
+   * Where a reacted listing goes. The car calculator only understands cars, so
+   * a source watching flats sets this to null and reactions simply do nothing -
+   * which is what lets it ship without a second calculator.
+   */
+  sink: 'car-tco',
+
+  /** Field labels for the Discord embed, in the language of the site. */
+  presentation: {
+    locale: 'fi-FI',
+    labels: {
+      price: 'Hinta',
+      mileage: 'Mittarilukema',
+      year: 'Vuosimalli',
+      specs: 'Tiedot',
+      seller: 'Myyjä',
+      packages: 'Varustepaketit (myyjän teksti)',
+      caveats: 'Huom',
+    },
+    footer: 'nettiauto.com',
+  },
+};
+
+export default nettiauto;

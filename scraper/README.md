@@ -1,13 +1,94 @@
-# Nettiauto watch
+# Listing watch
 
-Watches [nettiauto.com](https://www.nettiauto.com) for used cars matching your
-filters and posts new listings to a Discord channel. Runs as a standalone Node
-script — it shares no code, build step or dependency with the TCO calculator in
-the repo root, and the Vite build never sees this folder.
+Watches listing sites for things matching your filters and posts anything new to
+a Discord channel. [nettiauto.com](https://www.nettiauto.com) is the source it
+was built for and so far the only one; adding another is writing an adapter.
 
-A **filter** is one saved search: which listing page to read, plus the spec
-every car on it is checked against. There can be any number of them, and
-filters over the same make and model share a single crawl.
+Runs as a standalone Node script — it shares no code, build step or dependency
+with the TCO calculator in the repo root, and the Vite build never sees this
+folder.
+
+A **filter** is one saved search: a source, which of its listing pages to read,
+and the spec every listing on it is checked against. There can be any number of
+them, and filters sharing a source and a search share a single crawl.
+
+## Sources
+
+A **source** is one site. Everything site-specific lives in an adapter under
+[src/sources/](src/sources/) - how to page through a search, how to parse a
+card, which numeric facts its listings carry, how to recover a listing id from
+a link. Nothing outside that folder names a site: the orchestration in
+`src/index.js`, the matcher in `src/filter.js` and the Discord posting all work
+against the interface.
+
+`nettiauto` is the only one so far, and a filter that names no source gets it.
+To follow something else - flats, rentals, anything with listing pages - write
+another adapter, register it in [src/sources/index.js](src/sources/index.js),
+and make it pass `test/sources.test.js`, which is the specification.
+
+Two things a source decides that are worth knowing about:
+
+- **Its fields.** A filter's numeric limits are a bag keyed by field
+  (`ranges: { year: { max: 2023 }, mileage: { max: 120000 } }`), and the source
+  declares which fields exist and what to call them. `price` is just another
+  field. A flat's source would declare `sizeM2` and `rooms` and everything from
+  the matcher to the Discord embed to the filter editor would follow.
+- **Its sink**, meaning where a listing goes when someone reacts to it. Cars go
+  to the calculator; a source watching flats declares no sink, and reactions on
+  its posts do nothing. That is deliberate - it lets a new source ship without a
+  second calculator having to exist first.
+
+## Several people, one watcher
+
+The watcher runs for any number of people. Each keeps their own data in their
+own gist on their own GitHub account - filters, calculator, and the record of
+what has been posted to them - and posts land in a channel of their own. Nothing
+of one person's is visible to another.
+
+What they share is the crawl: filters group by source and search regardless of
+who owns them, so two people watching the same model cost one fetch, not two,
+and a listing page that both need read costs one request. A tenth person is
+nearly free.
+
+A person is declared entirely by their secrets, so onboarding is two of them and
+no commit:
+
+| Secret | |
+|---|---|
+| `TENANT_ALICE_GIST_TOKEN` | their gist token (classic, `gist` scope only) |
+| `TENANT_ALICE_WEBHOOK` | the webhook for their channel |
+| `TENANT_ALICE_LABEL` | optional display name, for names a secret cannot spell |
+
+Grouped by person rather than by kind because GitHub sorts the secrets page
+alphabetically - everything of one person's sits together. You stay on the
+original `DISCORD_WEBHOOK_URL` and `GIST_TOKEN`, so a single-person setup needs
+no `TENANT_` secrets at all and behaves exactly as before.
+
+**Their channel can be in their own Discord server.** A webhook URL carries its
+own channel, so posting works anywhere with no bot and no membership - nobody has
+to join anything. The one part that needs the bot present is reading reactions,
+because reading channel history is a bot operation: if the channel is in their
+server, the bot has to be invited there. `DISCORD_BOT_TOKEN` is shared, so one
+bot covers every server it has been added to.
+
+A tenant who has not invited it is not broken. The run notices, says so once,
+skips reactions for them alone and carries on for everyone else - they still get
+every post and add cars to the calculator by hand.
+
+The step-by-step is [../SETUP.md](../SETUP.md). Two rules worth knowing here:
+
+- **Half a tenant fails the run.** A token with no webhook, or the reverse, is a
+  typo or an unfinished setup; skipping it quietly would mean somebody stops
+  getting posts and nobody finds out until they ask.
+- **Only your own record may live in the committed file.** Everyone else's is
+  always in their gist. A record of what somebody has been shown and what they
+  are shopping for has no business in a public repository, so the code refuses
+  rather than leaving it to configuration.
+
+```sh
+node src/index.js --for=alice --dry-run   # one person, posting nothing
+npm run doctor                            # everyone found, each one probed
+```
 
 ## Where the filters come from
 
@@ -30,8 +111,12 @@ about there. *Copy all as JSON* in the filter dialog gives you the list back in
 this file's format, which is the easy way to keep the committed fallback in step
 with reality.
 
-`filters.json` is the fallback and the local default. It holds the spec this
-watcher was built for:
+`filters.json` is the fallback and the local default. It ships with **one
+disabled filter**, so a fresh clone or fork watches nothing until you say
+otherwise — the spec in it is one person's car, and inheriting it by accident is
+not a useful default. Enable it to try the watcher out before you have built a
+filter of your own; it is also the worked example the matching rules below are
+written against:
 
 | | |
 |---|---|
@@ -51,20 +136,40 @@ locally, exactly as in CI; without it a local run always uses the file.
 
 ## What a filter can ask for
 
-Everything except make and model is optional; a filter with no requirements
-matches the whole model's listing, which is what you want when scouting a car
-you have no fixed spec for.
+The only thing a filter cannot leave out is the search — the page to read.
+Everything else is optional, and a filter with no requirements at all matches
+that whole listing page, which is what you want when scouting something you have
+no fixed spec for.
 
 | Field | Checked against |
 |---|---|
-| `make`, `model` | the URL path: `/polestar/2` |
-| `yearFrom`, `yearTo`, `maxMileage`, `minPrice`, `maxPrice` | typed facts from the result card |
+| `source` | which site; omitted means `nettiauto` |
+| `search` | which of its pages. For nettiauto, `{ make, model }` → `/polestar/2` |
+| `ranges` | typed facts from the result card, keyed by field (see below) |
 | `variantMust`, `variantMustNot` | the variant name and the spec chips — short, structured text |
 | `textMust`, `textMustNot` | everything, the seller's own description included |
 | `packages` + `packageEvidence` | free text, but only where it reads as a package (see below) |
+| `packageQualifiers` | words that change what a package name means (see below) |
 | `implications` | "seeing A proves B", for facts a seller left implicit |
-| `postExisting` | whether its first run reports the cars already on sale |
+| `postExisting` | whether its first run reports the listings already on sale |
 | `enabled` | pausing keeps the filter and its history |
+
+`ranges` is how every numeric limit is expressed, and which fields exist is the
+source's declaration rather than anything hardcoded:
+
+```json
+"ranges": { "year": { "min": 2021, "max": 2023 }, "mileage": { "max": 120000 } }
+```
+
+Both bounds are inclusive, and a range over a field the listing does not state
+*fails* — "under 120 000 km" is a claim about the car, and an advert that does
+not say cannot support it. The older `yearFrom` / `yearTo` / `maxMileage` /
+`minPrice` / `maxPrice` spellings are still read, and still win where they
+disagree with `ranges`: only a writer that has never heard of the range bag sets
+one without the other, so trusting the bag there would discard its edit.
+
+Likewise `make` and `model` are still read from the filter's top level and fold
+into `search`.
 
 Phrases are matched on whitespace-flattened tokens, so `long range` finds
 `Long-Range`, `LONG RANGE / 78kWh` and `long/range` alike. The last word of a
@@ -97,13 +202,22 @@ cannot accidentally prove anything.
 ```sh
 cd scraper
 cp .env.example .env          # then paste your Discord webhook URL into it
+npm run doctor                # what is set up, and what each secret unlocks
 npm run dry-run               # full check, posts nothing, saves nothing
 npm start                     # the real thing
 
-node src/index.js --list --filters=file   # what the committed filter matches
+node src/index.js --list --filters=file   # what the committed example matches
 ```
 
-There is nothing to install — no dependencies, Node 20+ only.
+There is nothing to install — no dependencies, Node 20+ only. Setting the whole
+thing up from scratch, secrets included, is [../SETUP.md](../SETUP.md).
+
+A run with no `DISCORD_WEBHOOK_URL` has nowhere to deliver, so it stops before
+crawling rather than spending two minutes to find that out. Which *kind* of
+missing decides what happens next: a watcher that has never completed a run is
+an install waiting to be set up, and exits 0 with the onboarding text, while one
+that has posted before and lost its webhook fails loudly — the channel has gone
+quiet and that must not pass unnoticed.
 
 ## How announcing works
 
@@ -112,8 +226,36 @@ nothing**. Without that, the channel would fill up with every car already on
 the market. From then on, only listings that were not in the record get posted,
 and each is posted exactly once *per filter*.
 
-The record lives in [data/seen.json](data/) and is the only thing that makes
-runs stateful. Delete it and the next run re-seeds silently.
+The record is the only thing that makes runs stateful. Delete it and the next
+run re-seeds silently.
+
+**Where it lives is a backend**, in [src/storage/](src/storage/):
+
+| `state.store` | Where | Needs | Notes |
+|---|---|---|---|
+| `'file'` (default) | [data/seen.json](data/) | nothing | indented, and committed back by the workflow |
+| `'gist'` | `car-tco-seen.json` in your gist | `GIST_TOKEN` | minified, per user, nothing committed |
+
+The file backend makes the record *the repo's*, which is fine for one person
+and awkward for anyone else: two people cannot share it, and a fork diverges on
+it from its first run and then conflicts on every pull from upstream. The gist
+backend fixes both and removes the workflow's need for write access to the repo.
+
+Switching is deliberate, never automatic:
+
+```sh
+node src/index.js --migrate-state=gist   # copy the record across, then edit config.js
+```
+
+A run that quietly looked somewhere new would find nothing, conclude it was a
+first run, and silently re-baseline the whole market. So the copy is explicit,
+it refuses to overwrite a record that already exists, and it leaves the old one
+in place until you delete it.
+
+Records are keyed `<source>:<id>` — a site's ids are only unique within that
+site. Older files are migrated on read (v1 gave listings per-filter verdicts,
+v2 → v3 namespaces the keys) and rewritten in the new shape on the next save;
+everything already announced stays announced.
 
 - Verdicts, reasons and posts are stored **per filter**, because two filters
   can legitimately disagree about the same car. The listing's own facts (price,
@@ -149,11 +291,14 @@ npm start                    # check and post anything new
 npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
-npm test                     # unit tests (98 cases, no network)
+npm run doctor               # check the setup; posts nothing, writes nothing
+npm test                     # unit tests (200 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
+node src/index.js --for=alice        # run one person, by tenant id or name
 node src/index.js --filters=file     # ignore the gist, use filters.json
+node src/index.js --migrate-state=gist   # move the record into your gist
 node src/index.js --help
 ```
 
@@ -177,7 +322,9 @@ variables always win over the file, so CI secrets override it.
 | `filters.gistFilename` | `'car-tco-filters.json'` | Where the app syncs filters |
 | `fetch.delayMs` | `1500` | Gap between requests |
 | `fetch.maxSearchPages` | `40` | Per search, not per run |
-| `discord.maxPostsPerRun` | `20` | Anti-spam cap, across all filters |
+| `discord.maxPostsPerRun` | `20` | Anti-spam cap, per person per run |
+| `state.store` | `'file'` | `'gist'` to keep the record per user instead of in the repo |
+| `state.gistFilename` | `'car-tco-seen.json'` | Where the gist backend keeps it |
 | `state.forgetAfterDays` | `90` | When a vanished listing or a dormant filter is forgotten |
 
 Per-filter settings — including `packageEvidence` (`'weak'` accepts a bare
@@ -187,7 +334,8 @@ in `filters.json`.
 
 To watch a different car, add a filter in the app, or copy the entry in
 `filters.json` and change `make` / `model` to match the nettiauto URL path
-(`/polestar/2` → `"make": "polestar", "model": "2"`).
+(`/polestar/2` → `"make": "polestar", "model": "2"`). To watch something that is
+not a car at all, that is a new source — see *Sources* above.
 
 ## Running it on a schedule
 
@@ -212,10 +360,17 @@ React to any posted listing in Discord (any emoji, from anyone in the channel)
 and within a cycle the car is added to the Car TCO calculator's comparison.
 It arrives with the price, odometer and powertrain from the listing (a diesel
 is added as a diesel — filters can watch anything now), the nettiauto link in
-its notes, and an agreed financing baseline — 0 € down, 6 % interest, 72
-months — so candidates are comparable before any dealer has quoted a real
-rate. Everything else (insurance, tax, maintenance) is left at zero for you to
-fill in; the defaults live in `tco.carDefaults` in [src/config.js](src/config.js).
+its notes, and whatever financing baseline that person has set, so candidates are
+comparable before any dealer has quoted a real rate. Everything else (insurance,
+tax, maintenance) is left at zero for you to fill in — nobody can guess those,
+and a guessed number reads as a real one.
+
+The financing baseline is **theirs, not a fixed one**: the watcher reads
+`settings.newCar` out of the calculator the car is going into, which is what the
+app's *Assumptions → New car* panel writes. A rate and term fixed in the scraper
+would have put one person's assumptions about borrowing into everybody's
+calculator. `tco.carDefaults` in [src/config.js](src/config.js) is only the
+fallback, for somebody whose app predates the setting.
 
 No frontend changes are involved: the scraper appends to the same secret gist
 the app's GitHub sync already uses, and the app pulls it on load and tab focus.
@@ -250,7 +405,11 @@ Worth knowing:
 - To require a specific emoji instead of any reaction, set
   `tco.requiredEmoji` (e.g. `'✅'`) in [src/config.js](src/config.js).
 
-## How it reads nettiauto
+## How the nettiauto source reads nettiauto
+
+Everything below is one adapter's business, in
+[src/sources/nettiauto.js](src/sources/nettiauto.js). It is the worked example
+for writing another.
 
 There is no public API, so this parses the server-rendered HTML. Two details
 are worth knowing before changing anything:
@@ -291,7 +450,8 @@ The text is tokenised with every separator sellers use flattened to
 whitespace, then a package counts when the name sits within three tokens of
 either a `paketti`/`pkt`/`pack`/`varuste` word or the other required package.
 
-Two Polestar-specific exclusions matter:
+Two Polestar-specific exclusions matter, and they are the filter's own
+`packageQualifiers` rather than anything the matcher knows:
 
 - **Pilot Lite** is a smaller, separately sold package, so it does *not*
   satisfy Pilot. Tick *Accept the smaller version of a package* (or set
@@ -299,6 +459,20 @@ Two Polestar-specific exclusions matter:
 - **Pilot Assist** is a feature that ships in *both* Pilot and Pilot Lite, so
   seeing it proves nothing about which pack the car has, and it is ignored.
   (A listing naming both "Pilot Assist" and Pilot properly still matches.)
+
+Both are expressed as `{ package, word, means }`, where `means` is `lesser` or
+`feature`:
+
+```json
+"packageQualifiers": [
+  { "package": "pilot", "word": "lite", "means": "lesser" },
+  { "package": "pilot", "word": "assist", "means": "feature" }
+]
+```
+
+A filter that says nothing gets those two by default, so nothing written before
+the field existed changed behaviour. They are inert unless a filter asks for a
+package literally named `pilot`. An explicitly empty list clears them.
 
 Because this is fuzzy by nature, **every Discord post quotes the seller text it
 matched on**, so the verdict can be checked at a glance instead of trusted. If
@@ -311,9 +485,11 @@ the filter's own `implications` rules, and both are reported in the post. See
 
 ## Being a polite guest
 
-One request at a time, 1.5 s apart, a real browser User-Agent, and retries with
-backoff on 429/5xx — global, so adding filters never means more requests in
-flight, only a longer run. A full first run over the Polestar 2 listing is
+One request at a time **per host**, 1.5 s apart, a real browser User-Agent, and
+retries with backoff on 429/5xx. Per host rather than globally, so a run over
+several sources does not make each one wait out the others' politeness budget —
+within a site it is still strictly one request at a time, which is the part that
+matters. Adding filters never means more requests in flight, only a longer run. A full first run over the Polestar 2 listing is
 roughly 16 search pages plus a listing page for each undecided car; later runs
 are mostly just the 16 search pages. Filters watching the same make and model
 share that crawl; each additional make/model adds its own pages.
@@ -321,19 +497,30 @@ share that crawl; each additional make/model adds its own pages.
 ## Layout
 
 ```
-filters.json      the committed default filter (the gist wins when it has any)
-src/filters.js    loading and normalising filters; grouping them by search
-src/config.js     the runtime knobs
-src/index.js      orchestration and CLI
-src/nettiauto.js  fetching and parsing search + listing pages
-src/filter.js     the spec check: numbers, phrases, implications, packages
-src/state.js      the record of what has been seen and announced, per filter
-src/discord.js    webhook payloads
-src/gist.js       reading the gist; adding reacted cars to the calculator
-src/reactions.js  reading reactions off our own posts
-src/http.js       paced, retrying fetch
-src/html.js       entity decoding and text extraction
-src/env.js        reads .env
-test/             unit tests, no network
-data/seen.json    the record (commit this)
+filters.json           the committed example, disabled (the gist wins when it has any)
+src/index.js           orchestration and CLI - names no site
+src/filters.js          loading and normalising filters; grouping them into crawls
+src/filter.js           the spec check: numbers, phrases, implications, packages
+src/fields.js           checking numeric limits, whatever the fields are called
+src/sources/index.js    the source registry
+src/sources/nettiauto.js  everything nettiauto-specific
+src/sinks/index.js      where a reacted listing goes
+src/sinks/car-tco.js    ...into the calculator, as a car
+src/tenants.js          who the watcher runs for, and how they stay separate
+src/state.js            what has been seen and announced, per filter
+src/storage/index.js    where that record lives: a file, or your gist
+src/discord.js          webhook payloads, labelled by the source
+src/reactions.js        reading reactions off our own posts
+src/gist.js             the GitHub gist plumbing
+src/http.js             paced (per host), retrying fetch
+src/html.js             entity decoding and text extraction
+src/config.js           the runtime knobs
+src/preflight.js        whether a run can post, and whose problem it is if not
+src/doctor.js           the setup report (npm run doctor)
+src/env.js              reads .env
+test/                   unit tests, no network
+test/sources.test.js    conformance: what every adapter has to get right
+test/tenants.test.js    who it runs for, and the half-configured cases
+test/reactions.test.js  reading channels across several servers
+data/seen.json          the record (commit this)
 ```

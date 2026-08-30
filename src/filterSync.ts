@@ -17,6 +17,7 @@ import {
   EMPTY_FILTER_SET,
   mergeFilterSets,
   normalizeFilterSet,
+  toWire,
 } from './scraperFilters'
 import { type SyncConfig, github } from './sync'
 
@@ -35,7 +36,10 @@ export function loadFilterSet(): FilterSet {
 
 export function saveFilterSet(set: FilterSet): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(set))
+    // toWire, not the set as-is: it adds the old yearFrom/maxPrice spellings
+    // beside `ranges`, so a bundle that predates the range bag still reads the
+    // limits out of storage rather than seeing a filter with none.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...set, filters: set.filters.map(toWire) }))
   } catch {
     // storage full or blocked — the app keeps working in memory
   }
@@ -69,8 +73,10 @@ export async function pushFilterSet(cfg: SyncConfig, set: FilterSet): Promise<vo
   const envelope = {
     app: 'carcalculator',
     savedAt: new Date().toISOString(),
-    // Read by scraper/src/filters.js.
-    filters: set.filters,
+    // Read by scraper/src/filters.js. Written through toWire so both the range
+    // bag and the old single-purpose fields are present - the scraper prefers
+    // the old spelling on conflict, and they agree whenever we are the writer.
+    filters: set.filters.map(toWire),
     tombstones: set.tombstones,
   }
   await github(`/gists/${cfg.gistId}`, cfg.token, {

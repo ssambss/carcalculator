@@ -73,6 +73,29 @@ export interface CarListing {
   updatedAt: string
 }
 
+/**
+ * The financing a car starts with before a dealer has quoted anything.
+ *
+ * Yours, not everybody's. The listing watcher used to add cars on one hardcoded
+ * baseline, which meant one person's assumptions about rates and term landed in
+ * everyone's calculator - so it lives with your own data now, and applies to a
+ * car you add by hand as much as to one that arrives from a reaction.
+ *
+ * A common baseline is the point: candidates are only comparable if they are
+ * financed the same way until a real offer exists for one of them.
+ */
+export interface NewCarDefaults {
+  /** € paid upfront */
+  downPayment: number
+  /** nominal annual interest rate, e.g. 4.9 */
+  annualRatePct: number
+  termMonths: number
+  /** kWh/100km assumed for an EV or plug-in hybrid */
+  elecKwhPer100: number
+  /** l/100km assumed for petrol, diesel and a plug-in hybrid's engine */
+  fuelLPer100: number
+}
+
 export interface Settings {
   annualKm: number
   ownershipYears: number
@@ -82,6 +105,8 @@ export interface Settings {
   dieselPrice: number
   /** €/kWh */
   electricityPrice: number
+  /** what a newly added car assumes until it is refined */
+  newCar: NewCarDefaults
 }
 
 export interface AppData {

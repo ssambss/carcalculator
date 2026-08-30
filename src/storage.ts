@@ -4,11 +4,29 @@ import type {
   Financing,
   FinancingMethod,
   Lease,
+  NewCarDefaults,
   Powertrain,
   Settings,
 } from './types'
 
 const STORAGE_KEY = 'carcalculator.data.v1'
+
+/**
+ * What a new car assumes before anyone has quoted a real rate.
+ *
+ * 6 % over 72 months with nothing down is a plausible Finnish used-car loan and,
+ * more to the point, a *common* baseline - candidates only compare if they are
+ * financed alike until one of them has a real offer. The consumption figures sit
+ * above the WLTP numbers on purpose: roughly what a mid-size car actually uses
+ * in mixed Finnish driving.
+ */
+export const DEFAULT_NEW_CAR: NewCarDefaults = {
+  downPayment: 0,
+  annualRatePct: 6,
+  termMonths: 72,
+  elecKwhPer100: 20,
+  fuelLPer100: 6.5,
+}
 
 export const DEFAULT_SETTINGS: Settings = {
   annualKm: 20000,
@@ -16,6 +34,7 @@ export const DEFAULT_SETTINGS: Settings = {
   petrolPrice: 1.85,
   dieselPrice: 1.75,
   electricityPrice: 0.15,
+  newCar: { ...DEFAULT_NEW_CAR },
 }
 
 /* A 36-month contract with a 20 000 km/yr allowance is the common Finnish
@@ -33,7 +52,14 @@ export function cloneLease(lease: Lease): Lease {
   return { ...lease, includes: { ...lease.includes } }
 }
 
-export function newCar(): CarListing {
+/**
+ * A blank car, on whichever financing baseline the owner of the data uses.
+ *
+ * The defaults are a *setting*, not a constant: one person's assumptions about
+ * rate and term have no business in another person's calculator, and the same
+ * baseline should apply whether a car is typed in or arrives from a reaction.
+ */
+export function newCar(defaults: NewCarDefaults = DEFAULT_NEW_CAR): CarListing {
   const now = new Date().toISOString()
   return {
     id: crypto.randomUUID(),
@@ -48,15 +74,15 @@ export function newCar(): CarListing {
     expectedResaleValue: 0,
     financing: {
       method: 'cash',
-      downPayment: 0,
-      annualRatePct: 0,
-      termMonths: 60,
+      downPayment: defaults.downPayment,
+      annualRatePct: defaults.annualRatePct,
+      termMonths: defaults.termMonths,
       autoBalloon: true,
       balloon: 0,
     },
     lease: cloneLease(DEFAULT_LEASE),
-    fuelLPer100: 6.5,
-    elecKwhPer100: 17,
+    fuelLPer100: defaults.fuelLPer100,
+    elecKwhPer100: defaults.elecKwhPer100,
     electricSharePct: 50,
     insurancePerYear: 0,
     taxPerYear: 0,
@@ -105,7 +131,10 @@ export async function importJson(file: File): Promise<AppData> {
 export function normalizeData(raw: unknown): AppData {
   const obj = isRecord(raw) ? raw : {}
   const settings = normalizeSettings(obj.settings)
-  const cars = Array.isArray(obj.cars) ? obj.cars.map(normalizeCar) : []
+  // Settings first: a car with gaps fills them from this person's own baseline.
+  const cars = Array.isArray(obj.cars)
+    ? obj.cars.map((car) => normalizeCar(car, settings.newCar))
+    : []
   const tombstones: Record<string, string> = {}
   if (isRecord(obj.tombstones)) {
     for (const [id, at] of Object.entries(obj.tombstones)) {
@@ -123,12 +152,25 @@ function normalizeSettings(raw: unknown): Settings {
     petrolPrice: toNum(s.petrolPrice, DEFAULT_SETTINGS.petrolPrice),
     dieselPrice: toNum(s.dieselPrice, DEFAULT_SETTINGS.dieselPrice),
     electricityPrice: toNum(s.electricityPrice, DEFAULT_SETTINGS.electricityPrice),
+    newCar: normalizeNewCar(s.newCar),
   }
 }
 
-function normalizeCar(raw: unknown): CarListing {
+function normalizeNewCar(raw: unknown): NewCarDefaults {
+  const n = isRecord(raw) ? raw : {}
+  return {
+    downPayment: Math.max(0, toNum(n.downPayment, DEFAULT_NEW_CAR.downPayment)),
+    annualRatePct: Math.max(0, toNum(n.annualRatePct, DEFAULT_NEW_CAR.annualRatePct)),
+    // A term of zero would divide by nothing in the annuity.
+    termMonths: Math.max(1, toNum(n.termMonths, DEFAULT_NEW_CAR.termMonths)),
+    elecKwhPer100: Math.max(0, toNum(n.elecKwhPer100, DEFAULT_NEW_CAR.elecKwhPer100)),
+    fuelLPer100: Math.max(0, toNum(n.fuelLPer100, DEFAULT_NEW_CAR.fuelLPer100)),
+  }
+}
+
+function normalizeCar(raw: unknown, defaults: NewCarDefaults = DEFAULT_NEW_CAR): CarListing {
   const c = isRecord(raw) ? raw : {}
-  const base = newCar()
+  const base = newCar(defaults)
   return {
     id: typeof c.id === 'string' && c.id ? c.id : base.id,
     name: typeof c.name === 'string' ? c.name : '',
@@ -142,7 +184,7 @@ function normalizeCar(raw: unknown): CarListing {
     autoResale:
       typeof c.autoResale === 'boolean' ? c.autoResale : !(toNum(c.expectedResaleValue, 0) > 0),
     expectedResaleValue: toNum(c.expectedResaleValue, 0),
-    financing: normalizeFinancing(c.financing),
+    financing: normalizeFinancing(c.financing, defaults),
     lease: normalizeLease(c.lease),
     fuelLPer100: toNum(c.fuelLPer100, base.fuelLPer100),
     elecKwhPer100: toNum(c.elecKwhPer100, base.elecKwhPer100),
@@ -162,13 +204,17 @@ function normalizeCar(raw: unknown): CarListing {
   }
 }
 
-function normalizeFinancing(raw: unknown): Financing {
+/**
+ * `defaults` fills the gaps, so a car arriving without financing lands on this
+ * person's own baseline rather than on a rate and term picked here.
+ */
+function normalizeFinancing(raw: unknown, defaults: NewCarDefaults = DEFAULT_NEW_CAR): Financing {
   const f = isRecord(raw) ? raw : {}
   return {
     method: isFinancingMethod(f.method) ? f.method : 'cash',
-    downPayment: toNum(f.downPayment, 0),
-    annualRatePct: toNum(f.annualRatePct, 0),
-    termMonths: toNum(f.termMonths, 60),
+    downPayment: toNum(f.downPayment, defaults.downPayment),
+    annualRatePct: toNum(f.annualRatePct, defaults.annualRatePct),
+    termMonths: toNum(f.termMonths, defaults.termMonths),
     // Data saved before the standard balloon existed keeps its explicit figure
     autoBalloon: typeof f.autoBalloon === 'boolean' ? f.autoBalloon : false,
     balloon: toNum(f.balloon, 0),

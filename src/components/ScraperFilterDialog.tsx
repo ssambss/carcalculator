@@ -7,7 +7,14 @@ import {
   newScraperFilter,
   parseFilterJson,
   parseNettiautoUrl,
+  toWire,
 } from '../scraperFilters'
+import {
+  NETTIAUTO_FIELDS,
+  rangeInputs,
+  rangeValue,
+  withRange,
+} from '../listingFields'
 import type { ScraperFilterStore } from '../useScraperFilters'
 import { ChipInput } from './ChipInput'
 
@@ -63,7 +70,9 @@ export function ScraperFilterDialog({ store, connected, onClose }: Props) {
   }
 
   async function copyAll() {
-    const text = JSON.stringify(filters, null, 2)
+    // Through toWire, so the copied text is valid scraper/filters.json for an
+    // older checkout too.
+    const text = JSON.stringify(filters.map(toWire), null, 2)
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
@@ -313,28 +322,23 @@ function FilterEditor({ filter, isNew, onSave, onDelete, onCancel }: EditorProps
 
       <div className="form-section">
         <div className="section-title">Limits</div>
+        {/*
+          Generated from the source's field declarations rather than written
+          out. A source that carries square metres and a room count instead of
+          years and kilometres gets the right form with no change here - which
+          is the whole point of the range bag.
+        */}
         <div className="form-grid">
-          <LimitField label="Year from" value={draft.yearFrom} onChange={(v) => set({ yearFrom: v })} />
-          <LimitField label="Year to" value={draft.yearTo} onChange={(v) => set({ yearTo: v })} />
-          <LimitField
-            label="Max odometer"
-            value={draft.maxMileage}
-            unit="km"
-            onChange={(v) => set({ maxMileage: v })}
-          />
-          <LimitField
-            label="Max price"
-            value={draft.maxPrice}
-            unit="€"
-            onChange={(v) => set({ maxPrice: v })}
-          />
-          <LimitField
-            label="Min price"
-            value={draft.minPrice}
-            unit="€"
-            hint="Rules out parts cars and price-on-request adverts."
-            onChange={(v) => set({ minPrice: v })}
-          />
+          {rangeInputs(NETTIAUTO_FIELDS).map(({ field, side, label }) => (
+            <LimitField
+              key={`${field.key}.${side}`}
+              label={label}
+              value={rangeValue(draft.ranges, field.key, side)}
+              unit={field.unit}
+              hint={side === 'min' ? field.hint : undefined}
+              onChange={(v) => set({ ranges: withRange(draft.ranges, field.key, side, v) })}
+            />
+          ))}
         </div>
       </div>
 

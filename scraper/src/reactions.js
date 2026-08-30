@@ -1,13 +1,26 @@
 // Reading reactions off the listings we posted to Discord.
 //
 // Webhooks are send-only, so this needs a bot token. The bot reads the channel
-// and maps each embed back to its listing through the nettiauto URL, which
+// and maps each embed back to its listing through the link it points at, which
 // means it works on messages posted before this feature existed, and needs no
 // record of message ids.
+//
+// Every registered source gets a look at each link, because one channel can
+// legitimately carry posts from several - so a reaction on a flat and a reaction
+// on a car are told apart by which source claimed the URL.
 
 import config from './config.js';
+import { DEFAULT_SOURCE_ID, identifyUrl, sourceIds } from './sources/index.js';
 
 const API = 'https://discord.com/api/v10';
+
+/**
+ * Matches the id marker a footer ends with: "<source> 15900001".
+ *
+ * The bare "ilmoitus <id>" alternative is the older form, from before there was
+ * more than one source - every post carrying it is a nettiauto post.
+ */
+const FOOTER_ID_RE = new RegExp(`(?:(${sourceIds().join('|')})\\s+|ilmoitus\\s+)(\\d+)`);
 
 /** The webhook's own id, used to tell our posts apart from anyone else's. */
 export function webhookIdFrom(url) {
@@ -16,17 +29,23 @@ export function webhookIdFrom(url) {
 
 async function discord(path, { botToken, label }) {
   const response = await fetch(`${API}${path}`, {
-    headers: { Authorization: `Bot ${botToken}`, 'User-Agent': 'nettiauto-watch (carcalculator)' },
+    headers: { Authorization: `Bot ${botToken}`, 'User-Agent': 'listing-watch (carcalculator)' },
   });
 
   if (response.status === 401) {
     throw new Error('Discord rejected the bot token. Check DISCORD_BOT_TOKEN.');
   }
-  if (response.status === 403) {
-    throw new Error(
-      `Bot lacks access for ${label}. It needs "View Channel" and ` +
-        '"Read Message History" on the channel.',
+  if (response.status === 403 || response.status === 404) {
+    // Not necessarily broken. A tenant running this in their own Discord server
+    // who has not invited the bot is a perfectly good setup - they get posts and
+    // simply add cars by hand. So this is flagged for the caller to skip rather
+    // than thrown as a failure that would take everyone else's run down with it.
+    const error = new Error(
+      `The bot cannot read ${label}. In your own server it needs inviting; ` +
+        'in one it is already in, it needs "View Channel" and "Read Message History".',
     );
+    error.reason = 'no-channel-access';
+    throw error;
   }
   if (response.status === 429) {
     const body = await response.json().catch(() => ({}));
@@ -38,12 +57,18 @@ async function discord(path, { botToken, label }) {
   return response.json();
 }
 
-/** Resolve the channel the webhook posts into, so it needn't be configured. */
-export async function resolveChannelId({
-  webhookUrl = config.discord.webhookUrl,
-  channelId = config.discord.channelId,
-} = {}) {
-  if (channelId) return channelId;
+/**
+ * Which channel a webhook posts into.
+ *
+ * Always read off the webhook, never from configuration. There used to be a
+ * `DISCORD_CHANNEL_ID` override to save this one request, and once the watcher
+ * ran for several people that became a hole: it was global, so a single value
+ * set for the owner would have had every tenant scanning the owner's channel and
+ * picking up the owner's reactions into their own calculator. One request per
+ * tenant per run is a very cheap way not to have that.
+ */
+export async function resolveChannelId({ webhookUrl } = {}) {
+  if (!webhookUrl) throw new Error('resolveChannelId needs a webhook to read the channel off.');
   const response = await fetch(webhookUrl);
   if (!response.ok) throw new Error(`Could not read the webhook: HTTP ${response.status}`);
   const body = await response.json();
@@ -51,20 +76,32 @@ export async function resolveChannelId({
   return body.channel_id;
 }
 
-/** Pull the listing ids out of a message's embeds. */
-function listingIdsIn(message) {
-  const ids = new Set();
+/**
+ * Pull the listings out of a message's embeds, as `{ sourceId, id }`.
+ *
+ * The embed's own link is the good answer, and the only one that identifies the
+ * source. The footer is the fallback for a post whose embed layout has since
+ * changed - it carries "<source> <id>" now, and the older Finnish "ilmoitus
+ * <id>" form is still read, from before there was more than one source.
+ */
+export function listingsIn(message) {
+  const found = new Map();
+
   for (const embed of message.embeds ?? []) {
-    const fromUrl = /nettiauto\.com\/[^/]+\/[^/]+\/(\d+)/.exec(embed.url ?? '')?.[1];
+    const fromUrl = identifyUrl(embed.url);
     if (fromUrl) {
-      ids.add(fromUrl);
+      found.set(`${fromUrl.sourceId}:${fromUrl.id}`, fromUrl);
       continue;
     }
-    // Older posts, or a changed embed layout: the footer carries the id too.
-    const fromFooter = /ilmoitus\s+(\d+)/.exec(embed.footer?.text ?? '')?.[1];
-    if (fromFooter) ids.add(fromFooter);
+    const match = FOOTER_ID_RE.exec(embed.footer?.text ?? '');
+    if (match) {
+      // No source named means a post from before sources existed, and every
+      // one of those was nettiauto.
+      const entry = { sourceId: match[1] || DEFAULT_SOURCE_ID, id: match[2] };
+      found.set(`${entry.sourceId}:${entry.id}`, entry);
+    }
   }
-  return [...ids];
+  return [...found.values()];
 }
 
 /**
@@ -85,7 +122,10 @@ function hasQualifyingReaction(message, requiredEmoji) {
 }
 
 /**
- * Scan recent channel history and return the listing ids people reacted to.
+ * Scan recent channel history and return the listings people reacted to.
+ *
+ * Keyed `sourceId:id`, with the bare id carried in the value - the caller needs
+ * both to find the listing and to build its record key.
  *
  * A message may hold more than one embed (batched posts predate this feature),
  * and a reaction applies to the whole message - so every listing in a reacted
@@ -93,8 +133,10 @@ function hasQualifyingReaction(message, requiredEmoji) {
  * forward.
  */
 export async function fetchReactedListingIds({
+  // The bot is genuinely shared - one bot reads every server it is in - so its
+  // token may default. The webhook may not: it decides whose channel is read.
   botToken = config.discord.botToken,
-  webhookUrl = config.discord.webhookUrl,
+  webhookUrl,
   scanMessages = config.tco.scanMessages,
   requiredEmoji = config.tco.requiredEmoji,
   onProgress,
@@ -123,19 +165,26 @@ export async function fetchReactedListingIds({
     if (!Array.isArray(messages) || messages.length === 0) break;
 
     for (const message of messages) {
-      // Only our own posts; someone else's message with a nettiauto link is
-      // not a listing we announced.
+      // Only our own posts; someone else's message linking a listing is not a
+      // listing we announced.
       if (ourWebhookId && message.webhook_id && message.webhook_id !== ourWebhookId) continue;
       if (!hasQualifyingReaction(message, requiredEmoji)) continue;
-      const ids = listingIdsIn(message);
+      const listings = listingsIn(message);
       // Every post of ours carries an embed. A reacted post of ours with none
       // means Discord stripped them from the response, not that they're gone.
-      if (ids.length === 0 && (message.embeds ?? []).length === 0) {
+      if (listings.length === 0 && (message.embeds ?? []).length === 0) {
         strippedEmbeds += 1;
         continue;
       }
-      for (const id of ids) {
-        if (!reacted.has(id)) reacted.set(id, message.id);
+      for (const listing of listings) {
+        // Keyed by source *and* id. A site's ids are only unique within that
+        // site, so two sources both numbering a listing 900 would otherwise
+        // share one entry - and the survivor's source would decide which
+        // calculator the car landed in.
+        const key = `${listing.sourceId}:${listing.id}`;
+        if (!reacted.has(key)) {
+          reacted.set(key, { messageId: message.id, sourceId: listing.sourceId, id: listing.id });
+        }
       }
     }
 
