@@ -12,8 +12,10 @@ There are two halves:
   actually costs you *per month*, once fuel, insurance, tax, depreciation and
   the loan are all counted. That's the number a price tag doesn't tell you.
 
-You'll be watching your own cars. Nobody else sees your searches or your
-numbers, and you don't see theirs.
+You'll be watching your own cars. The other people using this can't see your
+searches or your numbers, and you can't see theirs. The person who set it up
+holds a key that reaches your data — that's how the watcher works, and it's
+spelled out in *What can and can't be seen* at the end.
 
 ---
 
@@ -33,7 +35,7 @@ It's a free signup form. If you already have an account, use it.
 ### 2. One password-like key, pasted into the app once
 
 GitHub can hand out a key that unlocks *only* that scratch space — not your
-email, not anything else. You'll create one and paste it into the app. That's
+code, not your repositories. You'll create one and paste it into the app. That's
 what lets the app save your work and have it show up on your phone and your
 laptop both.
 
@@ -155,9 +157,9 @@ there's no database with everyone's cars in it.
 **But the person running the watcher holds a copy of your key**, because that's
 how the watcher reads your searches and writes cars into your calculator. That
 key reaches your GitHub scratch space and nothing else — not your code, not your
-repositories. Within that space, though, it reaches everything —
-so treat your car data as *shared with them*, not private from them. If you keep
-other things in that same GitHub scratch space, they're reachable too.
+repositories. Within that space, though, it reaches everything, so treat your car
+data as *shared with them* rather than private from them. If you keep other
+things in that same scratch space, those are reachable too.
 
 **If you use your own Discord server** and invite their bot so that reacting
 works, that bot can read the channels you give it access to. If you'd rather not,
