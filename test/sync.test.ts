@@ -21,8 +21,19 @@ import type { AppData, CarListing } from '../src/types'
  */
 const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 3600 * 1000).toISOString()
 
+/**
+ * `createdAt` is fixed rather than derived from now.
+ *
+ * The output order is `createdAt` then `id`, and two calls to a now-based helper
+ * may or may not land in the same millisecond - so a test written that way
+ * passes on a fast machine and fails on a CI runner, which is exactly what
+ * happened. A fixture that decides which ordering rule it is exercising has to
+ * state the timestamps.
+ */
+const MADE = '2026-01-01T00:00:00.000Z'
+
 function car(id: string, updatedAt: string, over: Partial<CarListing> = {}): CarListing {
-  return { ...newCar(), id, name: id, createdAt: daysAgo(300), updatedAt, ...over }
+  return { ...newCar(), id, name: id, createdAt: MADE, updatedAt, ...over }
 }
 
 function data(cars: CarListing[], tombstones: Record<string, string> = {}): AppData {
@@ -111,12 +122,24 @@ describe('the merged output', () => {
     // ping-pong of writes that change nothing.
     const a = data([car('b', daysAgo(30)), car('a', daysAgo(30))], { z: daysAgo(50) })
     const b = data([car('c', daysAgo(50))], { y: daysAgo(45) })
-    const one = mergeData(a, b)
-    const two = mergeData(a, b)
-    expect(JSON.stringify(one)).toBe(JSON.stringify(two))
-    // Cars ordered by creation then id; tombstone keys sorted.
-    expect(one.cars.map((c) => c.id)).toEqual(['a', 'b', 'c'])
-    expect(Object.keys(one.tombstones)).toEqual(['y', 'z'])
+    expect(JSON.stringify(mergeData(a, b))).toBe(JSON.stringify(mergeData(a, b)))
+    expect(Object.keys(mergeData(a, b).tombstones)).toEqual(['y', 'z'])
+  })
+
+  it('orders cars by when they were created', () => {
+    const older = { ...car('zzz', daysAgo(10)), createdAt: '2026-01-01T00:00:00.000Z' }
+    const newer = { ...car('aaa', daysAgo(10)), createdAt: '2026-06-01T00:00:00.000Z' }
+    expect(mergeData(data([newer, older]), data([])).cars.map((c) => c.id)).toEqual(['zzz', 'aaa'])
+  })
+
+  it('breaks a creation-time tie on id, so the order cannot wobble', () => {
+    // Two cars made in the same millisecond is not hypothetical - the importer
+    // stamps a whole sheet at once. Without a tiebreak, two devices could sort
+    // them differently and push at each other forever.
+    const one = car('b', daysAgo(10))
+    const two = car('a', daysAgo(10))
+    expect(one.createdAt).toBe(two.createdAt)
+    expect(mergeData(data([one, two]), data([])).cars.map((c) => c.id)).toEqual(['a', 'b'])
   })
 
   it('is stable when the same merge runs with the sides swapped', () => {

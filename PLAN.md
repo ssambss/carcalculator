@@ -770,11 +770,25 @@ the Excel import, where a Finnish sheet will be full of them. Now reads comma
 decimals and grouped thousands, non-breaking spaces included, so an exported
 figure pasted back survives.
 
-**A lesson about test fixtures.** My first sync tests used fixed dates, and three
-failed — not from a bug but because `2026-03-01` is already past the 90-day
-tombstone window. A hardcoded date silently changes what a test *means* as the
-calendar moves: a "recent deletion" quietly becomes an expired one and the test
-starts asserting the opposite of its name. All time-relative now.
+**Two lessons about test fixtures, in opposite directions.**
+
+My first sync tests used *fixed* dates, and three failed — not from a bug but
+because `2026-03-01` is already past the 90-day tombstone window. A hardcoded
+date silently changes what a test *means* as the calendar moves: a "recent
+deletion" quietly becomes an expired one and the test starts asserting the
+opposite of its name. Tombstones are time-relative now.
+
+Then the *opposite* mistake, and CI caught it rather than me. `createdAt` came
+from a now-based helper, and the merge orders cars by `createdAt` then `id`. On
+this machine both calls landed in the same millisecond, so the id tiebreak
+applied and the order was `a, b`; on the runner they straddled a millisecond and
+the creation order won, giving `b, a`. The code was right both times — the
+fixture was not deciding which rule it was testing. `createdAt` is fixed now,
+and the two rules have a test each. Verified against repetition rather than one
+green run.
+
+The rule: **a value the code compares against *now* has to be relative; a value
+the code only compares against *other rows* has to be fixed.**
 
 The calc tests passed first try, including an independently computed annuity
 figure — reassuring, and the reason to write them was never that the maths was
