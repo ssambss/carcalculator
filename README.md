@@ -77,6 +77,17 @@ color-coded cost breakdown and a side-by-side comparison table.
   payment plus running costs — what actually leaves the account each month
   during the term. The budget line, distinct from the economic €/month,
   which nets out resale value and only counts interest and depreciation.
+- **Installable, and works offline.** Add it to a phone or desktop home screen
+  and it opens full-screen with its own icon, no address bar. The data was always
+  local; what the service worker adds is the *app* itself opening with no
+  signal — which is where it is meant to be used, at a dealership. Nothing to
+  install from a store and no separate build.
+  - HTML is fetched network-first and hashed assets cache-first, so a new deploy
+    reaches an installed phone on its next load rather than pinning it to an old
+    build. That policy is the part of a service worker worth reading:
+    [public/sw.js](public/sw.js).
+  - The GitHub API is never intercepted — sync has to be live or it would read a
+    stale gist.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.

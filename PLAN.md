@@ -34,7 +34,7 @@ apartments, rentals or anything else with listing pages.
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
 | [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ✅ done |
 | [· Test harness](#frontend-test-harness-) | `src/` has tests, and CI runs them | ✅ done |
-| [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; push | ⬜ recommended over native |
+| [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; offline | ✅ done |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
 Legend: ⬜ not started · 🔨 in progress · ✅ done · ⏸️ parked
@@ -781,18 +781,53 @@ suspected, but that nothing would have told us if a refactor broke it.
 
 ---
 
-## Phase 6b · Installable client (PWA)
+## Phase 6b · Installable client (PWA) ✅
 
 *Recommended answer to "should this be a desktop and phone app?" — see below.*
 
-- [ ] Web app manifest, icons, `display: standalone`
-- [ ] Service worker for offline shell (the data is already local-first)
-- [ ] Web push where the platform supports it, with Discord as the fallback that
-      never stops working
+- [x] Manifest, `display: standalone`, per-scheme theme colour (the manifest
+      carries only one, and a light bar above a dark app looks broken)
+- [x] Icons — a paper-ledger mark in the app's own palette, drawn once as SVG at
+      512 and rendered to the PNGs iOS needs, since it ignores SVG for
+      `apple-touch-icon`
+- [x] Hand-written service worker (~60 lines). Workbox would be a large
+      dependency for that, and the caching policy is the one part that has to be
+      understood rather than copied
+- [x] Registered in production only — in dev it would serve a cached bundle over
+      the one Vite just rebuilt, the most confusing possible failure
+- [ ] **Not done: web push.** Discord already delivers notifications and does it
+      reliably on every platform; push would duplicate that to win iOS users an
+      icon badge. Worth revisiting only if somebody actually asks.
 
-Adds an installable icon on both desktop and phone with no new build pipeline —
-a manifest and a service worker on the Vite build that already exists. Estimate:
-~1–2 days.
+### The caching policy, which is the whole risk
+
+| | |
+|---|---|
+| HTML | **network-first** — it names which hashed assets to load, so a stale one is how people get pinned to an old build forever |
+| Hashed assets | **cache-first** — the filename changes when the contents do, so a cached one cannot be wrong |
+| Cross-origin | **untouched** — the GitHub API must be live or sync reads a stale gist; fonts failing offline costs a fallback font |
+
+`skipWaiting` + `clients.claim` so a new build takes charge immediately. That is
+safe **because this app is a single bundle**: with code splitting, an open page
+could ask for a lazy chunk the new worker just evicted. If chunks are ever
+introduced, this has to become the wait-for-the-next-load dance instead — noted
+in the file itself.
+
+The open page is deliberately not reloaded. It would be the only way to
+guarantee fresh code in a tab left open for days, and it would also throw away
+whatever half-filled car form the person was looking at.
+
+### Verified in a real browser
+
+Driven with the Chromium already on this machine, against `dist/` served under a
+subpath the way Pages serves a repo:
+
+- the worker installs and takes control; the shell and both hashed assets cache
+- **the app renders with the network off**, with no page errors
+- `api.github.com` is *not* answered from cache — it fails offline, as it must
+- a simulated second deploy **reaches an already-installed client on its next
+  load**, fetching HTML from the network rather than cache
+- and offline afterwards serves the newer build, not the first one
 
 ### Why not native
 

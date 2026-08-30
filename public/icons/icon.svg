@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Car TCO">
+  <!--
+    The app's own marks, in the app's own palette: the paper-ledger ground
+    (#f6f5f1) it is named after, the accent blue (#235a9f) it uses for figures,
+    and a euro sign on a ruled line - the app turns a car into a monthly number,
+    so the number is the subject rather than the car.
+
+    One file, drawn at 512 and rendered down. Full-bleed with the mark inside
+    the middle 60 %, so a maskable icon can be cropped to a circle on Android
+    without losing anything.
+  -->
+  <rect width="512" height="512" fill="#f6f5f1"/>
+  <g stroke="#d8d5cc" stroke-width="6" stroke-linecap="round">
+    <line x1="96" y1="150" x2="416" y2="150"/>
+    <line x1="96" y1="362" x2="416" y2="362"/>
+  </g>
+  <text x="256" y="256" fill="#235a9f" font-family="Georgia, 'Times New Roman', serif"
+        font-size="252" font-weight="700" text-anchor="middle" dominant-baseline="central">€</text>
+  <rect x="96" y="404" width="200" height="18" rx="9" fill="#235a9f" opacity="0.28"/>
+  <rect x="96" y="404" width="118" height="18" rx="9" fill="#235a9f"/>
+</svg>
