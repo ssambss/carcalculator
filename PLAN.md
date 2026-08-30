@@ -497,8 +497,14 @@ strangers, or when there are more than about fifteen of them. Not at this scale.
 - [x] Onboarding written up in SETUP.md, including what to tell them about the
       token you are holding
 - [x] 22 new tests (179 total)
-- [ ] **Yours to do:** the Discord server, a channel per person, and the
-      ten-minute setup with each of them
+- [x] **Their channel can be in their own Discord server.** A webhook URL
+      carries its own channel, so posting needs no bot and no membership -
+      nobody has to join anything. Only reading reactions needs the bot present,
+      and a tenant who has not invited it is skipped for that alone rather than
+      failing the run.
+- [ ] **Yours to do:** a channel per person (in your server or theirs), the bot
+      invite link for anyone who wants reactions, and the ten-minute setup with
+      each of them
 
 Estimate was ~3–4 days.
 
@@ -512,6 +518,25 @@ so the secrets really are the whole configuration.
 Unpacked by our own ten lines rather than by one of the marketplace actions that
 offer this, because those would be handling other people's tokens.
 
+### Nobody has to join your server
+
+Asked for after the fact, and it turned out to be mostly free. Posting was
+already server-agnostic - a webhook URL identifies its channel wherever that
+channel lives - so a tenant can run this entirely in their own Discord.
+
+Reading reactions is the exception, because reading channel history is a bot
+operation and the bot has to be *in* that server. One OAuth invite link and one
+click from them covers it. Declining is a supported configuration rather than a
+broken one: the run notices, says so once, skips reactions for that person alone
+and carries on for everyone else. They still get every post, and add cars to the
+calculator by hand.
+
+| | Your server | Their own |
+|---|---|---|
+| Posting | works | works |
+| React → car in their calculator | works | needs the bot invited |
+| You can see | their channel | nothing, unless they invite the bot |
+
 ### Two bugs this turned up
 
 **Every tenant read the owner's state file.** `config.state.store` is global, and
@@ -524,6 +549,12 @@ enforced in code rather than left to configuration.
 **Filter ids are not unique across people.** Two of them can paste the same
 filter JSON. Anything spanning tenants within a run is keyed `tenant/filter`
 instead.
+
+**`DISCORD_CHANNEL_ID` was a global override.** Harmless with one user; with
+several it meant a single value set for the owner would have had every tenant
+scanning the owner's channel — reading the owner's reactions and adding those
+cars into each tenant's own calculator. The channel is now always read off the
+tenant's own webhook, one request per run, and the override is gone.
 
 ### The naming scheme
 
@@ -723,6 +754,11 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **Own-server support.** Tenants can use their own Discord
+  instead of joining the owner's; posting already worked that way, and reactions
+  now degrade to a per-tenant skip when the bot is not in their server. Found a
+  third cross-tenant leak on the way: `DISCORD_CHANNEL_ID` was a global override
+  that would have pointed every tenant at the owner's channel. 190 tests.
 - **2026-08-30** — **Phase 6 done.** Multi-tenant: a person is their two
   secrets, one crawl serves everyone, each keeps their own gist and record.
   Onboarding needs no commit (`toJSON(secrets)` unpacked by `env.js`). Two bugs

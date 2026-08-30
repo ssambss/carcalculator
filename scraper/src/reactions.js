@@ -35,11 +35,17 @@ async function discord(path, { botToken, label }) {
   if (response.status === 401) {
     throw new Error('Discord rejected the bot token. Check DISCORD_BOT_TOKEN.');
   }
-  if (response.status === 403) {
-    throw new Error(
-      `Bot lacks access for ${label}. It needs "View Channel" and ` +
-        '"Read Message History" on the channel.',
+  if (response.status === 403 || response.status === 404) {
+    // Not necessarily broken. A tenant running this in their own Discord server
+    // who has not invited the bot is a perfectly good setup - they get posts and
+    // simply add cars by hand. So this is flagged for the caller to skip rather
+    // than thrown as a failure that would take everyone else's run down with it.
+    const error = new Error(
+      `The bot cannot read ${label}. In your own server it needs inviting; ` +
+        'in one it is already in, it needs "View Channel" and "Read Message History".',
     );
+    error.reason = 'no-channel-access';
+    throw error;
   }
   if (response.status === 429) {
     const body = await response.json().catch(() => ({}));
@@ -51,12 +57,17 @@ async function discord(path, { botToken, label }) {
   return response.json();
 }
 
-/** Resolve the channel the webhook posts into, so it needn't be configured. */
-export async function resolveChannelId({
-  webhookUrl = config.discord.webhookUrl,
-  channelId = config.discord.channelId,
-} = {}) {
-  if (channelId) return channelId;
+/**
+ * Which channel a webhook posts into.
+ *
+ * Always read off the webhook, never from configuration. There used to be a
+ * `DISCORD_CHANNEL_ID` override to save this one request, and once the watcher
+ * ran for several people that became a hole: it was global, so a single value
+ * set for the owner would have had every tenant scanning the owner's channel and
+ * picking up the owner's reactions into their own calculator. One request per
+ * tenant per run is a very cheap way not to have that.
+ */
+export async function resolveChannelId({ webhookUrl = config.discord.webhookUrl } = {}) {
   const response = await fetch(webhookUrl);
   if (!response.ok) throw new Error(`Could not read the webhook: HTTP ${response.status}`);
   const body = await response.json();

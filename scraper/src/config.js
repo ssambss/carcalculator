@@ -37,8 +37,6 @@ export const config = {
     webhookUrl: process.env.DISCORD_WEBHOOK_URL ?? '',
     // Only needed for the reaction pickup below; posting works without it.
     botToken: process.env.DISCORD_BOT_TOKEN ?? '',
-    // Left empty, it is read off the webhook at runtime.
-    channelId: process.env.DISCORD_CHANNEL_ID ?? '',
     username: 'Nettiauto-vahti',
     // One car per message. Discord allows 10 embeds, but a reaction applies to
     // a whole message, so batching would make "react to add this one"

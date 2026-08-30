@@ -133,9 +133,10 @@ not two.
 
 ### Once per person, about ten minutes
 
-1. **A Discord channel for them**, in your server. Channel settings →
-   Integrations → Webhooks → New Webhook → Copy Webhook URL. Invite them to the
-   server; joining is all they have to do to start seeing listings.
+1. **A Discord channel.** Either in your server or in theirs — see
+   *Their server or yours* below. Channel settings → Integrations → Webhooks →
+   New Webhook → Copy Webhook URL. That URL identifies its channel wherever the
+   channel lives, so the watcher does not care which server it is.
 2. **A GitHub account**, if they have none. A signup form — worth doing together.
 3. **A gist token on their account** — [this prefilled page](https://github.com/settings/tokens/new?scopes=gist&description=Car%20TCO%20sync)
    creates a classic one with only the `gist` scope. Set it never to expire
@@ -160,6 +161,39 @@ The names group by person rather than by kind (`GIST_TOKEN_ALICE`,
 `WEBHOOK_ALICE`) because GitHub sorts that page alphabetically: everything of
 Alice's sits together, so adding or removing her means touching adjacent rows
 instead of hunting the list twice.
+
+### Their server or yours
+
+Both work, and it is entirely their choice.
+
+| | Your server | Their own server |
+|---|---|---|
+| What they do | accept an invite | make a channel and a webhook, send you the URL |
+| Posting | works | works — a webhook URL carries its own channel |
+| React → car in their calculator | works | needs your bot invited to their server |
+| They can see | whatever channels you give them | only their own |
+| You can see | their channel | nothing, unless they invite the bot |
+
+**Posting needs nothing special either way.** A webhook is self-contained: give
+the watcher the URL and posts arrive, in any server, with no bot and no
+membership.
+
+**Reactions are the only part that needs the bot present.** Reading a channel's
+history is a bot operation, so if their channel is in their server the bot has to
+be in it too. Send them an invite link — OAuth2 → URL Generator in your
+[Discord application](https://discord.com/developers/applications), scope `bot`,
+permissions *View Channels* + *Read Message History* — and they click it and pick
+their server. One click, and they need Manage Server there, which they have
+because it is theirs.
+
+If they would rather not, **nothing breaks**. The run notices the bot cannot read
+their channel, says so once, skips reactions for them alone and carries on for
+everybody else. They still get every post; they add cars to the calculator by
+hand instead of by reacting.
+
+Worth saying plainly when you send that invite: **a bot in their server can read
+the channels they grant it.** It is the same trust shape as holding their gist
+token — small, specific, and better stated than assumed.
 
 ### Checking it worked
 

@@ -62,8 +62,18 @@ no commit:
 Grouped by person rather than by kind because GitHub sorts the secrets page
 alphabetically - everything of one person's sits together. You stay on the
 original `DISCORD_WEBHOOK_URL` and `GIST_TOKEN`, so a single-person setup needs
-no `TENANT_` secrets at all and behaves exactly as before. `DISCORD_BOT_TOKEN`
-is shared: one bot reads every channel in the server.
+no `TENANT_` secrets at all and behaves exactly as before.
+
+**Their channel can be in their own Discord server.** A webhook URL carries its
+own channel, so posting works anywhere with no bot and no membership - nobody has
+to join anything. The one part that needs the bot present is reading reactions,
+because reading channel history is a bot operation: if the channel is in their
+server, the bot has to be invited there. `DISCORD_BOT_TOKEN` is shared, so one
+bot covers every server it has been added to.
+
+A tenant who has not invited it is not broken. The run notices, says so once,
+skips reactions for them alone and carries on for everyone else - they still get
+every post and add cars to the calculator by hand.
 
 The step-by-step is [../SETUP.md](../SETUP.md). Two rules worth knowing here:
 
@@ -282,7 +292,7 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (179 cases, no network)
+npm test                     # unit tests (190 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
@@ -312,7 +322,7 @@ variables always win over the file, so CI secrets override it.
 | `filters.gistFilename` | `'car-tco-filters.json'` | Where the app syncs filters |
 | `fetch.delayMs` | `1500` | Gap between requests |
 | `fetch.maxSearchPages` | `40` | Per search, not per run |
-| `discord.maxPostsPerRun` | `20` | Anti-spam cap, across all filters |
+| `discord.maxPostsPerRun` | `20` | Anti-spam cap, per person per run |
 | `state.store` | `'file'` | `'gist'` to keep the record per user instead of in the repo |
 | `state.gistFilename` | `'car-tco-seen.json'` | Where the gist backend keeps it |
 | `state.forgetAfterDays` | `90` | When a vanished listing or a dormant filter is forgotten |
@@ -504,5 +514,6 @@ src/env.js              reads .env
 test/                   unit tests, no network
 test/sources.test.js    conformance: what every adapter has to get right
 test/tenants.test.js    who it runs for, and the half-configured cases
+test/reactions.test.js  reading channels across several servers
 data/seen.json          the record (commit this)
 ```

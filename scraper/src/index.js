@@ -325,7 +325,25 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
     );
   }
 
-  const { reacted, scanned } = await fetchReactedListingIds({ botToken, webhookUrl });
+  // The bot is shared, but the servers need not be: a tenant can run this in
+  // their own Discord rather than joining yours, and then the bot is only there
+  // if they invited it. Not having done so is a legitimate setup - they get
+  // posts and add cars by hand - so it is a skip for them alone rather than a
+  // failure that would take everyone else's run down with it.
+  let reacted;
+  let scanned;
+  try {
+    ({ reacted, scanned } = await fetchReactedListingIds({ botToken, webhookUrl }));
+  } catch (error) {
+    if (error.reason !== 'no-channel-access') throw error;
+    console.log(
+      `  ${tenant.label}: the bot cannot read their channel, so reactions are not picked ` +
+        'up for them. If that channel is in their own server, invite the bot there ' +
+        '(see ../SETUP.md); otherwise check its View Channel and Read Message History ' +
+        'permissions. Everything else for them is unaffected.',
+    );
+    return;
+  }
   console.log(`Scanned ${scanned} Discord message(s); ${reacted.size} reacted listing(s).`);
   if (reacted.size === 0) return;
 
