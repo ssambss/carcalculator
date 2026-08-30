@@ -51,13 +51,22 @@ jobs:
       - name: Check for new listings
         working-directory: scraper
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # GIST_TOKEN does double duty: it is how the run reads the filters
-          # made in the app, and half of the reaction pickup (react to a post
-          # -> car lands in the calculator). Without it the run falls back to
-          # scraper/filters.json and skips the pickup.
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          # The whole secret set, in one variable, parsed by src/tenants.js.
+          #
+          # Actions only puts a secret in the environment if the workflow names
+          # it, so naming them individually would mean editing this file - and
+          # committing - every time somebody is added. This way onboarding is
+          # two secrets in the settings UI and nothing else:
+          #
+          #   TENANT_<NAME>_GIST_TOKEN   their gist token
+          #   TENANT_<NAME>_WEBHOOK      the webhook for their channel
+          #   TENANT_<NAME>_LABEL        optional, for names a secret cannot spell
+          #
+          # Your own stay as DISCORD_WEBHOOK_URL and GIST_TOKEN. GIST_TOKEN does
+          # double duty: reading the filters made in the app, and half of the
+          # reaction pickup. DISCORD_BOT_TOKEN is shared - one bot reads every
+          # channel in the server.
+          SECRETS_JSON: ${{ toJSON(secrets) }}
         run: |
           node src/index.js \
             --notify-errors \

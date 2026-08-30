@@ -16,14 +16,16 @@ import { access } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { loadEnvFile } from './env.js';
+import { expandSecretsJson, loadEnvFile } from './env.js';
 
+expandSecretsJson();
 await loadEnvFile();
 
 const { default: config } = await import('./config.js');
 const { describeFilter, loadFilters } = await import('./filters.js');
 const state = await import('./state.js');
 const { storeFor } = await import('./storage/index.js');
+const { describeTenant, loadTenants } = await import('./tenants.js');
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MIN_NODE = 20;
@@ -308,12 +310,67 @@ async function checkState() {
   }
 }
 
+/**
+ * Everyone this watcher runs for, and whether each of them is actually set up.
+ *
+ * The most useful thing here when onboarding somebody: their token and their
+ * webhook are probed separately, because they fail separately and the messages
+ * are quite different.
+ */
+async function checkTenants() {
+  const { tenants, problems } = loadTenants({ log: () => {} });
+  const lines = [];
+
+  for (const problem of problems) {
+    lines.push({ status: 'bad', name: 'Tenant', detail: problem });
+  }
+
+  const others = tenants.filter((tenant) => !tenant.ownerish);
+  if (others.length === 0) {
+    lines.push({
+      status: 'off',
+      name: 'Other people',
+      detail: 'Nobody else configured - this watcher runs for you alone.',
+      unlocks: 'TENANT_<NAME>_GIST_TOKEN + TENANT_<NAME>_WEBHOOK adds someone. See ../SETUP.md.',
+    });
+    return lines;
+  }
+
+  for (const tenant of others) {
+    const found = [];
+    const failed = [];
+
+    const hook = await fetch(tenant.webhookUrl).catch(() => null);
+    if (hook?.ok) {
+      const body = await hook.json().catch(() => ({}));
+      found.push(`channel ${body.channel_id ?? '?'}`);
+    } else {
+      failed.push(`webhook (HTTP ${hook?.status ?? 'unreachable'})`);
+    }
+
+    const gists = await github('/gists?per_page=1', tenant.gistToken).catch(() => null);
+    if (gists?.ok) found.push('gist token valid');
+    else failed.push(`gist token (HTTP ${gists?.status ?? 'unreachable'})`);
+
+    lines.push({
+      status: failed.length ? 'bad' : 'ok',
+      name: `Tenant: ${tenant.label}`,
+      detail: failed.length
+        ? `${failed.join(', ')} - check TENANT_${tenant.id.toUpperCase()}_* secrets.`
+        : `${describeTenant(tenant)}; ${found.join(', ')}.`,
+    });
+  }
+
+  return lines;
+}
+
 const checks = [
   checkNode(),
   await checkEnvFile(),
   await checkWebhook(),
   ...(await checkGistToken()),
   await checkBotToken(),
+  ...(await checkTenants()),
   await checkFilters(),
   await checkState(),
 ];

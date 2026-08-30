@@ -141,11 +141,11 @@ export function toCarListing(listing, { now = new Date() } = {}) {
  * session small. `savedAt` is stamped with the current time so every device
  * treats this as the newest edit and pulls it in.
  */
-export async function addCarsToTco(listings, { now = new Date() } = {}) {
+export async function addCarsToTco(listings, { now = new Date(), token } = {}) {
   if (listings.length === 0) return { added: [], skipped: [] };
 
-  const gistId = await findTcoGist();
-  const envelope = await readTcoData(gistId);
+  const gistId = await findTcoGist(token);
+  const envelope = await readTcoData(gistId, token);
   const existingIds = new Set(envelope.data.cars.map((car) => car.id));
 
   const added = [];
@@ -164,7 +164,7 @@ export async function addCarsToTco(listings, { now = new Date() } = {}) {
   if (added.length > 0) {
     envelope.app = envelope.app ?? 'carcalculator';
     envelope.savedAt = now.toISOString();
-    await writeTcoData(gistId, envelope);
+    await writeTcoData(gistId, envelope, token);
   }
 
   return { added, skipped };

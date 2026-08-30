@@ -38,6 +38,48 @@ Two things a source decides that are worth knowing about:
   its posts do nothing. That is deliberate - it lets a new source ship without a
   second calculator having to exist first.
 
+## Several people, one watcher
+
+The watcher runs for any number of people. Each keeps their own data in their
+own gist on their own GitHub account - filters, calculator, and the record of
+what has been posted to them - and posts land in a channel of their own. Nothing
+of one person's is visible to another.
+
+What they share is the crawl: filters group by source and search regardless of
+who owns them, so two people watching the same model cost one fetch, not two,
+and a listing page that both need read costs one request. A tenth person is
+nearly free.
+
+A person is declared entirely by their secrets, so onboarding is two of them and
+no commit:
+
+| Secret | |
+|---|---|
+| `TENANT_ALICE_GIST_TOKEN` | their gist token (classic, `gist` scope only) |
+| `TENANT_ALICE_WEBHOOK` | the webhook for their channel |
+| `TENANT_ALICE_LABEL` | optional display name, for names a secret cannot spell |
+
+Grouped by person rather than by kind because GitHub sorts the secrets page
+alphabetically - everything of one person's sits together. You stay on the
+original `DISCORD_WEBHOOK_URL` and `GIST_TOKEN`, so a single-person setup needs
+no `TENANT_` secrets at all and behaves exactly as before. `DISCORD_BOT_TOKEN`
+is shared: one bot reads every channel in the server.
+
+The step-by-step is [../SETUP.md](../SETUP.md). Two rules worth knowing here:
+
+- **Half a tenant fails the run.** A token with no webhook, or the reverse, is a
+  typo or an unfinished setup; skipping it quietly would mean somebody stops
+  getting posts and nobody finds out until they ask.
+- **Only your own record may live in the committed file.** Everyone else's is
+  always in their gist. A record of what somebody has been shown and what they
+  are shopping for has no business in a public repository, so the code refuses
+  rather than leaving it to configuration.
+
+```sh
+node src/index.js --for=alice --dry-run   # one person, posting nothing
+npm run doctor                            # everyone found, each one probed
+```
+
 ## Where the filters come from
 
 Make them in the calculator (funnel button in the header). They sync to
@@ -240,10 +282,11 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (157 cases, no network)
+npm test                     # unit tests (179 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
+node src/index.js --for=alice        # run one person, by tenant id or name
 node src/index.js --filters=file     # ignore the gist, use filters.json
 node src/index.js --migrate-state=gist   # move the record into your gist
 node src/index.js --help
@@ -446,6 +489,7 @@ src/sources/index.js    the source registry
 src/sources/nettiauto.js  everything nettiauto-specific
 src/sinks/index.js      where a reacted listing goes
 src/sinks/car-tco.js    ...into the calculator, as a car
+src/tenants.js          who the watcher runs for, and how they stay separate
 src/state.js            what has been seen and announced, per filter
 src/storage/index.js    where that record lives: a file, or your gist
 src/discord.js          webhook payloads, labelled by the source
@@ -459,5 +503,6 @@ src/doctor.js           the setup report (npm run doctor)
 src/env.js              reads .env
 test/                   unit tests, no network
 test/sources.test.js    conformance: what every adapter has to get right
+test/tenants.test.js    who it runs for, and the half-configured cases
 data/seen.json          the record (commit this)
 ```

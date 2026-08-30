@@ -123,6 +123,83 @@ sale* in the editor's Advanced section.
 
 ---
 
+## 6. Adding someone else
+
+The watcher runs for several people at once. Each keeps their own data in their
+own gist on their own GitHub account — their filters, their calculator, their
+record of what has been posted to them. **You never see any of it**, and the only
+thing shared is the crawl: two people watching the same model cost one fetch,
+not two.
+
+### Once per person, about ten minutes
+
+1. **A Discord channel for them**, in your server. Channel settings →
+   Integrations → Webhooks → New Webhook → Copy Webhook URL. Invite them to the
+   server; joining is all they have to do to start seeing listings.
+2. **A GitHub account**, if they have none. A signup form — worth doing together.
+3. **A gist token on their account** — [this prefilled page](https://github.com/settings/tokens/new?scopes=gist&description=Car%20TCO%20sync)
+   creates a classic one with only the `gist` scope. Set it never to expire
+   unless you enjoy renewal reminders.
+4. **Paste it into their browser**: open the app on their phone or laptop, cloud
+   button in the header, paste. Their calculator now syncs to their own gist.
+   Repeat per device.
+5. **Two secrets in your repo**, under Settings → Secrets and variables →
+   Actions, named for them:
+
+| Secret | Value |
+|---|---|
+| `TENANT_ALICE_GIST_TOKEN` | the token from step 3 |
+| `TENANT_ALICE_WEBHOOK` | the webhook from step 1 |
+| `TENANT_ALICE_LABEL` | *optional* — a display name a secret cannot spell, e.g. `Alice Mäkinen` |
+
+That is all of it. **No YAML to edit and nothing to commit** — the workflow hands
+the whole secret set to the watcher in one variable, so the secrets *are* the
+configuration. Removing someone is deleting their two secrets.
+
+The names group by person rather than by kind (`GIST_TOKEN_ALICE`,
+`WEBHOOK_ALICE`) because GitHub sorts that page alphabetically: everything of
+Alice's sits together, so adding or removing her means touching adjacent rows
+instead of hunting the list twice.
+
+### Checking it worked
+
+```sh
+cd scraper
+npm run doctor                             # lists everyone found, probes each
+node src/index.js --for=alice --dry-run    # just her, posting nothing
+```
+
+`--for=<who>` matches a tenant id or name. It is the safe way to try somebody
+new: a typo matches nobody rather than everybody, so it cannot accidentally post
+to the whole family.
+
+### What to tell them
+
+- **You hold their gist token.** It reaches gists and nothing else — not their
+  code, not their repositories — but it does reach any *other* gists on their
+  account. Say so rather than let them assume otherwise.
+- **Their data stays theirs.** It lives in their gist. The watcher reads their
+  filters and writes their cars there, and copies it nowhere else.
+- **Revoking is one click**, at [github.com/settings/tokens](https://github.com/settings/tokens).
+  The watcher then fails loudly for them and carries on for everyone else.
+
+### Their record never touches this repo
+
+Only your own state can use the committed `data/seen.json`. Everyone else's lives
+in their own gist, always — a record of what somebody has been shown and what
+they are shopping for has no business in a public repository, so the code refuses
+to put it there rather than leaving it to configuration.
+
+### Before moving your own state into a gist
+
+`--migrate-state=gist` stops the workflow committing `data/seen.json`, and those
+commits are what keep the repository active: GitHub disables a public repo's
+scheduled workflows after **60 days without commits**. Other people's records are
+in their gists either way, so this only concerns yours — leave it on the file
+backend unless something else is keeping the repo busy.
+
+---
+
 ## Rough edges when running a fork
 
 Honest list, being worked through in [PLAN.md](PLAN.md):
@@ -132,10 +209,9 @@ Honest list, being worked through in [PLAN.md](PLAN.md):
   upstream changes conflicts on it every time. Phase 3 of the plan moves state
   into your gist, which removes this entirely. Until then: resolve with
   `git checkout --ours scraper/data/seen.json` when pulling.
-- **One webhook per fork.** Everyone reading a channel sees every filter's
-  hits, and a reaction there adds the car to whichever gist that fork's
-  `GIST_TOKEN` belongs to. Fine for one household; not a way to share one
-  deployment between people who want separate data.
+- ~~One webhook per fork.~~ **Fixed** — see *Adding someone else* above. Each
+  person gets their own channel, their own gist and their own record, and a
+  reaction in their channel adds the car to their calculator, not yours.
 - **The watcher only reads nettiauto.** Making the source a pluggable module —
   so it can follow apartments or rentals — is Phases 1–5 of the plan.
 

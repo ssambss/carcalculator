@@ -25,11 +25,15 @@ import { findTcoGist, readGistFile, writeGistFile } from '../gist.js';
  */
 const WARN_BYTES = 900_000;
 
-export function gistStore({ filename = config.state.gistFilename, log = console.log } = {}) {
+export function gistStore({
+  filename = config.state.gistFilename,
+  log = console.log,
+  token = config.tco.gistToken,
+} = {}) {
   let gistId = null;
 
   async function id() {
-    gistId ??= await findTcoGist();
+    gistId ??= await findTcoGist(token);
     return gistId;
   }
 
@@ -46,7 +50,7 @@ export function gistStore({ filename = config.state.gistFilename, log = console.
     pretty: false,
 
     async read() {
-      const parsed = await readGistFile(await id(), filename);
+      const parsed = await readGistFile(await id(), filename, token);
       // readGistFile parses; the state layer wants text either way, so this
       // hands back a canonical serialization rather than the original bytes.
       return parsed === null ? null : JSON.stringify(parsed);
@@ -60,7 +64,7 @@ export function gistStore({ filename = config.state.gistFilename, log = console.
             'point to move to a real store rather than a larger blob (see PLAN.md phase 6).',
         );
       }
-      await writeGistFile(await id(), filename, text);
+      await writeGistFile(await id(), filename, text, token);
     },
   };
 }

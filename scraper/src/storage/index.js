@@ -36,7 +36,7 @@ export const BACKENDS = ['file', 'gist'];
 export function storeFor(name = config.state.store, options = {}) {
   if (name === 'file') return fileStore(options);
   if (name === 'gist') {
-    if (!config.tco.gistToken) {
+    if (!(options.token ?? config.tco.gistToken)) {
       throw new Error(
         'State is configured to live in the gist, but GIST_TOKEN is not set. ' +
           'Set it, or set state.store = \'file\' in src/config.js.',

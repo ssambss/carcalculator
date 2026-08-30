@@ -11,9 +11,10 @@ apartments, rentals or anything else with listing pages.
 > existing; and the record of what has been seen sits behind a storage backend
 > that a hosted store slots into. 157 scraper tests pass; app build and lint
 > clean.
-> **Next: Phase 6**, which shrank on 2026-08-30 from a hosted service to one
-> watcher over several people's own gists - the audience is family and friends,
-> so it needs no server, no database and no bill.
+> **Next: Phase 4/5** (the oikotie adapter, so it can follow flats) or **6b**
+> (the PWA). Phase 6 is done: the watcher runs for any number of people, each on
+> their own gist, sharing one crawl - no server, no database, no bill. What is
+> left there is yours: the Discord server and ten minutes with each person.
 >
 > **Decided 2026-08-30:** this gets hosted (Phase 6, Tier 2), because
 > fork-per-user does not reach a non-programmer. Sharing now outranks the
@@ -31,7 +32,7 @@ apartments, rentals or anything else with listing pages.
 | [3 · State adapter](#phase-3--state-behind-a-storage-adapter) | State is per-user, destination not baked in | ✅ done |
 | [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | 🔨 started in Phase 2 |
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
-| [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ⬜ next |
+| [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ✅ done |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; push | ⬜ recommended over native |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
@@ -439,7 +440,7 @@ Estimate: ~2–4 days.
 
 ---
 
-## Phase 6 · One watcher, several people
+## Phase 6 · One watcher, several people ✅
 
 **Revised 2026-08-30, after the audience got specific: family and friends,
 supporting their own car purchases. Five to fifteen people, all of them known.**
@@ -478,16 +479,66 @@ strangers, or when there are more than about fifteen of them. Not at this scale.
 
 ### Work
 
-- [ ] A tenant list: per person, a gist-token secret and a Discord channel
-- [ ] Widen `groupBySearch` across tenants, so one crawl still serves everyone
-- [ ] `maxPostsPerRun` becomes per tenant — one person's broad filter must not
-      starve everyone else's run
-- [ ] `announce` takes the tenant's channel; the sink takes the tenant's gist
-- [ ] One state store per tenant (Phase 3 already gives this)
-- [ ] A Discord server with a channel per person, and an invite link
-- [ ] Onboarding notes for the ten-minute setup
+- [x] `src/tenants.js` — a person is declared entirely by their secrets, so
+      onboarding is two of them and offboarding is deleting them
+- [x] Tokens threaded explicitly through `gist.js`, the storage backend, the
+      filter loader and the sink. A module-level token would have quietly written
+      one person's cars into another's calculator.
+- [x] One crawl across every tenant: `crawlFor` groups filters by source and
+      search regardless of owner, so two people watching the same model cost one
+      fetch and a shared listing page costs one request
+- [x] `maxPostsPerRun` applied per tenant
+- [x] `announce` takes the tenant's webhook; the sink and the reaction pickup
+      take the tenant's gist. The bot token stays shared — one bot reads every
+      channel in the server.
+- [x] One state store per tenant
+- [x] `--for=<who>` runs a single person, for checking a new setup without
+      posting to everyone. A typo matches nobody rather than everybody.
+- [x] Onboarding written up in SETUP.md, including what to tell them about the
+      token you are holding
+- [x] 22 new tests (179 total)
+- [ ] **Yours to do:** the Discord server, a channel per person, and the
+      ten-minute setup with each of them
 
-Estimate: **~3–4 days.** Phases 2 and 3 did the hard parts.
+Estimate was ~3–4 days.
+
+### Onboarding needs no commit
+
+Actions only puts a secret in the environment if the workflow names it, which
+would have meant editing YAML — and committing — every time somebody joined. The
+workflow passes `SECRETS_JSON: ${{ toJSON(secrets) }}` and `env.js` unpacks it,
+so the secrets really are the whole configuration.
+
+Unpacked by our own ten lines rather than by one of the marketplace actions that
+offer this, because those would be handling other people's tokens.
+
+### Two bugs this turned up
+
+**Every tenant read the owner's state file.** `config.state.store` is global, and
+the file backend has one path — so on the first multi-tenant run all three
+tenants loaded and would have written `data/seen.json`. Worse than a collision:
+it would have committed other people's browsing history into a public repo. Only
+the owner may use the file backend now; everyone else is always on their gist,
+enforced in code rather than left to configuration.
+
+**Filter ids are not unique across people.** Two of them can paste the same
+filter JSON. Anything spanning tenants within a run is keyed `tenant/filter`
+instead.
+
+### The naming scheme
+
+```
+TENANT_ALICE_GIST_TOKEN     her gist token
+TENANT_ALICE_WEBHOOK        the webhook for her channel
+TENANT_ALICE_LABEL          optional, for names a secret cannot spell
+```
+
+Grouped by person rather than by kind (`GIST_TOKEN_ALICE`, `WEBHOOK_ALICE`)
+because GitHub sorts the secrets page alphabetically: everything of one person's
+sits together, so adding or removing them means touching adjacent rows instead of
+reading the whole list twice. You stay on `DISCORD_WEBHOOK_URL` and `GIST_TOKEN`,
+so a single-person setup needs no `TENANT_` secrets and behaves exactly as before
+— verified.
 
 ### What to be honest with them about
 
@@ -672,6 +723,13 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **Phase 6 done.** Multi-tenant: a person is their two
+  secrets, one crawl serves everyone, each keeps their own gist and record.
+  Onboarding needs no commit (`toJSON(secrets)` unpacked by `env.js`). Two bugs
+  found: every tenant was reading the owner's state file — which would have
+  committed other people's browsing history into a public repo — and filter ids
+  are not unique across people. 179 tests. Owner-only behaviour verified
+  unchanged.
 - **2026-08-30** — **Phase 6 rescoped.** The audience is family and friends
   supporting their own car purchases — five to fifteen known people — so the
   hosted service is over-engineered. One watcher over several people's own gists

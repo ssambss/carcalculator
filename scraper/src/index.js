@@ -20,8 +20,10 @@
 // postExisting: false, since seeing the current market is the point of adding
 // one.
 
-import { loadEnvFile } from './env.js';
+import { expandSecretsJson, loadEnvFile } from './env.js';
 
+// Both before config.js loads, since it reads named variables at import time.
+expandSecretsJson();
 await loadEnvFile();
 
 const { default: config } = await import('./config.js');
@@ -34,6 +36,7 @@ const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
 const { BACKENDS, storeFor } = await import('./storage/index.js');
+const { describeTenant, loadTenants, postCapFor, selectTenants } = await import('./tenants.js');
 
 const FLAGS = ['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'];
 const FILTER_SOURCES = ['auto', 'gist', 'file'];
@@ -49,7 +52,7 @@ function parseArgs(argv) {
   const unknown = [
     ...[...flags].filter((flag) => !FLAGS.includes(flag)),
     ...[...options.keys()].filter(
-      (option) => !['--filters', '--only', '--migrate-state'].includes(option),
+      (option) => !['--filters', '--only', '--for', '--migrate-state'].includes(option),
     ),
   ];
 
@@ -72,6 +75,7 @@ function parseArgs(argv) {
     help: flags.has('--help') || flags.has('-h'),
     filterSource: source,
     only: options.get('--only') ?? null,
+    onlyTenant: options.get('--for') ?? null,
     migrateTo,
     unknown,
   };
@@ -89,6 +93,8 @@ Usage: node src/index.js [options]
   --notify-errors  Post a message to Discord if the run fails.
   --filters=SRC    Where to read filters from: auto (default), gist or file.
   --only=NAME      Run just the filters whose name or id contains NAME.
+  --for=WHO        Run just one person, by tenant id or name. Useful when
+                   onboarding somebody, to check their setup alone.
   --migrate-state=WHERE
                    Copy the record of what has been seen to another backend
                    (file, gist) and exit. Nothing else runs. See src/storage/.
@@ -124,6 +130,22 @@ first configured run still baselines the market properly.
 
 See README.md and ../SETUP.md.`;
 
+/**
+ * A filter's identity within one run.
+ *
+ * Filter ids are unique within a person's own gist, not across people - two of
+ * them can paste the same filter JSON and end up sharing an id. Everything that
+ * spans tenants in a single run is keyed by this instead.
+ */
+function entryKey(filter) {
+  return `${filter.tenant?.id ?? 'owner'}/${filter.id}`;
+}
+
+/** The record a filter's verdicts belong in: its own owner's. */
+function storeOf(filter) {
+  return filter.tenant.store;
+}
+
 function formatListing(listing) {
   const price = listing.price === null ? '?' : listing.price.toLocaleString('fi-FI');
   const mileage = listing.mileage === null ? '?' : listing.mileage.toLocaleString('fi-FI');
@@ -137,10 +159,14 @@ function formatListing(listing) {
  * the undecided ones cost a detail fetch. Verdicts already in the record are
  * reused, so a steady-state run fetches very few pages - and because the
  * detail page is the same for every filter, one fetch settles all of them.
+ *
+ * `filters` may belong to different people. Each one's verdict is recorded in
+ * its own tenant's record, but the *fetching* is shared: if two people both
+ * want the packages read off the same advert, that page is read once.
  */
-async function collectMatches(source, search, listings, filters, store) {
-  const matches = new Map(filters.map((filter) => [filter.id, []]));
-  const rejected = new Map(filters.map((filter) => [filter.id, []]));
+async function collectMatches(source, search, listings, filters) {
+  const matches = new Map(filters.map((filter) => [entryKey(filter), []]));
+  const rejected = new Map(filters.map((filter) => [entryKey(filter), []]));
   let detailFetches = 0;
   let reusedVerdicts = 0;
 
@@ -149,6 +175,7 @@ async function collectMatches(source, search, listings, filters, store) {
     let wantsDetail = false;
 
     for (const filter of filters) {
+      const store = storeOf(filter);
       let verdict = evaluate(listing, null, filter);
 
       // A cached verdict can stand in for a detail fetch when nothing about
@@ -178,7 +205,7 @@ async function collectMatches(source, search, listings, filters, store) {
         wantsDetail = true;
       }
 
-      verdicts.set(filter.id, verdict);
+      verdicts.set(entryKey(filter), verdict);
     }
 
     let detail = null;
@@ -193,7 +220,7 @@ async function collectMatches(source, search, listings, filters, store) {
       if (detail) {
         detailChecked = true;
         for (const filter of filters) {
-          if (!verdicts.get(filter.id).needsDetail) continue;
+          if (!verdicts.get(entryKey(filter)).needsDetail) continue;
           let verdict = evaluate(listing, detail, filter);
           if (detail.sold) {
             verdict = {
@@ -202,16 +229,16 @@ async function collectMatches(source, search, listings, filters, store) {
               reasons: [...verdict.reasons, 'no longer for sale'],
             };
           }
-          verdicts.set(filter.id, verdict);
+          verdicts.set(entryKey(filter), verdict);
         }
       }
     }
 
     for (const filter of filters) {
-      const verdict = verdicts.get(filter.id);
+      const verdict = verdicts.get(entryKey(filter));
       const bucket = verdict.matched ? matches : rejected;
-      bucket.get(filter.id).push({ listing, verdict, filter });
-      state.record(store, listing, filter.id, verdict, { detailChecked });
+      bucket.get(entryKey(filter)).push({ listing, verdict, filter });
+      state.record(storeOf(filter), listing, filter.id, verdict, { detailChecked });
     }
   }
 
@@ -252,9 +279,13 @@ function listingFromRecord(id, entry) {
  * (see state.needsTcoAdd for how that interacts with the app's last-write-wins
  * sync), missing ones get written.
  */
-async function pickUpReactions(listings, store, { dryRun, sources }) {
-  const { botToken, webhookUrl } = config.discord;
-  const gistToken = config.tco.gistToken;
+async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
+  // The bot token is shared: one bot reads every channel in the server. The
+  // gist token is not - a reacted listing goes into the calculator of whoever
+  // reacted in *their* channel, so it has to be theirs.
+  const { botToken } = config.discord;
+  const webhookUrl = tenant.webhookUrl;
+  const gistToken = tenant.gistToken;
 
   // A source that declares no sink has nowhere to send a reacted listing, and
   // that is a legitimate answer rather than a gap: a filter watching flats has
@@ -276,15 +307,20 @@ async function pickUpReactions(listings, store, { dryRun, sources }) {
   // a typo in a secret name, and that deserves a loud failure.
   if (!botToken && !gistToken) {
     console.log(
-      'Reaction pickup is on but DISCORD_BOT_TOKEN and GIST_TOKEN are not set - skipping. ' +
-        'Add both secrets to enable it (see README.md).',
+      `Reaction pickup is on but ${tenant.label} has no bot token or gist token - ` +
+        'skipping. Both are needed (see README.md).',
     );
     return;
   }
   if (!botToken || !gistToken) {
-    const missing = !botToken ? 'DISCORD_BOT_TOKEN' : 'GIST_TOKEN';
+    // Named as the secret actually is, so it can be found and fixed.
+    const theirToken = tenant.ownerish
+      ? 'GIST_TOKEN'
+      : `TENANT_${tenant.id.toUpperCase()}_GIST_TOKEN`;
+    const missing = !botToken ? 'DISCORD_BOT_TOKEN' : theirToken;
     throw new Error(
-      `Reaction pickup is half-configured: ${missing} is not set while the other token is. ` +
+      `Reaction pickup is half-configured for ${tenant.label}: ${missing} is not set while ` +
+        'the other token is. ' +
         'Add it, or set tco.pickUpReactions = false in src/config.js.',
     );
   }
@@ -322,7 +358,7 @@ async function pickUpReactions(listings, store, { dryRun, sources }) {
       continue;
     }
 
-    const { added, skipped } = await sink.add(batch);
+    const { added, skipped } = await sink.add(batch, { token: gistToken });
     const keyById = new Map(batch.map((listing) => [listing.id, state.keyFor(listing)]));
     for (const id of added) state.recordTcoAdd(store, keyById.get(id));
     for (const id of skipped) {
@@ -390,93 +426,69 @@ async function migrateState(target) {
   return 0;
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
-  if (args.help) {
-    console.log(HELP);
-    return 0;
-  }
-  if (args.unknown.length) {
-    console.error(`Unknown option(s): ${args.unknown.join(', ')}\n`);
-    console.error(HELP);
-    return 2;
-  }
-  // Moving the record is all this run does; crawling on top of it would write
-  // to the old backend and immediately make the copy stale.
-  if (args.migrateTo) return migrateState(args.migrateTo);
+/**
+ * Load one person's filters and their record.
+ *
+ * Everything here is read with *their* token, from *their* gist: their filters,
+ * their state, and later their calculator. Nothing of one tenant's is visible to
+ * another, which is the whole point of the arrangement - the only thing shared
+ * is the crawl.
+ */
+async function contextFor(tenant, args) {
+  const say = (line) => console.log(`  ${line}`);
+  const { filters: all, source } = await loadFilters({
+    source: args.filterSource,
+    gistToken: tenant.gistToken,
+    log: say,
+  });
 
-  const { filters: allFilters, source } = await loadFilters({ source: args.filterSource });
   const wanted = args.only
-    ? allFilters.filter(
+    ? all.filter(
         (filter) =>
-          filter.id === args.only ||
-          filter.name.toLowerCase().includes(args.only.toLowerCase()),
+          filter.id === args.only || filter.name.toLowerCase().includes(args.only.toLowerCase()),
       )
-    : allFilters;
+    : all;
   const filters = wanted.filter((filter) => filter.enabled);
 
-  const disabled = wanted.length - filters.length;
-  console.log(
-    `${allFilters.length} filter(s) from the ${source}` +
-      (args.only ? `, ${wanted.length} matching --only=${args.only}` : '') +
-      (disabled ? `, ${disabled} disabled` : '') +
-      ':',
-  );
-  for (const filter of filters) console.log(`  ${filter.name}: ${describeFilter(filter)}`);
-  if (filters.length === 0) {
-    console.log(NOTHING_TO_WATCH);
-    return 0;
-  }
-
-  const store = args.list ? { ...(await state.loadState()) } : await state.loadState();
-  const firstRun = store.isNew;
-
-  // Nothing to post to? Stop here rather than crawling for two minutes to
-  // deliver nowhere - but which kind of "nothing" this is decides whether that
-  // is a quiet exit or a loud failure. See preflight.js for the rule.
+  // Where their record lives.
   //
-  // Stopping without seeding is deliberate: state written now would baseline
-  // the market silently, so the first configured run would report nothing. Left
-  // alone, that run seeds properly instead.
-  const readiness = postingReadiness({
-    webhookUrl: config.discord.webhookUrl,
-    isNew: store.isNew,
-    runs: store.runs,
-    needsPosting: needsPosting(args),
-  });
-  if (readiness === 'regressed') {
-    throw new Error(
-      'DISCORD_WEBHOOK_URL is not set, but this watcher has run ' +
-        `${store.runs} time(s) before - so it used to have one. Restore the secret ` +
-        'rather than letting the channel go quiet. To run without posting anyway, ' +
-        'use --dry-run or --list.',
-    );
-  }
-  if (readiness === 'unconfigured') {
-    console.log(`\n${NOT_CONFIGURED}`);
-    return 0;
-  }
-  if (firstRun && !args.list) {
-    console.log('\nNo state file yet - this run records what is on sale and posts nothing.');
-  }
-  if (store.migrated) {
-    console.log(
-      `\nRecord upgraded from version ${store.migratedFrom}. Everything already posted ` +
-        'stays posted.' +
-        (store.migratedFrom === 1
-          ? ' Verdicts are re-derived, so this run reads a few more listing pages than usual.'
-          : ' Listing keys now name their source.'),
-    );
-  }
+  // Only the owner may use the file backend, and only because it is *their*
+  // repo the file is committed into. Someone else's record must never go there:
+  // it is a list of what they have been shown and what they are shopping for,
+  // and this repo is public. So everyone else keeps theirs in their own gist,
+  // which they have by definition - a tenant without a token is not a tenant.
+  const where = tenant.ownerish ? config.state.store : 'gist';
+  // A --list run must leave no trace, so it works on a copy.
+  const backing = storeFor(where, { token: tenant.gistToken, log: say });
+  const loaded = await state.loadState(backing);
+  const store = args.list ? { ...loaded } : loaded;
 
+  tenant.store = store;
+  for (const filter of filters) filter.tenant = tenant;
+
+  return { tenant, filters, store, source, found: all.length, wanted: wanted.length };
+}
+
+/**
+ * Crawl every distinct search once, whoever asked for it.
+ *
+ * This is what makes a tenth person nearly free: two people watching the same
+ * model share one crawl, and if both need the packages read off an advert, that
+ * listing page is read once. Filters group by source and search regardless of
+ * who owns them.
+ */
+async function crawlFor(contexts) {
+  const filters = contexts.flatMap((context) => context.filters);
   const groups = groupBySearch(filters);
   const everyListing = new Map();
-  const perFilter = new Map();
+  const results = new Map();
   let detailFetches = 0;
   let reusedVerdicts = 0;
 
   for (const group of groups) {
-    console.log(`\nFetching ${group.key} search results...`);
+    const who = [...new Set(group.filters.map((filter) => filter.tenant.label))];
+    const forWhom = who.length > 1 || who[0] !== 'you' ? ` (for ${who.join(', ')})` : '';
+    console.log(`\nFetching ${group.key} search results${forWhom}...`);
     const { listings, total } = await group.source.fetchAllListings(group.search, {
       onProgress: ({ page, lastPage, fresh }) =>
         console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
@@ -490,66 +502,42 @@ async function main() {
       everyListing.set(state.keyFor(listing), listing);
     }
 
-    const result = await collectMatches(
-      group.source,
-      group.search,
-      listings,
-      group.filters,
-      store,
-    );
+    const result = await collectMatches(group.source, group.search, listings, group.filters);
     detailFetches += result.detailFetches;
     reusedVerdicts += result.reusedVerdicts;
 
     for (const filter of group.filters) {
-      perFilter.set(filter.id, {
+      results.set(entryKey(filter), {
         filter,
-        matches: result.matches.get(filter.id),
-        rejected: result.rejected.get(filter.id),
+        matches: result.matches.get(entryKey(filter)),
+        rejected: result.rejected.get(entryKey(filter)),
       });
     }
   }
 
-  const totalMatches = [...perFilter.values()].reduce((sum, entry) => sum + entry.matches.length, 0);
-  console.log(
-    `\n${totalMatches} match(es) across ${filters.length} filter(s) ` +
-      `(${detailFetches} detail page(s) fetched, ${reusedVerdicts} cached verdict(s) reused).`,
-  );
+  return { groups, everyListing, results, detailFetches, reusedVerdicts };
+}
 
-  if (args.verbose) {
-    for (const { filter, rejected } of perFilter.values()) {
-      const near = nearMisses(rejected);
-      if (!near.length) continue;
-      console.log(`\n${filter.name} - near misses (${near.length}), in spec but unproven:`);
-      for (const { listing, verdict } of near) {
-        console.log(`  ${formatListing(listing)}`);
-        console.log(`      ${verdict.reasons.join('; ')}`);
-      }
-    }
-  }
-
-  if (args.list) {
-    for (const { filter, matches } of perFilter.values()) {
-      console.log(`\n${filter.name} (${matches.length}):`);
-      const sorted = [...matches].sort(
-        (a, b) => (a.listing.price ?? Infinity) - (b.listing.price ?? Infinity),
-      );
-      for (const { listing } of sorted) console.log(`  ${formatListing(listing)}`);
-    }
-    return 0;
-  }
-
-  if (config.tco.pickUpReactions) {
-    const sources = [...new Map(groups.map((group) => [group.source.id, group.source])).values()];
-    console.log('\nChecking Discord reactions...');
-    await pickUpReactions(everyListing, store, { dryRun: args.dryRun, sources });
-  }
+/**
+ * Decide and post one person's new listings, then save their record.
+ *
+ * Per tenant on purpose, including the post cap: the cap exists so a parsing
+ * regression or one very broad new filter cannot flood a channel, and sharing
+ * one budget across people would let one person's backlog starve everyone
+ * else's run.
+ */
+async function announceFor(context, crawled, args) {
+  const { tenant, filters, store } = context;
+  const firstRun = store.isNew;
+  const mine = filters.map((filter) => crawled.results.get(entryKey(filter))).filter(Boolean);
+  const label = tenant.label === 'you' ? '' : `[${tenant.label}] `;
 
   // Anything matching that this filter has never announced. On a first or
   // seeded run - or for a new filter that asked to start quiet - these are
   // recorded as announced without posting, so the channel stays calm and only
   // genuinely new listings show up later.
   const pending = [];
-  for (const { filter, matches } of perFilter.values()) {
+  for (const { filter, matches } of mine) {
     const unannounced = matches.filter(
       ({ listing }) => !state.wasAnnounced(store, state.keyFor(listing), filter.id),
     );
@@ -562,7 +550,7 @@ async function main() {
       }
       if (unannounced.length) {
         console.log(
-          `\n${filter.name}: ${args.dryRun ? 'would record' : 'recorded'} ` +
+          `\n${label}${filter.name}: ${args.dryRun ? 'would record' : 'recorded'} ` +
             `${unannounced.length} match(es) as already-seen. Nothing posted.`,
         );
       }
@@ -571,8 +559,8 @@ async function main() {
 
     if (brandNew && unannounced.length) {
       console.log(
-        `\n${filter.name} is new: posting the ${unannounced.length} car(s) it found ` +
-          'that are already on sale.',
+        `\n${label}${filter.name} is new: posting the ${unannounced.length} listing(s) it ` +
+          'found that are already on sale.',
       );
     }
     pending.push(
@@ -581,53 +569,50 @@ async function main() {
   }
 
   const waiting = pending.reduce((sum, items) => sum + items.length, 0);
+  const onSale = mine.reduce((sum, entry) => sum + entry.matches.length, 0);
 
   // A dry run must leave no trace, so the next real run behaves exactly as it
   // would have without it - including seeding, if that has not happened yet.
   const persist = async (extra = {}) => {
     for (const filter of filters) state.recordFilterRun(store, filter);
     if (args.dryRun) {
-      console.log('  (dry run: state file not written)');
+      console.log(`  ${label}(dry run: record not written)`);
       return;
     }
     state.prune(store);
-    await state.saveState({ ...store, runs: (store.runs ?? 0) + 1, ...extra });
+    await state.saveState({ ...store, runs: (store.runs ?? 0) + 1, ...extra }, store.store);
   };
 
   if (firstRun || args.seed) {
     await persist({ seeded: true, seededAt: new Date().toISOString() });
-    console.log('\nThe next run will post anything that appears from now on.');
-    return 0;
+    console.log(`\n${label}The next run will post anything that appears from now on.`);
+    return { posted: 0 };
   }
 
   if (waiting === 0) {
     await persist();
     // Two different populations, so name them separately: the matches are what
-    // is on sale right now, while the record also remembers listings since
-    // sold.
+    // is on sale right now, while the record also remembers listings since sold.
     const stats = state.summarise(store);
     console.log(
-      `\nNothing new. ${totalMatches} match(es) currently on sale; ` +
+      `\n${label}Nothing new. ${onSale} match(es) currently on sale; ` +
         `remembering ${stats.tracked} listing(s).`,
     );
-    return 0;
+    return { posted: 0 };
   }
 
-  // The cap counts across every filter: it exists to stop a parser regression
-  // or a brand new, very broad filter from flooding the channel. Filters take
-  // turns filling it, cheapest first, so one filter with a long backlog cannot
-  // starve the others out of the run - everyone gets a share now, and the rest
-  // follows next run.
+  // Filters take turns filling the cap, cheapest first, so one filter with a
+  // long backlog cannot starve the others - everyone gets a share now and the
+  // rest follows next run.
   //
-  // A car matching two filters is posted once, not twice: a broad filter and a
-  // narrow one over the same model are a normal thing to have, and seeing the
-  // same advert twice in the channel would be noise. The other filters that
-  // wanted it are marked as having announced it, because they have - it is in
-  // the channel - and the run log names them.
-  const cap = config.discord.maxPostsPerRun;
+  // A listing matching two of this person's filters is posted once, not twice:
+  // a broad filter and a narrow one over the same model are a normal pair to
+  // have. The others are marked as having announced it, because they have - it
+  // is in the channel - and the run log names them.
+  const cap = postCapFor(tenant);
   const byFilter = new Map();
   const alsoMatched = new Map();
-  const queuedIds = new Map();
+  const queuedKeys = new Map();
   let queued = 0;
   let deduped = 0;
 
@@ -637,17 +622,17 @@ async function main() {
       const item = items[round];
       if (!item) continue;
 
-      const alreadyQueued = queuedIds.get(state.keyFor(item.listing));
+      const alreadyQueued = queuedKeys.get(state.keyFor(item.listing));
       if (alreadyQueued) {
         alsoMatched.get(alreadyQueued).push(item.filter);
         deduped += 1;
         continue;
       }
 
-      const bucket = byFilter.get(item.filter.id);
+      const bucket = byFilter.get(entryKey(item.filter));
       if (bucket) bucket.push(item);
-      else byFilter.set(item.filter.id, [item]);
-      queuedIds.set(state.keyFor(item.listing), item);
+      else byFilter.set(entryKey(item.filter), [item]);
+      queuedKeys.set(state.keyFor(item.listing), item);
       alsoMatched.set(item, []);
       queued += 1;
     }
@@ -655,12 +640,12 @@ async function main() {
 
   if (queued + deduped < waiting) {
     console.warn(
-      `\nHolding back ${waiting - queued - deduped} listing(s): over the ` +
+      `\n${label}Holding back ${waiting - queued - deduped} listing(s): over the ` +
         `${cap}-per-run cap. They will be posted next run.`,
     );
   }
 
-  console.log(`\nPosting ${queued} new listing(s) to Discord...`);
+  console.log(`\n${label}Posting ${queued} new listing(s)...`);
   let posted = 0;
   let batches = 0;
   for (const items of byFilter.values()) {
@@ -668,6 +653,7 @@ async function main() {
     const result = await announce(filter, items, {
       dryRun: args.dryRun,
       source: sourceOf(filter),
+      webhookUrl: tenant.webhookUrl,
     });
     batches += result.batches;
     posted += result.announced.length;
@@ -687,9 +673,166 @@ async function main() {
 
   console.log(
     args.dryRun
-      ? `Dry run: ${posted} listing(s) would have been posted in ${batches} message(s).`
-      : `Posted ${posted} listing(s) in ${batches} message(s).`,
+      ? `${label}Dry run: ${posted} listing(s) would have been posted in ${batches} message(s).`
+      : `${label}Posted ${posted} listing(s) in ${batches} message(s).`,
   );
+  return { posted };
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.help) {
+    console.log(HELP);
+    return 0;
+  }
+  if (args.unknown.length) {
+    console.error(`Unknown option(s): ${args.unknown.join(', ')}\n`);
+    console.error(HELP);
+    return 2;
+  }
+  // Moving the record is all this run does; crawling on top of it would write
+  // to the old backend and immediately make the copy stale.
+  if (args.migrateTo) return migrateState(args.migrateTo);
+
+  // --- Who this run is for. ---
+  const { tenants: known, problems } = loadTenants();
+  for (const problem of problems) console.error(`Configuration problem: ${problem}`);
+  // A half-configured tenant is a typo or an unfinished setup. Failing is what
+  // makes it visible: skipping quietly means somebody stops getting posts and
+  // nobody finds out until they ask.
+  if (problems.length) {
+    throw new Error(
+      `${problems.length} tenant(s) are half-configured. Fix the secrets above, or remove ` +
+        'them. `npm run doctor` lists everyone it can see.',
+    );
+  }
+  if (known.length === 0) {
+    console.log(NOT_CONFIGURED);
+    return 0;
+  }
+  const tenants = selectTenants(known, args.onlyTenant);
+  if (tenants.length === 0) {
+    console.error(
+      `No tenant matches --for=${args.onlyTenant}. Known: ${known.map((t) => t.id).join(', ')}.`,
+    );
+    return 2;
+  }
+  if (known.length > 1) {
+    console.log(`Running for ${tenants.length} of ${known.length} tenant(s):`);
+    for (const tenant of tenants) console.log(`  ${describeTenant(tenant)}`);
+  }
+
+  // --- What each of them is watching, and what they have already seen. ---
+  const contexts = [];
+  for (const tenant of tenants) {
+    const prefix = tenant.label === 'you' ? '' : `${tenant.label}: `;
+    const context = await contextFor(tenant, args);
+    const disabled = context.wanted - context.filters.length;
+    console.log(
+      `${prefix}${context.found} filter(s) from the ${context.source}` +
+        (args.only ? `, ${context.wanted} matching --only=${args.only}` : '') +
+        (disabled ? `, ${disabled} disabled` : '') +
+        ':',
+    );
+    for (const filter of context.filters) {
+      console.log(`  ${filter.name}: ${describeFilter(filter)}`);
+    }
+
+    // Nothing to post to? Say so before crawling for two minutes to deliver
+    // nowhere - but which kind of "nothing" decides whether that is a quiet
+    // exit or a loud failure. See preflight.js.
+    const readiness = postingReadiness({
+      webhookUrl: tenant.webhookUrl,
+      isNew: context.store.isNew,
+      runs: context.store.runs,
+      needsPosting: needsPosting(args),
+    });
+    if (readiness === 'regressed') {
+      throw new Error(
+        `${tenant.label}: no webhook is set, but this watcher has run ` +
+          `${context.store.runs} time(s) for them before - so there was one. Restore the ` +
+          'secret rather than letting the channel go quiet. To run without posting anyway, ' +
+          'use --dry-run or --list.',
+      );
+    }
+    if (readiness === 'unconfigured') {
+      console.log(`\n${NOT_CONFIGURED}`);
+      return 0;
+    }
+    if (context.store.isNew && !args.list) {
+      console.log(`  ${prefix}no record yet - this run notes what is on sale and posts nothing.`);
+    }
+    if (context.store.migrated) {
+      console.log(
+        `  ${prefix}record upgraded from version ${context.store.migratedFrom}. Everything ` +
+          'already posted stays posted.' +
+          (context.store.migratedFrom === 1
+            ? ' Verdicts are re-derived, so this run reads a few more listing pages.'
+            : ' Listing keys now name their source.'),
+      );
+    }
+
+    if (context.filters.length > 0) contexts.push(context);
+  }
+
+  if (contexts.length === 0) {
+    console.log(NOTHING_TO_WATCH);
+    return 0;
+  }
+
+  // --- One crawl, shared. ---
+  const crawled = await crawlFor(contexts);
+  const totalMatches = [...crawled.results.values()].reduce(
+    (sum, entry) => sum + entry.matches.length,
+    0,
+  );
+  const filterCount = contexts.reduce((sum, context) => sum + context.filters.length, 0);
+  console.log(
+    `\n${totalMatches} match(es) across ${filterCount} filter(s) ` +
+      `(${crawled.detailFetches} detail page(s) fetched, ` +
+      `${crawled.reusedVerdicts} cached verdict(s) reused).`,
+  );
+
+  if (args.verbose) {
+    for (const { filter, rejected } of crawled.results.values()) {
+      const near = nearMisses(rejected);
+      if (!near.length) continue;
+      console.log(`\n${filter.name} - near misses (${near.length}), in spec but unproven:`);
+      for (const { listing, verdict } of near) {
+        console.log(`  ${formatListing(listing)}`);
+        console.log(`      ${verdict.reasons.join('; ')}`);
+      }
+    }
+  }
+
+  if (args.list) {
+    for (const { filter, matches } of crawled.results.values()) {
+      const owner = filter.tenant.label === 'you' ? '' : `[${filter.tenant.label}] `;
+      console.log(`\n${owner}${filter.name} (${matches.length}):`);
+      const sorted = [...matches].sort(
+        (a, b) => (a.listing.price ?? Infinity) - (b.listing.price ?? Infinity),
+      );
+      for (const { listing } of sorted) console.log(`  ${formatListing(listing)}`);
+    }
+    return 0;
+  }
+
+  // --- Then each person's own posting, reactions and record. ---
+  const sources = [
+    ...new Map(crawled.groups.map((group) => [group.source.id, group.source])).values(),
+  ];
+  for (const context of contexts) {
+    if (config.tco.pickUpReactions) {
+      const label = context.tenant.label === 'you' ? '' : `${context.tenant.label}: `;
+      console.log(`\n${label}checking Discord reactions...`);
+      await pickUpReactions(crawled.everyListing, context.store, {
+        dryRun: args.dryRun,
+        sources,
+        tenant: context.tenant,
+      });
+    }
+    await announceFor(context, crawled, args);
+  }
 
   return 0;
 }

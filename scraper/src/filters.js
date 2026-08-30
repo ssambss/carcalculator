@@ -382,12 +382,12 @@ async function readFiltersFile(path = DEFAULT_FILTERS_PATH, { log = console.log 
  * watcher that keeps running on slightly stale filters beats one that does not
  * run at all.
  */
-async function readFiltersFromGist({ log = console.log } = {}) {
-  if (!config.tco.gistToken) return null;
+async function readFiltersFromGist({ log = console.log, gistToken = config.tco.gistToken } = {}) {
+  if (!gistToken) return null;
   try {
     const { findTcoGist, readGistFile } = await import('./gist.js');
-    const gistId = await findTcoGist();
-    const envelope = await readGistFile(gistId, config.filters.gistFilename);
+    const gistId = await findTcoGist(gistToken);
+    const envelope = await readGistFile(gistId, config.filters.gistFilename, gistToken);
     if (!envelope || !Array.isArray(envelope.filters)) return null;
     return normalizeFilters(envelope.filters, { log });
   } catch (error) {
@@ -407,11 +407,12 @@ export async function loadFilters({
   source = config.filters.source,
   log = console.log,
   file = DEFAULT_FILTERS_PATH,
+  gistToken = config.tco.gistToken,
 } = {}) {
   const tried = [];
 
   if (source === 'auto' || source === 'gist') {
-    const fromGist = await readFiltersFromGist({ log });
+    const fromGist = await readFiltersFromGist({ log, gistToken });
     if (fromGist) {
       if (fromGist.length === 0) log('  the gist lists no filters - nothing to watch.');
       return { filters: fromGist, source: 'gist' };

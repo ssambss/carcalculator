@@ -1,7 +1,12 @@
-// Reading and writing the app's secret gist.
+// Reading and writing a gist.
 //
 // Plumbing only: the GitHub calls, and finding the gist. What a reacted listing
 // turns into once it gets there belongs to a sink - see src/sinks/.
+//
+// Every function takes the token explicitly, defaulting to the owner's. The
+// watcher runs for several people, each with their own gist and their own
+// token, and a module-level token would have quietly written one person's cars
+// into another's calculator.
 //
 // Two contracts to honour, both defined by src/sync.ts and src/storage.ts in
 // the repo root:
@@ -17,8 +22,7 @@ import config from './config.js';
 
 const API = 'https://api.github.com';
 
-async function github(path, init = {}) {
-  const token = config.tco.gistToken;
+async function github(path, init = {}, token = config.tco.gistToken) {
   if (!token) {
     throw new Error('No GitHub gist token configured. Set GIST_TOKEN (see README.md).');
   }
@@ -46,9 +50,9 @@ async function github(path, init = {}) {
  * be unable to locate its own gist. The car data file is tried first because
  * that is the one the app creates, so it is the usual answer.
  */
-export async function findTcoGist() {
+export async function findTcoGist(token) {
   const markers = [config.tco.gistFilename, config.filters.gistFilename, config.state.gistFilename];
-  const response = await github('/gists?per_page=100');
+  const response = await github('/gists?per_page=100', {}, token);
   const gists = await response.json();
   const match = Array.isArray(gists)
     ? gists.find((gist) => gist.files && markers.some((name) => name in gist.files))
@@ -69,8 +73,8 @@ export async function findTcoGist() {
  * The gist holds more than the car data: the app also syncs the scraper's
  * filters into a file of its own here (see filters.js).
  */
-export async function readGistFile(gistId, filename) {
-  const response = await github(`/gists/${gistId}`);
+export async function readGistFile(gistId, filename, token) {
+  const response = await github(`/gists/${gistId}`, {}, token);
   const gist = await response.json();
   const file = gist.files?.[filename];
   if (!file) return null;
@@ -81,9 +85,9 @@ export async function readGistFile(gistId, filename) {
   return JSON.parse(content);
 }
 
-export async function readTcoData(gistId) {
+export async function readTcoData(gistId, token) {
   const filename = config.tco.gistFilename;
-  const parsed = await readGistFile(gistId, filename);
+  const parsed = await readGistFile(gistId, filename, token);
   if (!parsed) throw new Error(`Gist ${gistId} no longer has ${filename}.`);
   if (typeof parsed !== 'object' || !parsed.data || !Array.isArray(parsed.data.cars)) {
     throw new Error('The gist data does not look like calculator data; refusing to write over it.');
@@ -92,18 +96,19 @@ export async function readTcoData(gistId) {
 }
 
 /** Replace one file in the gist, leaving every other file alone. */
-export async function writeGistFile(gistId, filename, content) {
-  await github(`/gists/${gistId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ files: { [filename]: { content } } }),
-  });
+export async function writeGistFile(gistId, filename, content, token) {
+  await github(
+    `/gists/${gistId}`,
+    { method: 'PATCH', body: JSON.stringify({ files: { [filename]: { content } } }) },
+    token,
+  );
 }
 
-export async function writeTcoData(gistId, envelope) {
-  await github(`/gists/${gistId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      files: { [config.tco.gistFilename]: { content: `${JSON.stringify(envelope, null, 2)}\n` } },
-    }),
-  });
+export async function writeTcoData(gistId, envelope, token) {
+  await writeGistFile(
+    gistId,
+    config.tco.gistFilename,
+    `${JSON.stringify(envelope, null, 2)}\n`,
+    token,
+  );
 }
