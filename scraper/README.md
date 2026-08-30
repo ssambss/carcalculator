@@ -30,8 +30,12 @@ about there. *Copy all as JSON* in the filter dialog gives you the list back in
 this file's format, which is the easy way to keep the committed fallback in step
 with reality.
 
-`filters.json` is the fallback and the local default. It holds the spec this
-watcher was built for:
+`filters.json` is the fallback and the local default. It ships with **one
+disabled filter**, so a fresh clone or fork watches nothing until you say
+otherwise — the spec in it is one person's car, and inheriting it by accident is
+not a useful default. Enable it to try the watcher out before you have built a
+filter of your own; it is also the worked example the matching rules below are
+written against:
 
 | | |
 |---|---|
@@ -97,13 +101,22 @@ cannot accidentally prove anything.
 ```sh
 cd scraper
 cp .env.example .env          # then paste your Discord webhook URL into it
+npm run doctor                # what is set up, and what each secret unlocks
 npm run dry-run               # full check, posts nothing, saves nothing
 npm start                     # the real thing
 
-node src/index.js --list --filters=file   # what the committed filter matches
+node src/index.js --list --filters=file   # what the committed example matches
 ```
 
-There is nothing to install — no dependencies, Node 20+ only.
+There is nothing to install — no dependencies, Node 20+ only. Setting the whole
+thing up from scratch, secrets included, is [../SETUP.md](../SETUP.md).
+
+A run with no `DISCORD_WEBHOOK_URL` has nowhere to deliver, so it stops before
+crawling rather than spending two minutes to find that out. Which *kind* of
+missing decides what happens next: a watcher that has never completed a run is
+an install waiting to be set up, and exits 0 with the onboarding text, while one
+that has posted before and lost its webhook fails loudly — the channel has gone
+quiet and that must not pass unnoticed.
 
 ## How announcing works
 
@@ -149,7 +162,8 @@ npm start                    # check and post anything new
 npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
-npm test                     # unit tests (98 cases, no network)
+npm run doctor               # check the setup; posts nothing, writes nothing
+npm test                     # unit tests (110 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
@@ -321,10 +335,12 @@ share that crawl; each additional make/model adds its own pages.
 ## Layout
 
 ```
-filters.json      the committed default filter (the gist wins when it has any)
+filters.json      the committed example, disabled (the gist wins when it has any)
 src/filters.js    loading and normalising filters; grouping them by search
 src/config.js     the runtime knobs
 src/index.js      orchestration and CLI
+src/preflight.js  whether a run can post, and whose problem it is if not
+src/doctor.js     the setup report (npm run doctor)
 src/nettiauto.js  fetching and parsing search + listing pages
 src/filter.js     the spec check: numbers, phrases, implications, packages
 src/state.js      the record of what has been seen and announced, per filter

@@ -21,6 +21,7 @@ import {
 } from '../src/filters.js';
 import { parseDetailPage, parseSearchPage, buildSearchUrl, buildListingUrl } from '../src/nettiauto.js';
 import { accentColour, buildEmbed } from '../src/discord.js';
+import { needsPosting, postingReadiness } from '../src/preflight.js';
 import {
   hasSeen,
   isNewFilter,
@@ -935,6 +936,71 @@ describe('verdict reuse', () => {
     assert.equal(
       canReuse(store, listing({ usp: 'Panorama / H&K', price: 28500 }), evaluate(item, null, POLESTAR)),
       false,
+    );
+  });
+});
+
+describe('a fresh fork that nobody has configured', () => {
+  // Two ways a run can have nothing to do, and neither may fail: a scheduled
+  // job on an unconfigured fork that mails a failure every half hour gets
+  // switched off, and then a configured one would not run either.
+
+  it('ships the committed example disabled, so a fork watches nothing by accident', () => {
+    // The committed filter is one person's Polestar spec. Forking must not
+    // silently sign the new owner up for it - they have their own car in mind.
+    assert.equal(POLESTAR.enabled, false);
+    assert.match(POLESTAR.name, /example/i);
+  });
+
+  it('reports no filters rather than throwing when there is no file at all', async () => {
+    // A checkout with filters.json deleted and no token. "Nothing to watch" is
+    // an answer; index.js prints how to fix it and exits 0.
+    const result = await loadFilters({
+      source: 'auto',
+      log: () => {},
+      file: join(tmpdir(), 'definitely-not-here-4f3a.json'),
+    });
+    assert.deepEqual(result.filters, []);
+    assert.equal(result.source, 'nowhere');
+  });
+
+  it('treats a missing webhook as onboarding before the first run', () => {
+    assert.equal(
+      postingReadiness({ webhookUrl: '', isNew: true, runs: 0 }),
+      'unconfigured',
+    );
+    // A state file can exist with no completed runs - a dry run that seeded
+    // nothing, say. Still nobody's regression.
+    assert.equal(
+      postingReadiness({ webhookUrl: '', isNew: false, runs: 0 }),
+      'unconfigured',
+    );
+  });
+
+  it('treats a missing webhook as a regression once it has posted before', () => {
+    // The opposite call, off the same absent value: this channel used to get
+    // posts and now gets none, which must never pass quietly.
+    assert.equal(
+      postingReadiness({ webhookUrl: '', isNew: false, runs: 14 }),
+      'regressed',
+    );
+  });
+
+  it('does not ask for a webhook on a run that cannot post', () => {
+    for (const args of [{ dryRun: true }, { list: true }, { seed: true }]) {
+      assert.equal(needsPosting(args), false, JSON.stringify(args));
+      assert.equal(
+        postingReadiness({ webhookUrl: '', isNew: false, runs: 14, needsPosting: false }),
+        'ready',
+      );
+    }
+    assert.equal(needsPosting({}), true);
+  });
+
+  it('gets out of the way as soon as a webhook exists', () => {
+    assert.equal(
+      postingReadiness({ webhookUrl: 'https://discord.com/api/webhooks/1/x', isNew: true, runs: 0 }),
+      'ready',
     );
   });
 });

@@ -3,6 +3,11 @@
 A total-cost-of-ownership calculator for comparing the cars you might buy or
 lease — built to be used at home and at the dealership (works well on a phone).
 
+Running your own copy — the app, sync and the listing watcher, with your data
+and your searches — is [SETUP.md](SETUP.md). Where the project is headed
+(generalizing the watcher's source so it can follow apartments or rentals, and
+making it fork-and-run for anyone) is [PLAN.md](PLAN.md).
+
 Each car gets a listing with purchase price, expected resale value, financing
 (cash, an annuity loan with optional balloon payment, or a lease), energy use
 (petrol / diesel / EV / plug-in hybrid) and yearly costs. The app boils it all
@@ -101,9 +106,14 @@ nettiauto.com for used cars matching your filters and posts new listings to a
 Discord channel. React to a post there and the car appears in this calculator.
 
 It runs any number of filters — the ones you make in the app, with
-[scraper/filters.json](scraper/filters.json) (a Polestar 2, 2021–2023, under
-120 000 km, Long Range Dual Motor with the Pilot and Plus packages) as the
-committed fallback for a fresh checkout.
+[scraper/filters.json](scraper/filters.json) as the committed fallback. That
+file ships **disabled**: the spec in it (a Polestar 2, 2021–2023, under
+120 000 km, Long Range Dual Motor with the Pilot and Plus packages) is a
+template and the worked example the matching rules are documented against, not
+a car a fresh fork should start watching on its owner's behalf.
+
+`cd scraper && npm run doctor` reports which secrets are set and what each one
+unlocks, without posting or saving anything.
 
 The code stays independent of the calculator — its own folder, no dependencies,
 no shared code, and nothing the Vite build touches. The only thing the two

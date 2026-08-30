@@ -222,7 +222,11 @@ async function readFiltersFromGist({ log = console.log } = {}) {
  * filters" is still an answer: emptying the list in the app has to mean the
  * watcher stops, not that the committed default quietly comes back.
  */
-export async function loadFilters({ source = config.filters.source, log = console.log } = {}) {
+export async function loadFilters({
+  source = config.filters.source,
+  log = console.log,
+  file = DEFAULT_FILTERS_PATH,
+} = {}) {
   const tried = [];
 
   if (source === 'auto' || source === 'gist') {
@@ -240,15 +244,19 @@ export async function loadFilters({ source = config.filters.source, log = consol
     }
   }
 
-  const fromFile = await readFiltersFile();
+  const fromFile = await readFiltersFile(file);
   if (fromFile) {
     if (fromFile.length === 0) log(`  ${config.filters.file} lists no filters - nothing to watch.`);
     return { filters: fromFile, source: 'file' };
   }
   tried.push(config.filters.file);
 
-  throw new Error(
-    `No filters to run (looked in: ${tried.join(', ')}). Create one in the calculator, ` +
-      `or put one in scraper/${config.filters.file}.`,
-  );
+  // No source answered at all - a fresh checkout with the file deleted, or no
+  // token and no file. That is an install waiting to be set up, not a failure:
+  // the caller prints the onboarding text and exits 0, so a scheduled run on a
+  // fork nobody has configured yet stays quiet instead of mailing a failure
+  // every half hour. Pinning --filters=gist still throws above, because asking
+  // for a specific source and not getting it *is* an error.
+  log(`  no filters anywhere (looked in: ${tried.join(', ')}).`);
+  return { filters: [], source: 'nowhere' };
 }

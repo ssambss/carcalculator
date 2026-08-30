@@ -25,6 +25,7 @@ const { describeFilter, groupBySearch, loadFilters } = await import('./filters.j
 const { fetchAllListings, fetchListingDetail } = await import('./nettiauto.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
+const { needsPosting, postingReadiness } = await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
 const { addCarsToTco } = await import('./gist.js');
 const state = await import('./state.js');
@@ -81,6 +82,30 @@ Filters are made in the calculator's UI and read from your gist; scraper/
 filters.json is the committed fallback. Runtime knobs live in src/config.js and
 the webhook in DISCORD_WEBHOOK_URL (a scraper/.env file is read automatically).
 See README.md.`;
+
+/** Shown when every filter is off, or there are none - including a fresh fork. */
+const NOTHING_TO_WATCH = `Nothing to watch.
+
+Make a filter in the calculator (funnel button in the header) and it reaches
+this watcher through your gist on the next run. Or enable one in
+scraper/filters.json - it ships with a disabled example.
+
+  node src/index.js --list --filters=file    what the example would match
+  npm run doctor                             check which secrets are set`;
+
+/** Shown on a run that could post but has nowhere to post to. */
+const NOT_CONFIGURED = `Nothing to post to: DISCORD_WEBHOOK_URL is not set.
+
+Stopping here rather than crawling, and leaving the state file alone so the
+first configured run still baselines the market properly.
+
+  locally  cp .env.example .env, then paste your webhook URL into it
+  in CI    Settings -> Secrets and variables -> Actions -> DISCORD_WEBHOOK_URL
+
+  npm run doctor     check every secret and what it unlocks
+  npm run dry-run    run the full check now, posting nothing
+
+See README.md and ../SETUP.md.`;
 
 function formatListing(listing) {
   const price = listing.price === null ? '?' : listing.price.toLocaleString('fi-FI');
@@ -299,12 +324,38 @@ async function main() {
   );
   for (const filter of filters) console.log(`  ${filter.name}: ${describeFilter(filter)}`);
   if (filters.length === 0) {
-    console.log('Nothing to do.');
+    console.log(NOTHING_TO_WATCH);
     return 0;
   }
 
   const store = args.list ? { ...(await state.loadState()) } : await state.loadState();
   const firstRun = store.isNew;
+
+  // Nothing to post to? Stop here rather than crawling for two minutes to
+  // deliver nowhere - but which kind of "nothing" this is decides whether that
+  // is a quiet exit or a loud failure. See preflight.js for the rule.
+  //
+  // Stopping without seeding is deliberate: state written now would baseline
+  // the market silently, so the first configured run would report nothing. Left
+  // alone, that run seeds properly instead.
+  const readiness = postingReadiness({
+    webhookUrl: config.discord.webhookUrl,
+    isNew: store.isNew,
+    runs: store.runs,
+    needsPosting: needsPosting(args),
+  });
+  if (readiness === 'regressed') {
+    throw new Error(
+      'DISCORD_WEBHOOK_URL is not set, but this watcher has run ' +
+        `${store.runs} time(s) before - so it used to have one. Restore the secret ` +
+        'rather than letting the channel go quiet. To run without posting anyway, ' +
+        'use --dry-run or --list.',
+    );
+  }
+  if (readiness === 'unconfigured') {
+    console.log(`\n${NOT_CONFIGURED}`);
+    return 0;
+  }
   if (firstRun && !args.list) {
     console.log('\nNo state file yet - this run records what is on sale and posts nothing.');
   }

@@ -1,8 +1,8 @@
 [
   {
     "id": "polestar2-lr-dm",
-    "name": "Polestar 2 LR DM",
-    "enabled": true,
+    "name": "Example: Polestar 2 LR DM",
+    "enabled": false,
     "make": "polestar",
     "model": "2",
 
