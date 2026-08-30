@@ -9,7 +9,13 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 
 import config from '../src/config.js';
-import { carName, powertrainOf, toCarListing, variantHint } from '../src/sinks/car-tco.js';
+import {
+  carName,
+  newCarDefaults,
+  powertrainOf,
+  toCarListing,
+  variantHint,
+} from '../src/sinks/car-tco.js';
 import { webhookIdFrom } from '../src/reactions.js';
 import {
   keyOf,
@@ -202,5 +208,83 @@ describe('add/confirm against last-write-wins sync', () => {
     recordTcoAdd(store, K('x'), new Date('2026-01-01T00:00:00Z'));
     recordTcoAdd(store, K('x'), new Date('2026-02-01T00:00:00Z'));
     assert.equal(store.tco[K('x')].addedAt, '2026-01-01T00:00:00.000Z');
+  });
+});
+
+describe('whose financing baseline a new car arrives on', () => {
+  // The watcher runs for several people. A rate and term hardcoded in the
+  // scraper put one person's assumptions about borrowing into everybody's
+  // calculator - defensible as a starting point, but not ours to decide.
+
+  const listing = {
+    id: '900',
+    url: 'https://www.nettiauto.com/polestar/2/900',
+    title: 'Polestar 2',
+    subTitle: '78 kWh, Long Range Dual Motor',
+    price: 30000,
+    mileage: 50000,
+    year: 2022,
+    fuelType: 'Sähkö',
+  };
+
+  const envelope = (settings) => ({ data: { cars: [], settings } });
+
+  it('takes it from their own calculator settings', () => {
+    const defaults = newCarDefaults(
+      envelope({ newCar: { downPayment: 5000, annualRatePct: 3.4, termMonths: 48 } }),
+    );
+    assert.equal(defaults.financing.downPayment, 5000);
+    assert.equal(defaults.financing.annualRatePct, 3.4);
+    assert.equal(defaults.financing.termMonths, 48);
+
+    const car = toCarListing(listing, { defaults });
+    assert.equal(car.financing.annualRatePct, 3.4);
+    assert.equal(car.financing.termMonths, 48);
+    assert.equal(car.financing.downPayment, 5000);
+  });
+
+  it('takes their consumption assumptions too', () => {
+    const defaults = newCarDefaults(envelope({ newCar: { elecKwhPer100: 24, fuelLPer100: 8 } }));
+    const car = toCarListing(listing, { defaults });
+    assert.equal(car.elecKwhPer100, 24);
+    assert.equal(car.fuelLPer100, 8);
+  });
+
+  it('falls back to the shipped baseline when their app predates the setting', () => {
+    // Not a broken car: somebody on an older bundle has no settings.newCar, and
+    // a car financed at 0 % over 0 months would be worse than an assumption.
+    for (const shape of [envelope({}), envelope(undefined), {}, null]) {
+      const defaults = newCarDefaults(shape);
+      assert.equal(defaults.financing.annualRatePct, config.tco.carDefaults.financing.annualRatePct);
+      assert.equal(defaults.financing.termMonths, config.tco.carDefaults.financing.termMonths);
+    }
+  });
+
+  it('falls back field by field, not all or nothing', () => {
+    // Somebody who has set only a rate should keep the shipped term.
+    const defaults = newCarDefaults(envelope({ newCar: { annualRatePct: 2.9 } }));
+    assert.equal(defaults.financing.annualRatePct, 2.9);
+    assert.equal(defaults.financing.termMonths, config.tco.carDefaults.financing.termMonths);
+  });
+
+  it('ignores nonsense rather than building an uncomputable car', () => {
+    const defaults = newCarDefaults(
+      envelope({ newCar: { annualRatePct: -1, termMonths: 0, downPayment: 'lots' } }),
+    );
+    assert.equal(defaults.financing.annualRatePct, config.tco.carDefaults.financing.annualRatePct);
+    // Zero months would divide by nothing in the app's annuity.
+    assert.equal(defaults.financing.termMonths, config.tco.carDefaults.financing.termMonths);
+    assert.equal(defaults.financing.downPayment, config.tco.carDefaults.financing.downPayment);
+  });
+
+  it('leaves the costs nobody can guess at zero', () => {
+    // Insurance, tax and maintenance are not assumptions the app can make, and
+    // a guessed number reads as a real one. Deliberately untouched by this.
+    const car = toCarListing(listing, {
+      defaults: newCarDefaults(envelope({ newCar: { annualRatePct: 3 } })),
+    });
+    assert.equal(car.insurancePerYear, 0);
+    assert.equal(car.taxPerYear, 0);
+    assert.equal(car.maintenancePerYear, 0);
   });
 });

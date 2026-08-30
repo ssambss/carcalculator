@@ -270,7 +270,9 @@ export default function App() {
     }
   }
 
-  const addCar = () => setDraft({ car: newCar(), isNew: true })
+  // On this person's own financing baseline (Assumptions -> New car), the same
+  // one a car added from a Discord reaction arrives with.
+  const addCar = () => setDraft({ car: newCar(data.settings.newCar), isNew: true })
 
   const activeFilterCount = scraperFilters.set.filters.filter((f) => f.enabled).length
 

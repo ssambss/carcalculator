@@ -66,6 +66,13 @@ color-coded cost breakdown and a side-by-side comparison table.
   accrued interest and lease terms included) so totals compare directly —
   note that a manually entered resale value is not re-estimated for the
   shorter window, so auto-estimated cars normalize more faithfully.
+- **New car baseline** (Assumptions → New car): the down payment, interest rate,
+  loan term and consumption figures a car starts on before any dealer has quoted
+  anything. A *common* baseline is the point — candidates only compare if they
+  are financed alike until one of them has a real offer. It applies to a car
+  typed in here and to one that arrives from a Discord reaction alike, and it is
+  per person: the watcher reads it out of whoever's calculator the car is going
+  into, so one person's assumptions about borrowing never land in another's.
 - **Out of pocket / mo** (cards, table, form previews): the loan or lease
   payment plus running costs — what actually leaves the account each month
   during the term. The budget line, distinct from the economic €/month,

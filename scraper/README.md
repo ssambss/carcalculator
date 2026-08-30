@@ -292,7 +292,7 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (190 cases, no network)
+npm test                     # unit tests (200 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
@@ -360,10 +360,17 @@ React to any posted listing in Discord (any emoji, from anyone in the channel)
 and within a cycle the car is added to the Car TCO calculator's comparison.
 It arrives with the price, odometer and powertrain from the listing (a diesel
 is added as a diesel — filters can watch anything now), the nettiauto link in
-its notes, and an agreed financing baseline — 0 € down, 6 % interest, 72
-months — so candidates are comparable before any dealer has quoted a real
-rate. Everything else (insurance, tax, maintenance) is left at zero for you to
-fill in; the defaults live in `tco.carDefaults` in [src/config.js](src/config.js).
+its notes, and whatever financing baseline that person has set, so candidates are
+comparable before any dealer has quoted a real rate. Everything else (insurance,
+tax, maintenance) is left at zero for you to fill in — nobody can guess those,
+and a guessed number reads as a real one.
+
+The financing baseline is **theirs, not a fixed one**: the watcher reads
+`settings.newCar` out of the calculator the car is going into, which is what the
+app's *Assumptions → New car* panel writes. A rate and term fixed in the scraper
+would have put one person's assumptions about borrowing into everybody's
+calculator. `tco.carDefaults` in [src/config.js](src/config.js) is only the
+fallback, for somebody whose app predates the setting.
 
 No frontend changes are involved: the scraper appends to the same secret gist
 the app's GitHub sync already uses, and the app pulls it on load and tab focus.

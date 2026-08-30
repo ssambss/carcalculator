@@ -63,9 +63,19 @@ export const config = {
     // How far back through the channel to look for reactions, in messages.
     scanMessages: 300,
 
-    // What an added car looks like before you refine it in the app. The price,
-    // odometer and powertrain come from the listing; everything below is an
-    // assumption, so it all lives here where it is easy to change.
+    // The *fallback* baseline for an added car, not the baseline.
+    //
+    // The financing and consumption figures now come from whoever owns the
+    // calculator the car is going into - settings.newCar in their own data,
+    // which the app's Assumptions panel writes. This watcher runs for several
+    // people, and a rate and term fixed here would have put one person's
+    // assumptions about borrowing into everybody else's calculator.
+    //
+    // What is left here answers the case where their app predates that setting:
+    // a car financed at 0 % over 0 months would be worse than an assumption.
+    // See newCarDefaults() in src/sinks/car-tco.js.
+    //
+    // The price, odometer and powertrain always come from the listing itself.
     carDefaults: {
       // Fallback only - the listing's own fuel type decides when it says.
       powertrain: 'ev',

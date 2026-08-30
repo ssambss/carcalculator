@@ -537,6 +537,24 @@ calculator by hand.
 | React → car in their calculator | works | needs the bot invited |
 | You can see | their channel | nothing, unless they invite the bot |
 
+### The financing baseline became a setting
+
+`tco.carDefaults` was global, so the watcher added every car on one hardcoded
+baseline — 0 € down, 6 %, 72 months — which meant one person's assumptions about
+borrowing landed in everybody's calculator. Defensible as a starting point they
+then edit, and still the wrong thing to decide on their behalf.
+
+Framed as an **app** feature rather than a scraper knob, because a scraper-side
+JSON file is worthless to a non-technical family member: *Assumptions → New car*
+now holds the down payment, rate, term and consumption figures, and applies to a
+car typed in by hand exactly as much as to one arriving from a reaction. The
+watcher reads `settings.newCar` out of the calculator the car is going into.
+
+Falls back field by field to `config.js`, so somebody on an older bundle gets a
+sensible car rather than one financed at 0 % over 0 months. Insurance, tax and
+maintenance stay at zero deliberately — nobody can guess them, and a guessed
+number reads as a real one.
+
 ### The leak hunt
 
 Three cross-tenant leaks surfaced while building this, all the same shape:
@@ -789,6 +807,10 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **New-car baseline is per person.** The last global that put
+  one person's assumptions in everyone's data. Built as an app setting rather
+  than a scraper config file, since a JSON file is no use to the actual audience.
+  200 tests.
 - **2026-08-30** — **Leak hunt.** A deliberate sweep after three cross-tenant
   leaks appeared on their own. Four more: every credential defaulted to the
   owner's, one tenant's failure aborted the run for everyone, an owner without a

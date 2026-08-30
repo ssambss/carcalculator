@@ -88,14 +88,49 @@ export function powertrainOf(listing, fallback = config.tco.carDefaults.powertra
 }
 
 /**
+ * The financing baseline a new car should arrive on: this person's own.
+ *
+ * Read from `settings.newCar` in their own calculator data, which is where the
+ * app's Assumptions panel writes it. The watcher runs for several people, and a
+ * rate and term hardcoded here would have put one person's assumptions about
+ * borrowing into everybody else's calculator - defensible as a starting point,
+ * but not something to decide on their behalf.
+ *
+ * Falls back field by field to src/config.js, so somebody whose app predates the
+ * setting still gets a sensible car rather than a car financed at 0 % over 0
+ * months. Only the fields the app actually owns are taken from it: insurance and
+ * tax stay at zero because nobody can guess them, and that is deliberate.
+ */
+export function newCarDefaults(envelope) {
+  const base = config.tco.carDefaults;
+  const theirs = envelope?.data?.settings?.newCar;
+  if (!theirs || typeof theirs !== 'object') return base;
+
+  const number = (value, fallback) =>
+    typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : fallback;
+
+  return {
+    ...base,
+    elecKwhPer100: number(theirs.elecKwhPer100, base.elecKwhPer100),
+    fuelLPer100: number(theirs.fuelLPer100, base.fuelLPer100),
+    financing: {
+      ...base.financing,
+      downPayment: number(theirs.downPayment, base.financing.downPayment),
+      annualRatePct: number(theirs.annualRatePct, base.financing.annualRatePct),
+      // A term of zero would divide by nothing in the app's annuity.
+      termMonths: number(theirs.termMonths, base.financing.termMonths) || base.financing.termMonths,
+    },
+  };
+}
+
+/**
  * Shape a scraped listing into the app's CarListing (see src/types.ts).
  *
  * Every field the app knows must be present: its normalizeCar() would fill
  * gaps with defaults, but writing the full shape keeps this file honest about
  * what the app expects.
  */
-export function toCarListing(listing, { now = new Date() } = {}) {
-  const defaults = config.tco.carDefaults;
+export function toCarListing(listing, { now = new Date(), defaults = config.tco.carDefaults } = {}) {
   const noteLines = [
     listing.url,
     [listing.subTitle, listing.color, listing.location].filter(Boolean).join(' · '),
@@ -147,11 +182,13 @@ export async function addCarsToTco(listings, { now = new Date(), token } = {}) {
   const gistId = await findTcoGist(token);
   const envelope = await readTcoData(gistId, token);
   const existingIds = new Set(envelope.data.cars.map((car) => car.id));
+  // Their own baseline, out of their own data - see newCarDefaults().
+  const defaults = newCarDefaults(envelope);
 
   const added = [];
   const skipped = [];
   for (const listing of listings) {
-    const car = toCarListing(listing, { now });
+    const car = toCarListing(listing, { now, defaults });
     if (existingIds.has(car.id)) {
       skipped.push(listing.id);
       continue;
