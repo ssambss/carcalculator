@@ -27,10 +27,11 @@ const VERSION = 2;
  *
  * Version 1 predates filters: there was one hardcoded spec, so its
  * announcements cannot be attributed to any filter id in particular. They land
- * under this key, and `wasAnnounced` honours it for every filter - so nothing
- * the old single-spec watcher already posted is ever posted again, whatever
- * the filters are called now. Its *verdicts* are not reused, since we no
- * longer know which spec produced them.
+ * under this key, and the first filter to form a verdict on such a listing
+ * copies the timestamp into its own record (see `record`) - so nothing the old
+ * single-spec watcher already posted is posted again, while every filter still
+ * keeps its own answer and can supersede it. Its *verdicts* are not reused,
+ * since we no longer know which spec produced them.
  */
 const LEGACY_KEY = '(pre-filters)';
 
@@ -135,13 +136,14 @@ export function verdictFor(state, id, filterId) {
 /**
  * Has this listing been posted for this filter?
  *
- * True also when the pre-filters watcher posted it: the point of the record is
- * that a human has already seen the car in the channel, and renaming or
- * rebuilding the filter it came from does not undo that.
+ * Only the filter's own record answers. What the pre-filters watcher posted is
+ * inherited once, when the filter first forms a verdict on the listing (see
+ * `record`). Reading the legacy key here instead made it a blanket mute: it
+ * belongs to no filter, so nothing ever supersedes it, and every filter made
+ * in the UI stayed permanently silent on those cars whatever its spec.
  */
 export function wasAnnounced(state, id, filterId) {
-  const filters = state.listings[id]?.filters ?? {};
-  return Boolean(filters[filterId]?.announcedAt || filters[LEGACY_KEY]?.announcedAt);
+  return Boolean(state.listings[id]?.filters?.[filterId]?.announcedAt);
 }
 
 /**
@@ -191,7 +193,11 @@ export function touch(state, listing, { detailChecked = false, now = new Date() 
  * Record what one filter learned about a listing.
  *
  * `announcedAt` is never overwritten once set, so a listing that resurfaces is
- * not treated as new.
+ * not treated as new. A filter meeting a listing the pre-filters watcher had
+ * already posted inherits that timestamp here: a human has seen the car in the
+ * channel, and rebuilding the filter it came from does not undo that. The
+ * inheritance is written per filter, so from then on it behaves like any other
+ * announcement instead of muting everyone at once.
  */
 export function record(state, listing, filterId, verdict, options = {}) {
   const entry = touch(state, listing, options);
@@ -200,7 +206,7 @@ export function record(state, listing, filterId, verdict, options = {}) {
   entry.filters[filterId] = {
     status: verdict.matched ? 'match' : 'rejected',
     reasons: verdict.matched ? [] : verdict.reasons,
-    announcedAt: existing?.announcedAt ?? null,
+    announcedAt: existing?.announcedAt ?? entry.filters[LEGACY_KEY]?.announcedAt ?? null,
   };
 
   return entry.filters[filterId];

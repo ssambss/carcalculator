@@ -721,14 +721,37 @@ describe('state', () => {
 
     const store = await loadState(path);
     assert.equal(store.migrated, true);
-    // Whatever the filters are called now, a car already in the channel stays
-    // out of it.
-    assert.equal(wasAnnounced(store, 'posted', 'some-new-filter-id'), true);
-    assert.equal(wasAnnounced(store, 'skipped', 'some-new-filter-id'), false);
+    assert.equal(store.listings.posted.price, 27000);
     // The old spec's verdicts are not attributed to any filter, so they are
     // not reused as if they were.
     assert.equal(verdictFor(store, 'posted', 'some-new-filter-id'), null);
-    assert.equal(store.listings.posted.price, 27000);
+
+    // Whatever the filters are called now, a car already in the channel stays
+    // out of it: the first filter to judge the listing inherits the old
+    // watcher's timestamp into its own record. The legacy key used to answer
+    // for every filter directly, which meant no filter could ever announce
+    // these cars again - not a mute that wears off, one that never did.
+    record(store, listing({ id: 'posted', price: 27000 }), 'some-new-filter-id', MATCH);
+    record(store, listing({ id: 'skipped', price: 27000 }), 'some-new-filter-id', MATCH);
+    assert.equal(wasAnnounced(store, 'posted', 'some-new-filter-id'), true);
+    assert.equal(wasAnnounced(store, 'skipped', 'some-new-filter-id'), false);
+    assert.equal(
+      verdictFor(store, 'posted', 'some-new-filter-id').announcedAt,
+      '2026-01-01T00:00:00.000Z',
+      'inherited verbatim, so the channel history stays honest',
+    );
+
+    // And it holds on the next run, rather than the inheritance being
+    // re-derived into a fresh announcement every cycle.
+    record(store, listing({ id: 'posted', price: 26500 }), 'some-new-filter-id', MATCH);
+    assert.equal(wasAnnounced(store, 'posted', 'some-new-filter-id'), true);
+    assert.equal(
+      verdictFor(store, 'posted', 'some-new-filter-id').announcedAt,
+      '2026-01-01T00:00:00.000Z',
+    );
+    // A car the old watcher never posted is still news for a filter that
+    // matches it, which is the whole point of the change.
+    assert.equal(wasAnnounced(store, 'skipped', 'another-filter'), false);
   });
 
   it('re-checks a rejected listing only when something changed or it went stale', async () => {
