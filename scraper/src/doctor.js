@@ -23,6 +23,7 @@ await loadEnvFile();
 const { default: config } = await import('./config.js');
 const { describeFilter, loadFilters } = await import('./filters.js');
 const state = await import('./state.js');
+const { storeFor } = await import('./storage/index.js');
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MIN_NODE = 20;
@@ -272,25 +273,38 @@ async function checkFilters() {
 
 /** The record of what has been seen. Its absence is meaningful, not an error. */
 async function checkState() {
+  let where;
   try {
-    const store = await state.loadState();
+    where = storeFor();
+  } catch (error) {
+    return { status: 'bad', name: 'Record', detail: error.message };
+  }
+
+  try {
+    const store = await state.loadState(where);
     if (store.isNew) {
       return {
         status: 'off',
-        name: 'State file',
-        detail: 'None yet, so the next run records what is on sale and posts nothing.',
+        name: `Record (${where.id})`,
+        detail:
+          `Nothing in ${where.describe()} yet, so the next run records what is on ` +
+          'sale and posts nothing.',
       };
     }
     const stats = state.summarise(store);
+    const upgrade = store.migrated
+      ? ` Will be upgraded from version ${store.migratedFrom} on the next write.`
+      : '';
     return {
       status: 'ok',
-      name: 'State file',
+      name: `Record (${where.id})`,
       detail:
-        `${store.runs ?? 0} run(s), remembering ${stats.tracked} listing(s), ` +
-        `${stats.announced} announcement(s) across ${Object.keys(store.filters ?? {}).length} filter(s).`,
+        `${where.describe()}: ${store.runs ?? 0} run(s), remembering ${stats.tracked} ` +
+        `listing(s), ${stats.announced} announcement(s) across ` +
+        `${Object.keys(store.filters ?? {}).length} filter(s).${upgrade}`,
     };
   } catch (error) {
-    return { status: 'bad', name: 'State file', detail: error.message };
+    return { status: 'bad', name: `Record (${where.id})`, detail: error.message };
   }
 }
 

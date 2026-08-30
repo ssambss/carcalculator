@@ -46,9 +46,17 @@ import {
   recordFilterRun,
   saveState,
   summarise,
+  keyFor,
+  keyOf,
   verdictFor,
   wasAnnounced,
 } from '../src/state.js';
+/**
+ * A record key. Listings are filed under `sourceId:id`, since a site's ids are
+ * only unique within that site - see keyOf() in state.js.
+ */
+const K = (id) => keyOf('nettiauto', id);
+
 
 // The committed default filter is the Polestar spec this watcher was built
 // for, so checking the matcher against it checks that file too.
@@ -680,13 +688,13 @@ describe('state', () => {
     const path = await tempFile('seen.json');
     const store = await loadState(path);
     record(store, listing(), 'f1', MATCH);
-    markAnnounced(store, '15900001', 'f1');
+    markAnnounced(store, K('15900001'), 'f1');
     await saveState(store, path);
 
     const reloaded = await loadState(path);
     assert.equal(reloaded.isNew, false);
-    assert.equal(hasSeen(reloaded, '15900001'), true);
-    assert.equal(wasAnnounced(reloaded, '15900001', 'f1'), true);
+    assert.equal(hasSeen(reloaded, K('15900001')), true);
+    assert.equal(wasAnnounced(reloaded, K('15900001'), 'f1'), true);
     assert.equal(JSON.parse(await readFile(path, 'utf8')).isNew, undefined);
   });
 
@@ -695,24 +703,24 @@ describe('state', () => {
     const store = await loadState(path);
     record(store, listing(), 'strict', REJECT('no plus package found'));
     record(store, listing(), 'loose', MATCH);
-    markAnnounced(store, '15900001', 'loose');
+    markAnnounced(store, K('15900001'), 'loose');
 
-    assert.equal(verdictFor(store, '15900001', 'strict').status, 'rejected');
-    assert.equal(verdictFor(store, '15900001', 'loose').status, 'match');
-    assert.equal(wasAnnounced(store, '15900001', 'loose'), true);
-    assert.equal(wasAnnounced(store, '15900001', 'strict'), false);
+    assert.equal(verdictFor(store, K('15900001'), 'strict').status, 'rejected');
+    assert.equal(verdictFor(store, K('15900001'), 'loose').status, 'match');
+    assert.equal(wasAnnounced(store, K('15900001'), 'loose'), true);
+    assert.equal(wasAnnounced(store, K('15900001'), 'strict'), false);
     // One listing, one shared set of facts about the advert.
-    assert.equal(store.listings['15900001'].price, 30000);
+    assert.equal(store.listings[K('15900001')].price, 30000);
   });
 
   it('never moves firstSeenAt or announcedAt once set', async () => {
     const path = await tempFile('seen.json');
     const store = await loadState(path);
     record(store, listing(), 'f1', MATCH, { now: new Date('2026-01-01T00:00:00Z') });
-    markAnnounced(store, '15900001', 'f1', new Date('2026-01-01T00:00:00Z'));
+    markAnnounced(store, K('15900001'), 'f1', new Date('2026-01-01T00:00:00Z'));
     record(store, listing({ price: 28000 }), 'f1', MATCH, { now: new Date('2026-02-01T00:00:00Z') });
 
-    const entry = store.listings['15900001'];
+    const entry = store.listings[K('15900001')];
     assert.equal(entry.firstSeenAt, '2026-01-01T00:00:00.000Z');
     assert.equal(entry.filters.f1.announcedAt, '2026-01-01T00:00:00.000Z');
     assert.equal(entry.lastSeenAt, '2026-02-01T00:00:00.000Z');
@@ -749,10 +757,10 @@ describe('state', () => {
 
     const store = await loadState(path);
     assert.equal(store.migrated, true);
-    assert.equal(store.listings.posted.price, 27000);
+    assert.equal(store.listings[K('posted')].price, 27000);
     // The old spec's verdicts are not attributed to any filter, so they are
     // not reused as if they were.
-    assert.equal(verdictFor(store, 'posted', 'some-new-filter-id'), null);
+    assert.equal(verdictFor(store, K('posted'), 'some-new-filter-id'), null);
 
     // Whatever the filters are called now, a car already in the channel stays
     // out of it: the first filter to judge the listing inherits the old
@@ -761,10 +769,10 @@ describe('state', () => {
     // these cars again - not a mute that wears off, one that never did.
     record(store, listing({ id: 'posted', price: 27000 }), 'some-new-filter-id', MATCH);
     record(store, listing({ id: 'skipped', price: 27000 }), 'some-new-filter-id', MATCH);
-    assert.equal(wasAnnounced(store, 'posted', 'some-new-filter-id'), true);
-    assert.equal(wasAnnounced(store, 'skipped', 'some-new-filter-id'), false);
+    assert.equal(wasAnnounced(store, K('posted'), 'some-new-filter-id'), true);
+    assert.equal(wasAnnounced(store, K('skipped'), 'some-new-filter-id'), false);
     assert.equal(
-      verdictFor(store, 'posted', 'some-new-filter-id').announcedAt,
+      verdictFor(store, K('posted'), 'some-new-filter-id').announcedAt,
       '2026-01-01T00:00:00.000Z',
       'inherited verbatim, so the channel history stays honest',
     );
@@ -772,14 +780,14 @@ describe('state', () => {
     // And it holds on the next run, rather than the inheritance being
     // re-derived into a fresh announcement every cycle.
     record(store, listing({ id: 'posted', price: 26500 }), 'some-new-filter-id', MATCH);
-    assert.equal(wasAnnounced(store, 'posted', 'some-new-filter-id'), true);
+    assert.equal(wasAnnounced(store, K('posted'), 'some-new-filter-id'), true);
     assert.equal(
-      verdictFor(store, 'posted', 'some-new-filter-id').announcedAt,
+      verdictFor(store, K('posted'), 'some-new-filter-id').announcedAt,
       '2026-01-01T00:00:00.000Z',
     );
     // A car the old watcher never posted is still news for a filter that
     // matches it, which is the whole point of the change.
-    assert.equal(wasAnnounced(store, 'skipped', 'another-filter'), false);
+    assert.equal(wasAnnounced(store, K('skipped'), 'another-filter'), false);
   });
 
   it('re-checks a rejected listing only when something changed or it went stale', async () => {
@@ -792,7 +800,7 @@ describe('state', () => {
     assert.equal(needsRecheck(store, listing({ price: 27000 }), 'f1'), true, 'price moved');
     assert.equal(needsRecheck(store, listing({ mileage: 90000 }), 'f1'), true, 'mileage moved');
 
-    store.listings['15900001'].detailCheckedAt = new Date(Date.now() - 30 * 864e5).toISOString();
+    store.listings[K('15900001')].detailCheckedAt = new Date(Date.now() - 30 * 864e5).toISOString();
     assert.equal(needsRecheck(store, listing(), 'f1'), true, 'cached verdict is stale');
   });
 
@@ -818,8 +826,8 @@ describe('state', () => {
     record(store, listing({ id: 'old' }), 'f1', MATCH, { now: new Date(Date.now() - 200 * 864e5) });
 
     assert.equal(prune(store, { forgetAfterDays: 90 }), 1);
-    assert.equal(hasSeen(store, 'old'), false);
-    assert.equal(hasSeen(store, '15900001'), true);
+    assert.equal(hasSeen(store, K('old')), false);
+    assert.equal(hasSeen(store, K('15900001')), true);
     assert.deepEqual(summarise(store), { tracked: 1, matches: 1, announced: 0 });
   });
 
@@ -833,10 +841,10 @@ describe('state', () => {
 
     prune(store, { forgetAfterDays: 90 });
     assert.deepEqual(Object.keys(store.filters), ['kept']);
-    assert.deepEqual(Object.keys(store.listings['15900001'].filters), ['kept']);
+    assert.deepEqual(Object.keys(store.listings[K('15900001')].filters), ['kept']);
     // A run whose filter source was briefly unreadable must not lose anything:
     // pruning goes by age, never by "not in this run's list".
-    assert.equal(verdictFor(store, '15900001', 'kept').status, 'match');
+    assert.equal(verdictFor(store, K('15900001'), 'kept').status, 'match');
   });
 
   it('counts per filter when asked, and across all of them otherwise', async () => {
@@ -844,7 +852,7 @@ describe('state', () => {
     const store = await loadState(path);
     record(store, listing(), 'a', MATCH);
     record(store, listing(), 'b', REJECT('no plus package found'));
-    markAnnounced(store, '15900001', 'a');
+    markAnnounced(store, K('15900001'), 'a');
 
     assert.deepEqual(summarise(store, 'a'), { tracked: 1, matches: 1, announced: 1 });
     assert.deepEqual(summarise(store, 'b'), { tracked: 1, matches: 0, announced: 0 });
@@ -912,12 +920,12 @@ describe('verdict reuse', () => {
   // a detail fetch, but only when nothing has moved and, for a match, only
   // once it has actually been announced.
   function canReuse(store, item, cardVerdict, filterId = 'f1') {
-    const cached = verdictFor(store, item.id, filterId);
+    const cached = verdictFor(store, keyFor(item), filterId);
     return Boolean(
       cardVerdict.needsDetail &&
         cached &&
         !needsRecheck(store, item, filterId) &&
-        (cached.status !== 'match' || wasAnnounced(store, item.id, filterId)),
+        (cached.status !== 'match' || wasAnnounced(store, keyFor(item), filterId)),
     );
   }
 
@@ -938,11 +946,11 @@ describe('verdict reuse', () => {
     // Matched last run only because the listing page named the packages.
     const item = listing({ usp: 'Panorama / H&K' });
     record(store, item, 'f1', { matched: true, reasons: [] }, { detailChecked: true });
-    markAnnounced(store, item.id, 'f1');
+    markAnnounced(store, keyFor(item), 'f1');
 
     assert.equal(canReuse(store, item, evaluate(item, null, POLESTAR)), true);
     // Regression: reusing must not silently downgrade it to a rejection.
-    assert.equal(verdictFor(store, item.id, 'f1').status, 'match');
+    assert.equal(verdictFor(store, keyFor(item), 'f1').status, 'match');
   });
 
   it('re-reads a match that was never announced, so the post has its evidence', async () => {

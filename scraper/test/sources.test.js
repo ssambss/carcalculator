@@ -8,7 +8,10 @@
 // If you are writing a new adapter, this file is the specification.
 
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { after, describe, it } from 'node:test';
 
 import {
   DEFAULT_SOURCE_ID,
@@ -20,6 +23,22 @@ import {
 } from '../src/sources/index.js';
 import { checkRanges } from '../src/fields.js';
 import { groupBySearch, normalizeFilter, normalizeFilters } from '../src/filters.js';
+import { keyFor, keyOf, loadState, record, wasAnnounced } from '../src/state.js';
+import { fileStore } from '../src/storage/file.js';
+import { storeFor } from '../src/storage/index.js';
+import config from '../src/config.js';
+
+const MATCH = { matched: true, reasons: [] };
+
+const tempDirs = [];
+async function tempFile(name) {
+  const dir = await mkdtemp(join(tmpdir(), 'sources-test-'));
+  tempDirs.push(dir);
+  return join(dir, name);
+}
+after(async () => {
+  for (const dir of tempDirs) await rm(dir, { recursive: true, force: true });
+});
 
 describe('the source registry', () => {
   it('has at least one source and a default that exists', () => {
@@ -168,5 +187,113 @@ describe('recovering a listing from a link', () => {
   it('returns null for a link no source claims', () => {
     assert.equal(identifyUrl('https://example.com/a/b/1'), null);
     assert.equal(identifyUrl(''), null);
+  });
+});
+
+describe('the state store', () => {
+  // Phase 3: where the record lives is a backend, and records are keyed by
+  // source and id together.
+
+  it('keys a listing by its source, so two sites cannot collide', () => {
+    // Site ids are only unique within a site. Two sources will eventually both
+    // number a listing 900, and a bare key would have them share one record.
+    assert.equal(keyOf('nettiauto', '900'), 'nettiauto:900');
+    assert.equal(keyFor({ sourceId: 'oikotie', id: '900' }), 'oikotie:900');
+    assert.notEqual(keyFor({ sourceId: 'oikotie', id: '900' }), keyOf('nettiauto', '900'));
+  });
+
+  it('treats a listing with no source as the default one', () => {
+    // Records written before sources existed, and listings the orchestration
+    // has not stamped yet.
+    assert.equal(keyFor({ id: '900' }), `${DEFAULT_SOURCE_ID}:900`);
+  });
+
+  it('keeps two sources apart in one record', async () => {
+    const path = await tempFile('seen.json');
+    const store = await loadState(path);
+    const shared = { url: 'u', title: 't', year: null, mileage: null, price: null, seller: null };
+    record(store, { ...shared, id: '900', sourceId: 'nettiauto', price: 1 }, 'f', MATCH);
+    record(store, { ...shared, id: '900', sourceId: 'oikotie', price: 2 }, 'f', MATCH);
+
+    assert.equal(Object.keys(store.listings).length, 2, 'same id, different sites, two records');
+    assert.equal(store.listings['nettiauto:900'].price, 1);
+    assert.equal(store.listings['oikotie:900'].price, 2);
+  });
+
+  it('re-keys a version 2 record without losing what was announced', async () => {
+    // A re-keying that dropped announcements would repost the entire market.
+    const path = await tempFile('seen.json');
+    await writeFile(
+      path,
+      JSON.stringify({
+        version: 2,
+        listings: {
+          '15900001': {
+            lastSeenAt: '2026-08-01T00:00:00.000Z',
+            price: 27000,
+            filters: { f1: { status: 'match', reasons: [], announcedAt: '2026-08-01T00:00:00.000Z' } },
+          },
+        },
+        tco: { '15900001': { addedAt: '2026-08-01T00:00:00.000Z', confirmedAt: null } },
+      }),
+      'utf8',
+    );
+
+    const store = await loadState(path);
+    assert.equal(store.migrated, true);
+    assert.equal(store.migratedFrom, 2);
+    assert.equal(wasAnnounced(store, 'nettiauto:15900001', 'f1'), true);
+    assert.equal(store.tco['nettiauto:15900001'].addedAt, '2026-08-01T00:00:00.000Z');
+    // Nothing left under the bare key, or the next run would keep two records.
+    assert.equal(store.listings['15900001'], undefined);
+  });
+
+  it('chains a version 1 record all the way through', async () => {
+    // v1 -> v2 gives it per-filter verdicts; v2 -> v3 namespaces the key. The
+    // first migration returning VERSION directly used to skip the second, and
+    // left bare keys behind.
+    const path = await tempFile('seen.json');
+    await writeFile(
+      path,
+      JSON.stringify({
+        version: 1,
+        listings: {
+          old: { status: 'match', announcedAt: '2026-01-01T00:00:00.000Z', lastSeenAt: '2026-08-01T00:00:00.000Z' },
+        },
+      }),
+      'utf8',
+    );
+    const store = await loadState(path);
+    assert.deepEqual(Object.keys(store.listings), ['nettiauto:old']);
+    assert.equal(store.migratedFrom, 1);
+  });
+
+  it('refuses a record from a newer version rather than mangling it', async () => {
+    const path = await tempFile('seen.json');
+    await writeFile(path, JSON.stringify({ version: 99, listings: {} }), 'utf8');
+    await assert.rejects(() => loadState(path), /version 99/);
+  });
+
+  it('indents the local file but not the network copy', () => {
+    // Indentation is about a third of the bytes. Worth it where a human opens
+    // the file; not worth it over the wire every half hour.
+    assert.equal(fileStore({ path: 'x' }).pretty, true);
+    assert.equal(storeFor('file').pretty, true);
+  });
+
+  it('refuses the gist store without a token instead of falling back', async () => {
+    // Falling back to the file would look like it worked, while writing
+    // somewhere the next run may not read.
+    const had = config.tco.gistToken;
+    config.tco.gistToken = '';
+    try {
+      assert.throws(() => storeFor('gist'), /GIST_TOKEN is not set/);
+    } finally {
+      config.tco.gistToken = had;
+    }
+  });
+
+  it('rejects a backend it does not have', () => {
+    assert.throws(() => storeFor('dropbox'), /Unknown state store/);
   });
 });

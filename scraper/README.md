@@ -174,8 +174,36 @@ nothing**. Without that, the channel would fill up with every car already on
 the market. From then on, only listings that were not in the record get posted,
 and each is posted exactly once *per filter*.
 
-The record lives in [data/seen.json](data/) and is the only thing that makes
-runs stateful. Delete it and the next run re-seeds silently.
+The record is the only thing that makes runs stateful. Delete it and the next
+run re-seeds silently.
+
+**Where it lives is a backend**, in [src/storage/](src/storage/):
+
+| `state.store` | Where | Needs | Notes |
+|---|---|---|---|
+| `'file'` (default) | [data/seen.json](data/) | nothing | indented, and committed back by the workflow |
+| `'gist'` | `car-tco-seen.json` in your gist | `GIST_TOKEN` | minified, per user, nothing committed |
+
+The file backend makes the record *the repo's*, which is fine for one person
+and awkward for anyone else: two people cannot share it, and a fork diverges on
+it from its first run and then conflicts on every pull from upstream. The gist
+backend fixes both and removes the workflow's need for write access to the repo.
+
+Switching is deliberate, never automatic:
+
+```sh
+node src/index.js --migrate-state=gist   # copy the record across, then edit config.js
+```
+
+A run that quietly looked somewhere new would find nothing, conclude it was a
+first run, and silently re-baseline the whole market. So the copy is explicit,
+it refuses to overwrite a record that already exists, and it leaves the old one
+in place until you delete it.
+
+Records are keyed `<source>:<id>` — a site's ids are only unique within that
+site. Older files are migrated on read (v1 gave listings per-filter verdicts,
+v2 → v3 namespaces the keys) and rewritten in the new shape on the next save;
+everything already announced stays announced.
 
 - Verdicts, reasons and posts are stored **per filter**, because two filters
   can legitimately disagree about the same car. The listing's own facts (price,
@@ -212,11 +240,12 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (148 cases, no network)
+npm test                     # unit tests (157 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
 node src/index.js --filters=file     # ignore the gist, use filters.json
+node src/index.js --migrate-state=gist   # move the record into your gist
 node src/index.js --help
 ```
 
@@ -241,6 +270,8 @@ variables always win over the file, so CI secrets override it.
 | `fetch.delayMs` | `1500` | Gap between requests |
 | `fetch.maxSearchPages` | `40` | Per search, not per run |
 | `discord.maxPostsPerRun` | `20` | Anti-spam cap, across all filters |
+| `state.store` | `'file'` | `'gist'` to keep the record per user instead of in the repo |
+| `state.gistFilename` | `'car-tco-seen.json'` | Where the gist backend keeps it |
 | `state.forgetAfterDays` | `90` | When a vanished listing or a dormant filter is forgotten |
 
 Per-filter settings — including `packageEvidence` (`'weak'` accepts a bare
@@ -416,6 +447,7 @@ src/sources/nettiauto.js  everything nettiauto-specific
 src/sinks/index.js      where a reacted listing goes
 src/sinks/car-tco.js    ...into the calculator, as a car
 src/state.js            what has been seen and announced, per filter
+src/storage/index.js    where that record lives: a file, or your gist
 src/discord.js          webhook payloads, labelled by the source
 src/reactions.js        reading reactions off our own posts
 src/gist.js             the GitHub gist plumbing

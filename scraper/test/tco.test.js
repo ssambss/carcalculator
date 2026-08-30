@@ -11,7 +11,20 @@ import { after, describe, it } from 'node:test';
 import config from '../src/config.js';
 import { carName, powertrainOf, toCarListing, variantHint } from '../src/sinks/car-tco.js';
 import { webhookIdFrom } from '../src/reactions.js';
-import { loadState, needsTcoAdd, recordTcoAdd, recordTcoConfirmed, saveState } from '../src/state.js';
+import {
+  keyOf,
+  loadState,
+  needsTcoAdd,
+  recordTcoAdd,
+  recordTcoConfirmed,
+  saveState,
+} from '../src/state.js';
+/**
+ * A record key. Listings are filed under `sourceId:id`, since a site's ids are
+ * only unique within that site - see keyOf() in state.js.
+ */
+const K = (id) => keyOf('nettiauto', id);
+
 
 const tempDirs = [];
 async function tempFile(name) {
@@ -147,30 +160,30 @@ describe('add/confirm against last-write-wins sync', () => {
     const store = await loadState(path);
 
     // Never seen: add it.
-    assert.equal(needsTcoAdd(store, '15905450'), true);
+    assert.equal(needsTcoAdd(store, K('15905450')), true);
 
     // Added but not yet observed in the gist: keep trying, in case a device
     // pushed older data over our write moments later.
-    recordTcoAdd(store, '15905450');
-    assert.equal(needsTcoAdd(store, '15905450'), true);
+    recordTcoAdd(store, K('15905450'));
+    assert.equal(needsTcoAdd(store, K('15905450')), true);
 
     // Observed present once: done. If it disappears from the gist after this,
     // that was the user deleting it in the app, and it must stay deleted.
-    recordTcoConfirmed(store, '15905450');
-    assert.equal(needsTcoAdd(store, '15905450'), false);
+    recordTcoConfirmed(store, K('15905450'));
+    assert.equal(needsTcoAdd(store, K('15905450')), false);
   });
 
   it('keeps the pickup record across a state file round-trip', async () => {
     const path = await tempFile('seen.json');
     const store = await loadState(path);
-    recordTcoAdd(store, '15905450', new Date('2026-08-26T12:00:00Z'));
-    recordTcoConfirmed(store, '15905450', new Date('2026-08-26T12:30:00Z'));
+    recordTcoAdd(store, K('15905450'), new Date('2026-08-26T12:00:00Z'));
+    recordTcoConfirmed(store, K('15905450'), new Date('2026-08-26T12:30:00Z'));
     await saveState(store, path);
 
     const reloaded = await loadState(path);
-    assert.equal(needsTcoAdd(reloaded, '15905450'), false);
-    assert.equal(reloaded.tco['15905450'].addedAt, '2026-08-26T12:00:00.000Z');
-    assert.equal(reloaded.tco['15905450'].confirmedAt, '2026-08-26T12:30:00.000Z');
+    assert.equal(needsTcoAdd(reloaded, K('15905450')), false);
+    assert.equal(reloaded.tco[K('15905450')].addedAt, '2026-08-26T12:00:00.000Z');
+    assert.equal(reloaded.tco[K('15905450')].confirmedAt, '2026-08-26T12:30:00.000Z');
   });
 
   it('tolerates a state file from before reaction pickup existed', async () => {
@@ -180,14 +193,14 @@ describe('add/confirm against last-write-wins sync', () => {
     await saveState(store, path);
     const reloaded = await loadState(path);
     assert.deepEqual(reloaded.tco, {});
-    assert.equal(needsTcoAdd(reloaded, 'anything'), true);
+    assert.equal(needsTcoAdd(reloaded, K('anything')), true);
   });
 
   it('timestamps are first-write-wins, like the announce marker', async () => {
     const path = await tempFile('seen.json');
     const store = await loadState(path);
-    recordTcoAdd(store, 'x', new Date('2026-01-01T00:00:00Z'));
-    recordTcoAdd(store, 'x', new Date('2026-02-01T00:00:00Z'));
-    assert.equal(store.tco.x.addedAt, '2026-01-01T00:00:00.000Z');
+    recordTcoAdd(store, K('x'), new Date('2026-01-01T00:00:00Z'));
+    recordTcoAdd(store, K('x'), new Date('2026-02-01T00:00:00Z'));
+    assert.equal(store.tco[K('x')].addedAt, '2026-01-01T00:00:00.000Z');
   });
 });

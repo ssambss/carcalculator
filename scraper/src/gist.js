@@ -38,19 +38,26 @@ async function github(path, init = {}) {
   return response;
 }
 
-/** Find the calculator's gist by its data file, exactly like the app does. */
+/**
+ * Find the gist this watcher shares with the app.
+ *
+ * Any of the files we know about identifies it, not just the calculator's data
+ * file: a watcher following flats has no car data to find, and would otherwise
+ * be unable to locate its own gist. The car data file is tried first because
+ * that is the one the app creates, so it is the usual answer.
+ */
 export async function findTcoGist() {
-  const filename = config.tco.gistFilename;
+  const markers = [config.tco.gistFilename, config.filters.gistFilename, config.state.gistFilename];
   const response = await github('/gists?per_page=100');
   const gists = await response.json();
   const match = Array.isArray(gists)
-    ? gists.find((gist) => gist.files && filename in gist.files)
+    ? gists.find((gist) => gist.files && markers.some((name) => name in gist.files))
     : null;
   if (!match) {
     throw new Error(
-      `No gist with ${filename} on this account. Connect the app to GitHub sync ` +
-        'first (cloud button in the header) - the scraper joins an existing sync, ' +
-        'it does not start one.',
+      `No gist on this account holds any of: ${markers.join(', ')}. Connect the app to ` +
+        'GitHub sync first (cloud button in the header) - the scraper joins an existing ' +
+        'sync, it does not start one.',
     );
   }
   return match.id;
@@ -82,6 +89,14 @@ export async function readTcoData(gistId) {
     throw new Error('The gist data does not look like calculator data; refusing to write over it.');
   }
   return parsed;
+}
+
+/** Replace one file in the gist, leaving every other file alone. */
+export async function writeGistFile(gistId, filename, content) {
+  await github(`/gists/${gistId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ files: { [filename]: { content } } }),
+  });
 }
 
 export async function writeTcoData(gistId, envelope) {

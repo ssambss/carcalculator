@@ -5,12 +5,13 @@ people can actually use — including people who do not write software — and
 (2) a watcher whose **source** is a pluggable module, so it can follow
 apartments, rentals or anything else with listing pages.
 
-> **Where we stand:** Phases 0, 1 and 2 done. The matcher no longer knows what
-> a car is; nettiauto is one adapter behind a registry, with a conformance suite
-> every future adapter must pass; sinks are pluggable, so a source watching flats
-> ships without a car calculator existing. 148 scraper tests pass; app build and
-> lint clean.
-> **Next: Phase 3**, state behind a storage adapter.
+> **Where we stand:** Phases 0-3 done. The matcher no longer knows what a car
+> is; nettiauto is one adapter behind a registry with a conformance suite; sinks
+> are pluggable, so a source watching flats ships without a car calculator
+> existing; and the record of what has been seen sits behind a storage backend
+> that a hosted store slots into. 157 scraper tests pass; app build and lint
+> clean.
+> **Next: Phase 6**, the hosted instance - the reason the order changed.
 >
 > **Decided 2026-08-30:** this gets hosted (Phase 6, Tier 2), because
 > fork-per-user does not reach a non-programmer. Sharing now outranks the
@@ -25,7 +26,7 @@ apartments, rentals or anything else with listing pages.
 | [0 · Hygiene](#phase-0--hygiene) | The repo is safe to hand to someone else | ✅ done |
 | [1 · Declarative ranges](#phase-1--declarative-ranges) | `filter.js` stops being about cars | ✅ done |
 | [2 · Source seam](#phase-2--source-seam) | nettiauto becomes one adapter of many | ✅ done |
-| [3 · State adapter](#phase-3--state-behind-a-storage-adapter) | State is per-user, destination not baked in | ⬜ not started |
+| [3 · State adapter](#phase-3--state-behind-a-storage-adapter) | State is per-user, destination not baked in | ✅ done |
 | [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | 🔨 started in Phase 2 |
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
 | [6 · Hosted sharing](#phase-6--hosted-for-people-who-cannot-fork) | Non-technical people actually using it | ⬜ decided, not started |
@@ -349,7 +350,7 @@ channel — neither is worth churning for tidiness.
 
 ---
 
-## Phase 3 · State behind a storage adapter
+## Phase 3 · State behind a storage adapter ✅
 
 *Was "move state into the user's gist". Widened so the delivery model stays an
 open question — see [the constraint](#the-delivery-model-constraint).*
@@ -359,23 +360,52 @@ an interface with three implementations: **local file** (today, and the
 no-credential fallback), **gist** (per-user, for anyone holding their own
 token), and later **hosted store** (for users who cannot).
 
-- [ ] Storage interface: `load()` / `save()`, nothing else — `state.js`'s logic
-      is already independent of where the bytes live
-- [ ] Namespace listing ids as `sourceId:id`, VERSION 3 + migration
-- [ ] Gist implementation; drop `contents: write`, the commit-back step and the
-      push-rebase retry loop from the workflow when it is in use
-- [ ] Key the gist lookup on a neutral marker, not `car-tco-data.json` — a pure
-      apartment watcher has no calculator data to find
-- [ ] Check the write ceiling first: **770 KB / 1027 listings** today. The
-      `truncated` + `raw_url` read path already exists in `gist.js`; the write
-      side needs verifying. If it is tight, that is an argument for the hosted
-      store sooner rather than a bigger JSON file.
+- [x] `src/storage/` - `read()` / `write(text)` / `pretty`, and nothing else.
+      `state.js` no longer knows what a file is.
+- [x] `file` backend (today's, atomic, indented) and `gist` backend (per user,
+      minified). A path string is accepted as shorthand for a file, which is what
+      tests and one-off inspection want.
+- [x] Records keyed `sourceId:id`, VERSION 3, with the v2 -> v3 re-keying
+- [x] Gist lookup keyed on any of the files we know about, not just
+      `car-tco-data.json` - a watcher following flats has no calculator data to
+      find and could not otherwise locate its own gist
+- [x] `--migrate-state=<backend>` - explicit, refuses to overwrite an existing
+      record, leaves the old one in place
+- [x] Size measured (see below); the gist backend warns at 900 KB
+- [x] 9 new tests (157 total)
+- [ ] **Deferred:** dropping `contents: write` and the commit-back step from the
+      workflow. That only becomes correct once the live watcher actually runs on
+      the gist backend, which is a config change plus a migration to make
+      deliberately rather than bundle into a refactor.
 
-Why it matters regardless of delivery model: every fork that runs the watcher
-diverges on `seen.json` on its first run and conflicts on every upstream pull,
-forever. There are already 10 bot commits rewriting this file.
+### A bug this turned up
 
-Estimate: ~1.5 days (one more indirection than the gist-only version).
+`migrateFrom1` returned `version: VERSION` rather than `version: 2`, so once a
+second migration existed a v1 file would skip it and keep bare, unnamespaced
+keys. Migrations chain now, and there is a test that walks v1 all the way
+through.
+
+### Sizing, measured
+
+| | |
+|---|---|
+| Pretty-printed (today) | 768 KB |
+| Minified | 528 KB |
+| Minified + gzip | 54 KB |
+| Per listing | ~748 bytes |
+
+So indentation alone is a third of the file - hence `pretty` being the backend's
+choice rather than a global. The gist backend warns at 900 KB, roughly two
+thousand listings. **If that is ever reached the answer is the hosted store, not
+a bigger blob.**
+
+### Verified on the real record
+
+1027 listings, all re-keyed under `nettiauto:`, and all **104 announcements
+preserved**. That last part is the one that mattered: a re-keying that dropped
+them would have reposted the entire current market on the next run.
+
+Estimate was ~1.5 days.
 
 ---
 
@@ -537,6 +567,12 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** - **Phase 3 done.** Record behind a storage backend (file or
+  gist), keys namespaced by source, `--migrate-state` to move it deliberately.
+  Found and fixed a migration-chaining bug that would have left v1 files with
+  bare keys. Verified on the live 1027-listing record: all 104 announcements
+  survive. 157 tests. Workflow still uses the file backend and still commits it
+  back - switching that is a deliberate config change, not part of a refactor.
 - **2026-08-30** — **Phase 2 done.** nettiauto behind an adapter and a registry;
   per-host pacing; sinks pluggable and optional; embeds labelled by the source;
   reaction recovery source-aware; package renamed to `listing-watch`. 148 tests.

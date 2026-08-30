@@ -98,6 +98,17 @@ export const config = {
   },
 
   state: {
+    // Where the record of what has been seen lives: 'file' (data/seen.json,
+    // needs no credential) or 'gist' (per user, needs GIST_TOKEN).
+    //
+    // Switching is deliberate, never automatic. A run that quietly looked
+    // somewhere else would find no state, conclude it was a first run, and
+    // silently re-baseline the whole market - so moving the record is a
+    // one-off `--migrate-state=<backend>`, not a side effect of setting a
+    // token. See src/storage/.
+    store: 'file',
+    // Where the gist backend keeps it, beside the app's data and filters.
+    gistFilename: 'car-tco-seen.json',
     // Listings unseen for this long are forgotten, so a genuine relisting
     // months later is announced again instead of being silently swallowed.
     forgetAfterDays: 90,

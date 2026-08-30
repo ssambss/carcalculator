@@ -33,6 +33,7 @@ const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
+const { BACKENDS, storeFor } = await import('./storage/index.js');
 
 const FLAGS = ['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'];
 const FILTER_SOURCES = ['auto', 'gist', 'file'];
@@ -47,12 +48,19 @@ function parseArgs(argv) {
 
   const unknown = [
     ...[...flags].filter((flag) => !FLAGS.includes(flag)),
-    ...[...options.keys()].filter((option) => !['--filters', '--only'].includes(option)),
+    ...[...options.keys()].filter(
+      (option) => !['--filters', '--only', '--migrate-state'].includes(option),
+    ),
   ];
 
   const source = options.get('--filters') ?? config.filters.source;
   if (!FILTER_SOURCES.includes(source)) {
     unknown.push(`--filters=${source} (use ${FILTER_SOURCES.join(', ')})`);
+  }
+
+  const migrateTo = options.get('--migrate-state') ?? null;
+  if (migrateTo !== null && !BACKENDS.includes(migrateTo)) {
+    unknown.push(`--migrate-state=${migrateTo} (use ${BACKENDS.join(', ')})`);
   }
 
   return {
@@ -64,6 +72,7 @@ function parseArgs(argv) {
     help: flags.has('--help') || flags.has('-h'),
     filterSource: source,
     only: options.get('--only') ?? null,
+    migrateTo,
     unknown,
   };
 }
@@ -80,6 +89,9 @@ Usage: node src/index.js [options]
   --notify-errors  Post a message to Discord if the run fails.
   --filters=SRC    Where to read filters from: auto (default), gist or file.
   --only=NAME      Run just the filters whose name or id contains NAME.
+  --migrate-state=WHERE
+                   Copy the record of what has been seen to another backend
+                   (file, gist) and exit. Nothing else runs. See src/storage/.
   --help           This text.
 
 Filters are made in the calculator's UI and read from your gist; scraper/
@@ -143,12 +155,13 @@ async function collectMatches(source, search, listings, filters, store) {
       // the listing has moved. A match that was never successfully announced
       // is excluded: it still has to be posted, and building that message
       // needs the detail page evidence.
-      const cached = state.verdictFor(store, listing.id, filter.id);
+      const key = state.keyFor(listing);
+      const cached = state.verdictFor(store, key, filter.id);
       const canReuse =
         verdict.needsDetail &&
         cached &&
         !state.needsRecheck(store, listing, filter.id) &&
-        (cached.status !== 'match' || state.wasAnnounced(store, listing.id, filter.id));
+        (cached.status !== 'match' || state.wasAnnounced(store, key, filter.id));
 
       if (canReuse) {
         reusedVerdicts += 1;
@@ -219,6 +232,7 @@ function listingFromRecord(id, entry) {
   if (!entry) return null;
   return {
     id,
+    sourceId: entry.sourceId,
     url: entry.url,
     title: entry.title ?? '',
     subTitle: entry.title ?? '',
@@ -283,10 +297,11 @@ async function pickUpReactions(listings, store, { dryRun, sources }) {
   // each one's listings go where its own source says.
   const wanted = new Map();
   for (const [id, entry] of reacted) {
-    if (!state.needsTcoAdd(store, id)) continue;
+    const key = state.keyOf(entry.sourceId, id);
+    if (!state.needsTcoAdd(store, key)) continue;
     const sink = sinks.get(entry.sourceId);
     if (!sink) continue;
-    const listing = listings.get(id) ?? listingFromRecord(id, store.listings[id]);
+    const listing = listings.get(key) ?? listingFromRecord(id, store.listings[key]);
     if (!listing) {
       console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
       continue;
@@ -308,11 +323,12 @@ async function pickUpReactions(listings, store, { dryRun, sources }) {
     }
 
     const { added, skipped } = await sink.add(batch);
-    for (const id of added) state.recordTcoAdd(store, id);
+    const keyById = new Map(batch.map((listing) => [listing.id, state.keyFor(listing)]));
+    for (const id of added) state.recordTcoAdd(store, keyById.get(id));
     for (const id of skipped) {
       // Already there: whoever put it there, it is confirmed present.
-      state.recordTcoAdd(store, id);
-      state.recordTcoConfirmed(store, id);
+      state.recordTcoAdd(store, keyById.get(id));
+      state.recordTcoConfirmed(store, keyById.get(id));
     }
     if (added.length) {
       console.log(`Added ${added.length} listing(s) to ${sink.label}:`);
@@ -322,6 +338,56 @@ async function pickUpReactions(listings, store, { dryRun, sources }) {
       console.log(`${skipped.length} reacted listing(s) were already in ${sink.label}.`);
     }
   }
+}
+
+/**
+ * Copy the record from one backend to another, once, on purpose.
+ *
+ * Moving where the state lives is not something to do as a side effect of
+ * setting a token: a run that quietly looked somewhere new would find nothing,
+ * conclude it was a first run, and silently re-baseline the whole market -
+ * every listing currently on sale marked as already seen, and nothing to show
+ * that it happened.
+ *
+ * So it is explicit, it refuses to overwrite a record that already exists, and
+ * it upgrades the version on the way through (`loadState` migrates, `saveState`
+ * writes the new shape).
+ */
+async function migrateState(target) {
+  const from = storeFor();
+  const to = storeFor(target);
+
+  if (from.id === to.id) {
+    console.log(`The record already lives in ${to.describe()}. Nothing to do.`);
+    return 0;
+  }
+
+  const current = await state.loadState(from);
+  if (current.isNew) {
+    console.error(`There is no record in ${from.describe()} to copy.`);
+    return 1;
+  }
+
+  const existing = await state.loadState(to);
+  if (!existing.isNew) {
+    console.error(
+      `${to.describe()} already holds a record (${Object.keys(existing.listings).length} ` +
+        'listing(s)). Refusing to overwrite it - delete it first if that is what you want.',
+    );
+    return 1;
+  }
+
+  const stats = state.summarise(current);
+  const written = await state.saveState(current, to);
+  console.log(
+    `Copied ${stats.tracked} listing(s) and ${stats.announced} announcement(s) from ` +
+      `${from.describe()} to ${to.describe()} (version ${written.version}).`,
+  );
+  console.log(
+    `\nNow set state.store = '${target}' in src/config.js. The old record is left in place;` +
+      ' delete it once the next run has worked.',
+  );
+  return 0;
 }
 
 async function main() {
@@ -335,6 +401,9 @@ async function main() {
     console.error(HELP);
     return 2;
   }
+  // Moving the record is all this run does; crawling on top of it would write
+  // to the old backend and immediately make the copy stale.
+  if (args.migrateTo) return migrateState(args.migrateTo);
 
   const { filters: allFilters, source } = await loadFilters({ source: args.filterSource });
   const wanted = args.only
@@ -392,8 +461,11 @@ async function main() {
   }
   if (store.migrated) {
     console.log(
-      '\nState file upgraded to per-filter records. Listings already posted stay posted; ' +
-        'verdicts are re-derived, so this run reads a few more listing pages than usual.',
+      `\nRecord upgraded from version ${store.migratedFrom}. Everything already posted ` +
+        'stays posted.' +
+        (store.migratedFrom === 1
+          ? ' Verdicts are re-derived, so this run reads a few more listing pages than usual.'
+          : ' Listing keys now name their source.'),
     );
   }
 
@@ -410,7 +482,13 @@ async function main() {
         console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
     });
     console.log(`Read ${listings.length} listings (site reports ${total ?? '?'}).`);
-    for (const listing of listings) everyListing.set(listing.id, listing);
+    // Stamped here rather than in each adapter: the record is keyed by source
+    // and id together, and one forgetful adapter would silently collide with
+    // another site's ids. Doing it once, centrally, cannot be forgotten.
+    for (const listing of listings) {
+      listing.sourceId = group.source.id;
+      everyListing.set(state.keyFor(listing), listing);
+    }
 
     const result = await collectMatches(
       group.source,
@@ -473,13 +551,15 @@ async function main() {
   const pending = [];
   for (const { filter, matches } of perFilter.values()) {
     const unannounced = matches.filter(
-      ({ listing }) => !state.wasAnnounced(store, listing.id, filter.id),
+      ({ listing }) => !state.wasAnnounced(store, state.keyFor(listing), filter.id),
     );
     const brandNew = state.isNewFilter(store, filter.id);
     const silent = firstRun || args.seed || (brandNew && !filter.postExisting);
 
     if (silent) {
-      for (const { listing } of unannounced) state.markAnnounced(store, listing.id, filter.id);
+      for (const { listing } of unannounced) {
+        state.markAnnounced(store, state.keyFor(listing), filter.id);
+      }
       if (unannounced.length) {
         console.log(
           `\n${filter.name}: ${args.dryRun ? 'would record' : 'recorded'} ` +
@@ -557,7 +637,7 @@ async function main() {
       const item = items[round];
       if (!item) continue;
 
-      const alreadyQueued = queuedIds.get(item.listing.id);
+      const alreadyQueued = queuedIds.get(state.keyFor(item.listing));
       if (alreadyQueued) {
         alsoMatched.get(alreadyQueued).push(item.filter);
         deduped += 1;
@@ -567,7 +647,7 @@ async function main() {
       const bucket = byFilter.get(item.filter.id);
       if (bucket) bucket.push(item);
       else byFilter.set(item.filter.id, [item]);
-      queuedIds.set(item.listing.id, item);
+      queuedIds.set(state.keyFor(item.listing), item);
       alsoMatched.set(item, []);
       queued += 1;
     }
@@ -598,8 +678,9 @@ async function main() {
       const names = [filter.name, ...shared.map((other) => other.name)].join(' + ');
       console.log(`  ${names}  ${formatListing(item.listing)}`);
       if (args.dryRun || !accepted.has(item.listing.id)) continue;
-      state.markAnnounced(store, item.listing.id, filter.id);
-      for (const other of shared) state.markAnnounced(store, item.listing.id, other.id);
+      const key = state.keyFor(item.listing);
+      state.markAnnounced(store, key, filter.id);
+      for (const other of shared) state.markAnnounced(store, key, other.id);
     }
   }
   await persist();
