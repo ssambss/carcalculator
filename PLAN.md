@@ -11,7 +11,9 @@ apartments, rentals or anything else with listing pages.
 > existing; and the record of what has been seen sits behind a storage backend
 > that a hosted store slots into. 157 scraper tests pass; app build and lint
 > clean.
-> **Next: Phase 6**, the hosted instance - the reason the order changed.
+> **Next: Phase 6**, which shrank on 2026-08-30 from a hosted service to one
+> watcher over several people's own gists - the audience is family and friends,
+> so it needs no server, no database and no bill.
 >
 > **Decided 2026-08-30:** this gets hosted (Phase 6, Tier 2), because
 > fork-per-user does not reach a non-programmer. Sharing now outranks the
@@ -29,7 +31,7 @@ apartments, rentals or anything else with listing pages.
 | [3 · State adapter](#phase-3--state-behind-a-storage-adapter) | State is per-user, destination not baked in | ✅ done |
 | [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | 🔨 started in Phase 2 |
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
-| [6 · Hosted sharing](#phase-6--hosted-for-people-who-cannot-fork) | Non-technical people actually using it | ⬜ decided, not started |
+| [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ⬜ next |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; push | ⬜ recommended over native |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
@@ -437,11 +439,91 @@ Estimate: ~2–4 days.
 
 ---
 
-## Phase 6 · Hosted, for people who cannot fork
+## Phase 6 · One watcher, several people
 
-**Decided 2026-08-30: build this.** One instance you run, so a user's whole
-setup is *click a Discord invite, click one sign-in button, make filters*. No
-token, no bot, no webhook, no fork.
+**Revised 2026-08-30, after the audience got specific: family and friends,
+supporting their own car purchases. Five to fifteen people, all of them known.**
+
+That is a different problem from the hosted service planned earlier, and a much
+smaller one. **No server, no database, no auth, €0/month.**
+
+### The shape
+
+One watcher — yours — running over several tenants, each of whom keeps their own
+data in their own gist.
+
+| | |
+|---|---|
+| Their data | their own gist, on their own GitHub account. You never see it. |
+| Their app | the token pasted once per device, exactly as yours works today |
+| Their filters | read from their gist, by your watcher |
+| Their state | their gist too (Phase 3's backend, one store per tenant) |
+| Their posts | a channel of their own, in one Discord server you own |
+| Your config | one tenant list: a token secret and a channel per person |
+
+The crawl is shared: one fetch of `/polestar/2` serves everyone watching it,
+which `groupBySearch` already does per filter and only needs widening across
+tenants.
+
+### Why this instead of the hosted version
+
+Onboarding a family member costs **you** about ten minutes, once: help them make
+a GitHub account and a `gist`-scoped token, paste it into their browser. For ten
+people that is under two hours of your time, forever, against **one to two weeks
+of building** plus permanent custody of other people's data.
+
+Supabase and a magic link are genuinely nicer onboarding — thirty seconds,
+self-service, and self-service re-auth. They are worth it when the people are
+strangers, or when there are more than about fifteen of them. Not at this scale.
+
+### Work
+
+- [ ] A tenant list: per person, a gist-token secret and a Discord channel
+- [ ] Widen `groupBySearch` across tenants, so one crawl still serves everyone
+- [ ] `maxPostsPerRun` becomes per tenant — one person's broad filter must not
+      starve everyone else's run
+- [ ] `announce` takes the tenant's channel; the sink takes the tenant's gist
+- [ ] One state store per tenant (Phase 3 already gives this)
+- [ ] A Discord server with a channel per person, and an invite link
+- [ ] Onboarding notes for the ten-minute setup
+
+Estimate: **~3–4 days.** Phases 2 and 3 did the hard parts.
+
+### What to be honest with them about
+
+- **You hold their gist token.** It is scoped to gists only — not their code,
+  not their repos — but that does include any other gists on their account.
+- **They need a GitHub account.** A one-time signup you walk them through. This
+  is the price of no server and no bill.
+- **Token trouble becomes a support call to you.** Classic tokens can be set
+  never to expire, which mostly removes this.
+- **Secrets stop being reasonable past ~15 people.** That is the point where
+  Supabase stops being over-engineering.
+
+### A dependency worth knowing before switching state backends
+
+GitHub disables a public repository's scheduled workflows after **60 days of
+repository inactivity**, and workflow runs themselves do not count — only
+commits. Today the watcher commits `seen.json` back after every run, so the repo
+is never idle and the schedule never lapses.
+
+**Moving state into the gist removes those commits.** Phase 3's own goal would
+therefore quietly disarm the thing keeping the schedule alive. So if the gist
+backend is ever switched on for the repo that runs the cron, it needs a
+keepalive commit, a paid scheduler, or ordinary development activity to take
+over that job — and it should be decided deliberately, not discovered 60 days
+later.
+
+For the family setup this does not bite: tenants' *state* lives in their gists,
+but the watcher still runs from a repo you actively work on.
+
+---
+
+## Phase 6-alt · Hosted, for strangers (parked)
+
+The earlier plan, kept because it is the right answer at a different scale:
+more than about fifteen people, or people you do not know. Costed and measured
+below; parked because the audience turned out to be family.
 
 ### What the user never has to do again
 
@@ -488,6 +570,29 @@ a real duty — deletion, retention, telling people what you keep — not a
 formality. Worth doing deliberately rather than discovering later.
 
 Estimate: ~1–2 weeks plus an ongoing hosting cost.
+
+### Costed, measured from the real record
+
+298 bytes per advert (shared across everyone watching that search) and 137 bytes
+per verdict (per filter). Nothing scales with users directly — adverts scale with
+distinct searches, verdicts with filters:
+
+| Scale | Adverts | Verdicts | Database |
+|---|---|---|---|
+| 5 users, 8 searches | 4 000 | 7 500 | 2.1 MB |
+| 20 users, 15 searches | 7 500 | 50 000 | 8.7 MB |
+| 100 users, 40 searches | 20 000 | 250 000 | 38.4 MB |
+
+Supabase's free tier is 500 MB of database and 5 GB of egress, so a hundred
+users fits with room to spare, and the 7-day inactivity pause never triggers on
+something polled every half hour. **~$25/month** buys backups and an SLA — paid
+because people depend on it, not because you outgrew anything.
+
+The one metric that could cost money is egress, and it is a *design* variable:
+reading and writing the whole record as a blob the way the gist backend does
+would be 108 GB/month at a hundred users, against ~1 GB with incremental
+queries. Which is a reason to use a real database rather than a bigger JSON
+file, quite apart from multi-tenancy.
 
 ### Still true, and still cheap
 
@@ -567,6 +672,17 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **Phase 6 rescoped.** The audience is family and friends
+  supporting their own car purchases — five to fifteen known people — so the
+  hosted service is over-engineered. One watcher over several people's own gists
+  needs no server, no database and no bill, and Phases 2 and 3 already did the
+  hard parts: ~3-4 days instead of 1-2 weeks. The hosted plan is parked, costed,
+  as the right answer past ~15 people or for strangers.
+  - Corrected: the 60-day scheduled-workflow disable is not a risk today,
+    because the watcher's own `seen.json` commits keep the repo active. But that
+    means **switching state to the gist would remove the commits keeping the
+    schedule alive** — noted against Phase 3, since it is its own goal that
+    would disarm it.
 - **2026-08-30** - **Phase 3 done.** Record behind a storage backend (file or
   gist), keys namespaced by source, `--migrate-state` to move it deliberately.
   Found and fixed a migration-chaining bug that would have left v1 files with
