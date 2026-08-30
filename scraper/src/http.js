@@ -1,6 +1,7 @@
 // Minimal polite HTTP client: one request at a time per host, paced, retried.
 
 import config from './config.js';
+import { backoffMs, outcomeOf, retryAfterMs } from './retry.js';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,22 +30,38 @@ async function pace(host, delayMs) {
   lastRequestAt.set(host, Date.now());
 }
 
-const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
-
 /**
- * Fetch a URL as text, retrying transient failures with linear backoff.
- * Returns null on a 404 (a listing that vanished mid-run is not an error).
+ * Fetch a URL as text, retrying transient failures.
+ *
+ * Returns null when the page is gone (404/410) - a listing that vanished
+ * mid-run is not an error. Throws when every attempt failed, with what was
+ * actually seen, because "Failed to fetch" in an Actions log tells nobody
+ * anything: two scheduled runs died at the crawl step and the message was not
+ * enough to say why.
+ *
+ * The policy - which statuses are worth another go, how long to wait, whether to
+ * honour the server's own Retry-After - lives in retry.js, where it can be
+ * tested without a network.
  */
 export async function fetchText(url, { label = url, delayMs: perSource = null } = {}) {
-  const { userAgent, delayMs, timeoutMs, retries, retryBackoffMs } = config.fetch;
+  const { userAgent, delayMs, timeoutMs, retries, retryBackoffMs, retryMaxBackoffMs } =
+    config.fetch;
   const host = hostOf(url);
   const gap = perSource ?? delayMs;
+  const started = Date.now();
+  // Every attempt's outcome, so a final failure can say what actually happened
+  // rather than only how the last one ended.
+  const seen = [];
   let lastError;
+  // Set when an attempt saw something no retry will improve on.
+  let giveUp = false;
 
   for (let attempt = 1; attempt <= retries; attempt += 1) {
     await pace(host, gap);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
+    let retryAfter = null;
+
     try {
       const response = await fetch(url, {
         signal: controller.signal,
@@ -57,31 +74,63 @@ export async function fetchText(url, { label = url, delayMs: perSource = null } 
         },
       });
 
-      if (response.status === 404 || response.status === 410) return null;
+      const outcome = outcomeOf({ status: response.status });
+      seen.push(`HTTP ${response.status}`);
 
-      if (!response.ok) {
-        const error = new Error(`HTTP ${response.status} for ${label}`);
-        if (!RETRYABLE_STATUS.has(response.status)) throw error;
-        lastError = error;
-      } else {
-        return await response.text();
-      }
+      if (outcome === 'gone') return null;
+      if (outcome === 'return') return await response.text();
+
+      retryAfter = retryAfterMs(response.headers.get('retry-after'));
+      lastError = new Error(`HTTP ${response.status} for ${label}`);
+      // A status no amount of waiting will change - a 403 block, a 400 - stops
+      // here rather than being hammered. Flagged rather than thrown, so there is
+      // one exit and one place that builds the message.
+      if (outcome === 'fail') giveUp = true;
     } catch (error) {
-      // A non-retryable HTTP status rethrows immediately.
-      if (error instanceof Error && /^HTTP \d+/.test(error.message) && !lastError) throw error;
+      // A network-level failure: DNS, a reset, or our own timeout firing.
+      const aborted = error?.name === 'AbortError';
+      seen.push(aborted ? `timeout after ${timeoutMs} ms` : (error?.message ?? 'network error'));
       lastError = error;
     } finally {
       clearTimeout(timer);
     }
 
+    if (giveUp) throw describeFailure({ label, seen, started, cause: lastError });
+
     if (attempt < retries) {
-      const backoff = retryBackoffMs * attempt;
-      console.warn(`  retry ${attempt}/${retries - 1} for ${label} in ${backoff}ms (${lastError?.message ?? 'unknown error'})`);
-      await sleep(backoff);
+      const wait = backoffMs({
+        attempt,
+        baseMs: retryBackoffMs,
+        maxMs: retryMaxBackoffMs,
+        retryAfter,
+      });
+      console.warn(
+        `  ${label}: ${seen[seen.length - 1]}; retry ${attempt}/${retries - 1} in ` +
+          `${Math.round(wait / 1000)}s`,
+      );
+      await sleep(wait);
     }
   }
 
-  throw lastError ?? new Error(`Failed to fetch ${label}`);
+  throw describeFailure({ label, seen, started, cause: lastError });
+}
+
+/**
+ * One error that says what the whole attempt sequence saw.
+ *
+ * Every retry's outcome and the elapsed time, so an Actions log read days later
+ * distinguishes "the site said 403 three times" from "three timeouts" from "DNS
+ * never resolved" - which the previous single-line message could not.
+ */
+function describeFailure({ label, seen, started, cause }) {
+  const elapsed = ((Date.now() - started) / 1000).toFixed(1);
+  const error = new Error(
+    `Could not fetch ${label} after ${seen.length} attempt(s) in ${elapsed}s: ` +
+      `${seen.join(' -> ')}`,
+  );
+  error.cause = cause;
+  error.attempts = seen.length;
+  return error;
 }
 
 /** POST JSON, used for the Discord webhook. Honours 429 Retry-After. */

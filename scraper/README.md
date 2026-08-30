@@ -292,7 +292,7 @@ npm run dry-run              # everything except posting; writes no state
 npm run seed                 # re-record what's on sale now, post nothing
 npm run list                 # print current matches per filter, touch nothing
 npm run doctor               # check the setup; posts nothing, writes nothing
-npm test                     # unit tests (200 cases, no network)
+npm test                     # unit tests (227 cases, no network)
 
 node src/index.js --verbose          # also show near misses and why they missed
 node src/index.js --only=polestar    # run one filter, by name or id
@@ -320,8 +320,12 @@ variables always win over the file, so CI secrets override it.
 | `filters.source` | `'auto'` | `'gist'` or `'file'` to pin it; `--filters=` overrides per run |
 | `filters.file` | `'filters.json'` | The committed fallback |
 | `filters.gistFilename` | `'car-tco-filters.json'` | Where the app syncs filters |
-| `fetch.delayMs` | `1500` | Gap between requests |
+| `fetch.delayMs` | `1500` | Gap between requests, per host |
 | `fetch.maxSearchPages` | `40` | Per search, not per run |
+| `fetch.minIntervalMinutes` | `25` | Least time between crawls, whatever the schedule delivers |
+| `fetch.retries` | `5` | Attempts per request, backing off exponentially with jitter |
+| `fetch.maxFailedPages` | `3` | Pages of one search that may fail before it is abandoned |
+| `liveness.staleAfterMinutes` | `120` | Say something when the last run was longer ago than this |
 | `discord.maxPostsPerRun` | `20` | Anti-spam cap, per person per run |
 | `state.store` | `'file'` | `'gist'` to keep the record per user instead of in the repo |
 | `state.gistFilename` | `'car-tco-seen.json'` | Where the gist backend keeps it |
@@ -340,8 +344,18 @@ not a car at all, that is a new source — see *Sources* above.
 ## Running it on a schedule
 
 [`.github/workflows/nettiauto-watch.yml`](../.github/workflows/nettiauto-watch.yml)
-runs the check every 30 minutes and commits `data/seen.json` back to the repo so
-the record survives between runs. Set up:
+asks to run twelve times an hour and commits `data/seen.json` back to the repo so
+the record survives between runs.
+
+**Twelve, to get two.** GitHub runs scheduled jobs on best-effort shared capacity
+and drops most of them: measured over four days on a 30-minute schedule, **17 runs
+against an expected 185** — a 9 % hit rate with a median gap of 5.7 hours, and
+none of the misses ours (no cancelled runs, every run under three minutes). So the
+workflow over-asks and `fetch.minIntervalMinutes` decides which firing actually
+crawls, which converges on the intended rate without becoming six times the load
+on nettiauto if GitHub ever delivers them all. A gap past
+`liveness.staleAfterMinutes` posts a notice, because otherwise the degradation is
+invisible: every individual run succeeds. Set up:
 
 1. Repo **Settings → Secrets and variables → Actions → New repository secret**,
    named `DISCORD_WEBHOOK_URL`.
@@ -486,7 +500,18 @@ the filter's own `implications` rules, and both are reported in the post. See
 ## Being a polite guest
 
 One request at a time **per host**, 1.5 s apart, a real browser User-Agent, and
-retries with backoff on 429/5xx. Per host rather than globally, so a run over
+five attempts with exponential jittered backoff on 429/5xx and Cloudflare's 52x
+range — honouring the server's own `Retry-After` when it sends one. A 403 is
+*not* retried: it is sometimes a bot block, and hammering it is what earns a
+longer one.
+
+**A page that fails does not end the crawl.** It used to, and one flaky request
+out of sixteen took the whole run down for everybody. The watcher is idempotent,
+so a listing missed now is found and announced on a later run, while a dead run
+announces nothing at all — so a failed page is logged, counted and stepped over
+(`fetch.maxFailedPages`). A failing *first* page still abandons that search,
+since there is nothing to page past, and one abandoned search no longer ends the
+run for the others. Per host rather than globally, so a run over
 several sources does not make each one wait out the others' politeness budget —
 within a site it is still strictly one request at a time, which is the part that
 matters. Adding filters never means more requests in flight, only a longer run. A full first run over the Polestar 2 listing is

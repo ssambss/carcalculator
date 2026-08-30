@@ -8,12 +8,22 @@ name: Nettiauto watch
 
 on:
   schedule:
-    # Every 30 minutes, deliberately offset off :00/:30. GitHub runs schedules
-    # on best-effort shared capacity and silently drops firings under load, and
-    # the top and half of the hour are the most oversubscribed minutes of all -
-    # on '*/30' this job was losing roughly nine firings in ten. Drift is still
-    # fine, the scraper is idempotent; never firing at all is not.
-    - cron: '7,37 * * * *'
+    # Ask for twelve an hour; the run itself decides which of them crawls.
+    #
+    # GitHub runs schedules on best-effort shared capacity and drops firings
+    # under load - heavily. Measured over four days on '7,37': **17 runs against
+    # an expected 185**, a 9 % hit rate, median gap 5.7 hours, worst gap 12.5.
+    # None of the misses were ours - no cancelled runs, every run under three
+    # minutes - so moving off :00/:30 was not the fix it looked like.
+    #
+    # So ask for far more than we want and throttle in the watcher instead
+    # (fetch.minIntervalMinutes, default 25). Taking all twelve would be six
+    # times the load on a site that owes us nothing; asking for twelve and
+    # crawling at most twice an hour converges on the rate we intend, whatever
+    # GitHub delivers - and self-corrects if their scheduler improves.
+    #
+    # Every minute is off the quarter-hours, the most oversubscribed of all.
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -70,6 +80,7 @@ jobs:
         run: |
           node src/index.js \
             --notify-errors \
+            ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }} \
             ${{ inputs.dry_run && '--dry-run' || '' }} \
             ${{ inputs.seed && '--seed' || '' }}
 

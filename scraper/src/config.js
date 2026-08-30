@@ -27,9 +27,48 @@ export const config = {
     // Be a polite guest: one request at a time, with a gap between them.
     delayMs: 1500,
     timeoutMs: 30000,
-    retries: 3,
+    // Five attempts, not three. Two scheduled runs have died at the crawl step,
+    // one of them in thirty seconds - the shape of giving up quickly rather than
+    // trying hard and losing. A page that fails is also no longer fatal (see
+    // maxFailedPages), so the cost of trying longer is a slower run at worst.
+    retries: 5,
+    // Exponential with jitter from here, capped below - see src/retry.js. A
+    // server's own Retry-After wins over both.
     retryBackoffMs: 4000,
+    retryMaxBackoffMs: 45000,
+    // How many pages of one search may fail before the crawl gives up on it.
+    // A partial crawl is fine - the watcher is idempotent and will see the rest
+    // next run - but a search where every page fails is a dead source, and
+    // grinding through forty of them wastes the run.
+    maxFailedPages: 3,
     maxSearchPages: 40,
+
+    /**
+     * Least time between crawls, whatever the schedule delivers.
+     *
+     * GitHub's scheduler drops most firings - measured at 9 % over four days -
+     * so the workflow asks for one every five minutes and this decides which of
+     * them actually does anything. Taking all twelve an hour would be six times
+     * the load on a site that owes us nothing.
+     *
+     * Set below the intended gap rather than at it, or a firing that arrives a
+     * minute early gets thrown away and the next chance is five minutes later.
+     */
+    minIntervalMinutes: 25,
+  },
+
+  /**
+   * Say something when the watcher has been quiet far longer than intended.
+   *
+   * The schedule degrading is invisible: every run succeeds, so nothing fails
+   * and nobody is told. It took reading the Actions API to notice a six-hour
+   * median gap between runs. Zero turns this off.
+   */
+  liveness: {
+    staleAfterMinutes: 120,
+    // At most one notice per this long, so a persistently bad schedule says so
+    // without saying it every time.
+    noticeEveryMinutes: 720,
   },
 
   discord: {

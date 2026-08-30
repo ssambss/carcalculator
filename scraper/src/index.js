@@ -30,7 +30,8 @@ const { default: config } = await import('./config.js');
 const { describeFilter, groupBySearch, loadFilters } = await import('./filters.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
-const { failureSummary, needsPosting, postingReadiness } = await import('./preflight.js');
+const { crawlReadiness, failureSummary, needsPosting, postingReadiness, stalenessNotice } =
+  await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
@@ -38,7 +39,16 @@ const state = await import('./state.js');
 const { BACKENDS, storeFor } = await import('./storage/index.js');
 const { describeTenant, loadTenants, postCapFor, selectTenants } = await import('./tenants.js');
 
-const FLAGS = ['--dry-run', '--seed', '--list', '--verbose', '--notify-errors', '--help', '-h'];
+const FLAGS = [
+  '--dry-run',
+  '--seed',
+  '--list',
+  '--verbose',
+  '--force',
+  '--notify-errors',
+  '--help',
+  '-h',
+];
 const FILTER_SOURCES = ['auto', 'gist', 'file'];
 
 function parseArgs(argv) {
@@ -71,6 +81,7 @@ function parseArgs(argv) {
     seed: flags.has('--seed'),
     list: flags.has('--list'),
     verbose: flags.has('--verbose'),
+    force: flags.has('--force'),
     notifyErrors: flags.has('--notify-errors'),
     help: flags.has('--help') || flags.has('-h'),
     filterSource: source,
@@ -90,6 +101,10 @@ Usage: node src/index.js [options]
                    Same as the automatic behaviour of a first run.
   --list           Print every current match and exit. Touches no state.
   --verbose        Also show near misses and why they were rejected.
+  --force          Crawl even if the last run was more recent than the minimum
+                   gap. The scheduled job asks for a firing every few minutes
+                   because most are dropped; this is how a deliberate run gets
+                   through anyway.
   --notify-errors  Post a message to Discord if the run fails.
   --filters=SRC    Where to read filters from: auto (default), gist or file.
   --only=NAME      Run just the filters whose name or id contains NAME.
@@ -499,6 +514,7 @@ async function contextFor(tenant, args) {
  * who owns them.
  */
 async function crawlFor(contexts) {
+  const crawlFailures = [];
   const filters = contexts.flatMap((context) => context.filters);
   const groups = groupBySearch(filters);
   const everyListing = new Map();
@@ -510,11 +526,36 @@ async function crawlFor(contexts) {
     const who = [...new Set(group.filters.map((filter) => filter.tenant.label))];
     const forWhom = who.length > 1 || who[0] !== 'you' ? ` (for ${who.join(', ')})` : '';
     console.log(`\nFetching ${group.key} search results${forWhom}...`);
-    const { listings, total } = await group.source.fetchAllListings(group.search, {
-      onProgress: ({ page, lastPage, fresh }) =>
-        console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
-    });
+    let listings;
+    let total;
+    let pageFailures;
+    try {
+      // One unreachable search must not cost the others theirs. Isolated the
+      // same way a tenant's failure is, and reported the same way at the end:
+      // the run ends non-zero so it cannot pass unnoticed, but everything that
+      // could be done was.
+      ({ listings, total, failures: pageFailures } = await group.source.fetchAllListings(
+        group.search,
+        {
+          onProgress: ({ page, lastPage, fresh }) =>
+            console.log(`  page ${page}/${lastPage} (+${fresh} listings)`),
+        },
+      ));
+    } catch (error) {
+      crawlFailures.push({ key: group.key, error });
+      console.error(`  FAILED: ${error.message}`);
+      continue;
+    }
     console.log(`Read ${listings.length} listings (site reports ${total ?? '?'}).`);
+    if (pageFailures?.length) {
+      // Said out loud, because a run that read twelve pages of sixteen looks
+      // exactly like one that read all of them.
+      console.warn(
+        `  ${pageFailures.length} page(s) of this search failed and were stepped over: ` +
+          `${pageFailures.map((f) => `page ${f.page}`).join(', ')}. ` +
+          'Anything on them will be found on a later run.',
+      );
+    }
     // Stamped here rather than in each adapter: the record is keyed by source
     // and id together, and one forgetful adapter would silently collide with
     // another site's ids. Doing it once, centrally, cannot be forgotten.
@@ -536,7 +577,7 @@ async function crawlFor(contexts) {
     }
   }
 
-  return { groups, everyListing, results, detailFetches, reusedVerdicts };
+  return { groups, everyListing, results, detailFetches, reusedVerdicts, crawlFailures };
 }
 
 /**
@@ -750,6 +791,58 @@ async function main() {
     for (const tenant of tenants) console.log(`  ${describeTenant(tenant)}`);
   }
 
+  // --- Should this firing do anything at all? ---
+  //
+  // The workflow asks for a firing every five minutes because GitHub delivers
+  // roughly one in eleven of them; this is what keeps that from becoming twelve
+  // crawls an hour on the rare stretches when it delivers most of them. See
+  // crawlReadiness().
+  //
+  // The clock is the owner's record, read once here. That is one extra read of a
+  // local file, or one gist call if the owner keeps their state there - cheap
+  // against a crawl, and it has to happen before the per-tenant loads because
+  // those are the expensive part.
+  const clockStore = storeFor(config.state.store, {
+    token: tenants[0]?.gistToken,
+    log: () => {},
+  });
+  const clock = await state.loadState(clockStore);
+  const lastRunAt = clock.isNew ? null : clock.updatedAt;
+
+  if (needsPosting(args)) {
+    const readiness = crawlReadiness({
+      lastRunAt,
+      minMinutes: config.fetch.minIntervalMinutes,
+      force: args.force,
+    });
+    if (readiness === 'too-soon') {
+      const mins = Math.round((Date.now() - Date.parse(lastRunAt)) / 60000);
+      console.log(
+        `Last run was ${mins} min ago and the minimum gap is ` +
+          `${config.fetch.minIntervalMinutes} min - nothing to do. Use --force to override.`,
+      );
+      return 0;
+    }
+  }
+
+  // The schedule degrading is otherwise invisible: every run succeeds, so
+  // nothing fails and nobody is told.
+  const stale = stalenessNotice({
+    lastRunAt,
+    lastNoticeAt: clock.staleNoticeAt ?? null,
+    staleAfterMinutes: config.liveness.staleAfterMinutes,
+    noticeEveryMinutes: config.liveness.noticeEveryMinutes,
+  });
+  if (stale) {
+    console.warn(`\nWATCHER WAS QUIET: ${stale}`);
+    if (needsPosting(args) && tenants[0]?.webhookUrl) {
+      await announceText(`⏰ ${stale}`, { webhookUrl: tenants[0].webhookUrl }).catch(() => {});
+      // Recorded on the same store the gap was read from, so the rate limit
+      // survives even if this run then fails for some other reason.
+      await state.saveState({ ...clock, staleNoticeAt: new Date().toISOString() }, clockStore);
+    }
+  }
+
   // --- What each of them is watching, and what they have already seen. ---
   //
   // One person's trouble must not become everyone's. An expired token or a
@@ -892,6 +985,13 @@ async function main() {
       failures.push({ tenant: context.tenant, error });
       console.error(`\n${label}FAILED: ${error.message}`);
     }
+  }
+
+  // A search that could not be reached is reported alongside the tenants, so
+  // one summary covers everything that went wrong and the run still ends
+  // non-zero rather than looking like a quiet success.
+  for (const { key, error } of crawled.crawlFailures) {
+    failures.push({ tenant: { label: `search ${key}` }, error });
   }
 
   return endRun(failures, tenants);

@@ -35,6 +35,7 @@ apartments, rentals or anything else with listing pages.
 | [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ✅ done |
 | [· Test harness](#frontend-test-harness-) | `src/` has tests, and CI runs them | ✅ done |
 | [· Spreadsheets](#spreadsheet-export-and-import-) | Export/import via Excel, not just JSON | ✅ done |
+| [· Schedule & fetching](#the-schedule-and-fetching-) | Runs when it should; a flaky page is not fatal | 🔨 stagger to verify |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; offline | ✅ done |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
@@ -940,6 +941,83 @@ And driven in a real browser against the built app: export downloads a real
 `.xlsx`, editing one cell and re-importing applies that edit and leaves the other
 car alone, re-importing an untouched sheet changes and restamps nothing, the JSON
 backup still works, and the export menu closes on an outside click.
+
+---
+
+## The schedule, and fetching 🔨
+
+*Found by measuring, not by anything failing.*
+
+### GitHub fires the watcher 9 % of the time
+
+Measured over 93 hours of run history:
+
+| | |
+|---|---|
+| Expected, every 30 min | 185 runs |
+| Actual | **17** |
+| Median gap | **5.7 hours** |
+| Worst gap | 12.5 hours |
+
+And the misses are not ours: **zero cancelled runs**, every run under three
+minutes. GitHub simply never fires them. Moving off `:00/:30` to `7,37` — recorded
+as the fix for this — did not help; the rate is unchanged.
+
+This matters because it is the product. In a live market, "within 30 minutes" and
+"within 6 hours" are the difference between seeing a car and reading about it
+afterwards.
+
+- [x] **Ask for twelve firings an hour and throttle in the run.** Taking all
+      twelve would be six times the load on a site that owes us nothing; asking
+      for twelve and crawling at most every `fetch.minIntervalMinutes` (25)
+      converges on the rate intended, whatever GitHub delivers — and
+      self-corrects if their scheduler improves. `--force` overrides, and a
+      `workflow_dispatch` passes it automatically.
+- [x] **Say something when it goes quiet.** The degradation is invisible by
+      design: every run succeeds, so nothing fails and nobody is told. It took
+      reading the Actions API to notice. A gap past `liveness.staleAfterMinutes`
+      now posts once per 12 h to the owner's channel.
+- [x] **Correct WELCOME.md**, which promised "within half an hour" — currently
+      false. It now says what it aims for, that it is hosted free on infrastructure
+      that runs jobs when it feels like it, and that nothing is missed, only
+      delayed.
+- [ ] **Measure again in a day.** If the stagger does not raise the delivered
+      rate, GitHub is dropping per *workflow* rather than per *entry*, and the
+      answer is an external trigger — a Cloudflare Worker cron calling
+      `workflow_dispatch` (free, and the token stays yours), or a small VM.
+
+### Fetching gave up too easily
+
+Two scheduled runs died at the crawl step, one of them in **30 seconds** — the
+shape of giving up quickly rather than trying hard and losing.
+
+- [x] **A failed page no longer ends the crawl.** It used to: one flaky request
+      out of sixteen threw and the whole run died for everybody. Wrong trade — the
+      watcher is idempotent, so a listing missed now is found and announced next
+      run, while a dead run announces nothing at all. A failed page is logged,
+      counted and stepped over, up to `fetch.maxFailedPages`. A failing *first*
+      page still stops that search, because there is nothing to step over.
+- [x] **A failed search no longer ends the run**, isolated exactly like a
+      tenant's failure and reported in the same summary.
+- [x] **Five attempts, exponential with jitter, capped** (was three, flat 4 s).
+      Jittered because several sources retrying in lockstep is a small
+      thundering herd; capped because a run has a job timeout.
+- [x] **`Retry-After` is honoured** on 429. It was ignored, so a rate-limited
+      request retried after four seconds and usually met another 429.
+- [x] **Cloudflare's 52x range is retryable**; **403 deliberately is not** —
+      sometimes a bot block, and hammering it earns a longer one.
+- [x] **Failures say what happened.** Every attempt's outcome and the elapsed
+      time, so an Actions log read days later distinguishes three timeouts from
+      three 403s from DNS never resolving. The old message could not, which is
+      why the two failures above are still guesses.
+- [x] Policy extracted to `src/retry.js` so it is testable without a network.
+      27 new tests (227 total).
+
+### A bug the extraction found
+
+The old inline version rethrew a non-retryable status **only when no earlier
+attempt had failed**, so a 503 followed by a 403 kept retrying the 403.
+Classification cannot depend on history; `outcomeOf()` does not.
 
 ---
 

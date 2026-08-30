@@ -7,7 +7,9 @@ There are two halves:
 
 - **A watcher.** You describe the car you're looking for — a Polestar 2 from
   2021–2023, under 120 000 km, with the Pilot pack — and when one appears for
-  sale, a message arrives in Discord. Usually within half an hour of it going up.
+  sale, a message arrives in Discord. It aims for within half an hour of the car
+  going up, though it runs on free infrastructure that isn't always punctual —
+  see [How quickly listings arrive](#how-quickly-listings-arrive).
 - **A calculator.** For each car you're considering, it works out what it
   actually costs you *per month*, once fuel, insurance, tax, depreciation and the
   loan are all counted. The number a price tag doesn't tell you.
@@ -201,8 +203,8 @@ Two things, in one private message:
    If you joined theirs, they already have it.
 
 Then they add you, which takes them a minute. **You'll know it worked when
-listings start arriving** — within half an hour, if cars matching your search are
-already for sale.
+listings start arriving** — usually within the hour, if cars matching your search
+are already for sale.
 
 ---
 
@@ -217,8 +219,8 @@ you can judge the call yourself rather than take its word for it.
 
 ## React to one, and it lands in your calculator
 
-Any emoji, from anyone, on any listing. Within half an hour it turns up as a car
-in the app, with the price, kilometres and engine type already filled in.
+Any emoji, from anyone, on any listing. On the next check it turns up as a car in
+the app, with the price, kilometres and engine type already filled in.
 
 **Insurance, tax and maintenance are left blank on purpose.** Nobody can guess
 those for a particular car and a particular person, and a made-up number looks
@@ -242,6 +244,25 @@ that money. Interest is a cost. Depreciation is a cost. The principal isn't.
 car losing €8 000 of value over three years costs you more than its fuel. The
 coloured bar on each card shows where the money actually goes, and it is often not
 where you'd expect.
+
+## How quickly listings arrive
+
+The watcher asks to run every few minutes. **It's hosted free, on shared
+infrastructure that runs scheduled jobs when it feels like it** — so in practice
+a listing usually reaches you within the hour, and occasionally it takes several.
+
+That's a known limitation rather than something broken, and it's being worked on.
+Two things worth knowing meanwhile:
+
+- **Nothing is ever missed, only delayed.** Every check looks at the whole
+  current market, so a car that appeared during a quiet stretch is still found
+  and still announced.
+- **If it goes quiet for hours, it says so.** A message appears in the channel
+  when the gap gets unreasonable, so you're not left wondering whether it's
+  broken or the market is.
+
+If a car is hot and you want to be first, the listing message links straight to
+the advert — the watcher finding it for you is still a head start on browsing.
 
 ## Put it on your home screen
 

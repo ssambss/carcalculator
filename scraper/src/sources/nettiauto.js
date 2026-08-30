@@ -208,21 +208,58 @@ export function parseSearchPage(html, search) {
 }
 
 /**
- * Walk every page of the search. Stops on an empty page, on a page that adds
- * no new ids (a guard against a pager that clamps), or at maxSearchPages.
+ * Walk every page of the search.
+ *
+ * Stops on an empty page, on a page that adds no new ids (a guard against a
+ * pager that clamps), or at maxSearchPages.
+ *
+ * **A page that fails does not end the crawl.** It used to: one flaky request
+ * out of sixteen threw, and the whole run died for everybody. That is the wrong
+ * trade, because the watcher is idempotent - a listing missed this time is found
+ * next time and announced then, while a dead run announces nothing at all. So a
+ * failed page is logged, counted, and stepped over.
+ *
+ * The exception is a *first* page that fails, or more than `maxFailedPages`
+ * failing: that is a source which is down rather than a request that was
+ * unlucky, and grinding through forty pages of it wastes the run. It gives up on
+ * that search and lets the caller carry on with the others.
  */
 export async function fetchAllListings(search, { onProgress } = {}) {
-  const { maxSearchPages } = config.fetch;
+  const { maxSearchPages, maxFailedPages } = config.fetch;
   const listings = [];
   const seenIds = new Set();
+  const failures = [];
   let page = 1;
   let lastPage = 1;
   let total = null;
 
   while (page <= maxSearchPages) {
-    const html = await fetchText(buildSearchUrl(search, page), {
-      label: `${search.make}/${search.model} search page ${page}`,
-    });
+    let html;
+    try {
+      html = await fetchText(buildSearchUrl(search, page), {
+        label: `${search.make}/${search.model} search page ${page}`,
+      });
+    } catch (error) {
+      failures.push({ page, message: error.message });
+      // Nothing at all from the first page means the search itself is
+      // unreachable: no total, no pager, nothing to step over.
+      if (page === 1) {
+        throw new Error(
+          `${search.make}/${search.model} is unreachable - the first search page failed. ` +
+            error.message,
+        );
+      }
+      if (failures.length > maxFailedPages) {
+        console.warn(
+          `  giving up on ${search.make}/${search.model}: ${failures.length} pages failed. ` +
+            `Keeping the ${listings.length} listing(s) read so far.`,
+        );
+        break;
+      }
+      console.warn(`  page ${page} failed, stepping over it: ${error.message}`);
+      page += 1;
+      continue;
+    }
     if (!html) break;
 
     const parsed = parseSearchPage(html, search);
@@ -245,7 +282,10 @@ export async function fetchAllListings(search, { onProgress } = {}) {
     page += 1;
   }
 
-  return { listings, total, pagesFetched: page };
+  // `failures` is reported rather than swallowed: a run that quietly read twelve
+  // of sixteen pages looks identical to one that read all of them, and the
+  // difference is listings nobody was told about until later.
+  return { listings, total, pagesFetched: page, failures };
 }
 
 const AD_STATUS_RE = /class="[^"]*ad-status[^"]*"[^>]*>([\s\S]*?)<\/div>/;

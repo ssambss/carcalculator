@@ -56,3 +56,63 @@ export function failureSummary(failures, tenantCount) {
     'Run `npm run doctor` to check each of them.'
   );
 }
+
+/**
+ * Has enough time passed since the last real run to crawl again?
+ *
+ * This exists because GitHub's scheduler is unreliable in one direction and we
+ * must not become unreliable in the other. Measured over four days, `7,37` fired
+ * **17 times out of an expected 185** - a 9 % hit rate, median gap 5.7 hours -
+ * and none of the misses were ours: no cancelled runs, every run under three
+ * minutes. GitHub simply drops them.
+ *
+ * The fix is to ask for far more firings than we want and throttle here. Asking
+ * for twelve an hour and taking whatever arrives would be six times the load on
+ * a site that owes us nothing; asking for twelve and crawling at most every
+ * `minMinutes` converges on the rate we actually intend, however many GitHub
+ * decides to deliver. It is also self-correcting if their scheduler improves.
+ *
+ * Returns `'ready'` or `'too-soon'`.
+ */
+export function crawlReadiness({ lastRunAt, minMinutes = 0, now = Date.now(), force = false }) {
+  if (force || minMinutes <= 0 || !lastRunAt) return 'ready';
+  const age = (now - Date.parse(lastRunAt)) / 60000;
+  // An unparseable timestamp is not a reason to stop running.
+  if (!Number.isFinite(age)) return 'ready';
+  return age < minMinutes ? 'too-soon' : 'ready';
+}
+
+/**
+ * How long the watcher has been quiet, and whether that is worth saying out loud.
+ *
+ * The schedule degrading is invisible by design: every individual run succeeds,
+ * so nothing fails and nobody is told. It took reading the Actions API to notice
+ * a six-hour median gap. This turns that into a message.
+ *
+ * Rate-limited by `noticeEverySeconds` against the last notice, because if runs
+ * are rare then a notice on every run is itself rare enough to be useful but
+ * frequent enough to be ignored.
+ */
+export function stalenessNotice({
+  lastRunAt,
+  lastNoticeAt = null,
+  staleAfterMinutes = 0,
+  noticeEveryMinutes = 720,
+  now = Date.now(),
+}) {
+  if (staleAfterMinutes <= 0 || !lastRunAt) return null;
+  const gap = (now - Date.parse(lastRunAt)) / 60000;
+  if (!Number.isFinite(gap) || gap < staleAfterMinutes) return null;
+
+  if (lastNoticeAt) {
+    const sinceNotice = (now - Date.parse(lastNoticeAt)) / 60000;
+    if (Number.isFinite(sinceNotice) && sinceNotice < noticeEveryMinutes) return null;
+  }
+
+  const hours = (gap / 60).toFixed(1);
+  return (
+    `The previous run was ${hours} h ago, not the ${staleAfterMinutes} min or less ` +
+    'it should be. GitHub drops most scheduled firings under load, so listings are ' +
+    'arriving late rather than not at all. See PLAN.md, "the schedule".'
+  );
+}
