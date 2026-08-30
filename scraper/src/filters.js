@@ -382,7 +382,7 @@ async function readFiltersFile(path = DEFAULT_FILTERS_PATH, { log = console.log 
  * watcher that keeps running on slightly stale filters beats one that does not
  * run at all.
  */
-async function readFiltersFromGist({ log = console.log, gistToken = config.tco.gistToken } = {}) {
+async function readFiltersFromGist({ log = console.log, gistToken = '' } = {}) {
   if (!gistToken) return null;
   try {
     const { findTcoGist, readGistFile } = await import('./gist.js');
@@ -407,7 +407,9 @@ export async function loadFilters({
   source = config.filters.source,
   log = console.log,
   file = DEFAULT_FILTERS_PATH,
-  gistToken = config.tco.gistToken,
+  // Empty means no gist, *not* the owner's gist: a forgotten token should read
+  // one filter less, never somebody else's filters.
+  gistToken = '',
 } = {}) {
   const tried = [];
 

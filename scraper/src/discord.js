@@ -155,13 +155,13 @@ export function buildEmbed(listing, verdict, filter = null, source = null) {
 export async function announce(
   filter,
   items,
-  { webhookUrl = config.discord.webhookUrl, dryRun = false, source = null } = {},
+  { webhookUrl, dryRun = false, source = null } = {},
 ) {
   if (items.length === 0) return { announced: [], batches: 0 };
+  // No default webhook. Falling back to the owner's would post one person's
+  // matches into another's channel on a forgotten argument.
   if (!dryRun && !webhookUrl) {
-    throw new Error(
-      'No Discord webhook configured. Set DISCORD_WEBHOOK_URL (see scraper/README.md).',
-    );
+    throw new Error('announce() needs the webhook of whoever the post is for.');
   }
 
   const { username, embedsPerMessage } = config.discord;

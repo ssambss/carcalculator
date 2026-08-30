@@ -250,7 +250,12 @@ async function checkBotToken() {
 /** Which source the filters would actually come from on a real run. */
 async function checkFilters() {
   try {
-    const { filters, source } = await loadFilters({ log: () => {} });
+    // Explicitly the owner's - the doctor reports on your setup, and each
+    // tenant is reported separately above.
+    const { filters, source } = await loadFilters({
+      log: () => {},
+      gistToken: config.tco.gistToken,
+    });
     const enabled = filters.filter((filter) => filter.enabled);
     if (enabled.length === 0) {
       return {
@@ -277,7 +282,7 @@ async function checkFilters() {
 async function checkState() {
   let where;
   try {
-    where = storeFor();
+    where = storeFor(config.state.store, { token: config.tco.gistToken });
   } catch (error) {
     return { status: 'bad', name: 'Record', detail: error.message };
   }

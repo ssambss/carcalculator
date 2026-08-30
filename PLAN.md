@@ -537,6 +537,41 @@ calculator by hand.
 | React → car in their calculator | works | needs the bot invited |
 | You can see | their channel | nothing, unless they invite the bot |
 
+### The leak hunt
+
+Three cross-tenant leaks surfaced while building this, all the same shape:
+something global, or a key that was not unique. That pattern was worth a
+deliberate sweep rather than waiting for the fourth. It found four more.
+
+**Every credential had an implicit fallback to the owner's.** `github()`,
+`gistStore()`, `loadFilters()`, `announce()` and `fetchReactedListingIds()` all
+defaulted to the owner's token or webhook, so *any* caller that forgot to pass
+one silently read or wrote the owner's data instead of the tenant's — the
+quietest possible version of the bug. Now nothing defaults: whose gist and whose
+channel are always named at the call site, and missing is an error. Where a
+default genuinely makes sense it defaults to **nothing rather than the owner** —
+`loadFilters` with no token reads the file only, so a forgotten token means one
+filter source less, never somebody else's filters.
+
+**One person's failure was everyone's.** An expired token or a deleted channel
+threw straight out of the tenant loop, so a problem belonging to one person cost
+every other tenant their watcher. Failures are collected now, the healthy tenants
+are served, and the run ends non-zero with a summary naming who failed — visible
+without being contagious. The rule lives in `preflight.js` beside its sibling.
+
+**An owner without a webhook aborted everyone.** The `unconfigured` reading
+returned from the whole run rather than skipping that one tenant, so a
+half-finished owner setup would silently stop every configured tenant.
+
+**`sinks.ready()` answered "can this sink be used?" by checking the owner's
+token** — the wrong answer for every other tenant. It was never called, so it is
+deleted rather than fixed, along with `anySinkConfigured`, whose job the
+per-tenant check in `pickUpReactions` now does.
+
+Also: the reacted-listing map was keyed by bare listing id, which two sources
+will eventually collide on, and `--verbose` printed every tenant's near misses
+unlabelled while `--list` labelled them.
+
 ### Two bugs this turned up
 
 **Every tenant read the owner's state file.** `config.state.store` is global, and
@@ -754,6 +789,13 @@ Deliberately out of scope until the watcher side proves out. Estimate:
   added; `SETUP.md` written; READMEs updated. New files:
   `scraper/src/doctor.js`, `scraper/src/preflight.js`, `SETUP.md`, `PLAN.md`.
   110 tests pass, lint and typecheck clean. Nothing committed to git yet.
+- **2026-08-30** — **Leak hunt.** A deliberate sweep after three cross-tenant
+  leaks appeared on their own. Four more: every credential defaulted to the
+  owner's, one tenant's failure aborted the run for everyone, an owner without a
+  webhook aborted every tenant, and a dead `sinks.ready()` answered for the owner
+  on everybody's behalf. Plus a bare-keyed reacted map and unlabelled `--verbose`
+  output. 194 tests. The rule adopted: **default to nothing, never to the
+  owner.**
 - **2026-08-30** — **Own-server support.** Tenants can use their own Discord
   instead of joining the owner's; posting already worked that way, and reactions
   now degrade to a per-tenant skip when the bot is not in their server. Found a

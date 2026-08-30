@@ -67,7 +67,8 @@ async function discord(path, { botToken, label }) {
  * picking up the owner's reactions into their own calculator. One request per
  * tenant per run is a very cheap way not to have that.
  */
-export async function resolveChannelId({ webhookUrl = config.discord.webhookUrl } = {}) {
+export async function resolveChannelId({ webhookUrl } = {}) {
+  if (!webhookUrl) throw new Error('resolveChannelId needs a webhook to read the channel off.');
   const response = await fetch(webhookUrl);
   if (!response.ok) throw new Error(`Could not read the webhook: HTTP ${response.status}`);
   const body = await response.json();
@@ -121,7 +122,10 @@ function hasQualifyingReaction(message, requiredEmoji) {
 }
 
 /**
- * Scan recent channel history and return the listing ids people reacted to.
+ * Scan recent channel history and return the listings people reacted to.
+ *
+ * Keyed `sourceId:id`, with the bare id carried in the value - the caller needs
+ * both to find the listing and to build its record key.
  *
  * A message may hold more than one embed (batched posts predate this feature),
  * and a reaction applies to the whole message - so every listing in a reacted
@@ -129,8 +133,10 @@ function hasQualifyingReaction(message, requiredEmoji) {
  * forward.
  */
 export async function fetchReactedListingIds({
+  // The bot is genuinely shared - one bot reads every server it is in - so its
+  // token may default. The webhook may not: it decides whose channel is read.
   botToken = config.discord.botToken,
-  webhookUrl = config.discord.webhookUrl,
+  webhookUrl,
   scanMessages = config.tco.scanMessages,
   requiredEmoji = config.tco.requiredEmoji,
   onProgress,
@@ -171,8 +177,13 @@ export async function fetchReactedListingIds({
         continue;
       }
       for (const listing of listings) {
-        if (!reacted.has(listing.id)) {
-          reacted.set(listing.id, { messageId: message.id, sourceId: listing.sourceId });
+        // Keyed by source *and* id. A site's ids are only unique within that
+        // site, so two sources both numbering a listing 900 would otherwise
+        // share one entry - and the survivor's source would decide which
+        // calculator the car landed in.
+        const key = `${listing.sourceId}:${listing.id}`;
+        if (!reacted.has(key)) {
+          reacted.set(key, { messageId: message.id, sourceId: listing.sourceId, id: listing.id });
         }
       }
     }

@@ -9,19 +9,21 @@
 //
 // A sink provides:
 //
-//   id            what a source's `sink` field names
-//   label         for the run log
-//   requires      env vars it cannot work without
-//   add(listings) -> { added, skipped }, both arrays of listing ids
+//   id                    what a source's `sink` field names
+//   label                 for the run log
+//   add(listings, {token}) -> { added, skipped }, both arrays of listing ids
+//
+// The token is always passed in, never read from configuration. A sink writes
+// into somebody's own gist, and whose is not a global fact - there used to be a
+// `ready()` here that answered "is this sink usable?" by checking the *owner's*
+// token, which would have been the wrong answer for every other tenant. It was
+// never called; it is gone rather than fixed.
 
 import { addCarsToTco } from './car-tco.js';
-import config from '../config.js';
 
 const carTco = {
   id: 'car-tco',
   label: 'the Car TCO calculator',
-  requires: ['GIST_TOKEN'],
-  ready: () => Boolean(config.tco.gistToken),
   add: addCarsToTco,
 };
 
@@ -45,9 +47,4 @@ export function sinkFor(source) {
     );
   }
   return sink;
-}
-
-/** True when at least one registered source sends its listings somewhere. */
-export function anySinkConfigured(sources) {
-  return sources.some((source) => Boolean(sinkFor(source)));
 }

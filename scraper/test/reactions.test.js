@@ -136,8 +136,10 @@ describe('reading a tenant\'s own channel', () => {
       webhookUrl: 'https://discord.com/api/webhooks/2/alice',
       scanMessages: 100,
     });
-    assert.deepEqual([...reacted.keys()], ['15900001']);
-    assert.equal(reacted.get('15900001').sourceId, 'nettiauto');
+    // Keyed by source and id together: a site's ids are unique only within
+    // that site, so two sources numbering a listing 900 must not share an entry.
+    assert.deepEqual([...reacted.keys()], ['nettiauto:15900001']);
+    assert.equal(reacted.get('nettiauto:15900001').id, '15900001');
   });
 
   it('ignores a reaction the bot added itself', async () => {

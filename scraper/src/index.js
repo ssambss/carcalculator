@@ -30,7 +30,7 @@ const { default: config } = await import('./config.js');
 const { describeFilter, groupBySearch, loadFilters } = await import('./filters.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
-const { needsPosting, postingReadiness } = await import('./preflight.js');
+const { failureSummary, needsPosting, postingReadiness } = await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
@@ -350,14 +350,14 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
   // Grouped by destination: a channel can carry posts from several sources, and
   // each one's listings go where its own source says.
   const wanted = new Map();
-  for (const [id, entry] of reacted) {
-    const key = state.keyOf(entry.sourceId, id);
+  for (const entry of reacted.values()) {
+    const key = state.keyOf(entry.sourceId, entry.id);
     if (!state.needsTcoAdd(store, key)) continue;
     const sink = sinks.get(entry.sourceId);
     if (!sink) continue;
-    const listing = listings.get(key) ?? listingFromRecord(id, store.listings[key]);
+    const listing = listings.get(key) ?? listingFromRecord(entry.id, store.listings[key]);
     if (!listing) {
-      console.warn(`  reacted listing ${id} is unknown to the record; skipping`);
+      console.warn(`  reacted listing ${key} is unknown to the record; skipping`);
       continue;
     }
     if (wanted.has(sink.id)) wanted.get(sink.id).listings.push(listing);
@@ -408,8 +408,11 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
  * writes the new shape).
  */
 async function migrateState(target) {
-  const from = storeFor();
-  const to = storeFor(target);
+  // The owner's record, explicitly. Everyone else's is always in their own gist
+  // and never moves, so there is nothing here to migrate for them.
+  const token = config.tco.gistToken;
+  const from = storeFor(config.state.store, { token });
+  const to = storeFor(target, { token });
 
   if (from.id === to.id) {
     console.log(`The record already lives in ${to.describe()}. Nothing to do.`);
@@ -697,6 +700,13 @@ async function announceFor(context, crawled, args) {
   return { posted };
 }
 
+/** Throw the summary from preflight.js, or return 0 when nobody failed. */
+function endRun(failures, tenants) {
+  const message = failureSummary(failures, tenants.length);
+  if (message) throw new Error(message);
+  return 0;
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -741,61 +751,80 @@ async function main() {
   }
 
   // --- What each of them is watching, and what they have already seen. ---
+  //
+  // One person's trouble must not become everyone's. An expired token or a
+  // deleted channel used to throw straight out of here, which stopped the run
+  // for every other tenant too - so a problem belonging to one person silently
+  // cost everybody else their watcher. Failures are collected instead, the
+  // healthy tenants are served, and the run ends non-zero with a summary so it
+  // is still impossible to miss.
   const contexts = [];
+  const failures = [];
+  let anyoneCanPost = false;
+
   for (const tenant of tenants) {
     const prefix = tenant.label === 'you' ? '' : `${tenant.label}: `;
-    const context = await contextFor(tenant, args);
-    const disabled = context.wanted - context.filters.length;
-    console.log(
-      `${prefix}${context.found} filter(s) from the ${context.source}` +
-        (args.only ? `, ${context.wanted} matching --only=${args.only}` : '') +
-        (disabled ? `, ${disabled} disabled` : '') +
-        ':',
-    );
-    for (const filter of context.filters) {
-      console.log(`  ${filter.name}: ${describeFilter(filter)}`);
-    }
-
-    // Nothing to post to? Say so before crawling for two minutes to deliver
-    // nowhere - but which kind of "nothing" decides whether that is a quiet
-    // exit or a loud failure. See preflight.js.
-    const readiness = postingReadiness({
-      webhookUrl: tenant.webhookUrl,
-      isNew: context.store.isNew,
-      runs: context.store.runs,
-      needsPosting: needsPosting(args),
-    });
-    if (readiness === 'regressed') {
-      throw new Error(
-        `${tenant.label}: no webhook is set, but this watcher has run ` +
-          `${context.store.runs} time(s) for them before - so there was one. Restore the ` +
-          'secret rather than letting the channel go quiet. To run without posting anyway, ' +
-          'use --dry-run or --list.',
-      );
-    }
-    if (readiness === 'unconfigured') {
-      console.log(`\n${NOT_CONFIGURED}`);
-      return 0;
-    }
-    if (context.store.isNew && !args.list) {
-      console.log(`  ${prefix}no record yet - this run notes what is on sale and posts nothing.`);
-    }
-    if (context.store.migrated) {
+    try {
+      const context = await contextFor(tenant, args);
+      const disabled = context.wanted - context.filters.length;
       console.log(
-        `  ${prefix}record upgraded from version ${context.store.migratedFrom}. Everything ` +
-          'already posted stays posted.' +
-          (context.store.migratedFrom === 1
-            ? ' Verdicts are re-derived, so this run reads a few more listing pages.'
-            : ' Listing keys now name their source.'),
+        `${prefix}${context.found} filter(s) from the ${context.source}` +
+          (args.only ? `, ${context.wanted} matching --only=${args.only}` : '') +
+          (disabled ? `, ${disabled} disabled` : '') +
+          ':',
       );
-    }
+      for (const filter of context.filters) {
+        console.log(`  ${filter.name}: ${describeFilter(filter)}`);
+      }
 
-    if (context.filters.length > 0) contexts.push(context);
+      // Nothing to post to? Skip them before crawling for two minutes to
+      // deliver nowhere - but which kind of "nothing" decides whether that is
+      // quiet or loud. See preflight.js.
+      const readiness = postingReadiness({
+        webhookUrl: tenant.webhookUrl,
+        isNew: context.store.isNew,
+        runs: context.store.runs,
+        needsPosting: needsPosting(args),
+      });
+      if (readiness === 'regressed') {
+        throw new Error(
+          'no webhook is set, but this watcher has run ' +
+            `${context.store.runs} time(s) for them before - so there was one. Restore the ` +
+            'secret rather than letting the channel go quiet. To run without posting anyway, ' +
+            'use --dry-run or --list.',
+        );
+      }
+      if (readiness === 'unconfigured') {
+        // Theirs alone. An owner who has not set a webhook yet used to abort the
+        // whole run here, taking down every tenant who *was* configured.
+        console.log(`  ${prefix}nothing to post to yet - skipping them this run.`);
+        continue;
+      }
+      anyoneCanPost = true;
+
+      if (context.store.isNew && !args.list) {
+        console.log(`  ${prefix}no record yet - this run notes what is on sale and posts nothing.`);
+      }
+      if (context.store.migrated) {
+        console.log(
+          `  ${prefix}record upgraded from version ${context.store.migratedFrom}. Everything ` +
+            'already posted stays posted.' +
+            (context.store.migratedFrom === 1
+              ? ' Verdicts are re-derived, so this run reads a few more listing pages.'
+              : ' Listing keys now name their source.'),
+        );
+      }
+
+      if (context.filters.length > 0) contexts.push(context);
+    } catch (error) {
+      failures.push({ tenant, error });
+      console.error(`  ${prefix}FAILED: ${error.message}`);
+    }
   }
 
   if (contexts.length === 0) {
-    console.log(NOTHING_TO_WATCH);
-    return 0;
+    console.log(anyoneCanPost ? NOTHING_TO_WATCH : NOT_CONFIGURED);
+    return endRun(failures, tenants);
   }
 
   // --- One crawl, shared. ---
@@ -815,7 +844,12 @@ async function main() {
     for (const { filter, rejected } of crawled.results.values()) {
       const near = nearMisses(rejected);
       if (!near.length) continue;
-      console.log(`\n${filter.name} - near misses (${near.length}), in spec but unproven:`);
+      // Labelled by owner, like --list. Two people can have filters with the
+      // same name, and an unlabelled list reads as if it were all one person's.
+      const owner = filter.tenant.label === 'you' ? '' : `[${filter.tenant.label}] `;
+      console.log(
+        `\n${owner}${filter.name} - near misses (${near.length}), in spec but unproven:`,
+      );
       for (const { listing, verdict } of near) {
         console.log(`  ${formatListing(listing)}`);
         console.log(`      ${verdict.reasons.join('; ')}`);
@@ -840,19 +874,27 @@ async function main() {
     ...new Map(crawled.groups.map((group) => [group.source.id, group.source])).values(),
   ];
   for (const context of contexts) {
-    if (config.tco.pickUpReactions) {
-      const label = context.tenant.label === 'you' ? '' : `${context.tenant.label}: `;
-      console.log(`\n${label}checking Discord reactions...`);
-      await pickUpReactions(crawled.everyListing, context.store, {
-        dryRun: args.dryRun,
-        sources,
-        tenant: context.tenant,
-      });
+    const label = context.tenant.label === 'you' ? '' : `${context.tenant.label}: `;
+    try {
+      if (config.tco.pickUpReactions) {
+        console.log(`\n${label}checking Discord reactions...`);
+        await pickUpReactions(crawled.everyListing, context.store, {
+          dryRun: args.dryRun,
+          sources,
+          tenant: context.tenant,
+        });
+      }
+      await announceFor(context, crawled, args);
+    } catch (error) {
+      // Same isolation as loading them: a deleted webhook or a gist that
+      // stopped answering belongs to one person, and the crawl has already been
+      // paid for. Everyone else still gets their posts.
+      failures.push({ tenant: context.tenant, error });
+      console.error(`\n${label}FAILED: ${error.message}`);
     }
-    await announceFor(context, crawled, args);
   }
 
-  return 0;
+  return endRun(failures, tenants);
 }
 
 try {

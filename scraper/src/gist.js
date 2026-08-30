@@ -3,10 +3,10 @@
 // Plumbing only: the GitHub calls, and finding the gist. What a reacted listing
 // turns into once it gets there belongs to a sink - see src/sinks/.
 //
-// Every function takes the token explicitly, defaulting to the owner's. The
+// Every function takes the token explicitly, and there is no default. The
 // watcher runs for several people, each with their own gist and their own
-// token, and a module-level token would have quietly written one person's cars
-// into another's calculator.
+// token; an implicit token would quietly write one person's cars into another's
+// calculator on nothing worse than a forgotten argument.
 //
 // Two contracts to honour, both defined by src/sync.ts and src/storage.ts in
 // the repo root:
@@ -22,9 +22,16 @@ import config from './config.js';
 
 const API = 'https://api.github.com';
 
-async function github(path, init = {}, token = config.tco.gistToken) {
+async function github(path, init = {}, token) {
+  // No default. It used to fall back to the owner's token, which meant any
+  // caller that forgot to pass one silently read and wrote the owner's gist
+  // instead of the tenant's - the quietest possible version of exactly the bug
+  // this module exists to avoid. Missing is now an error.
   if (!token) {
-    throw new Error('No GitHub gist token configured. Set GIST_TOKEN (see README.md).');
+    throw new Error(
+      'No gist token passed. Every gist call names whose gist it is talking to; ' +
+        'see src/tenants.js.',
+    );
   }
   const response = await fetch(`${API}${path}`, {
     ...init,

@@ -10,6 +10,7 @@ import { describe, it } from 'node:test';
 
 import { describeTenant, loadTenants, postCapFor, selectTenants } from '../src/tenants.js';
 import { expandSecretsJson } from '../src/env.js';
+import { failureSummary } from '../src/preflight.js';
 
 /** The owner's secrets, as they have always been named. */
 const OWNER = { GIST_TOKEN: 'owner-token', DISCORD_WEBHOOK_URL: 'https://hook/owner' };
@@ -234,5 +235,35 @@ describe('describing a tenant for the run log', () => {
   it('says so when the owner has no gist of their own', () => {
     const { tenants } = load({ DISCORD_WEBHOOK_URL: 'https://hook/owner' });
     assert.match(describeTenant(tenants[0]), /filters from file/);
+  });
+});
+
+describe('when it works for some people and not others', () => {
+  // One person's expired token or deleted channel used to throw straight out of
+  // the run, which cost every other tenant their watcher too. Now the healthy
+  // ones are served and the run still ends red.
+
+  it('says nothing when nobody failed', () => {
+    assert.equal(failureSummary([], 3), null);
+    assert.equal(failureSummary(undefined, 3), null);
+  });
+
+  it('names who failed, and how many of how many', () => {
+    // Named because the owner has to know whose secrets to go and fix.
+    const message = failureSummary(
+      [{ tenant: { label: 'Alice' } }, { tenant: { label: 'Bob K.' } }],
+      4,
+    );
+    assert.match(message, /2 of 4 tenant\(s\) failed/);
+    assert.match(message, /Alice, Bob K\./);
+  });
+
+  it('says the others were served, so the message is not read as a dead run', () => {
+    const message = failureSummary([{ tenant: { label: 'Alice' } }], 3);
+    assert.match(message, /Everyone else was served/);
+  });
+
+  it('survives a failure with no tenant attached', () => {
+    assert.match(failureSummary([{ error: new Error('x') }], 1), /unknown/);
   });
 });

@@ -25,11 +25,10 @@ import { findTcoGist, readGistFile, writeGistFile } from '../gist.js';
  */
 const WARN_BYTES = 900_000;
 
-export function gistStore({
-  filename = config.state.gistFilename,
-  log = console.log,
-  token = config.tco.gistToken,
-} = {}) {
+export function gistStore({ filename = config.state.gistFilename, log = console.log, token } = {}) {
+  // Whose gist is never implicit: defaulting to the owner's would put one
+  // person's record in another's gist on a forgotten argument.
+  if (!token) throw new Error('gistStore needs the token of whoever owns the gist.');
   let gistId = null;
 
   async function id() {

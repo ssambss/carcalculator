@@ -33,3 +33,26 @@ export function postingReadiness({ webhookUrl, isNew, runs, needsPosting = true 
 export function needsPosting({ dryRun = false, list = false, seed = false } = {}) {
   return !dryRun && !list && !seed;
 }
+
+/**
+ * How a run ends when it worked for some people and not others.
+ *
+ * Returns a message when somebody failed, null when nobody did. The caller
+ * throws it, and throws it *last*: throwing is what turns the workflow run red
+ * and fires `--notify-errors`, while doing it after everyone else has been
+ * served is what stops one person's expired token or deleted channel costing
+ * the rest of the family their watcher.
+ *
+ * Both halves matter. Failing immediately made one person's problem everyone's;
+ * swallowing it would leave somebody quietly unwatched, which is the failure
+ * nobody notices until they ask why the channel went silent.
+ */
+export function failureSummary(failures, tenantCount) {
+  if (!failures?.length) return null;
+  const names = failures.map(({ tenant }) => tenant?.label ?? 'unknown').join(', ');
+  return (
+    `${failures.length} of ${tenantCount} tenant(s) failed: ${names}. ` +
+    'Everyone else was served; their messages are above. ' +
+    'Run `npm run doctor` to check each of them.'
+  );
+}

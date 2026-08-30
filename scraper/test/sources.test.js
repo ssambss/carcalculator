@@ -26,7 +26,6 @@ import { groupBySearch, normalizeFilter, normalizeFilters } from '../src/filters
 import { keyFor, keyOf, loadState, record, wasAnnounced } from '../src/state.js';
 import { fileStore } from '../src/storage/file.js';
 import { storeFor } from '../src/storage/index.js';
-import config from '../src/config.js';
 
 const MATCH = { matched: true, reasons: [] };
 
@@ -281,16 +280,15 @@ describe('the state store', () => {
     assert.equal(storeFor('file').pretty, true);
   });
 
-  it('refuses the gist store without a token instead of falling back', async () => {
-    // Falling back to the file would look like it worked, while writing
-    // somewhere the next run may not read.
-    const had = config.tco.gistToken;
-    config.tco.gistToken = '';
-    try {
-      assert.throws(() => storeFor('gist'), /GIST_TOKEN is not set/);
-    } finally {
-      config.tco.gistToken = had;
-    }
+  it('refuses the gist store without being told whose gist it is', () => {
+    // Not "is a token configured somewhere" - *this* caller's token. Consulting
+    // the owner's would let a caller that forgot to pass a tenant's token sail
+    // past the check and then write that tenant's record into the owner's gist.
+    assert.throws(() => storeFor('gist'), /needs the token of whoever owns the gist/);
+    assert.throws(() => storeFor('gist', {}), /needs the token of whoever owns the gist/);
+    assert.throws(() => storeFor('gist', { token: '' }), /needs the token/);
+    // And is happy once told.
+    assert.equal(storeFor('gist', { token: 'someones-token' }).id, 'gist');
   });
 
   it('rejects a backend it does not have', () => {
