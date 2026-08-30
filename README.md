@@ -26,7 +26,27 @@ color-coded cost breakdown and a side-by-side comparison table.
   payment charged once per term started; that keeps a 36-month lease comparable
   with a car kept for five years instead of making its last two years free.
 - Data lives in the browser's `localStorage` by default — nothing is sent
-  anywhere. Use **Export** to download a JSON backup, **Import** to restore.
+  anywhere.
+- **Export → Spreadsheet** (`.xlsx`): every car as a row, every field as a
+  column, with €/month, €/km and the total alongside for reading. Two sheets —
+  the cars, and the assumptions they are costed against. **Export → Backup**
+  (`.json`) is the exact copy, for restoring.
+- **Import** takes either, picking by the file rather than asking. They mean
+  different things, so they behave differently:
+  - a **backup replaces** everything, because it is an exact copy;
+  - a **spreadsheet merges** — a row updates the car whose `Id` it carries, a row
+    without one becomes a new car, and a car the sheet does not mention is left
+    alone. Deleting by omission is far too easy to do by accident in Excel, so
+    deleting stays something you do here.
+  - Headers are matched loosely (lowercased, units and punctuation stripped), so
+    a sheet survives being reordered, having columns deleted, or being typed from
+    scratch — a hand-made shortlist with just *Name* and *Purchase price* imports
+    fine.
+  - A blank cell means "unchanged", never zero. The computed columns are ignored
+    on the way back in. A sheet nobody edited imports as a no-op — it does not
+    even restamp the cars, so it cannot win a sync merge against another
+    device's real edits.
+  - Numbers are read the way people write them: `28 500`, `4,25`, `1 500 €`.
 - Optional **GitHub sync** (cloud button in the header): the app auto-syncs
   your data to a private gist on your GitHub account, so it survives browser
   resets and follows you between phone and desktop. Setup: create a classic

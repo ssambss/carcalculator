@@ -10,6 +10,7 @@ import {
   saveSelection,
 } from './filtering'
 import { cloneLease, exportJson, importJson, loadData, newCar, saveData } from './storage'
+import { exportExcel, importExcel } from './excel'
 import {
   type SyncConfig,
   connectGist,
@@ -48,6 +49,7 @@ export default function App() {
   const [syncError, setSyncError] = useState('')
   const [syncOpen, setSyncOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
   // The nettiauto watcher's saved searches: kept in their own gist file, so
   // they ride along with sync without being part of the car data.
   const scraperFilters = useScraperFilters(syncConfig)
@@ -258,15 +260,58 @@ export default function App() {
     updateData((d) => ({ ...d, cars: [...d.cars, copy] }))
   }
 
+  /**
+   * Read either format, chosen by the file rather than by the user.
+   *
+   * They mean different things, so they ask differently. A JSON backup is an
+   * exact copy and **replaces** everything. A spreadsheet is something somebody
+   * has been editing, so it **merges**: rows update the cars they match, new
+   * rows are added, and a car the sheet does not mention is left alone -
+   * deleting by omission is far too easy to do by accident in Excel.
+   */
   async function handleImportFile(file: File) {
+    const isSpreadsheet = /\.(xlsx|xlsm)$/i.test(file.name)
     try {
+      if (isSpreadsheet) {
+        const report = await importExcel(file, data)
+        const changes = [
+          report.updated ? `${report.updated} car(s) updated` : '',
+          report.added ? `${report.added} added` : '',
+          report.settingsChanged ? 'assumptions updated' : '',
+        ].filter(Boolean)
+        if (changes.length === 0) {
+          // Reachable and worth saying plainly: importing a sheet nobody edited
+          // is a no-op rather than a failure.
+          window.alert(`Nothing in "${file.name}" differs from what is here already.`)
+          return
+        }
+        const notes = report.warnings.length
+          ? ['', '', 'Worth knowing:', ...report.warnings.map((w) => `• ${w}`)].join('\n')
+          : ''
+        const ok = window.confirm(
+          [
+            `Apply "${file.name}"?`,
+            '',
+            `${changes.join(', ')}.`,
+            '',
+            'Cars not in the sheet are left alone.',
+          ].join('\n') + notes,
+        )
+        if (ok) updateData(() => report.data)
+        return
+      }
+
       const imported = await importJson(file)
       const ok = window.confirm(
         `Replace current data (${data.cars.length} cars) with "${file.name}" (${imported.cars.length} cars)?`,
       )
       if (ok) updateData(() => imported)
-    } catch {
-      window.alert('Could not read that file — it does not look like an export from this app.')
+    } catch (error) {
+      window.alert(
+        error instanceof Error && isSpreadsheet
+          ? ['Could not read that spreadsheet.', '', error.message].join('\n')
+          : 'Could not read that file — it does not look like an export from this app.',
+      )
     }
   }
 
@@ -365,14 +410,62 @@ export default function App() {
             </svg>
             <span className="btn-label">Import</span>
           </button>
-          <button className="btn" onClick={() => exportJson(data)}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8 10V2" />
-              <path d="M5 5l3-3 3 3" />
-              <path d="M2 13h12" />
-            </svg>
-            <span className="btn-label">Export</span>
-          </button>
+          {/*
+            Two formats, because they are for different things: a spreadsheet to
+            read and edit, a JSON backup that is exact. A menu rather than two
+            more buttons - the header is already full on a phone.
+          */}
+          <div className="menu-anchor">
+            <button
+              className="btn"
+              aria-haspopup="true"
+              aria-expanded={exportOpen}
+              onClick={() => setExportOpen((open) => !open)}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 10V2" />
+                <path d="M5 5l3-3 3 3" />
+                <path d="M2 13h12" />
+              </svg>
+              <span className="btn-label">Export</span>
+            </button>
+            {exportOpen && (
+              <>
+                {/* Catches the next click anywhere, which is what closes it. */}
+                <button
+                  className="menu-backdrop"
+                  aria-label="Close export menu"
+                  onClick={() => setExportOpen(false)}
+                />
+                <div className="menu" role="menu">
+                  <button
+                    className="menu-item"
+                    role="menuitem"
+                    onClick={() => {
+                      setExportOpen(false)
+                      exportExcel(data).catch(() =>
+                        window.alert('Could not build the spreadsheet.'),
+                      )
+                    }}
+                  >
+                    <span className="menu-item-name">Spreadsheet</span>
+                    <span className="menu-item-note">.xlsx — every car in a grid, editable</span>
+                  </button>
+                  <button
+                    className="menu-item"
+                    role="menuitem"
+                    onClick={() => {
+                      setExportOpen(false)
+                      exportJson(data)
+                    }}
+                  >
+                    <span className="menu-item-name">Backup</span>
+                    <span className="menu-item-note">.json — exact, for restoring</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           <button className="btn btn-primary header-add" onClick={addCar}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               <path d="M8 3v10" />
@@ -384,7 +477,7 @@ export default function App() {
         <input
           ref={fileInput}
           type="file"
-          accept="application/json,.json"
+          accept="application/json,.json,.xlsx,.xlsm"
           style={{ display: 'none' }}
           onChange={(e) => {
             const file = e.target.files?.[0]

@@ -34,6 +34,7 @@ apartments, rentals or anything else with listing pages.
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
 | [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ✅ done |
 | [· Test harness](#frontend-test-harness-) | `src/` has tests, and CI runs them | ✅ done |
+| [· Spreadsheets](#spreadsheet-export-and-import-) | Export/import via Excel, not just JSON | ✅ done |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; offline | ✅ done |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
@@ -858,6 +859,69 @@ objection.
 out to be what actually blocks real users, or store distribution becomes a goal.
 Capacitor can wrap this same codebase later with little rework, so choosing the
 PWA now does not close the door.
+
+---
+
+## Spreadsheet export and import ✅
+
+*Not a numbered phase — asked for directly.*
+
+The JSON export is a backup: complete, exact and unreadable. This is the other
+thing people want — every car in a grid they can sort, tweak in bulk, and send to
+somebody who lives in Excel.
+
+`src/excel.ts`. **One schema, both directions**: every column is declared once,
+with how to read it and how to write it. A column defined twice is a column that
+drifts, and a spreadsheet whose halves disagree corrupts data quietly rather than
+failing.
+
+### Library choice
+
+| | |
+|---|---|
+| `xlsx` (SheetJS) | npm still carries the 2022 release, whose prototype-pollution fix only shipped on their own CDN. Rejected — the import path is a *parser*. |
+| `exceljs` | 21 MB unpacked, untouched since 2024. Rejected. |
+| **`write-excel-file` + `read-excel-file`** | Both current, purpose-built, and split so only what is used is paid for. **Chosen.** |
+
+**+33 KB gzipped, bundled rather than lazy-loaded.** Lazy-loading would create a
+chunk, and the service worker's `skipWaiting` is safe *because* this app is one
+bundle. 33 KB is a fair price for not complicating the update story.
+
+### The decisions worth knowing
+
+- **Import merges, never replaces.** A car the sheet does not mention is left
+  alone: deleting by omission is far too easy in a spreadsheet.
+- **A blank cell means unchanged, not zero.** Reading it as zero would let
+  somebody tidying up the sheet wipe every price they cleared.
+- **Computed columns are written and ignored.** They are outputs; reading them
+  back would let a stale figure overwrite the numbers it was derived from.
+- **Headers match loosely** — lowercased, units and punctuation stripped — so a
+  hand-made shortlist with only *Name* and *Purchase price* imports fine.
+- **yes/no as text, not Excel booleans**, which a Finnish Excel renders as
+  TOSI/EPÄTOSI. Read back in several languages.
+
+### Two bugs the tests caught
+
+**An unedited import reported changes and restamped every car.** `updated` counted
+every row that *matched*, and `updatedAt` was bumped on all of them. That is worse
+than a cosmetic miscount: restamping makes the whole import newer than another
+device's genuine edits and quietly wins the sync merge against them. Now only a
+row that actually changed something counts or is restamped.
+
+**`settingsChanged` was true whenever an assumption was *read*.** Same shape,
+found by the same browser check. Export-then-import is now a complete no-op.
+
+### Verified
+
+116 frontend tests, including a real round trip — a workbook actually written,
+actually parsed, compared field by field — plus hand-made sheets, comma decimals,
+euro signs, Finnish yes/no and powertrain words, and a sheet with no recognisable
+columns being refused rather than turned into junk.
+
+And driven in a real browser against the built app: export downloads a real
+`.xlsx`, editing one cell and re-importing applies that edit and leaves the other
+car alone, re-importing an untouched sheet changes and restamps nothing, the JSON
+backup still works, and the export menu closes on an outside click.
 
 ---
 

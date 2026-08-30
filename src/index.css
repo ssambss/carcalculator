@@ -1412,3 +1412,64 @@ a.dialog-text {
     height: 40px;
   }
 }
+
+/* Export menu: two formats without two more buttons in a full header. */
+.menu-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+/* An invisible full-screen button, so the next click anywhere closes the menu
+   and the menu itself stays keyboard-reachable. */
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.menu {
+  position: absolute;
+  z-index: 41;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 15rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--bg);
+}
+
+.menu-item-name {
+  font-weight: 600;
+}
+
+.menu-item-note {
+  color: var(--ink-3);
+  font-size: 0.78rem;
+}
