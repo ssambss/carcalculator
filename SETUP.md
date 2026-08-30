@@ -131,6 +131,11 @@ record of what has been posted to them. **You never see any of it**, and the onl
 thing shared is the crawl: two people watching the same model cost one fetch,
 not two.
 
+**Send them [WELCOME.md](WELCOME.md) first.** It is written to them rather than
+to you: what this is, what you are about to ask for and why, how to use it, and
+plainly what you can and cannot see. Reading it before you sit down together
+turns the ten minutes below into confirmation rather than explanation.
+
 ### Once per person, about ten minutes
 
 1. **A Discord channel.** Either in your server or in theirs — see

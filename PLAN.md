@@ -496,6 +496,10 @@ strangers, or when there are more than about fifteen of them. Not at this scale.
       nobody has to join anything. Only reading reactions needs the bot present,
       and a tenant who has not invited it is skipped for that alone rather than
       failing the run.
+- [x] [WELCOME.md](WELCOME.md) — the page you hand to the person joining,
+      written to them rather than about them. SETUP.md §6 is the owner's side;
+      this is theirs, and it says plainly what you can and cannot see, because
+      they are being asked to hand over a key.
 - [ ] **Yours to do:** a channel per person (in your server or theirs), the bot
       invite link for anyone who wants reactions, and the ten-minute setup with
       each of them

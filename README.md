@@ -4,7 +4,9 @@ A total-cost-of-ownership calculator for comparing the cars you might buy or
 lease — built to be used at home and at the dealership (works well on a phone).
 
 Running your own copy — the app, sync and the listing watcher, with your data
-and your searches — is [SETUP.md](SETUP.md). Where the project is headed
+and your searches — is [SETUP.md](SETUP.md). If somebody set this up *for* you,
+[WELCOME.md](WELCOME.md) is the one to read: what it does, what you were asked
+for and why, and what the person running it can and cannot see. Where the project is headed
 (making the watcher's source pluggable so it can follow apartments or rentals,
 and hosting it so people who do not write software can use it) is
 [PLAN.md](PLAN.md).
