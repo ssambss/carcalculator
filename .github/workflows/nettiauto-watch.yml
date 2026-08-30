@@ -8,9 +8,12 @@ name: Nettiauto watch
 
 on:
   schedule:
-    # Every 30 minutes. GitHub queues cron runs on shared capacity, so the
-    # actual time drifts; that is fine, the scraper is idempotent.
-    - cron: '*/30 * * * *'
+    # Every 30 minutes, deliberately offset off :00/:30. GitHub runs schedules
+    # on best-effort shared capacity and silently drops firings under load, and
+    # the top and half of the hour are the most oversubscribed minutes of all -
+    # on '*/30' this job was losing roughly nine firings in ten. Drift is still
+    # fine, the scraper is idempotent; never firing at all is not.
+    - cron: '7,37 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -33,6 +36,11 @@ permissions:
 jobs:
   watch:
     runs-on: ubuntu-latest
+    # A normal run takes ~2 minutes and the slowest seen was 7. Without a
+    # ceiling, a run wedged on an unresponsive nettiauto holds the concurrency
+    # group for GitHub's default six hours and every schedule behind it is
+    # dropped - one stuck run costs a whole morning of checks.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
