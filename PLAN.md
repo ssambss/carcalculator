@@ -33,6 +33,7 @@ apartments, rentals or anything else with listing pages.
 | [4 · Conformance suite](#phase-4--conformance-suite) | A stranger can add a source safely | 🔨 started in Phase 2 |
 | [5 · Second source](#phase-5--second-source) | Proof it generalizes (oikotie) | ⬜ not started |
 | [6 · One watcher, several people](#phase-6--one-watcher-several-people) | Family and friends using it, €0/month | ✅ done |
+| [· Test harness](#frontend-test-harness-) | `src/` has tests, and CI runs them | ✅ done |
 | [6b · Installable client](#phase-6b--installable-client-pwa) | Home-screen icon on desktop and phone; push | ⬜ recommended over native |
 | [7 · Asset-agnostic TCO](#phase-7--asset-agnostic-tco-optional) | Apartments in the calculator | ⬜ optional |
 
@@ -275,18 +276,10 @@ Replace named numeric fields with a generic constraint bag:
 - [ ] **Deferred:** drop the compatibility default once the live filters carry
       their own qualifiers — the last car-specific thing left in the matcher
 
-### Gap worth knowing about
+### Gap now closed
 
-**The frontend has no test harness.** The scraper has 130 tests; `src/` has
-none, so the app-side normalizer was verified with a throwaway script (compile
-the two modules standalone, assert on the round trip) rather than something that
-runs in CI. It checked the two rules that matter — legacy-wins-on-conflict, and
-an unknown field surviving the normalizer — and both hold. But nothing stops
-them regressing.
-
-Adding vitest is the obvious fix and a real dependency decision, so it is
-flagged rather than taken. It gets more pressing at Phase 6, where the app grows
-auth and a second transport.
+The frontend had no test harness, so app-side normalizers were verified with a
+throwaway script. **Fixed** — see the harness section below.
 
 Estimate was ~2 days; came in around that.
 
@@ -739,6 +732,52 @@ plan to *a* path.
 
 **Shipping a shared write credential in the static app** so users need no
 account at all. It hands that credential to everyone who opens the page.
+
+---
+
+## Frontend test harness ✅
+
+*Not a numbered phase — it was the gap every phase kept widening.*
+
+`src/` had no tests at all. The scraper had 200; the app had a throwaway script
+I wrote twice and deleted twice. **vitest**, chosen because it is the standard
+for a Vite project and handles TS and bundler-style resolution without a second
+build step. Dev dependency only.
+
+87 tests, aimed where a mistake is silent rather than loud:
+
+| | |
+|---|---|
+| `calc.ts` | 34 tests. **Never tested before**, and it is every number the app shows. |
+| `storage.ts` | The normalizers — the only gate between stored JSON and everything else |
+| `sync.ts` | The per-car merge: tombstones, resurrection, stable serialization |
+| `scraperFilters.ts` / `listingFields.ts` | The cross-codebase filter contract |
+
+No DOM environment. The money is in the logic, not in whether a button renders,
+and adding jsdom later is a config line rather than a rewrite.
+
+Also adds `.github/workflows/test.yml`, running both suites on every push and
+pull request — there was no test gate at all before, so a broken normalizer
+would have reached Pages unnoticed.
+
+### What writing them found
+
+**`toNum` did not read comma decimals.** The comma handling lives in the number
+*input* component, so `"1,95"` in stored or imported JSON silently became the
+default price. Harmless while the app was the only writer; directly in the way of
+the Excel import, where a Finnish sheet will be full of them. Now reads comma
+decimals and grouped thousands, non-breaking spaces included, so an exported
+figure pasted back survives.
+
+**A lesson about test fixtures.** My first sync tests used fixed dates, and three
+failed — not from a bug but because `2026-03-01` is already past the 90-day
+tombstone window. A hardcoded date silently changes what a test *means* as the
+calendar moves: a "recent deletion" quietly becomes an expired one and the test
+starts asserting the opposite of its name. All time-relative now.
+
+The calc tests passed first try, including an independently computed annuity
+figure — reassuring, and the reason to write them was never that the maths was
+suspected, but that nothing would have told us if a refactor broke it.
 
 ---
 

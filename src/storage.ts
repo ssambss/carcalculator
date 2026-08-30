@@ -251,7 +251,20 @@ function isFinancingMethod(v: unknown): v is FinancingMethod {
   return v === 'cash' || v === 'loan' || v === 'lease'
 }
 
+/**
+ * A number out of stored JSON, however it was written.
+ *
+ * Strings get the same treatment the number inputs give typing: a comma decimal
+ * and grouping spaces are both accepted. The app itself always writes real
+ * numbers, so this is for everything that is not the app - a hand-edited export,
+ * a spreadsheet, a locale that puts commas in decimals. `1,95` silently becoming
+ * the default petrol price is a worse answer than reading it.
+ */
 function toNum(v: unknown, fallback: number): number {
-  const n = typeof v === 'string' ? Number(v) : v
-  return typeof n === 'number' && Number.isFinite(n) ? n : fallback
+  if (typeof v === 'number') return Number.isFinite(v) ? v : fallback
+  if (typeof v !== 'string') return fallback
+  const cleaned = v.replace(/[\s  ]/g, '').replace(',', '.')
+  if (!cleaned) return fallback
+  const n = Number(cleaned)
+  return Number.isFinite(n) ? n : fallback
 }

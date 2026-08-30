@@ -88,7 +88,16 @@ npm install
 npm run dev      # dev server at http://localhost:5173
 npm run build    # type-check + production build into dist/
 npm run lint     # oxlint
+npm test         # unit tests (vitest)
+npm run test:all # ...and the listing watcher's, which are separate
 ```
+
+Tests cover the parts where a mistake is silent rather than loud: the TCO maths
+in [src/calc.ts](src/calc.ts), the normalizers that read stored and imported
+data, and the per-car sync merge. No DOM environment — the money is in the logic,
+not in whether a button renders, and adding jsdom later is a config line rather
+than a rewrite. Both suites run on every push
+([.github/workflows/test.yml](.github/workflows/test.yml)).
 
 The design mockups (Claude Design canvas) live in [design/](design/) —
 open `design/car-tco-design.html` in a browser to view them.

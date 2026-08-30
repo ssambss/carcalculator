@@ -1,0 +1,52 @@
+name: Tests
+
+# Both halves of the repo, on every push and pull request.
+#
+# They are genuinely independent - the scraper shares no code, no dependency and
+# no build step with the app - so they run as separate jobs and one failing does
+# not hide the other's result.
+#
+# This gates nothing by itself; it is here so a broken normalizer or a broken
+# matcher is visible before the Pages deploy publishes it.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A superseded run on the same branch tells you nothing useful.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Calculator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Type-check separately from the build, so a type error reads as one.
+      - run: npx tsc -b
+      - run: npm run lint
+      - run: npm test
+
+  watcher:
+    name: Listing watcher
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # No npm ci: the watcher has no dependencies, which is the point of it.
+      - run: npm test
+        working-directory: scraper
