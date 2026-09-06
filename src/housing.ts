@@ -190,7 +190,12 @@ export function paymentForLoan(loan: number, ratePct: number, termMonths: number
 
 /* ---------------------------------------------------------------- ASP split */
 
-/** An ASP loan runs at most 25 years, whatever term the regular loan gets. */
+/**
+ * An ASP loan runs at most 25 years under the rules in force, whatever term
+ * the regular loan gets. The April 2026 kehysriihi decision stretches ASP
+ * terms to 40 years (and the loan share to 95 %) — lift this cap when that
+ * reform actually lands.
+ */
 const aspTermMonths = (s: HousingSituation): number => Math.min(s.termYears, 25) * 12
 
 export interface LoanSplit {

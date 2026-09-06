@@ -1077,6 +1077,14 @@ the summed figures. Fixed on the way: the ceiling card had no padding of its
 own (`.card` brings none; every variant sets it), which is why its texts sat
 on the container edge.
 
+**Pending law (flagged 2026-09-06):** the April 2026 kehysriihi decided to
+raise the ASP loan share to 95 % (käsiraha 10 % → 5 %) and stretch ASP terms
+to 40 years; the Valtiokonttori guidance in force (1.6.2026) still says 10 %
+and 25 years, and the press expects the change ~2027. When it lands: lift the
+25-year ASP cap in `aspTermMonths`, flip the min-cash-share hint to 5 %, and
+re-check the two-saver cap figures. The hints already tell the user to ask
+their bank which rules apply.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie

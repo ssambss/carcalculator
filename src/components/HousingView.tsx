@@ -328,7 +328,7 @@ function SituationPanel({
           unit="%"
           hint={
             situation.useAspLoan
-              ? 'ASP itself requires 10 % of the price saved, whatever the loan cap says'
+              ? 'ASP: 10 % saved under the rules in force — the decided 4/2026 reform cuts it to 5 %, ask your bank which applies'
               : 'the loan cap allows 5 % since 6/2026 — your bank may still want more'
           }
         />
