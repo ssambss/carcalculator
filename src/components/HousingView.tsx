@@ -326,6 +326,11 @@ function SituationPanel({
           value={situation.minDownPaymentPct}
           onChange={(n) => set({ minDownPaymentPct: Math.min(100, Math.max(0, n)) })}
           unit="%"
+          hint={
+            situation.useAspLoan
+              ? 'ASP itself requires 10 % of the price saved, whatever the loan cap says'
+              : 'the loan cap allows 5 % since 6/2026 — your bank may still want more'
+          }
         />
         <NumberField
           compact
