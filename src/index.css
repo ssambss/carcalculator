@@ -1554,3 +1554,25 @@ a.dialog-text {
   color: var(--danger);
   font-weight: 600;
 }
+
+/* The add tile at the end of the property grid — a button dressed as a card. */
+.add-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 180px;
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-card:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}

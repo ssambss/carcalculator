@@ -104,6 +104,15 @@ export function HousingView({ store }: { store: HousingStore }) {
                 onDelete={() => deleteProperty(p)}
               />
             ))}
+            {/* The desktop add lives here: the header has no housing buttons
+                and the fab only exists below 640px. */}
+            <button className="card add-card" onClick={addProperty}>
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                <path d="M8 3v10" />
+                <path d="M3 8h10" />
+              </svg>
+              Add place
+            </button>
           </div>
           <HousingTable properties={sorted} costs={costs} ceiling={ceiling.maxPrice} />
         </>
