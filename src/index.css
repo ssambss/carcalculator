@@ -1522,9 +1522,11 @@ a.dialog-text {
 }
 
 /* Its own card, not a tail on the panel above: the same 24px rhythm the other
-   sections keep. */
+   sections keep. `.card` brings no padding of its own - every variant sets it,
+   and this one forgot at first, leaving the texts on the border. */
 .ceiling-card {
   margin-top: 24px;
+  padding: 18px 20px 20px;
 }
 
 .ceiling-label {

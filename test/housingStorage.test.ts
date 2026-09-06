@@ -164,3 +164,30 @@ describe('the ASP fields', () => {
     expect(normalizeSituation({ useAspLoan: 1 }).useAspLoan).toBe(false)
   })
 })
+
+describe('the second borrower', () => {
+  it('defaults to buying alone', () => {
+    const s = normalizeSituation({})
+    expect(s.buyingTogether).toBe(false)
+    expect(s.partnerNetIncomePerMonth).toBe(0)
+    expect(s.partnerSavings).toBe(0)
+  })
+
+  it('reads the partner figures back', () => {
+    const s = normalizeSituation({
+      buyingTogether: true,
+      partnerNetIncomePerMonth: '2 600',
+      partnerOtherLoanPaymentsPerMonth: 150,
+      partnerSavings: '20 000',
+    })
+    expect(s.buyingTogether).toBe(true)
+    expect(s.partnerNetIncomePerMonth).toBe(2600)
+    expect(s.partnerOtherLoanPaymentsPerMonth).toBe(150)
+    expect(s.partnerSavings).toBe(20000)
+  })
+
+  it('treats anything but literal true as buying alone', () => {
+    expect(normalizeSituation({ buyingTogether: 'yes' }).buyingTogether).toBe(false)
+    expect(normalizeSituation({ buyingTogether: 1 }).buyingTogether).toBe(false)
+  })
+})

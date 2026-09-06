@@ -86,6 +86,16 @@ export function normalizeSituation(raw: unknown): HousingSituation {
       toNum(s.otherLoanPaymentsPerMonth, d.otherLoanPaymentsPerMonth),
     ),
     savings: Math.max(0, toNum(s.savings, d.savings)),
+    buyingTogether: s.buyingTogether === true,
+    partnerNetIncomePerMonth: Math.max(
+      0,
+      toNum(s.partnerNetIncomePerMonth, d.partnerNetIncomePerMonth),
+    ),
+    partnerOtherLoanPaymentsPerMonth: Math.max(
+      0,
+      toNum(s.partnerOtherLoanPaymentsPerMonth, d.partnerOtherLoanPaymentsPerMonth),
+    ),
+    partnerSavings: Math.max(0, toNum(s.partnerSavings, d.partnerSavings)),
     housingSharePct: Math.min(100, Math.max(0, toNum(s.housingSharePct, d.housingSharePct))),
     ratePct: Math.max(0, toNum(s.ratePct, d.ratePct)),
     // A term of zero would make every annuity zero; a year is the sane floor.

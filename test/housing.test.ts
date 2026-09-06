@@ -174,6 +174,49 @@ describe('the ceiling', () => {
   })
 })
 
+describe('buying together', () => {
+  it('makes a couple exactly the sum of its parts', () => {
+    // The bank sizes one household: a partner's income, obligations and
+    // savings count in full, nothing more and nothing less. So a couple must
+    // produce the identical result to one borrower holding the summed figures.
+    const couple = situation({
+      buyingTogether: true,
+      partnerNetIncomePerMonth: 2600,
+      partnerOtherLoanPaymentsPerMonth: 150,
+      partnerSavings: 20000,
+    })
+    const summed = situation({
+      netIncomePerMonth: 3400 + 2600,
+      otherLoanPaymentsPerMonth: 190 + 150,
+      savings: 40000 + 20000,
+    })
+    expect(affordability(couple)).toEqual(affordability(summed))
+    expect(propertyCost(flat(), couple, 0)).toEqual(propertyCost(flat(), summed, 0))
+  })
+
+  it('keeps the partner fields inert until the toggle is on', () => {
+    // Filled-in partner figures with the toggle off must change nothing - a
+    // couple that splits up does not want ghost income in the ceiling.
+    const off = situation({ partnerNetIncomePerMonth: 5000, partnerSavings: 100000 })
+    expect(affordability(off)).toEqual(affordability(situation()))
+  })
+
+  it('raises the ceiling with the partner income, budget first', () => {
+    // Second income 2 600 €: budget (6 000 × 35 %) − 190 − 250 = 1 660 €/mo,
+    // carrying 1 660 × 155.2069 ≈ 257 643 under stress. Savings unchanged.
+    const a = affordability(situation({ buyingTogether: true, partnerNetIncomePerMonth: 2600 }))
+    expect(a.paymentBudget).toBeCloseTo(1660, 6)
+    expect(a.maxLoanByStress).toBeCloseTo(257643, 0)
+  })
+
+  it('puts the partner savings into a candidate loan', () => {
+    // 249 000 × 1.015 − (40 000 + 20 000) = 192 735.
+    const couple = situation({ buyingTogether: true, partnerSavings: 20000 })
+    const c = propertyCost(flat(), couple, 0)
+    expect(c.loan).toBeCloseTo(192735, 4)
+  })
+})
+
 describe('the ASP split', () => {
   // Annuity factors used in the hand references:
   //   3.0 % / 300 mo → 210.8745    3.5 % / 300 mo → 199.7510

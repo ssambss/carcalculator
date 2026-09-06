@@ -45,6 +45,11 @@ export interface HousingSituation {
   otherLoanPaymentsPerMonth: number
   /** cash available for the down payment, tax and fees */
   savings: number
+  /** a second borrower on the same loan — a couple buying together */
+  buyingTogether: boolean
+  partnerNetIncomePerMonth: number
+  partnerOtherLoanPaymentsPerMonth: number
+  partnerSavings: number
   /** how much of net income housing may take, % — payment plus charges */
   housingSharePct: number
   /** the rate you expect to actually pay (reference + margin), %/yr */
@@ -72,6 +77,10 @@ export const DEFAULT_HOUSING: HousingSituation = {
   netIncomePerMonth: 0,
   otherLoanPaymentsPerMonth: 0,
   savings: 0,
+  buyingTogether: false,
+  partnerNetIncomePerMonth: 0,
+  partnerOtherLoanPaymentsPerMonth: 0,
+  partnerSavings: 0,
   housingSharePct: 35,
   ratePct: 3.5,
   termYears: 25,
@@ -107,6 +116,26 @@ export interface PropertyListing {
 }
 
 export type Constraint = 'income' | 'stress' | 'savings'
+
+/* ---------------------------------------------------------- the household */
+
+/**
+ * Both borrowers' figures together — the bank sizes one household, so with the
+ * toggle on, a partner's income, obligations and savings simply count in full.
+ * Everything downstream reads only these totals: the partner fields are inert
+ * until the toggle says otherwise.
+ */
+export function householdIncome(s: HousingSituation): number {
+  return s.netIncomePerMonth + (s.buyingTogether ? s.partnerNetIncomePerMonth : 0)
+}
+
+export function householdOtherLoans(s: HousingSituation): number {
+  return s.otherLoanPaymentsPerMonth + (s.buyingTogether ? s.partnerOtherLoanPaymentsPerMonth : 0)
+}
+
+export function householdSavings(s: HousingSituation): number {
+  return s.savings + (s.buyingTogether ? s.partnerSavings : 0)
+}
 
 export interface Affordability {
   /** the ceiling: the highest price every constraint allows */
@@ -235,8 +264,8 @@ function maxLoanForBudget(budget: number, s: HousingSituation): number {
 export function affordability(s: HousingSituation): Affordability {
   const budget = Math.max(
     0,
-    (s.netIncomePerMonth * s.housingSharePct) / 100 -
-      s.otherLoanPaymentsPerMonth -
+    (householdIncome(s) * s.housingSharePct) / 100 -
+      householdOtherLoans(s) -
       s.maintenanceEstimatePerMonth,
   )
 
@@ -251,7 +280,7 @@ export function affordability(s: HousingSituation): Affordability {
 
   const t = s.transferTaxPct / 100
   const d = s.minDownPaymentPct / 100
-  const cashForPrice = Math.max(0, s.savings - s.buyingCosts)
+  const cashForPrice = Math.max(0, householdSavings(s) - s.buyingCosts)
 
   const priceByCash = (cashForPrice + loanCap) / (1 + t)
   // d + t can be 0 if somebody sets both to zero; then savings never bind.
@@ -261,7 +290,10 @@ export function affordability(s: HousingSituation): Affordability {
   const transferTax = maxPrice * t
   // The cash equation decides the split at the ceiling; the clamps only matter
   // away from it, but keep the numbers honest against rounding.
-  const loan = Math.min(loanCap, Math.max(0, maxPrice + transferTax + s.buyingCosts - s.savings))
+  const loan = Math.min(
+    loanCap,
+    Math.max(0, maxPrice + transferTax + s.buyingCosts - householdSavings(s)),
+  )
   const downPayment = Math.max(0, maxPrice - loan)
   const split = splitLoan(loan, s)
 
@@ -343,7 +375,7 @@ export interface PropertyCost {
  */
 export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: number): PropertyCost {
   const t = s.transferTaxPct / 100
-  const loan = Math.max(0, p.price * (1 + t) + s.buyingCosts - s.savings)
+  const loan = Math.max(0, p.price * (1 + t) + s.buyingCosts - householdSavings(s))
   const downPayment = Math.max(0, p.price - loan)
   const split = splitLoan(loan, s)
   const loanPayment = split.payment

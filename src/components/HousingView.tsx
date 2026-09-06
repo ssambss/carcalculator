@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import {
   HOUSING_CATEGORIES,
   affordability,
+  householdIncome,
+  householdSavings,
   propertyCost,
   type HousingSituation,
   type PropertyCost,
@@ -138,7 +140,8 @@ function SituationPanel({
   const [expanded, setExpanded] = useState(false)
   const set = (patch: Partial<HousingSituation>) => onChange({ ...situation, ...patch })
 
-  const summary = `${fmtNum(situation.netIncomePerMonth)} €/mo net · ${fmtNum(situation.savings)} € saved · ${fmtNum(situation.ratePct)} % / ${fmtNum(situation.termYears)} yrs`
+  // The collapsed line shows what the maths actually uses: household totals.
+  const summary = `${fmtNum(householdIncome(situation))} €/mo net · ${fmtNum(householdSavings(situation))} € saved · ${fmtNum(situation.ratePct)} % / ${fmtNum(situation.termYears)} yrs${situation.buyingTogether ? ' · two borrowers' : ''}`
 
   return (
     <div className={`card assumptions housing-panel${expanded ? ' expanded' : ''}`}>
@@ -203,6 +206,50 @@ function SituationPanel({
           unit="€/mo"
         />
       </div>
+
+      <div className="assumptions-heading">
+        <div className="assumptions-title">Buying together</div>
+        <div className="assumptions-caption">a second borrower on the same loan</div>
+      </div>
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={situation.buyingTogether}
+          onChange={(e) => set({ buyingTogether: e.target.checked })}
+        />
+        <span>
+          Add a second borrower
+          <span className="check-hint">
+            Their income raises the monthly budget and their savings the cash — the
+            bank sizes one household. The ASP cap stays per home, not per buyer.
+          </span>
+        </span>
+      </label>
+      {situation.buyingTogether && (
+        <div className="assumptions-fields">
+          <NumberField
+            compact
+            label="Their net income"
+            value={situation.partnerNetIncomePerMonth}
+            onChange={(n) => set({ partnerNetIncomePerMonth: Math.max(0, n) })}
+            unit="€/mo"
+          />
+          <NumberField
+            compact
+            label="Their other loans"
+            value={situation.partnerOtherLoanPaymentsPerMonth}
+            onChange={(n) => set({ partnerOtherLoanPaymentsPerMonth: Math.max(0, n) })}
+            unit="€/mo"
+          />
+          <NumberField
+            compact
+            label="Their savings"
+            value={situation.partnerSavings}
+            onChange={(n) => set({ partnerSavings: Math.max(0, n) })}
+            unit="€"
+          />
+        </div>
+      )}
 
       {/*
         ASP is a financing choice, not a fact about the buyer: the loan is ASP

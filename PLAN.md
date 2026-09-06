@@ -1068,6 +1068,15 @@ a stacked layout (`.housing-panel`) because three headed groups plus a
 checkbox stopped reading as the car panel's single strip, and the ceiling
 card got the 24 px rhythm instead of sitting attached to the panel.
 
+**Buying together (2026-09-06):** a second borrower as a toggle plus three
+fields. Everything downstream reads only household totals
+(`householdIncome`/`OtherLoans`/`Savings`), so the partner fields are inert
+until the toggle is on, and a couple is *exactly* the sum of its parts — a
+test asserts `affordability(couple)` deep-equals a single borrower holding
+the summed figures. Fixed on the way: the ceiling card had no padding of its
+own (`.card` brings none; every variant sets it), which is why its texts sat
+on the container edge.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1077,6 +1086,10 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-06** — **Second borrower for couples.** Household totals feed the
+  whole model; couple ≡ summed single borrower by test. Ceiling card finally
+  got its own padding — its texts sat on the card border. 170 frontend tests,
+  verified in Chromium.
 - **2026-09-06** — **ASP loans in housing mode.** Full-ASP or ASP + regular
   split, cap and rate as inputs; stress test unchanged by design. Ceiling card
   detached from the situation panel, panel restacked. 163 frontend tests,
