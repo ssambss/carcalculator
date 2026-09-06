@@ -169,6 +169,7 @@ function SituationPanel({
           value={situation.otherLoanPaymentsPerMonth}
           onChange={(n) => set({ otherLoanPaymentsPerMonth: Math.max(0, n) })}
           unit="€/mo"
+          hint="what you pay per month — not the balance owed"
         />
         <NumberField
           compact
@@ -241,6 +242,7 @@ function SituationPanel({
             value={situation.partnerOtherLoanPaymentsPerMonth}
             onChange={(n) => set({ partnerOtherLoanPaymentsPerMonth: Math.max(0, n) })}
             unit="€/mo"
+            hint="payments per month, not the balance"
           />
           <NumberField
             compact
@@ -354,6 +356,15 @@ function SituationPanel({
 /* ------------------------------------------------------------------ ceiling */
 
 function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> }) {
+  // A zero budget is nearly always a typo, not a fact about the household -
+  // the classic being a loan's total balance typed into the €/mo field. Say
+  // that outright instead of letting the generic note imply low income.
+  const note =
+    ceiling.paymentBudget <= 0
+      ? 'Your monthly budget is zero — other loans and the maintenance estimate use up ' +
+        'the whole housing share, so only savings count. Check that "Other loans" holds ' +
+        'the monthly payments, not the balance owed.'
+      : LIMIT_NOTE[ceiling.limitedBy]
   return (
     <div className="card ceiling-card">
       <div className="ceiling-label">You could afford up to</div>
@@ -362,7 +373,7 @@ function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> })
           <span className="hero-value display">{fmtEur(ceiling.maxPrice)}</span>
         </div>
       </div>
-      <p className="ceiling-note">{LIMIT_NOTE[ceiling.limitedBy]}</p>
+      <p className="ceiling-note">{note}</p>
       {ceiling.maxPrice > 0 && (
         <div className="stat-row">
           {ceiling.aspLoan > 0 && ceiling.regularLoan > 0 ? (
@@ -389,6 +400,10 @@ function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> })
           <div className="stat">
             <span className="stat-label">Transfer tax</span>
             <span className="stat-value">{fmtEur(ceiling.transferTax)}</span>
+          </div>
+          <div className="stat">
+            <span className="stat-label">Budget / mo</span>
+            <span className="stat-value">{fmtEur(ceiling.paymentBudget)}</span>
           </div>
           <div className="stat">
             <span className="stat-label">Payment / mo</span>
