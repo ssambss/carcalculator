@@ -221,7 +221,8 @@ function SituationPanel({
           Add a second borrower
           <span className="check-hint">
             Their income raises the monthly budget and their savings the cash — the
-            bank sizes one household. The ASP cap stays per home, not per buyer.
+            bank sizes one household. If you are both ASP savers, the ASP cap rises
+            too: set the higher figure in the ASP section.
           </span>
         </span>
       </label>
@@ -270,9 +271,10 @@ function SituationPanel({
         <span>
           Finance with an ASP loan
           <span className="check-hint">
-            ASP up to the cap, the rest as a regular loan on top. Caps are per
-            municipality (Helsinki 230 000 €, Espoo/Vantaa 185 000 €, Tampere/Turku
-            160 000 €, elsewhere 140 000 €) — check the current ones.
+            ASP up to the cap, the rest as a regular loan on top. Caps from 6/2026:
+            Helsinki, Espoo, Vantaa, Kauniainen, Tampere, Turku and Oulu 230 000 €,
+            elsewhere 160 000 € — and two ASP savers together get 345 000 € /
+            240 000 €. Check the current ones.
           </span>
         </span>
       </label>
@@ -291,6 +293,11 @@ function SituationPanel({
             value={situation.aspMaxLoan}
             onChange={(n) => set({ aspMaxLoan: Math.max(0, n) })}
             unit="€"
+            hint={
+              situation.buyingTogether
+                ? 'two ASP savers together: 345 000 € in the big cities, 240 000 € elsewhere'
+                : undefined
+            }
           />
         </div>
       )}

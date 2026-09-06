@@ -91,8 +91,12 @@ export const DEFAULT_HOUSING: HousingSituation = {
   maintenanceEstimatePerMonth: 250,
   useAspLoan: false,
   aspRatePct: 3.0,
-  // Helsinki's cap; Espoo/Vantaa/Kauniainen, Tampere/Turku and the rest are
-  // lower. An input like the other rules - check your municipality's figure.
+  // The single-borrower cap in the big cities (Helsinki, Espoo, Vantaa,
+  // Kauniainen, Tampere, Turku, Oulu — the 1.6.2026 tiers; elsewhere
+  // 160 000 €). Two ASP savers buying together get half as much again
+  // (345 000 € / 240 000 €) - typed in here, not multiplied by the code,
+  // because it depends on BOTH buyers being ASP savers, which this model
+  // does not know. An input like the other rules - check the current figure.
   aspMaxLoan: 230000,
 }
 

@@ -1086,6 +1086,12 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-06** — **ASP caps corrected to the 1.6.2026 rules** (user caught
+  the stale 2023 figures): big cities 230 000 € / elsewhere 160 000 €, and two
+  ASP savers together get 345 000 € / 240 000 €. The two-saver raise is typed
+  into the cap field, not multiplied by code - it requires both buyers to be
+  ASP savers, which the model does not know. The buying-together hint's
+  "per home, not per buyer" claim was wrong under the new rules and is gone.
 - **2026-09-06** — **Second borrower for couples.** Household totals feed the
   whole model; couple ≡ summed single borrower by test. Ceiling card finally
   got its own padding — its texts sat on the card border. 170 frontend tests,

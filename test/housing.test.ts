@@ -291,7 +291,8 @@ describe('the ASP split', () => {
   })
 
   it('packages a candidate loan as ASP plus the top-up, and prices each part', () => {
-    // Espoo's lower cap: the 212 735 € loan splits 185 000 + 27 735.
+    // A cap below the loan: 212 735 € splits into 185 000 + 27 735. (The cap
+    // is an arithmetic fixture here, not any municipality's current figure.)
     const s = asp({ aspMaxLoan: 185000 })
     const c = propertyCost(flat(), s, affordability(s).maxPrice)
     expect(c.aspLoan).toBe(185000)
