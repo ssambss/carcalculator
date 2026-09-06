@@ -98,6 +98,9 @@ export function normalizeSituation(raw: unknown): HousingSituation {
       0,
       toNum(s.maintenanceEstimatePerMonth, d.maintenanceEstimatePerMonth),
     ),
+    useAspLoan: s.useAspLoan === true,
+    aspRatePct: Math.max(0, toNum(s.aspRatePct, d.aspRatePct)),
+    aspMaxLoan: Math.max(0, toNum(s.aspMaxLoan, d.aspMaxLoan)),
   }
 }
 

@@ -23,10 +23,16 @@
  *    (90 % is the common cap), so cash has to bridge the rest no matter how
  *    strong the income is.
  *
- * The regulatory numbers — stress rate, LTV cap, transfer tax — are **inputs
- * with defaults, not facts baked in**. They change with the law and with the
- * buyer (first homes have had different rules over the years), so the form
- * says "check the current rules" rather than this file pretending to know.
+ * Financing can be a regular mortgage or an **ASP loan** (the first-home
+ * scheme): cheaper money, but capped per municipality — a home under the cap
+ * is bought fully on ASP, a dearer one on ASP plus a regular loan on top.
+ * See `splitLoan` for what is and is not modeled.
+ *
+ * The regulatory numbers — stress rate, LTV cap, transfer tax, the ASP cap —
+ * are **inputs with defaults, not facts baked in**. They change with the law
+ * and with the buyer (first homes have had different rules over the years), so
+ * the form says "check the current rules" rather than this file pretending to
+ * know.
  */
 
 /* -------------------------------------------------------------------- types */
@@ -54,6 +60,12 @@ export interface HousingSituation {
   buyingCosts: number
   /** hoitovastike guess used for the ceiling; candidates carry their own */
   maintenanceEstimatePerMonth: number
+  /** finance with an ASP loan — first-home scheme, cheaper but capped */
+  useAspLoan: boolean
+  /** the ASP loan's rate, %/yr — banks price these below a regular mortgage */
+  aspRatePct: number
+  /** the municipal cap on the ASP loan, € — anything above becomes a regular loan */
+  aspMaxLoan: number
 }
 
 export const DEFAULT_HOUSING: HousingSituation = {
@@ -68,6 +80,11 @@ export const DEFAULT_HOUSING: HousingSituation = {
   transferTaxPct: 1.5,
   buyingCosts: 0,
   maintenanceEstimatePerMonth: 250,
+  useAspLoan: false,
+  aspRatePct: 3.0,
+  // Helsinki's cap; Espoo/Vantaa/Kauniainen, Tampere/Turku and the rest are
+  // lower. An input like the other rules - check your municipality's figure.
+  aspMaxLoan: 230000,
 }
 
 /** A flat or house you are actually considering. */
@@ -96,6 +113,9 @@ export interface Affordability {
   maxPrice: number
   /** the loan and cash split at that ceiling */
   loan: number
+  /** how the ceiling loan packages: the ASP part and the regular part on top */
+  aspLoan: number
+  regularLoan: number
   downPayment: number
   transferTax: number
   /** € / month the budget allows for the payment, after other loans and charges */
@@ -135,6 +155,69 @@ export function paymentForLoan(loan: number, ratePct: number, termMonths: number
   return (loan * i) / (1 - Math.pow(1 + i, -termMonths))
 }
 
+/* ---------------------------------------------------------------- ASP split */
+
+/** An ASP loan runs at most 25 years, whatever term the regular loan gets. */
+const aspTermMonths = (s: HousingSituation): number => Math.min(s.termYears, 25) * 12
+
+export interface LoanSplit {
+  /** the ASP part, up to the municipal cap */
+  asp: number
+  /** whatever the cap could not cover, as a regular mortgage on top */
+  regular: number
+  aspPayment: number
+  regularPayment: number
+  /** both annuities together, € / month */
+  payment: number
+  /** first-month interest across both parts */
+  firstMonthInterest: number
+}
+
+/**
+ * How a loan packages under the chosen financing.
+ *
+ * With ASP on, the cheap money goes in first: the ASP loan takes as much as
+ * the municipal cap allows, and only the remainder becomes a regular mortgage
+ * — a home under the cap is bought fully on ASP, a dearer one on the
+ * combination. With ASP off, everything is one regular loan and the split
+ * degenerates to what the maths did before it existed.
+ *
+ * The ASP interest subsidy (the state pays 70 % of the rate above 3.8 % for
+ * the first ten years) is deliberately NOT modeled: at today's rates it is
+ * worth zero, it expires mid-loan, and a bank does not count it when sizing.
+ * If rates climb past the threshold, fold it into the ASP rate by hand.
+ */
+export function splitLoan(loan: number, s: HousingSituation): LoanSplit {
+  const asp = s.useAspLoan ? Math.min(Math.max(0, loan), Math.max(0, s.aspMaxLoan)) : 0
+  const regular = Math.max(0, loan - asp)
+  const aspPayment = paymentForLoan(asp, s.aspRatePct, aspTermMonths(s))
+  const regularPayment = paymentForLoan(regular, s.ratePct, s.termYears * 12)
+  return {
+    asp,
+    regular,
+    aspPayment,
+    regularPayment,
+    payment: aspPayment + regularPayment,
+    firstMonthInterest: (asp * s.aspRatePct + regular * s.ratePct) / 100 / 12,
+  }
+}
+
+/**
+ * The largest total loan the budget carries at the offered rates: with ASP on,
+ * the budget buys the ASP loan first (the cheaper money, so every euro of
+ * budget carries more of it), and whatever budget remains carries a regular
+ * loan on top.
+ */
+function maxLoanForBudget(budget: number, s: HousingSituation): number {
+  if (!s.useAspLoan) return maxLoanForPayment(budget, s.ratePct, s.termYears * 12)
+  const asp = Math.min(
+    Math.max(0, s.aspMaxLoan),
+    maxLoanForPayment(budget, s.aspRatePct, aspTermMonths(s)),
+  )
+  const budgetLeft = budget - paymentForLoan(asp, s.aspRatePct, aspTermMonths(s))
+  return asp + maxLoanForPayment(budgetLeft, s.ratePct, s.termYears * 12)
+}
+
 /**
  * How high a price the whole situation reaches, and what stops it there.
  *
@@ -157,9 +240,11 @@ export function affordability(s: HousingSituation): Affordability {
       s.maintenanceEstimatePerMonth,
   )
 
-  const maxLoanByPayment = maxLoanForPayment(budget, s.ratePct, s.termYears * 12)
+  const maxLoanByPayment = maxLoanForBudget(budget, s)
   // The stress test uses the test rate over at most 25 years, whatever the
   // offered term - a 30-year loan is not allowed to look cheaper under stress.
+  // It tests the whole debt, however it is packaged: an ASP loan is stressed
+  // exactly like a regular one, so ASP never moves a stress-limited ceiling.
   const stressMonths = Math.min(s.termYears, 25) * 12
   const maxLoanByStress = maxLoanForPayment(budget, s.stressRatePct, stressMonths)
   const loanCap = Math.min(maxLoanByPayment, maxLoanByStress)
@@ -178,6 +263,7 @@ export function affordability(s: HousingSituation): Affordability {
   // away from it, but keep the numbers honest against rounding.
   const loan = Math.min(loanCap, Math.max(0, maxPrice + transferTax + s.buyingCosts - s.savings))
   const downPayment = Math.max(0, maxPrice - loan)
+  const split = splitLoan(loan, s)
 
   const limitedBy: Constraint =
     priceByLtv < priceByCash
@@ -189,10 +275,12 @@ export function affordability(s: HousingSituation): Affordability {
   return {
     maxPrice,
     loan,
+    aspLoan: split.asp,
+    regularLoan: split.regular,
     downPayment,
     transferTax,
     paymentBudget: budget,
-    paymentAtRate: paymentForLoan(loan, s.ratePct, s.termYears * 12),
+    paymentAtRate: split.payment,
     paymentAtStress: paymentForLoan(loan, s.stressRatePct, stressMonths),
     maxLoanByPayment,
     maxLoanByStress,
@@ -225,6 +313,9 @@ export type HousingBreakdown = Record<HousingCategoryKey, number>
 export interface PropertyCost {
   /** what this price would have you borrow, given your savings */
   loan: number
+  /** how that loan packages — all ASP, ASP + regular on top, or all regular */
+  aspLoan: number
+  regularLoan: number
   downPayment: number
   /** € / month: the annuity at your own rate and term */
   loanPayment: number
@@ -254,13 +345,12 @@ export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: n
   const t = s.transferTaxPct / 100
   const loan = Math.max(0, p.price * (1 + t) + s.buyingCosts - s.savings)
   const downPayment = Math.max(0, p.price - loan)
-  const termMonths = s.termYears * 12
-  const loanPayment = paymentForLoan(loan, s.ratePct, termMonths)
+  const split = splitLoan(loan, s)
+  const loanPayment = split.payment
 
-  // First-month split: interest is simply the monthly rate on the full
+  // First-month split: interest is simply each part's monthly rate on its
   // principal; everything else in the payment reduces the loan.
-  const monthlyRate = s.ratePct / 100 / 12
-  const interest = loan * monthlyRate
+  const interest = split.firstMonthInterest
   const principal = Math.max(0, loanPayment - interest)
 
   const charges = p.maintenancePerMonth + p.financingChargePerMonth + p.otherPerMonth
@@ -268,6 +358,8 @@ export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: n
 
   return {
     loan,
+    aspLoan: split.asp,
+    regularLoan: split.regular,
     downPayment,
     loanPayment,
     totalPerMonth,

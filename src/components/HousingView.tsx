@@ -141,7 +141,7 @@ function SituationPanel({
   const summary = `${fmtNum(situation.netIncomePerMonth)} €/mo net · ${fmtNum(situation.savings)} € saved · ${fmtNum(situation.ratePct)} % / ${fmtNum(situation.termYears)} yrs`
 
   return (
-    <div className={`card assumptions${expanded ? ' expanded' : ''}`}>
+    <div className={`card assumptions housing-panel${expanded ? ' expanded' : ''}`}>
       <div className="assumptions-heading">
         <div className="assumptions-title">Your situation</div>
         <div className="assumptions-caption">what the ceiling is computed from</div>
@@ -205,6 +205,50 @@ function SituationPanel({
       </div>
 
       {/*
+        ASP is a financing choice, not a fact about the buyer: the loan is ASP
+        up to the municipal cap, and whatever the cap cannot cover becomes a
+        regular mortgage on top. The subsidy above 3.8 % is documented as not
+        modeled in housing.ts.
+      */}
+      <div className="assumptions-heading">
+        <div className="assumptions-title">ASP loan</div>
+        <div className="assumptions-caption">first-home scheme — cheaper, but capped</div>
+      </div>
+      <label className="check-row asp-toggle">
+        <input
+          type="checkbox"
+          checked={situation.useAspLoan}
+          onChange={(e) => set({ useAspLoan: e.target.checked })}
+        />
+        <span>
+          Finance with an ASP loan
+          <span className="check-hint">
+            ASP up to the cap, the rest as a regular loan on top. Caps are per
+            municipality (Helsinki 230 000 €, Espoo/Vantaa 185 000 €, Tampere/Turku
+            160 000 €, elsewhere 140 000 €) — check the current ones.
+          </span>
+        </span>
+      </label>
+      {situation.useAspLoan && (
+        <div className="assumptions-fields">
+          <NumberField
+            compact
+            label="ASP interest"
+            value={situation.aspRatePct}
+            onChange={(n) => set({ aspRatePct: Math.max(0, n) })}
+            unit="%/yr"
+          />
+          <NumberField
+            compact
+            label="ASP loan cap"
+            value={situation.aspMaxLoan}
+            onChange={(n) => set({ aspMaxLoan: Math.max(0, n) })}
+            unit="€"
+          />
+        </div>
+      )}
+
+      {/*
         The rules banks and the taxman apply, not facts this app knows: the
         stress rate is supervisory practice, the LTV cap and transfer tax are
         law that changes. Defaults are the common case - check the current
@@ -262,10 +306,23 @@ function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> })
       <p className="ceiling-note">{LIMIT_NOTE[ceiling.limitedBy]}</p>
       {ceiling.maxPrice > 0 && (
         <div className="stat-row">
-          <div className="stat">
-            <span className="stat-label">Loan</span>
-            <span className="stat-value">{fmtEur(ceiling.loan)}</span>
-          </div>
+          {ceiling.aspLoan > 0 && ceiling.regularLoan > 0 ? (
+            <>
+              <div className="stat">
+                <span className="stat-label">ASP loan</span>
+                <span className="stat-value">{fmtEur(ceiling.aspLoan)}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Regular on top</span>
+                <span className="stat-value">{fmtEur(ceiling.regularLoan)}</span>
+              </div>
+            </>
+          ) : (
+            <div className="stat">
+              <span className="stat-label">{ceiling.aspLoan > 0 ? 'Loan (all ASP)' : 'Loan'}</span>
+              <span className="stat-value">{fmtEur(ceiling.loan)}</span>
+            </div>
+          )}
           <div className="stat">
             <span className="stat-label">Down payment</span>
             <span className="stat-value">{fmtEur(ceiling.downPayment)}</span>
@@ -368,10 +425,23 @@ function PropertyCard({
             <span className="stat-value">{fmtEur(cost.pricePerM2)}</span>
           </div>
         )}
-        <div className="stat">
-          <span className="stat-label">Loan</span>
-          <span className="stat-value">{fmtEur(cost.loan)}</span>
-        </div>
+        {cost.aspLoan > 0 && cost.regularLoan > 0 ? (
+          <>
+            <div className="stat">
+              <span className="stat-label">ASP loan</span>
+              <span className="stat-value">{fmtEur(cost.aspLoan)}</span>
+            </div>
+            <div className="stat">
+              <span className="stat-label">Regular on top</span>
+              <span className="stat-value">{fmtEur(cost.regularLoan)}</span>
+            </div>
+          </>
+        ) : (
+          <div className="stat">
+            <span className="stat-label">{cost.aspLoan > 0 ? 'Loan (all ASP)' : 'Loan'}</span>
+            <span className="stat-value">{fmtEur(cost.loan)}</span>
+          </div>
+        )}
         <div className="stat">
           <span className="stat-label">Cost / mo</span>
           <span className="stat-value">{fmtEur(cost.costPerMonth)}</span>
@@ -420,6 +490,7 @@ function HousingTable({
   const visibleCategories = HOUSING_CATEGORIES.filter((cat) =>
     list.some(({ c }) => c.breakdown[cat.key] > 0),
   )
+  const anyAsp = list.some(({ c }) => c.aspLoan > 0)
 
   return (
     <div className="card cmp-card">
@@ -498,6 +569,26 @@ function HousingTable({
                 </td>
               ))}
             </tr>
+            {anyAsp && (
+              <tr>
+                <th className="rowhead">of which ASP</th>
+                {list.map(({ p, c }) => (
+                  <td key={p.id} className={`num${c.aspLoan > 0 ? '' : ' muted'}`}>
+                    {c.aspLoan > 0 ? fmtEur(c.aspLoan) : '—'}
+                  </td>
+                ))}
+              </tr>
+            )}
+            {anyAsp && (
+              <tr>
+                <th className="rowhead">Regular loan on top</th>
+                {list.map(({ p, c }) => (
+                  <td key={p.id} className={`num${c.regularLoan > 0 ? '' : ' muted'}`}>
+                    {c.regularLoan > 0 ? fmtEur(c.regularLoan) : c.loan > 0 ? 'fits in ASP' : '—'}
+                  </td>
+                ))}
+              </tr>
+            )}
             {visibleCategories.map((cat) => {
               const values = list.map(({ c }) => c.breakdown[cat.key])
               return (

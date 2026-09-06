@@ -1374,6 +1374,18 @@ a.dialog-text {
     display: flex;
   }
 
+  .housing-panel .check-row {
+    display: none;
+  }
+
+  .housing-panel.expanded .check-row {
+    display: flex;
+  }
+
+  .housing-panel.expanded .assumptions-heading {
+    display: flex;
+  }
+
   .field-compact {
     width: calc(50% - 8px);
   }
@@ -1479,6 +1491,40 @@ a.dialog-text {
   display: inline-flex;
   gap: 4px;
   margin-right: 6px;
+}
+
+/*
+  The situation panel stacks its groups instead of using the car panel's single
+  strip: three headed groups plus a checkbox do not read as one row.
+*/
+.assumptions.housing-panel {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.housing-panel .assumptions-heading {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.housing-panel .assumptions-heading + .assumptions-heading,
+.housing-panel .assumptions-fields + .assumptions-heading,
+.housing-panel .check-row + .assumptions-heading {
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.housing-panel .check-row {
+  max-width: 62ch;
+}
+
+/* Its own card, not a tail on the panel above: the same 24px rhythm the other
+   sections keep. */
+.ceiling-card {
+  margin-top: 24px;
 }
 
 .ceiling-label {

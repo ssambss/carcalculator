@@ -142,3 +142,25 @@ describe('merging between devices', () => {
     expect(merged.tombstones.recent).toBeTruthy()
   })
 })
+
+describe('the ASP fields', () => {
+  it('defaults to off with the standard figures', () => {
+    const s = normalizeSituation({})
+    expect(s.useAspLoan).toBe(false)
+    expect(s.aspRatePct).toBe(DEFAULT_HOUSING.aspRatePct)
+    expect(s.aspMaxLoan).toBe(DEFAULT_HOUSING.aspMaxLoan)
+  })
+
+  it('reads them back, cap typed the way a person types it', () => {
+    const s = normalizeSituation({ useAspLoan: true, aspMaxLoan: '185 000', aspRatePct: '2,9' })
+    expect(s.useAspLoan).toBe(true)
+    expect(s.aspMaxLoan).toBe(185000)
+    expect(s.aspRatePct).toBe(2.9)
+  })
+
+  it('treats anything but literal true as off', () => {
+    // A hand-edited gist saying "yes" must not switch financing models.
+    expect(normalizeSituation({ useAspLoan: 'yes' }).useAspLoan).toBe(false)
+    expect(normalizeSituation({ useAspLoan: 1 }).useAspLoan).toBe(false)
+  })
+})

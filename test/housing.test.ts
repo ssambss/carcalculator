@@ -16,6 +16,7 @@ import {
   maxLoanForPayment,
   paymentForLoan,
   propertyCost,
+  splitLoan,
   type HousingSituation,
   type PropertyListing,
 } from '../src/housing'
@@ -170,6 +171,95 @@ describe('the ceiling', () => {
     const a = affordability(situation())
     expect(a.paymentAtStress).toBeCloseTo(a.paymentBudget, 0)
     expect(a.paymentAtRate).toBeLessThan(a.paymentBudget)
+  })
+})
+
+describe('the ASP split', () => {
+  // Annuity factors used in the hand references:
+  //   3.0 % / 300 mo → 210.8745    3.5 % / 300 mo → 199.7510
+  const asp = (over: Partial<HousingSituation> = {}) =>
+    situation({ useAspLoan: true, aspRatePct: 3.0, aspMaxLoan: 230000, ...over })
+
+  it('is off by default and changes nothing', () => {
+    const split = splitLoan(200000, situation())
+    expect(split.asp).toBe(0)
+    expect(split.regular).toBe(200000)
+    expect(split.payment).toBeCloseTo(paymentForLoan(200000, 3.5, 300), 6)
+  })
+
+  it('buys a home under the cap fully on ASP', () => {
+    const split = splitLoan(150000, asp())
+    expect(split.asp).toBe(150000)
+    expect(split.regular).toBe(0)
+    expect(split.payment).toBeCloseTo(paymentForLoan(150000, 3.0, 300), 6)
+  })
+
+  it('puts a regular loan on top once the cap is hit', () => {
+    const split = splitLoan(250000, asp())
+    expect(split.asp).toBe(230000)
+    expect(split.regular).toBe(20000)
+    // Two annuities at their own rates, not one blended loan.
+    expect(split.payment).toBeCloseTo(
+      paymentForLoan(230000, 3.0, 300) + paymentForLoan(20000, 3.5, 300),
+      6,
+    )
+  })
+
+  it('runs the ASP part over at most 25 years, whatever the regular term', () => {
+    const s = asp({ termYears: 30 })
+    const split = splitLoan(330000, s)
+    // The ASP annuity is priced on 300 months, the regular top-up on 360.
+    expect(split.aspPayment).toBeCloseTo(paymentForLoan(230000, 3.0, 300), 6)
+    expect(split.regularPayment).toBeCloseTo(paymentForLoan(100000, 3.5, 360), 6)
+  })
+
+  it('stretches an income-limited loan but never the stress test', () => {
+    // Cheaper money carries more: 750 €/mo at 3.0 % is 750 × 210.8745
+    // ≈ 158 156 of ASP loan against 149 813 at the regular 3.5 %. The stress
+    // test does not care how the debt is packaged, so it stays put - which is
+    // why ASP alone does not move a stress-limited ceiling.
+    const without = affordability(situation())
+    const withAsp = affordability(asp())
+    expect(withAsp.maxLoanByPayment).toBeCloseTo(158156, -1)
+    expect(withAsp.maxLoanByPayment).toBeGreaterThan(without.maxLoanByPayment)
+    expect(withAsp.maxLoanByStress).toBeCloseTo(without.maxLoanByStress, 6)
+    expect(withAsp.limitedBy).toBe('stress')
+    expect(withAsp.maxPrice).toBeCloseTo(without.maxPrice, 6)
+    // ...but the ceiling loan gets cheaper: all of it fits inside the cap.
+    expect(withAsp.aspLoan).toBeCloseTo(withAsp.loan, 6)
+    expect(withAsp.regularLoan).toBe(0)
+    // 116 405 at 3.0 %/25 y ≈ 552 €/mo, against 583 at the regular rate.
+    expect(withAsp.paymentAtRate).toBeCloseTo(552, 0)
+    expect(withAsp.paymentAtRate).toBeLessThan(without.paymentAtRate)
+  })
+
+  it('fills ASP first, then the regular loan with what is left of the budget', () => {
+    // Cap 100 000: its payment is 100 000 / 210.8745 ≈ 474.22, leaving
+    // 275.78 €/mo to carry 275.78 × 199.7510 ≈ 55 088 of regular loan.
+    const a = affordability(asp({ aspMaxLoan: 100000 }))
+    expect(a.maxLoanByPayment).toBeCloseTo(100000 + 55088, -1)
+  })
+
+  it('degenerates to a plain mortgage at the same rate and a high cap', () => {
+    const plain = affordability(situation())
+    const pointless = affordability(asp({ aspRatePct: 3.5, aspMaxLoan: 10_000_000 }))
+    expect(pointless.maxLoanByPayment).toBeCloseTo(plain.maxLoanByPayment, 4)
+    expect(pointless.maxPrice).toBeCloseTo(plain.maxPrice, 4)
+  })
+
+  it('packages a candidate loan as ASP plus the top-up, and prices each part', () => {
+    // Espoo's lower cap: the 212 735 € loan splits 185 000 + 27 735.
+    const s = asp({ aspMaxLoan: 185000 })
+    const c = propertyCost(flat(), s, affordability(s).maxPrice)
+    expect(c.aspLoan).toBe(185000)
+    expect(c.regularLoan).toBeCloseTo(27735, 0)
+    expect(c.aspLoan + c.regularLoan).toBeCloseTo(c.loan, 4)
+    // 185 000 / 210.8745 ≈ 877.30 plus 27 735 / 199.7510 ≈ 138.85.
+    expect(c.loanPayment).toBeCloseTo(877.3 + 138.85, 1)
+    // First-month interest at each part's own rate:
+    // 185 000 × 3.0 %/12 + 27 735 × 3.5 %/12 ≈ 462.50 + 80.89.
+    expect(c.breakdown.interest).toBeCloseTo(543.39, 1)
+    expect(c.breakdown.interest + c.breakdown.principal).toBeCloseTo(c.loanPayment, 4)
   })
 })
 

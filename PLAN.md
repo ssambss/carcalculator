@@ -1057,6 +1057,17 @@ Verified in real Chromium against hand-computed references (ceiling
 154 094 € for the worked example; a 249 k€ flat at 1 330 €/mo, 94 906 €
 over). 152 frontend tests.
 
+**ASP financing (2026-09-06):** the loan can be a regular mortgage or an ASP
+loan — fully ASP under the municipal cap, ASP plus a regular loan on top above
+it. The budget buys the cheap money first; the stress test deliberately tests
+the whole debt however it is packaged, so ASP never moves a stress-limited
+ceiling (a test asserts exactly that). The interest subsidy above 3.8 % is
+documented as not modeled in `splitLoan`'s docblock — worth zero at current
+rates, expires mid-loan, and banks do not size on it. The situation panel got
+a stacked layout (`.housing-panel`) because three headed groups plus a
+checkbox stopped reading as the car panel's single strip, and the ceiling
+card got the 24 px rhythm instead of sitting attached to the panel.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1066,6 +1077,10 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-06** — **ASP loans in housing mode.** Full-ASP or ASP + regular
+  split, cap and rate as inputs; stress test unchanged by design. Ceiling card
+  detached from the situation panel, panel restacked. 163 frontend tests,
+  verified in Chromium against hand-computed annuities.
 - **2026-09-06** — **Phase 7 done: housing mode.** Ceiling + candidates, as a
   second calculator behind a device-local mode toggle rather than a
   generalisation of the car model. Own gist file so old bundles cannot strip
