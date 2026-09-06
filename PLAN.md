@@ -1077,13 +1077,17 @@ the summed figures. Fixed on the way: the ceiling card had no padding of its
 own (`.card` brings none; every variant sets it), which is why its texts sat
 on the container edge.
 
-**Pending law (flagged 2026-09-06):** the April 2026 kehysriihi decided to
-raise the ASP loan share to 95 % (käsiraha 10 % → 5 %) and stretch ASP terms
-to 40 years; the Valtiokonttori guidance in force (1.6.2026) still says 10 %
-and 25 years, and the press expects the change ~2027. When it lands: lift the
-25-year ASP cap in `aspTermMonths`, flip the min-cash-share hint to 5 %, and
-re-check the two-saver cap figures. The hints already tell the user to ask
-their bank which rules apply.
+**Modeling the decided reform (user's call, 2026-09-06):** the April 2026
+kehysriihi raises the ASP loan share to 95 % (käsiraha 10 % → 5 %) and ASP
+terms to 40 years; in-force rules (Valtiokonttori 1.6.2026) still say 10 %
+and 25 years, expected to change ~2027. Because the planned purchase is
+~2028, the app models the reform as in force: default cash share 5 %, ASP
+term cap 40 years. The stress test keeps its 25-year cap — supervisory
+practice, not part of this reform. The min-cash hint says to type 10 for a
+purchase before the reform lands. A situation already saved in a browser
+keeps its stored 10 — the default only seeds fresh ones, so the user edits
+the field once. If the law lands in a different shape, these two constants
+and the hint are the whole surface.
 
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when

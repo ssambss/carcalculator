@@ -20,8 +20,8 @@
  * 3. **Savings** — the price where the down payment plus transfer tax plus
  *    costs exhausts what you have.
  * 4. **The loan-to-value rule** — a mortgage may only cover part of the price
- *    (90 % is the common cap), so cash has to bridge the rest no matter how
- *    strong the income is.
+ *    (95 % under the 2026 loan cap and the decided ASP reform), so cash has to
+ *    bridge the rest no matter how strong the income is.
  *
  * Financing can be a regular mortgage or an **ASP loan** (the first-home
  * scheme): cheaper money, but capped per municipality — a home under the cap
@@ -85,7 +85,11 @@ export const DEFAULT_HOUSING: HousingSituation = {
   ratePct: 3.5,
   termYears: 25,
   stressRatePct: 6,
-  minDownPaymentPct: 10,
+  // The April 2026 reform's figure (ASP loan to 95 % of the price), modeled
+  // as in force because the purchase this plans for happens after it lands;
+  // the rule banks apply in 2026 is still 10. The general loan cap has
+  // allowed 5 % for everyone since 30.6.2026 anyway.
+  minDownPaymentPct: 5,
   transferTaxPct: 1.5,
   buyingCosts: 0,
   maintenanceEstimatePerMonth: 250,
@@ -191,12 +195,12 @@ export function paymentForLoan(loan: number, ratePct: number, termMonths: number
 /* ---------------------------------------------------------------- ASP split */
 
 /**
- * An ASP loan runs at most 25 years under the rules in force, whatever term
- * the regular loan gets. The April 2026 kehysriihi decision stretches ASP
- * terms to 40 years (and the loan share to 95 %) — lift this cap when that
- * reform actually lands.
+ * The ASP term cap, taken from the April 2026 reform (40 years) rather than
+ * the 25 of the rules in force — this models a purchase made after the reform
+ * lands. The stress test keeps its own 25-year cap: that is supervisory
+ * practice, not part of the ASP reform.
  */
-const aspTermMonths = (s: HousingSituation): number => Math.min(s.termYears, 25) * 12
+const aspTermMonths = (s: HousingSituation): number => Math.min(s.termYears, 40) * 12
 
 export interface LoanSplit {
   /** the ASP part, up to the municipal cap */

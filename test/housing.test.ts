@@ -110,8 +110,8 @@ describe('the ceiling', () => {
 
   it('is set by savings when income could carry more', () => {
     // 2 100 €/mo of budget carries ~325 900 even under stress, but 20 000 € of
-    // savings must cover the 10 % cash share plus 1.5 % tax:
-    // price ≤ 20 000 / 0.115 ≈ 173 913.
+    // savings must cover the 5 % cash share plus 1.5 % tax:
+    // price ≤ 20 000 / 0.065 ≈ 307 692.
     const a = affordability(
       situation({
         netIncomePerMonth: 6000,
@@ -121,9 +121,9 @@ describe('the ceiling', () => {
       }),
     )
     expect(a.limitedBy).toBe('savings')
-    expect(a.maxPrice).toBeCloseTo(173913, 0)
+    expect(a.maxPrice).toBeCloseTo(307692, 0)
     // At the savings-limited ceiling the loan sits exactly on the LTV cap.
-    expect(a.loan).toBeCloseTo(0.9 * a.maxPrice, 0)
+    expect(a.loan).toBeCloseTo(0.95 * a.maxPrice, 0)
   })
 
   it('is set by income when the stress test is not the tighter screw', () => {
@@ -248,12 +248,15 @@ describe('the ASP split', () => {
     )
   })
 
-  it('runs the ASP part over at most 25 years, whatever the regular term', () => {
-    const s = asp({ termYears: 30 })
-    const split = splitLoan(330000, s)
-    // The ASP annuity is priced on 300 months, the regular top-up on 360.
-    expect(split.aspPayment).toBeCloseTo(paymentForLoan(230000, 3.0, 300), 6)
-    expect(split.regularPayment).toBeCloseTo(paymentForLoan(100000, 3.5, 360), 6)
+  it('lets the ASP part run to 40 years, but no further', () => {
+    // The reform's term cap, modeled as in force (the purchase happens after
+    // it lands): a 30-year term is priced as 30 for both parts...
+    const at30 = splitLoan(330000, asp({ termYears: 30 }))
+    expect(at30.aspPayment).toBeCloseTo(paymentForLoan(230000, 3.0, 360), 6)
+    expect(at30.regularPayment).toBeCloseTo(paymentForLoan(100000, 3.5, 360), 6)
+    // ...and past 40, the ASP annuity stops stretching.
+    const at50 = splitLoan(330000, asp({ termYears: 50 }))
+    expect(at50.aspPayment).toBeCloseTo(paymentForLoan(230000, 3.0, 480), 6)
   })
 
   it('stretches an income-limited loan but never the stress test', () => {
