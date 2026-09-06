@@ -1,16 +1,25 @@
-import { CATEGORIES, type Breakdown } from '../calc'
+import { CATEGORIES } from '../calc'
 import { fmtEur } from '../format'
 
-interface Props {
-  breakdown: Breakdown
-  total: number
+/** What both calculators' category lists share; each declares its own keys. */
+export interface Category {
+  key: string
+  label: string
+  series: number
 }
 
-export function BreakdownBar({ breakdown, total }: Props) {
+interface Props {
+  breakdown: Record<string, number>
+  total: number
+  /** which categories to draw — defaults to the car set */
+  categories?: readonly Category[]
+}
+
+export function BreakdownBar({ breakdown, total, categories = CATEGORIES }: Props) {
   if (total <= 0) return null
-  const parts = CATEGORIES.map((c) => ({ ...c, value: breakdown[c.key] })).filter(
-    (p) => p.value > 0,
-  )
+  const parts = categories
+    .map((c) => ({ ...c, value: breakdown[c.key] ?? 0 }))
+    .filter((p) => p.value > 0)
   return (
     <div className="breakdown-bar" aria-label="Cost breakdown">
       {parts.map((p) => (
@@ -31,8 +40,14 @@ export function BreakdownBar({ breakdown, total }: Props) {
   )
 }
 
-export function Legend({ breakdowns }: { breakdowns: Breakdown[] }) {
-  const visible = CATEGORIES.filter((c) => breakdowns.some((b) => b[c.key] > 0))
+export function Legend({
+  breakdowns,
+  categories = CATEGORIES,
+}: {
+  breakdowns: Record<string, number>[]
+  categories?: readonly Category[]
+}) {
+  const visible = categories.filter((c) => breakdowns.some((b) => (b[c.key] ?? 0) > 0))
   if (visible.length === 0) return null
   return (
     <div className="legend">

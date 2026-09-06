@@ -1021,19 +1021,56 @@ Classification cannot depend on history; `outcomeOf()` does not.
 
 ---
 
-## Phase 7 · Asset-agnostic TCO (optional)
+## Phase 7 · Housing mode ✅ (was: asset-agnostic TCO)
 
-Apartments need maintenance fee, transfer tax and appreciation where cars have
-depreciation. Touches `calc.ts`, `CarForm.tsx` (533 lines),
-`ComparisonTable.tsx`, `types.ts` and make-based filtering.
+The original idea — generalise `calc.ts` until an apartment is a car with
+different fields — was dropped when it was actually scoped: housing leads with
+the **inverse** question (“given my income and savings, what price can I reach
+at all?”), which no amount of parameterising the car model produces. Built
+instead as a second calculator behind a mode toggle, sharing the shell.
 
-Deliberately out of scope until the watcher side proves out. Estimate:
-~1–2 weeks.
+**Scope chosen (2026-09-06): ceiling + candidates.** Affordability gives a
+maximum price and names the binding constraint (income / stress test /
+savings); candidate flats are measured against it and costed per month.
+
+What landed:
+
+- `src/housing.ts` — pure maths. Annuity both ways round, cross-checked in
+  tests against `calc.ts`'s `calcLoan` so the two implementations cannot
+  drift. Regulatory numbers (6 % stress rate, 10 % cash share, 1.5 % transfer
+  tax) are **inputs with defaults, not baked facts** — the UI says “check the
+  current rules”.
+- `src/housingStorage.ts` — normalize/merge/localStorage plus gist sync into
+  **its own file** (`car-tco-housing.json`), for the same reason the scraper
+  filters have one: an old cached bundle that has never heard of housing must
+  not be able to strip it on sync. Situation merges whole by its own
+  timestamp; properties merge per-item with tombstones like everything else.
+- `src/useHousing.ts` — the filters' hook shape, but with the push debounced
+  (the situation edits keystroke by keystroke through NumberFields).
+- `src/mode.ts` + App header toggle — device-local like the theme, not synced.
+- `src/components/HousingView.tsx` (+ `PropertyForm.tsx`) — situation panel in
+  the assumptions idiom, ceiling card with the binding-constraint sentence,
+  property cards + side-by-side table, breakdown bar reused via a new
+  `categories` prop on `BreakdownBar`/`Legend`.
+
+Verified in real Chromium against hand-computed references (ceiling
+154 094 € for the worked example; a 249 k€ flat at 1 330 €/mo, 94 906 €
+over). 152 frontend tests.
+
+Not done, deliberately: housing in the Excel export/import and JSON backup
+(the gist file is the durable copy for now — add a Properties sheet when
+someone actually edits these in a spreadsheet), and any scraper feed — oikotie
+forbids scraping in its terms, so candidates are typed in by hand.
 
 ---
 
 ## Log
 
+- **2026-09-06** — **Phase 7 done: housing mode.** Ceiling + candidates, as a
+  second calculator behind a device-local mode toggle rather than a
+  generalisation of the car model. Own gist file so old bundles cannot strip
+  it; maths cross-checked against `calcLoan`; verified in real Chromium.
+  152 frontend tests, lint and typecheck clean.
 - **2026-08-30** — Analysis done, plan written. Baseline: 104 scraper tests
   pass, no network.
 - **2026-08-30** — **Phase 0 done.** Committed example disabled; unconfigured

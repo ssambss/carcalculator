@@ -23,7 +23,10 @@ import {
   stampEditedAt,
 } from './sync'
 import { useTheme } from './theme'
+import { useMode } from './mode'
 import { useScraperFilters } from './useScraperFilters'
+import { useHousing } from './useHousing'
+import { HousingView } from './components/HousingView'
 import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
@@ -42,6 +45,8 @@ export default function App() {
   const [data, setData] = useState<AppData>(loadData)
   const [draft, setDraft] = useState<DraftState | null>(null)
   const [theme, toggleTheme] = useTheme()
+  // Which calculator this device is on - cars or housing. Local like the theme.
+  const [mode, setMode] = useMode()
   const fileInput = useRef<HTMLInputElement>(null)
 
   const [syncConfig, setSyncConfig] = useState<SyncConfig | null>(loadSyncConfig)
@@ -53,6 +58,9 @@ export default function App() {
   // The nettiauto watcher's saved searches: kept in their own gist file, so
   // they ride along with sync without being part of the car data.
   const scraperFilters = useScraperFilters(syncConfig)
+  // The housing side: its own gist file, so an old cached bundle that has
+  // never heard of housing cannot strip it on sync.
+  const housing = useHousing(syncConfig)
   const dataRef = useRef(data)
   const syncConfigRef = useRef(syncConfig)
   // The last data object that came from a non-edit source (initial load or a
@@ -325,10 +333,32 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div>
-          <h1 className="app-title display">Car TCO</h1>
-          <p className="app-subtitle">Total cost of ownership — compare your candidates</p>
+          <h1 className="app-title display">{mode === 'cars' ? 'Car TCO' : 'Housing budget'}</h1>
+          <p className="app-subtitle">
+            {mode === 'cars'
+              ? 'Total cost of ownership — compare your candidates'
+              : 'What you could afford — and what each place would cost'}
+          </p>
         </div>
         <div className="header-actions">
+          <div className="mode-toggle" role="tablist" aria-label="Calculator">
+            <button
+              className={`filter-chip${mode === 'cars' ? ' active' : ''}`}
+              role="tab"
+              aria-selected={mode === 'cars'}
+              onClick={() => setMode('cars')}
+            >
+              Cars
+            </button>
+            <button
+              className={`filter-chip${mode === 'housing' ? ' active' : ''}`}
+              role="tab"
+              aria-selected={mode === 'housing'}
+              onClick={() => setMode('housing')}
+            >
+              Housing
+            </button>
+          </div>
           <button
             className="btn icon-btn"
             onClick={toggleTheme}
@@ -354,6 +384,7 @@ export default function App() {
               </svg>
             )}
           </button>
+          {mode === 'cars' && (
           <button
             className="btn icon-btn"
             onClick={() => setFiltersOpen(true)}
@@ -374,6 +405,7 @@ export default function App() {
             </svg>
             {activeFilterCount > 0 && <span className="btn-count">{activeFilterCount}</span>}
           </button>
+          )}
           <button
             className="btn icon-btn sync-btn"
             onClick={() => setSyncOpen(true)}
@@ -402,6 +434,10 @@ export default function App() {
             </svg>
             {syncConfig && <span className={`sync-dot ${syncStatus}`} />}
           </button>
+          {/* Import, export and add are the car data's tools; housing keeps its
+              own add button and is not in the spreadsheet or backup yet. */}
+          {mode === 'cars' && (
+          <>
           <button className="btn" onClick={() => fileInput.current?.click()}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 2v8" />
@@ -473,6 +509,8 @@ export default function App() {
             </svg>
             Add car
           </button>
+          </>
+          )}
         </div>
         <input
           ref={fileInput}
@@ -487,6 +525,10 @@ export default function App() {
         />
       </header>
 
+      {mode === 'housing' ? (
+        <HousingView store={housing} />
+      ) : (
+        <>
       <SettingsPanel
         settings={data.settings}
         onChange={(settings) => updateData((d) => ({ ...d, settings }))}
@@ -557,6 +599,8 @@ export default function App() {
           <path d="M3 8h10" />
         </svg>
       </button>
+        </>
+      )}
 
       <footer className="app-footer">
         Data is stored in this browser only — export a backup now and then.
