@@ -125,6 +125,37 @@ sale* in the editor's Advanced section.
 
 ## 6. Adding someone else
 
+Two different situations, two different setups — pick the right one first:
+
+- **Same household, same data** (a partner who should see and edit *your*
+  cars, places and numbers): do NOT give them their own gist. See
+  *One household, two people* just below.
+- **A separate person with their own data** (a friend running their own
+  search): the rest of this section.
+
+### One household, two people
+
+Gists cannot take collaborators from another GitHub account, so shared editing
+means both browsers sync **with your account**. That is one step:
+
+1. Create a **second** gist token on your own account —
+   [the same prefilled page](https://github.com/settings/tokens/new?scopes=gist&description=Car%20TCO%20sync%20partner)
+   — and name it after the person, so you can revoke theirs some day without
+   logging your own devices out.
+2. They open the app, cloud button in the header, paste. The app finds your
+   existing gist by its files and both of you now edit the same data; edits
+   merge per item, and a save on one phone shows up on the other when it next
+   syncs (the app also pulls when its tab regains focus).
+
+Worth saying out loud before you do it: that token acts as your GitHub account
+for **all** its gists (that is as narrow as GitHub's classic tokens go), so
+this is for someone you share a household with, not a friend. Hand it over the
+way WELCOME.md says to — privately, not in a group chat — and revoke it at
+[github.com/settings/tokens](https://github.com/settings/tokens) if the phone
+holding it goes missing.
+
+### A separate person, their own data
+
 The watcher runs for several people at once. Each keeps their own data in their
 own gist on their own GitHub account — their filters, their calculator, their
 record of what has been posted to them. **You never see any of it**, and the only
