@@ -13,9 +13,11 @@ import {
   DEFAULT_HOUSING,
   HOUSING_CATEGORIES,
   affordability,
+  amortization,
   maxLoanForPayment,
   paymentForLoan,
   propertyCost,
+  shiftRates,
   splitLoan,
   type HousingSituation,
   type PropertyListing,
@@ -366,5 +368,109 @@ describe('what a candidate costs', () => {
     const c = propertyCost(flat(), s, ceiling)
     const declared = HOUSING_CATEGORIES.map((cat) => cat.key).sort()
     expect(Object.keys(c.breakdown).sort()).toEqual(declared)
+  })
+})
+
+describe('over the years', () => {
+  const s = situation()
+
+  it('repays exactly the loan, month by month, and ends at zero', () => {
+    const sched = amortization(212735, s)
+    expect(sched.months).toHaveLength(300)
+    const repaid = sched.months.reduce((sum, m) => sum + m.principal, 0)
+    expect(repaid).toBeCloseTo(212735, 4)
+    const end = sched.months[sched.months.length - 1]
+    expect(end.balance).toBe(0)
+    expect(end.principalToDate).toBeCloseTo(212735, 4)
+    expect(sched.totalInterest).toBeCloseTo(end.interestToDate, 6)
+    expect(sched.loan).toBe(212735)
+  })
+
+  it('starts with the first bill the card shows', () => {
+    // The breakdown bar states the first month; the chart's first point must
+    // be the same number, or the two disagree in the same card.
+    const c = propertyCost(flat(), s, 0)
+    const first = amortization(c.loan, s).months[0]
+    expect(first.interest).toBeCloseTo(c.breakdown.interest, 6)
+    expect(first.principal).toBeCloseTo(c.breakdown.principal, 6)
+  })
+
+  it('keeps the payment level while the split drifts towards principal', () => {
+    const { months } = amortization(212735, s)
+    const payment = months[0].interest + months[0].principal
+    for (const m of months) expect(m.interest + m.principal).toBeCloseTo(payment, 6)
+    for (let k = 1; k < months.length; k++) {
+      expect(months[k].interest).toBeLessThan(months[k - 1].interest)
+      expect(months[k].principal).toBeGreaterThan(months[k - 1].principal)
+      expect(months[k].balance).toBeLessThan(months[k - 1].balance)
+    }
+  })
+
+  it('matches the closed form for the principal in payment k', () => {
+    // For an annuity A over n months at monthly rate i, the principal in
+    // payment k is A · (1+i)^(k−1−n) - the recurrence must land on it exactly.
+    const { months } = amortization(100000, situation({ ratePct: 6 }))
+    const A = paymentForLoan(100000, 6, 300)
+    for (const k of [1, 60, 163, 300]) {
+      expect(months[k - 1].principal).toBeCloseTo(A * Math.pow(1.005, k - 1 - 300), 6)
+    }
+  })
+
+  it('finds the payment that turns from mostly interest into mostly ownership', () => {
+    // Principal reaches interest once (1+i)^(k−1−n) ≥ ½, i.e.
+    // k ≥ n + 1 − ln 2 / ln(1+i): at 6 % over 25 years, 301 − 138.98 → the
+    // 163rd payment, in year 14.
+    const sched = amortization(100000, situation({ ratePct: 6 }))
+    expect(sched.crossoverMonth).toBe(163)
+    const at = sched.months[162]
+    const before = sched.months[161]
+    expect(at.principal).toBeGreaterThanOrEqual(at.interest)
+    expect(before.principal).toBeLessThan(before.interest)
+  })
+
+  it('is all ownership from the first payment at zero per cent', () => {
+    const sched = amortization(120000, situation({ ratePct: 0 }))
+    expect(sched.crossoverMonth).toBe(1)
+    expect(sched.totalInterest).toBe(0)
+    expect(sched.months[0].principal).toBeCloseTo(400, 6)
+  })
+
+  it('adds the ASP part and the regular part into one bill', () => {
+    const asp = situation({ useAspLoan: true, aspRatePct: 3, aspMaxLoan: 185000 })
+    const split = splitLoan(212735, asp)
+    const { months } = amortization(212735, asp)
+    expect(months[0].interest).toBeCloseTo(split.firstMonthInterest, 6)
+    expect(months[0].interest + months[0].principal).toBeCloseTo(split.payment, 6)
+  })
+
+  it('steps the payment down when the ASP part ends before the regular one', () => {
+    // A 45-year term: the ASP part is capped at 40 years, the 27 735 € regular
+    // part on top runs the full 45.
+    const asp = situation({ useAspLoan: true, aspRatePct: 3, aspMaxLoan: 185000, termYears: 45 })
+    const { months } = amortization(212735, asp)
+    expect(months).toHaveLength(540)
+    const pay = (k: number) => months[k - 1].interest + months[k - 1].principal
+    expect(pay(480)).toBeCloseTo(pay(1), 6)
+    expect(pay(481)).toBeLessThan(pay(480))
+    // After the ASP part clears, only some of the regular loan is left.
+    expect(months[479].balance).toBeGreaterThan(0)
+    expect(months[479].balance).toBeLessThan(27735)
+    expect(months[539].balance).toBe(0)
+  })
+
+  it('charts nothing without a loan', () => {
+    const sched = amortization(0, s)
+    expect(sched.months).toEqual([])
+    expect(sched.crossoverMonth).toBeNull()
+    expect(sched.totalInterest).toBe(0)
+  })
+
+  it('shifts both rates together, never below zero, and nothing else', () => {
+    const base = situation({ useAspLoan: true, aspRatePct: 3 })
+    const up = shiftRates(base, 1.5)
+    expect(up.ratePct).toBeCloseTo(5, 6)
+    expect(up.aspRatePct).toBeCloseTo(4.5, 6)
+    expect({ ...up, ratePct: 0, aspRatePct: 0 }).toEqual({ ...base, ratePct: 0, aspRatePct: 0 })
+    expect(shiftRates(situation({ ratePct: 1 }), -2).ratePct).toBe(0)
   })
 })

@@ -1576,3 +1576,200 @@ a.dialog-text {
   color: var(--accent);
   border-color: var(--accent);
 }
+
+/* ————— Loan schedule ————— */
+/* The card after the ceiling: how the payment splits over the life of the loan. */
+.schedule-card {
+  margin-top: 24px;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.schedule-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.schedule-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.schedule-subjects {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.schedule-subjects .filter-chip {
+  height: 30px;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.chip-note {
+  margin-left: 6px;
+  color: var(--ink-3);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-chip.active .chip-note {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.schedule-card .legend {
+  margin-top: 0;
+}
+
+/* Lines are keyed by a short stroke, not a box - the legend mirrors the mark. */
+.swatch-line {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.chart {
+  position: relative;
+  border-radius: 8px;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Chart furniture stays recessive: hairline solid grid, muted text tokens. */
+.chart-grid line {
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.chart-grid line.baseline {
+  stroke: var(--line);
+}
+
+.chart-axis text {
+  font-size: 11px;
+  fill: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* Text never wears the series color: labels are ink, identity comes from the
+   line they sit on. The surface-colored halo keeps a label legible where it
+   crosses that line. */
+.chart-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.chart-marker {
+  fill: var(--ink);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.chart-crosshair line {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+
+.chart-crosshair circle {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.chart-tip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  background: var(--tip-bg);
+  color: var(--tip-ink);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.chart-tip-head {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.chart-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.chart-tip-key {
+  flex: none;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.chart-tip-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tip-label {
+  opacity: 0.75;
+}
+
+.chart-tip-rule {
+  border-top: 1px solid currentColor;
+  opacity: 0.25;
+  margin: 5px 0;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.schedule-table th.rowhead {
+  min-width: 0;
+}
+
+.schedule-card .cmp-scroll {
+  margin: 0 -20px;
+  padding: 0 20px;
+}
+
+.cell-note {
+  color: var(--ink-3);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.cmp tr.marked th,
+.cmp tr.marked td {
+  background: var(--row-total);
+  font-weight: 600;
+}
+
+.rate-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

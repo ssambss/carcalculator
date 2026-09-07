@@ -1089,6 +1089,27 @@ keeps its stored 10 — the default only seeds fresh ones, so the user edits
 the field once. If the law lands in a different shape, these two constants
 and the hint are the whole surface.
 
+**Over the loan's life (2026-09-07):** a card after the ceiling that shows how
+each payment splits between interest and principal across the whole term —
+two lines crossing, with the crossover month marked ("half and half · year
+17"), a hover/keyboard readout per month (split, paid so far, owned, still
+owed), a table twin at year ends, three milestone tiles (crossover year,
+interest over the term, owned after 10 years) and a rate table: the same loan
+at ±1 and ±2 pp on both rates, plus one row with everything at the stress
+rate, which is the scenario the bank has already priced in. The chart can be
+switched between the ceiling loan and each candidate's loan.
+`amortization()` in `housing.ts` is the plain monthly recurrence per loan part
+(ASP and regular each at their own rate and term, so a 45-year term shows the
+payment stepping down when the ASP part clears at 40); tests pin it to the
+closed form p_k = A·(1+i)^(k−1−n) and to the crossover it predicts (6 %/25 y →
+payment 163). The chart is hand-rolled SVG — no charting dependency for two
+lines. On the way, **principal moved from series slot 8 to slot 1**: the
+dataviz validator fails red next to orange for everyone (ΔE 7, below the 15
+floor for full color vision), and interest and principal are the two series
+that touch in every housing chart; blue against orange passes every check in
+both themes, alone and in the full bar order. The breakdown bar, legend and
+table follow automatically since they read `HOUSING_CATEGORIES`.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1098,6 +1119,13 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-07** — **Interest against principal over the loan's life.** A
+  schedule card in housing mode: crossing lines with the crossover month,
+  per-month hover/keyboard readout, table twin, milestone tiles and a rate
+  table (±1/±2 pp and the stress rate). Principal recolored to series 1 after
+  the palette validator failed orange/red. 180 frontend tests, verified in
+  Chromium (light, dark, 390 px). Known, pre-existing: the breakdown bar's
+  hidden `.seg-tip` tooltips widen the page's scroll width on phones.
 - **2026-09-06** — **ASP caps corrected to the 1.6.2026 rules** (user caught
   the stale 2023 figures): big cities 230 000 € / elsewhere 160 000 €, and two
   ASP savers together get 345 000 € / 240 000 €. The two-saver raise is typed

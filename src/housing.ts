@@ -346,7 +346,11 @@ export function affordability(s: HousingSituation): Affordability {
  */
 export const HOUSING_CATEGORIES = [
   { key: 'interest', label: 'Loan interest', series: 2 },
-  { key: 'principal', label: 'Loan principal (equity)', series: 8 },
+  // Slot 1, not the otherwise-free slot 8: red next to orange fails the palette
+  // validator for everyone (ΔE 7 - hard to tell apart even with full color
+  // vision), and interest and principal are the two series that touch in
+  // every housing chart. Blue against orange passes every check in both themes.
+  { key: 'principal', label: 'Loan principal (equity)', series: 1 },
   { key: 'maintenance', label: 'Maintenance charge', series: 6 },
   { key: 'financingCharge', label: 'Financing charge', series: 5 },
   { key: 'other', label: 'Other', series: 7 },
@@ -418,5 +422,115 @@ export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: n
       financingCharge: p.financingChargePerMonth,
       other: p.otherPerMonth,
     },
+  }
+}
+
+/* ------------------------------------------------------------ over the years */
+
+/**
+ * One payment of the loan, and where the loan stands after it.
+ *
+ * The whole point of an annuity is that the payment stays put while what it
+ * buys changes underneath: the first payments are mostly interest, the last
+ * ones almost entirely principal. A monthly row is the honest resolution for
+ * that - the crossover is a particular month, not "somewhere in year 17".
+ */
+export interface ScheduleMonth {
+  /** 1-based month of the loan */
+  month: number
+  /** € of this payment that is interest */
+  interest: number
+  /** € of this payment that repays the loan - what you own afterwards */
+  principal: number
+  /** € still owed after this payment */
+  balance: number
+  /** € paid since the start, this payment included */
+  interestToDate: number
+  principalToDate: number
+}
+
+export interface Schedule {
+  loan: number
+  months: ScheduleMonth[]
+  /**
+   * The first payment in which principal reaches interest - the month the
+   * payment turns from mostly cost into mostly ownership. Null without a loan.
+   */
+  crossoverMonth: number | null
+  /** € of interest over the whole term */
+  totalInterest: number
+}
+
+/**
+ * Month by month, how a loan repays under the chosen financing.
+ *
+ * Each part - the ASP loan and the regular one on top - runs its own annuity
+ * at its own rate and term (the ASP part stops at the 40-year cap, so a longer
+ * term makes the payment step down when it ends). The rows add the parts
+ * together: this is the bill as the borrower sees it, not two ledgers.
+ *
+ * The maths is the plain recurrence rather than the closed form, so the last
+ * payment clears whatever rounding left behind and the balance ends at exactly
+ * zero. Fractional terms are rounded to whole months.
+ */
+export function amortization(loan: number, s: HousingSituation): Schedule {
+  const split = splitLoan(loan, s)
+  const parts = [
+    { balance: split.asp, ratePct: s.aspRatePct, months: Math.round(aspTermMonths(s)) },
+    { balance: split.regular, ratePct: s.ratePct, months: Math.round(s.termYears * 12) },
+  ]
+    .filter((p) => p.balance > 0 && p.months > 0)
+    .map((p) => ({
+      ...p,
+      i: p.ratePct / 100 / 12,
+      payment: paymentForLoan(p.balance, p.ratePct, p.months),
+    }))
+
+  const months: ScheduleMonth[] = []
+  const last = Math.max(0, ...parts.map((p) => p.months))
+  let interestToDate = 0
+  let principalToDate = 0
+  let crossoverMonth: number | null = null
+
+  for (let m = 1; m <= last; m++) {
+    let interest = 0
+    let principal = 0
+    for (const p of parts) {
+      if (m > p.months || p.balance <= 0) continue
+      const int = p.balance * p.i
+      // The last payment repays what is left, not what the formula says; the
+      // two differ by rounding only, but "-0.00 € owed" is not a number to show.
+      const repaid = m === p.months ? p.balance : Math.min(p.balance, p.payment - int)
+      p.balance = Math.max(0, p.balance - repaid)
+      interest += int
+      principal += repaid
+    }
+    interestToDate += interest
+    principalToDate += principal
+    if (crossoverMonth === null && principal >= interest) crossoverMonth = m
+    months.push({
+      month: m,
+      interest,
+      principal,
+      balance: parts.reduce((sum, p) => sum + p.balance, 0),
+      interestToDate,
+      principalToDate,
+    })
+  }
+
+  return { loan: split.asp + split.regular, months, crossoverMonth, totalInterest: interestToDate }
+}
+
+/**
+ * The same situation with both rates moved by `pp` percentage points, floored
+ * at zero. Finnish mortgages float on the reference rate, so "what if rates
+ * were higher" is a parallel shift of the ASP and the regular rate together -
+ * not a new number for one of them.
+ */
+export function shiftRates(s: HousingSituation, pp: number): HousingSituation {
+  return {
+    ...s,
+    ratePct: Math.max(0, s.ratePct + pp),
+    aspRatePct: Math.max(0, s.aspRatePct + pp),
   }
 }

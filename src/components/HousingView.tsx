@@ -13,6 +13,7 @@ import { newProperty } from '../housingStorage'
 import type { HousingStore } from '../useHousing'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
 import { BreakdownBar, Legend } from './BreakdownBar'
+import { LoanSchedule, type ScheduleSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
 import { PropertyForm } from './PropertyForm'
 
@@ -53,6 +54,20 @@ export function HousingView({ store }: { store: HousingStore }) {
   const cheapestId =
     sorted.length > 1 && (costs.get(sorted[0].id)?.totalPerMonth ?? 0) > 0 ? sorted[0].id : null
 
+  // What the schedule card can chart: the ceiling loan first, then each
+  // candidate's own loan, in the order the cards show them.
+  const scheduleSubjects = useMemo<ScheduleSubject[]>(
+    () => [
+      { id: 'ceiling', label: 'Ceiling loan', loan: ceiling.loan },
+      ...sorted.map((p) => ({
+        id: p.id,
+        label: p.name || 'Unnamed place',
+        loan: costs.get(p.id)?.loan ?? 0,
+      })),
+    ],
+    [ceiling.loan, sorted, costs],
+  )
+
   const addProperty = () => setDraft({ property: newProperty(), isNew: true })
 
   function saveProperty(p: PropertyListing) {
@@ -74,6 +89,8 @@ export function HousingView({ store }: { store: HousingStore }) {
       )}
 
       <CeilingCard ceiling={ceiling} />
+
+      <LoanSchedule situation={data.situation} subjects={scheduleSubjects} />
 
       {data.properties.length === 0 ? (
         <div className="card empty-state">
