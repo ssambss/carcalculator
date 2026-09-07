@@ -1,23 +1,16 @@
-import {
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type PointerEvent,
-  type RefObject,
-} from 'react'
+import { useMemo, useState } from 'react'
 import {
   HOUSING_CATEGORIES,
   amortization,
   shiftRates,
   splitLoan,
+  type Holding,
   type HousingSituation,
   type Schedule,
-  type ScheduleMonth,
 } from '../housing'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
+import { pct, tableYears, yearOf } from './chartHelpers'
+import { TipRow, TipRule, TwoLineChart } from './TwoLineChart'
 
 /**
  * How a loan repays over its life: interest against principal, payment by
@@ -34,11 +27,77 @@ import { fmtEur, fmtEurExact, fmtNum } from '../format'
  * mode rather than as a chart pasted into it.
  */
 
-/** A loan worth charting: the ceiling's, or a candidate's. */
-export interface ScheduleSubject {
+/** A home the analysis cards can look at: the ceiling, or a candidate. */
+export interface AnalysisSubject extends Holding {
   id: string
   label: string
-  loan: number
+}
+
+interface SubjectProps {
+  subjects: AnalysisSubject[]
+  /** the chosen subject, shared between the analysis cards */
+  subjectId: string | null
+  onSelectSubject: (id: string) => void
+}
+
+/** The chip row that picks the subject - the same in every analysis card. */
+export function SubjectChips({
+  subjects,
+  selected,
+  onSelect,
+  note,
+}: {
+  subjects: AnalysisSubject[]
+  selected: AnalysisSubject
+  onSelect: (id: string) => void
+  /** the figure shown beside each name */
+  note: (s: AnalysisSubject) => string
+}) {
+  if (subjects.length < 2) return null
+  return (
+    <div className="schedule-subjects" role="tablist" aria-label="Which home">
+      {subjects.map((s) => (
+        <button
+          key={s.id}
+          role="tab"
+          aria-selected={s.id === selected.id}
+          className={`filter-chip${s.id === selected.id ? ' active' : ''}`}
+          onClick={() => onSelect(s.id)}
+        >
+          {s.label}
+          <span className="chip-note">{note(s)}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** The Chart / Table switch every analysis card carries in its head. */
+export function ViewToggle({
+  view,
+  onChange,
+}: {
+  view: 'chart' | 'table'
+  onChange: (v: 'chart' | 'table') => void
+}) {
+  return (
+    <div className="cmp-toggle">
+      <button
+        className={`filter-chip${view === 'chart' ? ' active' : ''}`}
+        onClick={() => onChange('chart')}
+        aria-pressed={view === 'chart'}
+      >
+        Chart
+      </button>
+      <button
+        className={`filter-chip${view === 'table' ? ' active' : ''}`}
+        onClick={() => onChange('table')}
+        aria-pressed={view === 'table'}
+      >
+        Table
+      </button>
+    </div>
+  )
 }
 
 const seriesColor = (key: 'interest' | 'principal') =>
@@ -46,17 +105,12 @@ const seriesColor = (key: 'interest' | 'principal') =>
 const INTEREST_COLOR = seriesColor('interest')
 const PRINCIPAL_COLOR = seriesColor('principal')
 
-const yearOf = (month: number) => Math.ceil(month / 12)
-const pct = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 100) : 0)
-
 export function LoanSchedule({
   situation,
   subjects,
-}: {
-  situation: HousingSituation
-  subjects: ScheduleSubject[]
-}) {
-  const [subjectId, setSubjectId] = useState<string | null>(null)
+  subjectId,
+  onSelectSubject,
+}: { situation: HousingSituation } & SubjectProps) {
   const [view, setView] = useState<'chart' | 'table'>('chart')
 
   // A place cheap enough to buy outright has nothing to chart; leave it off
@@ -74,55 +128,18 @@ export function LoanSchedule({
       <div className="schedule-head">
         <div className="cmp-title display">Over the loan’s life</div>
         <div className="cmp-caption">how each payment splits between interest and what you own</div>
-        <div className="cmp-toggle">
-          <button
-            className={`filter-chip${view === 'chart' ? ' active' : ''}`}
-            onClick={() => setView('chart')}
-            aria-pressed={view === 'chart'}
-          >
-            Chart
-          </button>
-          <button
-            className={`filter-chip${view === 'table' ? ' active' : ''}`}
-            onClick={() => setView('table')}
-            aria-pressed={view === 'table'}
-          >
-            Table
-          </button>
-        </div>
+        <ViewToggle view={view} onChange={setView} />
       </div>
 
-      {chartable.length > 1 && (
-        <div className="schedule-subjects" role="tablist" aria-label="Which loan">
-          {chartable.map((s) => (
-            <button
-              key={s.id}
-              role="tab"
-              aria-selected={s.id === subject.id}
-              className={`filter-chip${s.id === subject.id ? ' active' : ''}`}
-              onClick={() => setSubjectId(s.id)}
-            >
-              {s.label}
-              <span className="chip-note">{fmtEur(s.loan)}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <SubjectChips
+        subjects={chartable}
+        selected={subject}
+        onSelect={onSelectSubject}
+        note={(s) => fmtEur(s.loan)}
+      />
 
       {view === 'chart' ? (
-        <>
-          <div className="legend chart-legend">
-            <span className="legend-item">
-              <span className="swatch swatch-line" style={{ background: INTEREST_COLOR }} />
-              Interest
-            </span>
-            <span className="legend-item">
-              <span className="swatch swatch-line" style={{ background: PRINCIPAL_COLOR }} />
-              Principal — what you own
-            </span>
-          </div>
-          <ScheduleChart schedule={schedule} />
-        </>
+        <ScheduleChart schedule={schedule} />
       ) : (
         <ScheduleTable schedule={schedule} />
       )}
@@ -136,272 +153,49 @@ export function LoanSchedule({
 
 /* -------------------------------------------------------------------- chart */
 
-/** The rendered width of an element, so SVG text stays at CSS pixel size. */
-function useWidth<T extends HTMLElement>(): [RefObject<T | null>, number] {
-  const ref = useRef<T>(null)
-  const [width, setWidth] = useState(0)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    // ResizeObserver reports once on observe, so the first size arrives
-    // without a synchronous read here.
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) setWidth(e.contentRect.width)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  return [ref, width]
-}
-
-/** 0 … a clean ceiling above `peak`, in four or five steps. */
-function niceTicks(peak: number): number[] {
-  if (peak <= 0) return [0, 1]
-  const mag = Math.pow(10, Math.floor(Math.log10(peak / 4)))
-  let step = mag
-  for (const f of [1, 2, 2.5, 5, 10]) {
-    step = f * mag
-    if (peak / step <= 5) break
-  }
-  const ticks: number[] = []
-  for (let t = 0; t < peak + step; t += step) ticks.push(t)
-  return ticks
-}
-
-/** Year ticks: whole years at a spacing that leaves at most eight labels. */
-function yearTicks(months: number): number[] {
-  const years = months / 12
-  const step = [1, 2, 5, 10, 20].find((s) => years / s <= 8) ?? 20
-  const ticks: number[] = []
-  for (let y = step; y * 12 <= months; y += step) ticks.push(y)
-  return ticks
-}
-
-const HEIGHT = 244
-const TOP = 26
-const BOTTOM = HEIGHT - 40
-
 function ScheduleChart({ schedule }: { schedule: Schedule }) {
-  const id = useId()
-  const [ref, width] = useWidth<HTMLDivElement>()
-  const [active, setActive] = useState<number | null>(null)
   const { months, crossoverMonth, loan } = schedule
-  const n = months.length
-
-  const peak = months.reduce((m, r) => Math.max(m, r.interest, r.principal), 0)
-  const ticks = niceTicks(peak)
-  const yMax = ticks[ticks.length - 1]
-  const left = 12 + 7 * Math.max(...ticks.map((t) => fmtEur(t).length))
-  const right = Math.max(left + 1, width - 12)
-  const plotW = right - left
-  const plotH = BOTTOM - TOP
-  const x = (m: number) => left + ((m - 1) / Math.max(1, n - 1)) * plotW
-  const y = (v: number) => BOTTOM - (v / yMax) * plotH
-
-  const line = (get: (m: ScheduleMonth) => number) =>
-    months
-      .map((m, k) => `${k === 0 ? 'M' : 'L'}${x(m.month).toFixed(1)} ${y(get(m)).toFixed(1)}`)
-      .join('')
-  const interestLine = line((m) => m.interest)
-  const principalLine = line((m) => m.principal)
-  const toBaseline = (path: string) =>
-    `${path}L${x(n).toFixed(1)} ${BOTTOM}L${x(1).toFixed(1)} ${BOTTOM}Z`
-  const toTop = (path: string) => `${path}L${x(n).toFixed(1)} ${TOP}L${x(1).toFixed(1)} ${TOP}Z`
-
-  const last = months[n - 1]
-  const yPrincipalEnd = y(last.principal)
-  const yInterestEnd = y(last.interest)
-  // The interest label sits just above the baseline, the principal label just
-  // under its line; when a short loan leaves them no room, the tooltip and the
-  // table still carry the interest figure.
-  const interestLabelFits = yInterestEnd - 6 - (yPrincipalEnd + 14) > 14
-
-  const cross = crossoverMonth !== null ? months[crossoverMonth - 1] : null
-  const crossX = cross ? x(cross.month) : 0
-  const crossAnchor: 'start' | 'middle' | 'end' =
-    crossX < left + 80 ? 'start' : crossX > right - 80 ? 'end' : 'middle'
-
-  function monthAt(e: PointerEvent<SVGRectElement>): number {
-    const r = e.currentTarget.getBoundingClientRect()
-    const rel = r.width > 0 ? (e.clientX - r.left) / r.width : 0
-    return Math.min(n, Math.max(1, Math.round(rel * (n - 1)) + 1))
-  }
-
-  function onKey(e: KeyboardEvent<HTMLDivElement>) {
-    const current = active ?? crossoverMonth ?? 1
-    const step = e.shiftKey ? 1 : 12
-    let next: number | null = null
-    if (e.key === 'ArrowRight') next = Math.min(n, current + step)
-    else if (e.key === 'ArrowLeft') next = Math.max(1, current - step)
-    else if (e.key === 'Home') next = 1
-    else if (e.key === 'End') next = n
-    else if (e.key === 'Escape') next = null
-    else return
-    e.preventDefault()
-    setActive(next)
-  }
-
-  const row = active !== null ? months[active - 1] : null
-  const activeX = active !== null ? x(active) : 0
-  const tipOnRight = activeX < left + plotW * 0.55
-
+  const c = crossoverMonth
   return (
-    <div
-      ref={ref}
-      className="chart"
-      style={{ height: HEIGHT }}
-      tabIndex={0}
-      role="group"
-      aria-label="Interest and principal per month over the loan. Arrow keys step a year, with Shift a month; the Table view lists the same figures."
-      onKeyDown={onKey}
-      onFocus={() => setActive((a) => a ?? crossoverMonth ?? 1)}
-      onBlur={() => setActive(null)}
-    >
-      {width > 0 && (
-        <svg width={width} height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} aria-hidden="true">
-          <defs>
-            <clipPath id={`${id}-under-interest`}>
-              <path d={toBaseline(interestLine)} />
-            </clipPath>
-            <clipPath id={`${id}-under-principal`}>
-              <path d={toBaseline(principalLine)} />
-            </clipPath>
-          </defs>
-
-          <g className="chart-grid">
-            {ticks.map((t) => (
-              <line
-                key={t}
-                x1={left}
-                x2={right}
-                y1={y(t)}
-                y2={y(t)}
-                className={t === 0 ? 'baseline' : undefined}
-              />
-            ))}
-          </g>
-          <g className="chart-axis">
-            {ticks.map((t) => (
-              <text key={t} x={left - 8} y={y(t) + 4} textAnchor="end">
-                {fmtEur(t)}
-              </text>
-            ))}
-            <text x={0} y={12} textAnchor="start">
-              € per month
-            </text>
-            {yearTicks(n).map((yr) => (
-              <text key={yr} x={x(yr * 12)} y={BOTTOM + 16} textAnchor="middle">
-                {yr}
-              </text>
-            ))}
-            <text x={left} y={HEIGHT - 4} textAnchor="start">
-              years into the loan
-            </text>
-          </g>
-
-          {/* The gap between the lines, in the color of whichever is on top:
-              interest while the payment is mostly cost, principal once it is
-              mostly ownership. */}
-          <path
-            d={toTop(principalLine)}
-            clipPath={`url(#${id}-under-interest)`}
-            fill={INTEREST_COLOR}
-            fillOpacity={0.14}
-          />
-          <path
-            d={toTop(interestLine)}
-            clipPath={`url(#${id}-under-principal)`}
-            fill={PRINCIPAL_COLOR}
-            fillOpacity={0.14}
-          />
-
-          <path d={interestLine} className="chart-line" stroke={INTEREST_COLOR} />
-          <path d={principalLine} className="chart-line" stroke={PRINCIPAL_COLOR} />
-
-          <text x={right - 2} y={yPrincipalEnd + 14} textAnchor="end" className="chart-label">
-            Principal {fmtEur(last.principal)}
-          </text>
-          {interestLabelFits && (
-            <text x={right - 2} y={yInterestEnd - 6} textAnchor="end" className="chart-label">
-              Interest {fmtEur(last.interest)}
-            </text>
-          )}
-
-          {cross && (
-            <g>
-              <circle cx={crossX} cy={y(cross.principal)} r={4.5} className="chart-marker" />
-              <text
-                x={crossX}
-                y={y(cross.principal) - 10}
-                textAnchor={crossAnchor}
-                className="chart-label"
-              >
-                {cross.month === 1
-                  ? 'Half and half from the start'
-                  : `Half and half · year ${yearOf(cross.month)}`}
-              </text>
-            </g>
-          )}
-
-          {row && (
-            <g className="chart-crosshair">
-              <line x1={activeX} x2={activeX} y1={TOP} y2={BOTTOM} />
-              <circle cx={activeX} cy={y(row.interest)} r={4} fill={INTEREST_COLOR} />
-              <circle cx={activeX} cy={y(row.principal)} r={4} fill={PRINCIPAL_COLOR} />
-            </g>
-          )}
-
-          <rect
-            x={left}
-            y={TOP}
-            width={plotW}
-            height={plotH}
-            fill="transparent"
-            onPointerMove={(e) => setActive(monthAt(e))}
-            onPointerLeave={() => setActive(null)}
-          />
-        </svg>
-      )}
-
-      {row && (
-        <div
-          className="chart-tip"
-          style={
-            tipOnRight ? { left: activeX + 12, top: TOP } : { right: width - activeX + 12, top: TOP }
-          }
-        >
-          <div className="chart-tip-head">
-            Year {yearOf(row.month)} · month {((row.month - 1) % 12) + 1}
-          </div>
-          <div className="chart-tip-row">
-            <span className="chart-tip-key" style={{ background: INTEREST_COLOR }} />
-            <span className="chart-tip-value">{fmtEurExact(row.interest)}</span>
-            <span className="chart-tip-label">interest</span>
-          </div>
-          <div className="chart-tip-row">
-            <span className="chart-tip-key" style={{ background: PRINCIPAL_COLOR }} />
-            <span className="chart-tip-value">{fmtEurExact(row.principal)}</span>
-            <span className="chart-tip-label">principal</span>
-          </div>
-          <div className="chart-tip-rule" />
-          <div className="chart-tip-row">
-            <span className="chart-tip-key" />
-            <span className="chart-tip-value">{fmtEur(row.interestToDate)}</span>
-            <span className="chart-tip-label">interest paid so far</span>
-          </div>
-          <div className="chart-tip-row">
-            <span className="chart-tip-key" />
-            <span className="chart-tip-value">{fmtEur(row.principalToDate)}</span>
-            <span className="chart-tip-label">owned · {pct(row.principalToDate, loan)} %</span>
-          </div>
-          <div className="chart-tip-row">
-            <span className="chart-tip-key" />
-            <span className="chart-tip-value">{fmtEur(row.balance)}</span>
-            <span className="chart-tip-label">still owed</span>
-          </div>
-        </div>
-      )}
-    </div>
+    <TwoLineChart
+      a={{
+        label: 'Interest',
+        color: INTEREST_COLOR,
+        values: months.map((m) => m.interest),
+      }}
+      b={{
+        label: 'Principal — what you own',
+        short: 'Principal',
+        color: PRINCIPAL_COLOR,
+        values: months.map((m) => m.principal),
+      }}
+      marker={
+        c === null
+          ? null
+          : {
+              month: c,
+              text: c === 1 ? 'Half and half from the start' : `Half and half · year ${yearOf(c)}`,
+            }
+      }
+      yCaption="€ per month"
+      ariaLabel="Interest and principal per month over the loan. Arrow keys step a year, with Shift a month; the Table view lists the same figures."
+      tooltip={(month) => {
+        const r = months[month - 1]
+        return (
+          <>
+            <TipRow color={INTEREST_COLOR} value={fmtEurExact(r.interest)} label="interest" />
+            <TipRow color={PRINCIPAL_COLOR} value={fmtEurExact(r.principal)} label="principal" />
+            <TipRule />
+            <TipRow value={fmtEur(r.interestToDate)} label="interest paid so far" />
+            <TipRow
+              value={fmtEur(r.principalToDate)}
+              label={`owned · ${pct(r.principalToDate, loan)} %`}
+            />
+            <TipRow value={fmtEur(r.balance)} label="still owed" />
+          </>
+        )
+      }}
+    />
   )
 }
 
@@ -411,12 +205,10 @@ function ScheduleChart({ schedule }: { schedule: Schedule }) {
 function ScheduleTable({ schedule }: { schedule: Schedule }) {
   const { months, loan } = schedule
   const n = months.length
-  const years = new Set<number>([1])
-  for (let y = 5; y * 12 <= n; y += 5) years.add(y)
-  years.add(yearOf(n))
-  const rows = [...years]
-    .sort((a, b) => a - b)
-    .map((y) => ({ y: Math.min(y, n / 12), r: months[Math.min(n, y * 12) - 1] }))
+  const rows = tableYears(n).map((y) => ({
+    y: Math.min(y, n / 12),
+    r: months[Math.min(n, y * 12) - 1],
+  }))
 
   return (
     <div className="cmp-scroll">

@@ -111,6 +111,13 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     useAspLoan: s.useAspLoan === true,
     aspRatePct: Math.max(0, toNum(s.aspRatePct, d.aspRatePct)),
     aspMaxLoan: Math.max(0, toNum(s.aspMaxLoan, d.aspMaxLoan)),
+    rentPerMonth: Math.max(0, toNum(s.rentPerMonth, d.rentPerMonth)),
+    // Rents, returns and prices can all fall, so these may go negative - but
+    // not past -100 %, where the compounding maths stops meaning anything.
+    rentGrowthPct: Math.max(-99, toNum(s.rentGrowthPct, d.rentGrowthPct)),
+    investmentReturnPct: Math.max(-99, toNum(s.investmentReturnPct, d.investmentReturnPct)),
+    homeValueGrowthPct: Math.max(-99, toNum(s.homeValueGrowthPct, d.homeValueGrowthPct)),
+    gainsTaxPct: Math.min(100, Math.max(0, toNum(s.gainsTaxPct, d.gainsTaxPct))),
   }
 }
 

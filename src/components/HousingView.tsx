@@ -13,8 +13,9 @@ import { newProperty } from '../housingStorage'
 import type { HousingStore } from '../useHousing'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
 import { BreakdownBar, Legend } from './BreakdownBar'
-import { LoanSchedule, type ScheduleSubject } from './LoanSchedule'
+import { LoanSchedule, type AnalysisSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
+import { RentVsBuy } from './RentVsBuy'
 import { PropertyForm } from './PropertyForm'
 
 /** Why the ceiling stops where it does, in words somebody can act on. */
@@ -32,6 +33,8 @@ interface DraftState {
 export function HousingView({ store }: { store: HousingStore }) {
   const { data } = store
   const [draft, setDraft] = useState<DraftState | null>(null)
+  // Which home the analysis cards look at - one choice drives both of them.
+  const [subjectId, setSubjectId] = useState<string | null>(null)
 
   const ceiling = useMemo(() => affordability(data.situation), [data.situation])
 
@@ -54,19 +57,32 @@ export function HousingView({ store }: { store: HousingStore }) {
   const cheapestId =
     sorted.length > 1 && (costs.get(sorted[0].id)?.totalPerMonth ?? 0) > 0 ? sorted[0].id : null
 
-  // What the schedule card can chart: the ceiling loan first, then each
-  // candidate's own loan, in the order the cards show them.
-  const scheduleSubjects = useMemo<ScheduleSubject[]>(
-    () => [
-      { id: 'ceiling', label: 'Ceiling loan', loan: ceiling.loan },
-      ...sorted.map((p) => ({
-        id: p.id,
-        label: p.name || 'Unnamed place',
-        loan: costs.get(p.id)?.loan ?? 0,
-      })),
-    ],
-    [ceiling.loan, sorted, costs],
-  )
+  // What the analysis cards can look at: the ceiling first, then each
+  // candidate, in the order the cards show them.
+  const subjects = useMemo<AnalysisSubject[]>(() => {
+    const s = data.situation
+    return [
+      {
+        id: 'ceiling',
+        label: 'At the ceiling',
+        price: ceiling.maxPrice,
+        loan: ceiling.loan,
+        cashAtClosing: ceiling.downPayment + ceiling.transferTax + s.buyingCosts,
+        chargesPerMonth: s.maintenanceEstimatePerMonth,
+      },
+      ...sorted.map((p) => {
+        const c = costs.get(p.id)
+        return {
+          id: p.id,
+          label: p.name || 'Unnamed place',
+          price: p.price,
+          loan: c?.loan ?? 0,
+          cashAtClosing: (c?.downPayment ?? 0) + (p.price * s.transferTaxPct) / 100 + s.buyingCosts,
+          chargesPerMonth: p.maintenancePerMonth + p.financingChargePerMonth + p.otherPerMonth,
+        }
+      }),
+    ]
+  }, [ceiling, sorted, costs, data.situation])
 
   const addProperty = () => setDraft({ property: newProperty(), isNew: true })
 
@@ -90,7 +106,20 @@ export function HousingView({ store }: { store: HousingStore }) {
 
       <CeilingCard ceiling={ceiling} />
 
-      <LoanSchedule situation={data.situation} subjects={scheduleSubjects} />
+      <LoanSchedule
+        situation={data.situation}
+        subjects={subjects}
+        subjectId={subjectId}
+        onSelectSubject={setSubjectId}
+      />
+
+      <RentVsBuy
+        situation={data.situation}
+        subjects={subjects}
+        subjectId={subjectId}
+        onSelectSubject={setSubjectId}
+        onChange={store.saveSituation}
+      />
 
       {data.properties.length === 0 ? (
         <div className="card empty-state">

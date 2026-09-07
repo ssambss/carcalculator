@@ -1110,6 +1110,34 @@ that touch in every housing chart; blue against orange passes every check in
 both themes, alone and in the full bar order. The breakdown bar, legend and
 table follow automatically since they read `HOUSING_CATEGORIES`.
 
+**Rent instead, and invest the difference (2026-09-07):** the other half of
+the mortgage question, as a second analysis card. The renter keeps the closing
+cash (down payment, transfer tax, costs) invested from day one; every month
+after, whoever pays less — payment plus charges against rent — invests the
+gap, so the comparison is symmetric when rent is the dearer option. Buying is
+worth the home less the loan; renting is the portfolio. Both are counted after
+the tax on investment gains, because an own home sells tax-free in Finland and
+a fund does not — over decades that decides close cases. Rent, its yearly
+rise (which the charges share), the investment return, the home's growth and
+the gains tax are five new situation fields with defaults (0 / 2 / 7 / 2 /
+30 %), normalized like the rest so a saved situation from before them just
+gains the defaults. The chart marks the month one side pulled ahead for
+good; the tiles give the final gap, the **break-even return** (bisection on
+the return; renting wins above it, buying below), what the renter put in, and
+rent over the term against the owner's interest and charges. The horizon is
+the loan term; selling costs, a deposit and the post-loan years are named as
+not modeled. `rentVsBuy()` in `housing.ts`, tests in `test/rentVsBuy.test.ts`
+(the flat-world identity: with rent 0 and no returns, renter minus buyer is
+exactly transfer tax + all interest + all charges).
+
+The chart itself was pulled out of the schedule card into `TwoLineChart.tsx`
+(two lines, a wash in the color of whichever is on top, marker, legend,
+end labels, crosshair readout by pointer and keyboard) so both cards share
+one implementation; `chartHelpers.ts` holds the tick maths. One subject
+choice (the ceiling or a candidate) drives both cards. Buying wears the
+ownership blue (slot 1) the principal line already uses; renting gets slot 3,
+which passes the validator against it in both themes.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1119,6 +1147,11 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-07** — **Rent or buy.** A second analysis card: rent a comparable
+  home and invest the difference, against buying — net worth over the term
+  with gains taxed, the month one side pulls ahead, and the break-even
+  return. Five new situation fields with defaults. The two-line chart became
+  a shared component. 194 frontend tests, verified in Chromium.
 - **2026-09-07** — **Interest against principal over the loan's life.** A
   schedule card in housing mode: crossing lines with the crossover month,
   per-month hover/keyboard readout, table twin, milestone tiles and a rate

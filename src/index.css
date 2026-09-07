@@ -1390,6 +1390,10 @@ a.dialog-text {
     width: calc(50% - 8px);
   }
 
+  .analysis-fields .field-compact {
+    width: calc(50% - 6px);
+  }
+
   .filter-search {
     width: 100%;
   }
@@ -1772,4 +1776,23 @@ a.dialog-text {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* ————— Rent or buy ————— */
+/* The card has its own inputs: they are guesses about the future, not facts
+   about the household, so they do not belong in the situation panel. Its own
+   class, because the mobile rules hide .assumptions-fields wholesale. */
+.analysis-fields {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.chart-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.45;
+  max-width: 72ch;
 }

@@ -71,6 +71,16 @@ export interface HousingSituation {
   aspRatePct: number
   /** the municipal cap on the ASP loan, € — anything above becomes a regular loan */
   aspMaxLoan: number
+  /** what renting a comparable home would cost instead, € / month; 0 = not asked */
+  rentPerMonth: number
+  /** how fast rent and the housing charges rise, %/yr */
+  rentGrowthPct: number
+  /** what invested money earns, %/yr nominal */
+  investmentReturnPct: number
+  /** how the home's value moves, %/yr nominal */
+  homeValueGrowthPct: number
+  /** tax on investment gains when they are finally sold, % — an own home sells tax-free */
+  gainsTaxPct: number
 }
 
 export const DEFAULT_HOUSING: HousingSituation = {
@@ -102,6 +112,17 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // because it depends on BOTH buyers being ASP savers, which this model
   // does not know. An input like the other rules - check the current figure.
   aspMaxLoan: 230000,
+  rentPerMonth: 0,
+  rentGrowthPct: 2,
+  // A broad equity index's long-run nominal return, before the tax below; the
+  // home's growth is the modest long-run figure for Finnish cities, where
+  // prices have lately trailed inflation. Both are guesses to argue with.
+  investmentReturnPct: 7,
+  homeValueGrowthPct: 2,
+  // Finland taxes capital gains at 30 % (34 % above 30 000 € a year); the
+  // gain on a home you lived in for two years is exempt. That asymmetry is
+  // real money over decades, which is why it is modeled and not footnoted.
+  gainsTaxPct: 30,
 }
 
 /** A flat or house you are actually considering. */
@@ -532,5 +553,185 @@ export function shiftRates(s: HousingSituation, pp: number): HousingSituation {
     ...s,
     ratePct: Math.max(0, s.ratePct + pp),
     aspRatePct: Math.max(0, s.aspRatePct + pp),
+  }
+}
+
+/* ------------------------------------------------------------ rent or buy */
+
+/**
+ * What a home costs to hold, for the rent-or-buy question: the price and the
+ * loan the buyer would take, the cash that leaves at closing, and the monthly
+ * charges that come with owning it. Either the ceiling or a candidate fits.
+ */
+export interface Holding {
+  price: number
+  loan: number
+  /** down payment plus transfer tax plus buying costs — what the renter keeps */
+  cashAtClosing: number
+  /** hoitovastike, rahoitusvastike, other — what the buyer pays on top of the loan */
+  chargesPerMonth: number
+}
+
+export interface RentVsBuyMonth {
+  month: number
+  /** € the buyer pays this month: loan payment plus charges */
+  buyerPays: number
+  /** € of that which is the housing charges */
+  charges: number
+  /** € the renter pays this month */
+  rent: number
+  /** € invested this month: positive by the renter, negative by the buyer */
+  invested: number
+  homeValue: number
+  loanBalance: number
+  /** home value less what is still owed */
+  homeEquity: number
+  /** the buyer's side portfolio, if rent ever cost more than owning */
+  buyerPortfolio: number
+  renterPortfolio: number
+  /** home equity plus the side portfolio, gains taxed */
+  buyerNetWorth: number
+  /** the renter's portfolio, gains taxed */
+  renterNetWorth: number
+}
+
+export interface RentVsBuy {
+  months: RentVsBuyMonth[]
+  /** who ends ahead, and from which month they stayed ahead; null if level at the end */
+  leader: 'buy' | 'rent' | null
+  leaderFrom: number | null
+  /** € the renter put in over the whole term, the closing cash included */
+  renterInvested: number
+  totalRent: number
+  totalInterest: number
+  totalCharges: number
+  /**
+   * The yearly return at which both end level, %/yr - renting wins above it,
+   * buying below. Null when one side is ahead at every return from 0 to 30 %.
+   */
+  breakEvenReturnPct: number | null
+}
+
+/** A yearly rate as its monthly compounding equivalent. */
+const monthlyRate = (pct: number) => Math.pow(1 + pct / 100, 1 / 12) - 1
+
+/** Portfolio value after the gains tax, gains being whatever exceeds the money put in. */
+function afterGainsTax(portfolio: number, contributed: number, taxPct: number): number {
+  return portfolio - (Math.max(0, portfolio - contributed) * taxPct) / 100
+}
+
+function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuyMonth[] {
+  const schedule = amortization(h.loan, s)
+  const horizon = Math.max(1, Math.round(s.termYears * 12))
+  const r = monthlyRate(returnPct)
+  const g = monthlyRate(s.homeValueGrowthPct)
+
+  let renterPortfolio = h.cashAtClosing
+  let renterContributed = h.cashAtClosing
+  let buyerPortfolio = 0
+  let buyerContributed = 0
+  let homeValue = h.price
+  const out: RentVsBuyMonth[] = []
+
+  for (let m = 1; m <= horizon; m++) {
+    // Rent and charges step up once a year, as leases and vastikkeet do.
+    const uplift = Math.pow(1 + s.rentGrowthPct / 100, Math.floor((m - 1) / 12))
+    const rent = s.rentPerMonth * uplift
+    const charges = h.chargesPerMonth * uplift
+    const payment = schedule.months[m - 1]
+    const buyerPays = (payment ? payment.interest + payment.principal : 0) + charges
+    const loanBalance = payment ? payment.balance : 0
+
+    // Both grow for the month, then whoever paid less invests the difference.
+    renterPortfolio *= 1 + r
+    buyerPortfolio *= 1 + r
+    homeValue *= 1 + g
+    const invested = buyerPays - rent
+    if (invested > 0) {
+      renterPortfolio += invested
+      renterContributed += invested
+    } else {
+      buyerPortfolio -= invested
+      buyerContributed -= invested
+    }
+
+    const homeEquity = homeValue - loanBalance
+    out.push({
+      month: m,
+      buyerPays,
+      charges,
+      rent,
+      invested,
+      homeValue,
+      loanBalance,
+      homeEquity,
+      buyerPortfolio,
+      renterPortfolio,
+      buyerNetWorth: homeEquity + afterGainsTax(buyerPortfolio, buyerContributed, s.gainsTaxPct),
+      renterNetWorth: afterGainsTax(renterPortfolio, renterContributed, s.gainsTaxPct),
+    })
+  }
+  return out
+}
+
+/**
+ * Buy this home, or rent one like it and invest the difference?
+ *
+ * The renter keeps the closing cash and invests it on day one; every month
+ * after, whoever pays less puts the difference into the same investments -
+ * usually the renter, since a payment plus charges tends to exceed rent, but
+ * the other way round when it does not. The buyer's wealth is the home's
+ * value less the loan; the renter's is the portfolio. Both are counted after
+ * the tax on investment gains, because an own home sells tax-free in Finland
+ * and a fund does not - over decades that decides close cases.
+ *
+ * Not modeled, deliberately: selling costs on the home, a rent deposit, the
+ * years after the loan is repaid (the horizon is the loan term, when the
+ * buyer's outlay drops to the charges alone and the picture only improves
+ * for them), and rent-vs-own differences in insurance or utilities. Each is a
+ * refinement on a comparison whose answer is dominated by three guesses:
+ * the return, the home's growth, and how rents move.
+ */
+export function rentVsBuy(h: Holding, s: HousingSituation): RentVsBuy {
+  const months = simulate(h, s, s.investmentReturnPct)
+  const last = months[months.length - 1]
+
+  // Who leads at the end, and how far back they have led without a break.
+  const sign = (m: RentVsBuyMonth) => Math.sign(m.buyerNetWorth - m.renterNetWorth)
+  const finalSign = sign(last)
+  let leaderFrom: number | null = null
+  if (finalSign !== 0) {
+    let k = months.length - 1
+    while (k > 0 && sign(months[k - 1]) === finalSign) k--
+    leaderFrom = months[k].month
+  }
+
+  // Bisection on the return: the gap at the horizon rises with it, because the
+  // renter holds more invested money than the buyer at every return.
+  const gapAt = (pct: number) => {
+    const end = simulate(h, s, pct)[months.length - 1]
+    return end.renterNetWorth - end.buyerNetWorth
+  }
+  let breakEvenReturnPct: number | null = null
+  let lo = 0
+  let hi = 30
+  if (gapAt(lo) < 0 && gapAt(hi) > 0) {
+    for (let i = 0; i < 40; i++) {
+      const mid = (lo + hi) / 2
+      if (gapAt(mid) < 0) lo = mid
+      else hi = mid
+    }
+    breakEvenReturnPct = (lo + hi) / 2
+  }
+
+  return {
+    months,
+    leader: finalSign > 0 ? 'buy' : finalSign < 0 ? 'rent' : null,
+    leaderFrom,
+    renterInvested: h.cashAtClosing + months.reduce((sum, m) => sum + Math.max(0, m.invested), 0),
+    totalRent: months.reduce((sum, m) => sum + m.rent, 0),
+    totalInterest: amortization(h.loan, s).totalInterest,
+    totalCharges: months.reduce((sum, m) => sum + m.charges, 0),
+    breakEvenReturnPct,
   }
 }
