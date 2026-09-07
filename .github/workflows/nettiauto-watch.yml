@@ -6,7 +6,7 @@ name: Nettiauto watch
 # otherwise. Independent of the Pages deploy workflow - it touches nothing the
 # frontend build uses.
 
-on:
+off:
   schedule:
     # Ask for twelve an hour; the run itself decides which of them crawls.
     #
