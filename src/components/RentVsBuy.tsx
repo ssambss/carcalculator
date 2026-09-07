@@ -72,6 +72,14 @@ export function RentVsBuy({
         />
         <NumberField
           compact
+          label="Owner invests"
+          value={situation.ownerInvestPerMonth}
+          onChange={(n) => set({ ownerInvestPerMonth: Math.max(0, n) })}
+          unit="€/mo"
+          hint="on top of the loan and charges; the renter gets the same total to spend"
+        />
+        <NumberField
+          compact
           label="Rent rises"
           value={situation.rentGrowthPct}
           onChange={(n) => set({ rentGrowthPct: Math.max(-99, n) })}
@@ -105,8 +113,9 @@ export function RentVsBuy({
       {!result ? (
         <p className="chart-note">
           Type the rent a comparable place would cost. The renter keeps the{' '}
-          {fmtEur(subject.cashAtClosing)} that closing would take and invests it from day one;
-          after that, whoever pays less each month invests the difference.
+          {fmtEur(subject.cashAtClosing)} that closing would take and invests it from day one.
+          After that both sides have the same monthly budget: the owner pays the loan and the
+          charges and invests the fixed sum above, the renter invests what the rent leaves of it.
         </p>
       ) : (
         <>
@@ -120,6 +129,8 @@ export function RentVsBuy({
             The home sells tax-free and investment gains are taxed at {fmtNum(situation.gainsTaxPct)}{' '}
             % at the end. Not counted: selling costs, a rent deposit, and the years after the loan
             is repaid, when owning gets cheaper still.
+            {result.renterShortMonths > 0 &&
+              ` In ${result.renterShortMonths} of ${result.months.length} months the rent exceeded the owner’s whole budget, so the renter invested nothing then and paid the rest from elsewhere.`}
           </p>
         </>
       )}
@@ -143,7 +154,7 @@ function ComparisonChart({ result }: { result: Comparison }) {
   return (
     <TwoLineChart
       a={{
-        label: 'Buying — home equity plus any side investments',
+        label: 'Buying — home equity plus the owner’s investments',
         short: 'Buying',
         color: BUY_COLOR,
         values: months.map((m) => m.buyerNetWorth),
@@ -167,9 +178,10 @@ function ComparisonChart({ result }: { result: Comparison }) {
             <TipRow value={fmtEur(r.buyerPays)} label="the owner pays this month" />
             <TipRow value={fmtEur(r.rent)} label="rent" />
             <TipRow
-              value={fmtEur(Math.abs(r.invested))}
-              label={r.invested >= 0 ? 'the renter invests' : 'the owner invests'}
+              value={fmtEur(r.renterInvests)}
+              label={r.renterShort > 0 ? `the renter invests · ${fmtEur(r.renterShort)} short` : 'the renter invests'}
             />
+            {r.ownerInvests > 0 && <TipRow value={fmtEur(r.ownerInvests)} label="the owner invests" />}
             <TipRow value={fmtEur(r.homeEquity)} label="home equity" />
           </>
         )
@@ -181,12 +193,13 @@ function ComparisonChart({ result }: { result: Comparison }) {
 /* -------------------------------------------------------------------- table */
 
 function ComparisonTable({ result }: { result: Comparison }) {
-  const { months } = result
+  const { months, ownerInvested } = result
   const n = months.length
   const rows = tableYears(n).map((y) => ({
     y: Math.min(y, n / 12),
     r: months[Math.min(n, y * 12) - 1],
   }))
+  const ownerColumn = ownerInvested > 0
   return (
     <div className="cmp-scroll">
       <table className="cmp schedule-table">
@@ -195,7 +208,8 @@ function ComparisonTable({ result }: { result: Comparison }) {
             <th className="rowhead">After</th>
             <th>Owner pays / mo</th>
             <th>Rent / mo</th>
-            <th>Invested / mo</th>
+            <th>Renter invests / mo</th>
+            {ownerColumn && <th>Owner invests / mo</th>}
             <th>Home equity</th>
             <th>Buying</th>
             <th>Renting</th>
@@ -210,9 +224,12 @@ function ComparisonTable({ result }: { result: Comparison }) {
               <td className="num">{fmtEur(r.buyerPays)}</td>
               <td className="num">{fmtEur(r.rent)}</td>
               <td className="num">
-                {fmtEur(Math.abs(r.invested))}
-                <span className="cell-note"> {r.invested >= 0 ? 'renter' : 'owner'}</span>
+                {fmtEur(r.renterInvests)}
+                {r.renterShort > 0 && (
+                  <span className="cell-note"> {fmtEur(r.renterShort)} short</span>
+                )}
               </td>
+              {ownerColumn && <td className="num">{fmtEur(r.ownerInvests)}</td>}
               <td className="num">{fmtEur(r.homeEquity)}</td>
               <td className="num">{fmtEur(r.buyerNetWorth)}</td>
               <td className="num">{fmtEur(r.renterNetWorth)}</td>
@@ -227,8 +244,17 @@ function ComparisonTable({ result }: { result: Comparison }) {
 /* ------------------------------------------------------------------ outcome */
 
 function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSubject }) {
-  const { months, leader, breakEvenReturnPct, renterInvested, totalRent, totalInterest, totalCharges } =
-    result
+  const {
+    months,
+    leader,
+    breakEvenReturnPct,
+    breakEvenRent,
+    renterInvested,
+    ownerInvested,
+    totalRent,
+    totalInterest,
+    totalCharges,
+  } = result
   const last = months[months.length - 1]
   const gap = last.buyerNetWorth - last.renterNetWorth
   const years = fmtNum(months.length / 12)
@@ -244,6 +270,19 @@ function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSub
   } else {
     breakEven = 'Buying, up to 30 %/yr'
     breakEvenNote = 'no realistic return catches the home'
+  }
+
+  let rentEdge: string
+  let rentEdgeNote: string
+  if (breakEvenRent !== null) {
+    rentEdge = `${fmtEur(breakEvenRent)}/mo`
+    rentEdgeNote = 'at the set return: renting wins below this rent, buying above'
+  } else if (leader === 'rent') {
+    rentEdge = 'Renting, at any rent'
+    rentEdgeNote = 'the closing cash alone outgrows the home at this return'
+  } else {
+    rentEdge = 'Buying, even rent-free'
+    rentEdgeNote = 'a renter investing the owner’s whole budget still ends behind'
   }
 
   return (
@@ -262,6 +301,11 @@ function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSub
         </span>
       </div>
       <div className="stat">
+        <span className="stat-label">Break-even rent</span>
+        <span className="stat-value">{rentEdge}</span>
+        <span className="stat-sub">{rentEdgeNote}</span>
+      </div>
+      <div className="stat">
         <span className="stat-label">Break-even return</span>
         <span className="stat-value">{breakEven}</span>
         <span className="stat-sub">{breakEvenNote}</span>
@@ -270,8 +314,9 @@ function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSub
         <span className="stat-label">The renter puts in</span>
         <span className="stat-value">{fmtEur(renterInvested)}</span>
         <span className="stat-sub">
-          {fmtEur(subject.cashAtClosing)} at closing, then the monthly difference ·{' '}
+          {fmtEur(subject.cashAtClosing)} at closing, then what the rent leaves ·{' '}
           {pct(renterInvested, last.renterPortfolio)} % of the final portfolio
+          {ownerInvested > 0 && ` · the owner puts in ${fmtEur(ownerInvested)}`}
         </span>
       </div>
       <div className="stat">

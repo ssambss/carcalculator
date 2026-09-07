@@ -81,6 +81,8 @@ export interface HousingSituation {
   homeValueGrowthPct: number
   /** tax on investment gains when they are finally sold, % — an own home sells tax-free */
   gainsTaxPct: number
+  /** what the owner puts into investments each month on top of the housing costs, € — a fixed figure */
+  ownerInvestPerMonth: number
 }
 
 export const DEFAULT_HOUSING: HousingSituation = {
@@ -123,6 +125,9 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // gain on a home you lived in for two years is exempt. That asymmetry is
   // real money over decades, which is why it is modeled and not footnoted.
   gainsTaxPct: 30,
+  // Zero until the buyer says otherwise: the renter then invests only what the
+  // housing costs leave, and the owner nothing - the conservative reading.
+  ownerInvestPerMonth: 0,
 }
 
 /** A flat or house you are actually considering. */
@@ -580,8 +585,12 @@ export interface RentVsBuyMonth {
   charges: number
   /** € the renter pays this month */
   rent: number
-  /** € invested this month: positive by the renter, negative by the buyer */
-  invested: number
+  /** € the owner puts into investments this month - the fixed figure from the situation */
+  ownerInvests: number
+  /** € the renter invests: the owner's whole budget less the rent, never below zero */
+  renterInvests: number
+  /** € by which the rent exceeded the owner's whole budget this month, if it did */
+  renterShort: number
   homeValue: number
   loanBalance: number
   /** home value less what is still owed */
@@ -602,14 +611,29 @@ export interface RentVsBuy {
   leaderFrom: number | null
   /** € the renter put in over the whole term, the closing cash included */
   renterInvested: number
+  /** € the owner put into investments over the whole term */
+  ownerInvested: number
+  /** months in which the rent outgrew the owner's whole budget, so the renter invested nothing */
+  renterShortMonths: number
   totalRent: number
   totalInterest: number
   totalCharges: number
   /**
    * The yearly return at which both end level, %/yr - renting wins above it,
    * buying below. Null when one side is ahead at every return from 0 to 30 %.
+   * With a fixed owner figure the gap need not move one way with the return
+   * (a higher return also feeds the owner's larger monthly sum), so this is
+   * the lowest such point, not necessarily the only one.
    */
   breakEvenReturnPct: number | null
+  /**
+   * The rent at which both end level, € / month at today's level - renting
+   * wins below it, buying above. Rent touches only the renter's side, so this
+   * one is clean: higher rent always means less invested. Null when buying
+   * wins even rent-free, or renting wins even when rent takes the owner's
+   * whole budget (tell them apart by `leader`).
+   */
+  breakEvenRent: number | null
 }
 
 /** A yearly rate as its monthly compounding equivalent. */
@@ -642,18 +666,19 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
     const buyerPays = (payment ? payment.interest + payment.principal : 0) + charges
     const loanBalance = payment ? payment.balance : 0
 
-    // Both grow for the month, then whoever paid less invests the difference.
+    // Both grow for the month. Then the owner invests the fixed figure, and
+    // the renter invests what the same total budget leaves after the rent -
+    // nothing, once the rent has outgrown it.
     renterPortfolio *= 1 + r
     buyerPortfolio *= 1 + r
     homeValue *= 1 + g
-    const invested = buyerPays - rent
-    if (invested > 0) {
-      renterPortfolio += invested
-      renterContributed += invested
-    } else {
-      buyerPortfolio -= invested
-      buyerContributed -= invested
-    }
+    const ownerInvests = Math.max(0, s.ownerInvestPerMonth)
+    const renterBudget = buyerPays + ownerInvests - rent
+    const renterInvests = Math.max(0, renterBudget)
+    renterPortfolio += renterInvests
+    renterContributed += renterInvests
+    buyerPortfolio += ownerInvests
+    buyerContributed += ownerInvests
 
     const homeEquity = homeValue - loanBalance
     out.push({
@@ -661,7 +686,9 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
       buyerPays,
       charges,
       rent,
-      invested,
+      ownerInvests,
+      renterInvests,
+      renterShort: Math.max(0, -renterBudget),
       homeValue,
       loanBalance,
       homeEquity,
@@ -677,13 +704,24 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
 /**
  * Buy this home, or rent one like it and invest the difference?
  *
- * The renter keeps the closing cash and invests it on day one; every month
- * after, whoever pays less puts the difference into the same investments -
- * usually the renter, since a payment plus charges tends to exceed rent, but
- * the other way round when it does not. The buyer's wealth is the home's
- * value less the loan; the renter's is the portfolio. Both are counted after
- * the tax on investment gains, because an own home sells tax-free in Finland
- * and a fund does not - over decades that decides close cases.
+ * Both households have the same money to spend each month. The owner pays
+ * the loan and the charges and puts a fixed sum into investments on top; the
+ * renter keeps the closing cash invested from day one and, every month,
+ * invests whatever that same total leaves after the rent. Since rent rises
+ * while the payment stays put, the renter's investing shrinks over the term
+ * and can reach zero; the owner's stays at the figure typed in. The buyer's
+ * wealth is the home's value less the loan plus the side portfolio; the
+ * renter's is the portfolio. Both are counted after the tax on investment
+ * gains, because an own home sells tax-free in Finland and a fund does not -
+ * over decades that decides close cases.
+ *
+ * The owner's figure is fixed on purpose. An earlier version let the owner
+ * invest the whole gap once rent had climbed past the payment, which grew
+ * into thousands a month by the end of a 40-year term and made the buying
+ * line explode; a number the reader sets keeps the expectation theirs. The
+ * price of that choice is that when rent outgrows the owner's whole budget,
+ * the extra the renter spends is not credited to anyone: the month is counted
+ * (`renterShortMonths`) and the card says so.
  *
  * Not modeled, deliberately: selling costs on the home, a rent deposit, the
  * years after the loan is repaid (the horizon is the loan term, when the
@@ -706,32 +744,58 @@ export function rentVsBuy(h: Holding, s: HousingSituation): RentVsBuy {
     leaderFrom = months[k].month
   }
 
-  // Bisection on the return: the gap at the horizon rises with it, because the
-  // renter holds more invested money than the buyer at every return.
-  const gapAt = (pct: number) => {
-    const end = simulate(h, s, pct)[months.length - 1]
+  // The renter's lead at the horizon, as a function of one input at a time.
+  const renterLead = (over: Partial<HousingSituation>, returnPct = s.investmentReturnPct) => {
+    const run = simulate(h, { ...s, ...over }, returnPct)
+    const end = run[run.length - 1]
     return end.renterNetWorth - end.buyerNetWorth
   }
-  let breakEvenReturnPct: number | null = null
-  let lo = 0
-  let hi = 30
-  if (gapAt(lo) < 0 && gapAt(hi) > 0) {
-    for (let i = 0; i < 40; i++) {
-      const mid = (lo + hi) / 2
-      if (gapAt(mid) < 0) lo = mid
-      else hi = mid
-    }
-    breakEvenReturnPct = (lo + hi) / 2
-  }
+  const breakEvenReturnPct = firstCrossing((pct) => renterLead({}, pct), 0, 30, 60)
+  // Rent only ever takes from the renter, so buying's lead rises with it; the
+  // scan runs up to the rent that swallows the owner's whole first-month budget.
+  const first = months[0]
+  const wholeBudget = first.buyerPays + first.ownerInvests
+  const breakEvenRent =
+    wholeBudget > 0
+      ? firstCrossing((rent) => -renterLead({ rentPerMonth: rent }), 0, wholeBudget, 40)
+      : null
 
   return {
     months,
     leader: finalSign > 0 ? 'buy' : finalSign < 0 ? 'rent' : null,
     leaderFrom,
-    renterInvested: h.cashAtClosing + months.reduce((sum, m) => sum + Math.max(0, m.invested), 0),
+    renterInvested: h.cashAtClosing + months.reduce((sum, m) => sum + m.renterInvests, 0),
+    ownerInvested: months.reduce((sum, m) => sum + m.ownerInvests, 0),
+    renterShortMonths: months.filter((m) => m.renterShort > 0).length,
     totalRent: months.reduce((sum, m) => sum + m.rent, 0),
     totalInterest: amortization(h.loan, s).totalInterest,
     totalCharges: months.reduce((sum, m) => sum + m.charges, 0),
     breakEvenReturnPct,
+    breakEvenRent,
   }
+}
+
+/**
+ * The first x in [lo, hi] where f turns from at most zero to positive: a
+ * coarse scan in `steps` slices, then bisection inside the slice that turned.
+ * Null when f never turns positive, or starts positive. A scan rather than a
+ * bare bisection because the curves here need not be monotonic.
+ */
+function firstCrossing(f: (x: number) => number, lo: number, hi: number, steps: number): number | null {
+  if (f(lo) > 0) return null
+  let a = lo
+  for (let i = 1; i <= steps; i++) {
+    const x = lo + ((hi - lo) * i) / steps
+    if (f(x) > 0) {
+      let b = x
+      for (let k = 0; k < 30; k++) {
+        const mid = (a + b) / 2
+        if (f(mid) > 0) b = mid
+        else a = mid
+      }
+      return (a + b) / 2
+    }
+    a = x
+  }
+  return null
 }

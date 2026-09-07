@@ -1130,6 +1130,24 @@ not modeled. `rentVsBuy()` in `housing.ts`, tests in `test/rentVsBuy.test.ts`
 (the flat-world identity: with rent 0 and no returns, renter minus buyer is
 exactly transfer tax + all interest + all charges).
 
+**The owner's investing is a fixed figure (2026-09-07, user's call):** the first
+version let whoever paid less invest the difference, so once rent had risen
+past the flat payment the owner's monthly investing grew without bound -
+2 800 €/mo by year 40 in the user's own case - and the buying line exploded
+into millions. Now the owner pays the loan and charges and invests a fixed
+`ownerInvestPerMonth` on top (default 0); the renter has the same total each
+month and invests what the rent leaves of it, floored at zero. Months where
+the rent outgrows the owner's whole budget are counted (`renterShortMonths`)
+and named on the card, because there the equal-budget premise breaks and
+nobody is credited with the renter's extra spending. The identity test
+survives unchanged (rent 0, owner 0: renter minus buyer is exactly tax +
+interest + charges). A side effect worth knowing: the renter-minus-buyer gap
+is no longer monotonic in the return (a higher return also feeds the owner's
+fixed monthly sum, so buying's lead can *widen* up to ~15 % before the
+renter's early cash wins at ~20 %), so the break-even search became a coarse
+scan plus bisection, and the card gained the threshold that is provably
+monotonic and closer to the reader's question: the **break-even rent**.
+
 The chart itself was pulled out of the schedule card into `TwoLineChart.tsx`
 (two lines, a wash in the color of whichever is on top, marker, legend,
 end labels, crosshair readout by pointer and keyboard) so both cards share
@@ -1147,6 +1165,10 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-07** — **Owner invests a fixed sum.** The rent-or-buy card no
+  longer hands the owner the ever-growing rent gap; a typed monthly figure
+  replaces it, the renter gets the same budget, short months are counted and
+  shown.
 - **2026-09-07** — **Rent or buy.** A second analysis card: rent a comparable
   home and invest the difference, against buying — net worth over the term
   with gains taxed, the month one side pulls ahead, and the break-even

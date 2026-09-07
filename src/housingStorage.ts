@@ -118,6 +118,7 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     investmentReturnPct: Math.max(-99, toNum(s.investmentReturnPct, d.investmentReturnPct)),
     homeValueGrowthPct: Math.max(-99, toNum(s.homeValueGrowthPct, d.homeValueGrowthPct)),
     gainsTaxPct: Math.min(100, Math.max(0, toNum(s.gainsTaxPct, d.gainsTaxPct))),
+    ownerInvestPerMonth: Math.max(0, toNum(s.ownerInvestPerMonth, d.ownerInvestPerMonth)),
   }
 }
 

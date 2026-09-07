@@ -73,23 +73,70 @@ describe('rent or buy', () => {
     const s = still({ rentPerMonth: 0 })
     const payment = amortization(kamppi.loan, s).months[0]
     const r = rentVsBuy(kamppi, still({ rentPerMonth: payment.interest + payment.principal + 265 }))
-    for (const m of r.months) expect(m.invested).toBeCloseTo(0, 6)
+    for (const m of r.months) {
+      expect(m.renterInvests).toBeCloseTo(0, 6)
+      expect(m.ownerInvests).toBe(0)
+    }
     const end = r.months[r.months.length - 1]
     expect(end.renterNetWorth).toBeCloseTo(40000, 4)
     expect(end.buyerNetWorth).toBeCloseTo(249000, 4)
     expect(r.renterInvested).toBeCloseTo(40000, 4)
+    expect(r.renterShortMonths).toBe(0)
   })
 
-  it('lets the owner invest when rent is the dearer option', () => {
-    // 2 000 € rent against ~1 330 € of payment and charges: the owner banks
-    // the ~670 € gap, the renter never adds to the closing cash.
-    const r = rentVsBuy(kamppi, still({ rentPerMonth: 2000 }))
-    expect(r.months[0].invested).toBeLessThan(0)
+  it('gives the owner a fixed sum to invest, and the renter the same total budget', () => {
+    // Owner: ~1 330 € of payment and charges plus 500 € invested = ~1 830 € a
+    // month. Renter at 1 230 € rent: the same 1 830 € less the rent is 600 €
+    // invested, every month, since nothing here rises. The owner's 500 € is
+    // the typed figure, not a gap that grows.
+    const s = still({ rentPerMonth: 0, ownerInvestPerMonth: 500 })
+    const payment = amortization(kamppi.loan, s).months[0]
+    const owning = payment.interest + payment.principal + 265
+    const r = rentVsBuy(kamppi, { ...s, rentPerMonth: owning - 100 })
+    for (const m of r.months) {
+      expect(m.ownerInvests).toBe(500)
+      expect(m.renterInvests).toBeCloseTo(600, 6)
+    }
     const end = r.months[r.months.length - 1]
-    expect(end.buyerPortfolio).toBeGreaterThan(0)
+    expect(end.buyerPortfolio).toBeCloseTo(500 * 300, 4)
+    expect(end.renterPortfolio).toBeCloseTo(40000 + 600 * 300, 4)
+    expect(r.ownerInvested).toBeCloseTo(500 * 300, 4)
+    expect(r.renterInvested).toBeCloseTo(40000 + 600 * 300, 4)
+    expect(end.buyerNetWorth).toBeCloseTo(249000 + 500 * 300, 4)
+  })
+
+  it('credits nobody with the extra when rent outgrows the whole budget, and counts the months', () => {
+    // 2 000 € rent against ~1 330 € of owning and nothing set aside: the
+    // renter cannot invest, the owner does not inherit the gap, and every
+    // month is a short one.
+    const r = rentVsBuy(kamppi, still({ rentPerMonth: 2000 }))
+    for (const m of r.months) {
+      expect(m.renterInvests).toBe(0)
+      expect(m.ownerInvests).toBe(0)
+      expect(m.renterShort).toBeGreaterThan(0)
+    }
+    expect(r.renterShortMonths).toBe(300)
+    const end = r.months[r.months.length - 1]
+    expect(end.buyerPortfolio).toBe(0)
     expect(end.renterPortfolio).toBeCloseTo(40000, 4)
-    expect(r.renterInvested).toBeCloseTo(40000, 4)
-    expect(end.buyerNetWorth).toBeCloseTo(249000 + end.buyerPortfolio, 4)
+    expect(end.buyerNetWorth).toBeCloseTo(249000, 4)
+  })
+
+  it('lets rising rent eat the renter’s investing while the owner’s stays put', () => {
+    // Rent starts 200 € under the owner's total budget and rises 2 % a year
+    // against a flat payment: the renter invests less each year and, by the
+    // end of 25 years, nothing - the owner's 300 € never moves.
+    const r = rentVsBuy(kamppi, still({ rentPerMonth: 1400, rentGrowthPct: 2, ownerInvestPerMonth: 300 }))
+    const first = r.months[0]
+    const last = r.months[r.months.length - 1]
+    expect(first.renterInvests).toBeGreaterThan(0)
+    expect(last.renterInvests).toBeLessThan(first.renterInvests)
+    expect(first.ownerInvests).toBe(300)
+    expect(last.ownerInvests).toBe(300)
+    // Year over year the renter's figure never rises.
+    for (let y = 1; y < 25; y++) {
+      expect(r.months[y * 12].renterInvests).toBeLessThanOrEqual(r.months[(y - 1) * 12].renterInvests)
+    }
   })
 
   it('steps rent and the charges up once a year', () => {
@@ -149,6 +196,43 @@ describe('rent or buy', () => {
     expect(end(pctAt - 1)).toBeLessThan(0)
   })
 
+  it('finds the rent at which both end level', () => {
+    // Rent only takes from the renter, so buying's lead grows with it: at the
+    // threshold the two coincide, 50 € below renting is ahead, 50 € above buying.
+    const s = situation({ ownerInvestPerMonth: 300 })
+    const r = rentVsBuy(kamppi, s)
+    expect(r.breakEvenRent).not.toBeNull()
+    const rent = r.breakEvenRent!
+    const lead = (rentPerMonth: number) => {
+      const months = rentVsBuy(kamppi, { ...s, rentPerMonth }).months
+      const last = months[months.length - 1]
+      return last.renterNetWorth - last.buyerNetWorth
+    }
+    expect(lead(rent)).toBeCloseTo(0, -1)
+    expect(lead(rent - 50)).toBeGreaterThan(0)
+    expect(lead(rent + 50)).toBeLessThan(0)
+  })
+
+  it('finds the lowest return crossing even when the gap is not monotonic', () => {
+    // A large fixed owner sum makes a higher return help the owner first:
+    // buying's lead widens for a while before the renter's early cash wins.
+    // The search must still land on a real crossing, with renting ahead just
+    // above it and buying just below.
+    const s = situation({ rentPerMonth: 1400, ownerInvestPerMonth: 1000, termYears: 40 })
+    const r = rentVsBuy(kamppi, s)
+    expect(r.breakEvenReturnPct).not.toBeNull()
+    const pct = r.breakEvenReturnPct!
+    const lead = (investmentReturnPct: number) => {
+      const months = rentVsBuy(kamppi, { ...s, investmentReturnPct }).months
+      const last = months[months.length - 1]
+      return last.renterNetWorth - last.buyerNetWorth
+    }
+    expect(lead(pct + 0.5)).toBeGreaterThan(0)
+    expect(lead(pct - 0.5)).toBeLessThan(0)
+    // ...and everything below it is buying's, or the point would not be the first.
+    for (let p = 0; p < pct - 0.5; p += 1) expect(lead(p)).toBeLessThan(0)
+  })
+
   it('reports no threshold when one side wins at every return', () => {
     // Rent-free and no growth anywhere: the renter banks every payment, so
     // even money earning nothing ends ahead of the home - no return to find.
@@ -175,6 +259,12 @@ describe('the rent-or-buy inputs in storage', () => {
     expect(s.investmentReturnPct).toBe(DEFAULT_HOUSING.investmentReturnPct)
     expect(s.homeValueGrowthPct).toBe(DEFAULT_HOUSING.homeValueGrowthPct)
     expect(s.gainsTaxPct).toBe(DEFAULT_HOUSING.gainsTaxPct)
+    expect(s.ownerInvestPerMonth).toBe(0)
+  })
+
+  it('keep the owner’s investing at zero or above', () => {
+    expect(normalizeSituation({ ownerInvestPerMonth: -200 }).ownerInvestPerMonth).toBe(0)
+    expect(normalizeSituation({ ownerInvestPerMonth: '1 000' }).ownerInvestPerMonth).toBe(1000)
   })
 
   it('fill in the fields a situation saved before them lacks', () => {
