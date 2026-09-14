@@ -1942,3 +1942,37 @@ a.dialog-text {
 .schedule-card .cmp-head {
   padding: 0;
 }
+
+/* Reading the trend: the checks in prose; a flagged line carries a red bullet. */
+.reading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reading-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 78ch;
+}
+
+.reading-list b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.reading-list li.flag::marker {
+  color: var(--danger);
+}
+
+.reading-verdict {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 78ch;
+}

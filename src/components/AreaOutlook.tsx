@@ -11,6 +11,7 @@ import {
   kindLabel,
   outlook,
   project,
+  readTrend,
   resolveProjectionYear,
   type AreaOutlook as Outlook,
   type AreaRecord,
@@ -18,6 +19,7 @@ import {
   type IndexKey,
   type PriceData,
   type SeriesKind,
+  type TrendRead,
   type Zone,
 } from '../areas'
 import { HELSINKI_PRICES } from '../data/helsinkiPrices'
@@ -159,6 +161,17 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
   // a stale area has no horizons of its own and shows its history alone.
   const horizons = city.projection?.horizons ?? []
 
+  // Why the selected area's trend reads as it does - only for an area, since
+  // the checks measure it against the city and its zone.
+  const read = useMemo<TrendRead | null>(() => {
+    if (!picked || picked.zone === null) return null
+    const zoneKey = `zone${picked.zone}` as IndexKey
+    return readTrend(data.years, picked.values, picked.counts, city.values, {
+      years: data.index.years,
+      values: data.index.series[zoneKey].nominal,
+    })
+  }, [picked, city, data])
+
   return (
     <div className="card schedule-card">
       <div className="schedule-head">
@@ -253,6 +266,7 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
       <AreaChart area={current} city={city} showCity={current !== city} horizon={horizon} since={longRun.since} />
       <Tiles o={current} />
       <Horizons o={current} horizon={horizon} since={longRun.since} />
+      {read && picked && <Reading o={picked} read={read} kind={kind} longRunPct={picked.projection?.longRunPct ?? null} />}
 
       {candidates.length > 0 && (
         <Candidates
@@ -811,6 +825,130 @@ function Horizons({ o, horizon, since }: { o: Outlook; horizon: number; since: n
         {p.stale
           ? `The figures for this area stop at ${startYear}, so nothing is continued from them - a line compounded for decades from a number the market left behind would be a headline, not an estimate. The trend above is still what those years showed.`
           : `The trend is the area’s own ${p.trend ? `${p.trend.years}-year` : ''} figure; the long run is the price index of ${o.zone === null ? 'all Helsinki' : `the whole zone ${o.zone}`} since ${since}. Where the three disagree, the disagreement is the finding.`}
+      </p>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ reading */
+
+/** "18 sales a year" / "1 sale a year" */
+const salesAYear = (n: number) => `${fmtNum(n)} ${n === 1 ? 'sale' : 'sales'} a year`
+/** "2,1 points a year" / "1 point a year" - the difference between two rates */
+const pp = (v: number) => {
+  const r = Math.round(Math.abs(v) * 10) / 10
+  return `${fmtNum(r)} ${r === 1 ? 'point' : 'points'} a year`
+}
+/** "2023 (+16,4 % against Helsinki’s −5,1 %)" */
+const divergenceText = (d: { year: number; areaPct: number; cityPct: number }) =>
+  `${d.year} (${fmtPct(d.areaPct)} against Helsinki’s ${fmtPct(d.cityPct)})`
+
+/**
+ * Why the area's trend reads the way it does, in the order a careful reader
+ * would check: is the figure an artefact of the window, of a thin sample, of
+ * one or two odd years; how does it sit against the city and its own zone;
+ * and what has it given back since its peak. Then a verdict on how much of
+ * it to believe.
+ */
+function Reading({
+  o,
+  read,
+  kind,
+  longRunPct,
+}: {
+  o: Outlook
+  read: TrendRead
+  kind: SeriesKind
+  longRunPct: number | null
+}) {
+  const { trend, windows, sample, city, excessPct, divergences, divergenceShare, fromPeak, zone, zoneExcessPct } = read
+  const aligned = divergences.filter((d) => d.aligned)
+  const against = divergences.filter((d) => !d.aligned)
+  const concentrated = aligned.length > 0 && (divergenceShare ?? 0) >= 0.5
+  const flagged = windows.fragile || (sample?.thin ?? false) || concentrated
+  const zoneName = `zone ${o.zone}`
+
+  return (
+    <div className="reading">
+      <div className="cmp-head">
+        <div className="schedule-subtitle">Reading the trend</div>
+        <div className="cmp-caption">
+          how much of {o.name}’s {trend.years}-year figure to believe, and why
+        </div>
+      </div>
+      <ul className="reading-list">
+        <li className={windows.fragile ? 'flag' : undefined}>
+          <b>The window.</b> {trend.fromYear}–{trend.toYear}: {fmtPct(trend.pct)}/yr. Start or end a
+          year earlier or later and it reads {fmtPct(windows.low)} to {fmtPct(windows.high)}/yr —{' '}
+          {windows.fragile
+            ? 'fragile: the figure depends on the year you start from.'
+            : 'steady whichever year you start from.'}
+        </li>
+        {sample && (
+          <li className={sample.thin ? 'flag' : undefined}>
+            <b>The sample.</b> {salesAYear(sample.median)} in the window, as few as {fmtNum(sample.min)} —{' '}
+            {sample.thin
+              ? 'thin: a handful of homes decides each year’s figure.'
+              : 'a solid base for a yearly average.'}
+          </li>
+        )}
+        {city && excessPct !== null && (
+          <li className={concentrated ? 'flag' : undefined}>
+            <b>Against Helsinki.</b> {kindLabel(kind)} across the city over the same years:{' '}
+            {fmtPct(city.pct)}/yr, so this area ran {excessPct >= 0 ? 'ahead' : 'behind'} by {pp(excessPct)}.{' '}
+            {divergences.length === 0
+              ? 'The gap built a little each year, with no single year out of step.'
+              : concentrated
+                ? `${fmtNum(Math.round(divergenceShare! * 100))} % of that gap came in ${
+                    aligned.length === 1 ? 'one year' : 'two years'
+                  } when the area moved against the city: ${aligned.map(divergenceText).join(' and ')}.${
+                    against.length ? ` ${against.map((d) => `${d.year} cut the other way (${fmtPct(d.areaPct)} against ${fmtPct(d.cityPct)})`).join('; ')}.` : ''
+                  }`
+                : `The years out of step — ${divergences.map(divergenceText).join(' and ')} — ${
+                    aligned.length === 0 ? 'cut against the gap' : 'explain little of it'
+                  }; it built in the years between.`}
+          </li>
+        )}
+        {zone && zoneExcessPct !== null && (
+          <li>
+            <b>Against its zone.</b> {zoneName}’s price index over the same years: {fmtPct(zone.pct)}/yr —{' '}
+            {Math.abs(zoneExcessPct) < 1
+              ? 'the area moved with its zone.'
+              : `the area ${zoneExcessPct > 0 ? 'outran' : 'lagged'} its own zone by ${pp(zoneExcessPct)}, so this is a story about the area, not the zone.`}
+          </li>
+        )}
+        {fromPeak.area !== null && fromPeak.areaPeakYear !== null && (
+          <li>
+            <b>Since the peak.</b>{' '}
+            {fromPeak.area < -0.05
+              ? `${fmtPct(fromPeak.area)} since ${fromPeak.areaPeakYear}`
+              : `at its peak in ${fromPeak.areaPeakYear}`}
+            {fromPeak.city !== null && fromPeak.cityPeakYear !== null
+              ? `; Helsinki ${fromPeak.city < -0.05 ? `${fmtPct(fromPeak.city)} since ${fromPeak.cityPeakYear}` : 'at its peak'}${
+                  fromPeak.area < -0.05 && fromPeak.city < -0.05
+                    ? fromPeak.area < fromPeak.city - 2
+                      ? ' — the area has given back more than the city.'
+                      : fromPeak.area > fromPeak.city + 2
+                        ? ' — the area has held up better than the city.'
+                        : ' — about in step.'
+                    : '.'
+                }`
+              : '.'}
+          </li>
+        )}
+      </ul>
+      <p className="reading-verdict">
+        {concentrated
+          ? 'A gap that arrives in one or two years, while the rest of the time the area keeps the city’s pace, is the signature of a change in what sold — newer or renovated homes reaching the resale market, a different corner of the area trading — rather than of the same homes gaining value. The data cannot say which; a trend line assumes the latter. '
+          : flagged
+            ? `Read it as ${fmtPct(windows.low)} to ${fmtPct(windows.high)}/yr at best${
+                sample?.thin ? `: with ${salesAYear(sample.median)}, the yearly figures wobble more than the homes do` : ''
+              }. `
+            : `Steady across windows${sample && !sample.thin ? ', on a solid sample' : ''}, built a little each year: as good as a postal-code trend gets. It still contains the 2022–2025 fall, and should not be pushed past the zone’s long run without a reason of its own. `}
+        {flagged &&
+          (longRunPct !== null
+            ? `For the years ahead, lean on ${zoneName}’s long run (${fmtPct(longRunPct)}/yr) and treat the area’s own trend as a range of what it might be, not a rate.`
+            : 'For the years ahead, treat the area’s own trend as a range of what it might be, not a rate.')}
       </p>
     </div>
   )

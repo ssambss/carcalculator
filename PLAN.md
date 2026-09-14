@@ -1223,6 +1223,37 @@ above and guess below, from today's price); the chart's end labels are
 stacked so three never collide; arrow keys stride five years on a long axis.
 231 frontend tests; verified in Chromium at +10 and +20, light, dark, 390 px.
 
+**Reading the trend (2026-09-14, user's ask — "why do some places go against
+the long run, e.g. Malminkartano's terraced houses"):** the table can rank
+areas by trend, but a trend that disagrees with the zone's long run is a
+question, not an answer, and the card now runs the checks a careful reader
+would. `readTrend()` in `areas.ts`: (1) **window sensitivity** — the same
+figure with the window moved a year at either end (`growthBetween`); a spread
+over 1.5 pp marks it fragile; (2) **sample** — median and minimum sales a year
+in the window, thin under 20; (3) **against Helsinki** — the city's same-class
+growth over the same years, the excess in points, and the **years out of
+step**: yearly moves of eight points or more against the city, largest two,
+with the share of the whole gap the ones pushing the gap's way account for
+(a year that cut the other way is listed but does not explain anything);
+(4) **against its zone** — the zone index over the same window; (5) **since
+the peak**, both sides against their own. The `Reading` block renders these as
+five sentences with red bullets on the flagged ones and a verdict: a gap that
+arrives in one or two years while the area otherwise keeps the city's pace is
+named as the signature of a change in *what* sold — newer or renovated stock
+reaching the resale market — which the data cannot confirm and a trend line
+assumes away; a fragile or thin trend is read as a range; a steady one is
+called as good as a postal-code trend gets, still containing the 2022–2025
+fall. Malminkartano terraced (the question that prompted it): 2015 was the
+series' trough, so the window reads 1.9–4.3 %/yr depending on the start year;
+8–22 sales a year; the excess over the city came in 2020 and 2023, years the
+area rose while Helsinki fell — Honkasuo's new wooden townhouses (built from
+2015, postal code 00410) reaching resale is the likely composition story; and
+it has given back −16.8 % since 2023 against the city's −9 %. The verdict
+points at zone 4's long run instead. The block only appears for an area, not
+for Helsinki as a whole; its tests are in `test/areaRead.test.ts`. Built in
+a worktree (`worktree-area-trend-read`) because another session was editing
+the housing view at the same time.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1232,6 +1263,11 @@ forbids scraping in its terms, so candidates are typed in by hand.
 
 ## Log
 
+- **2026-09-14** — **Reading the trend.** Under the selected area, five checks
+  on its trend — window sensitivity, sample, the years out of step with the
+  city and their share of the gap, the zone over the same years, the fall
+  since the peak — and a verdict on how much to believe. 240 frontend tests,
+  verified in Chromium. Built on a worktree branch.
 - **2026-09-14** — **Ten and twenty years on.** Three horizons per area
   (purchase, +10, +20) as chips; a third continued line at the zone's long-run
   rate since 1988; stale series get no continuation at all; a horizons strip

@@ -601,6 +601,187 @@ export function nominalRates(data: PriceData, postalCode: string): NominalRates 
   }
 }
 
+/* ---------------------------------------------------------- reading a trend */
+
+/** Average yearly change between two particular years, both of which must be published. */
+export function growthBetween(
+  years: number[],
+  values: Series,
+  fromYear: number,
+  toYear: number,
+): Growth | null {
+  const a = years.indexOf(fromYear)
+  const b = years.indexOf(toYear)
+  if (a < 0 || b < 0 || b <= a) return null
+  const va = values[a]
+  const vb = values[b]
+  if (va === null || vb === null || va <= 0) return null
+  return { pct: cagr(va, vb, toYear - fromYear), fromYear, toYear, years: toYear - fromYear }
+}
+
+export interface Divergence {
+  year: number
+  /** the area's change on the year before, % */
+  areaPct: number
+  /** the city's change over the same year, % */
+  cityPct: number
+  /** whether the year pushed the same way as the whole gap to the city - only those can explain it */
+  aligned: boolean
+}
+
+/**
+ * Why an area's trend reads the way it does - the checks a careful reader
+ * would run before believing a figure that disagrees with the zone's long run.
+ */
+export interface TrendRead {
+  /** the window the trend is read from */
+  trend: Growth
+  /**
+   * The same figure with the window moved one year at either end. A wide
+   * spread means the trend is mostly the choice of a start year.
+   */
+  windows: { low: number; high: number; fragile: boolean }
+  /** sales a year inside the window; thin when a handful of homes decide each year's figure */
+  sample: { median: number; min: number; thin: boolean } | null
+  /** Helsinki, same class of home, over the same years */
+  city: Growth | null
+  /** area minus city, percentage points a year */
+  excessPct: number | null
+  /**
+   * The years in which the area moved hardest against the city, largest
+   * first - at most two, and only moves of eight points or more. A gap to the
+   * city that arrives in one or two such years, while the rest of the time the
+   * area keeps the city's pace, is the signature of a change in what sold, not
+   * of the same homes gaining value.
+   */
+  divergences: Divergence[]
+  /**
+   * How much of the whole gap to the city the divergent years that push the
+   * gap's way account for, 0-1. Null when there is no gap, or when every
+   * divergent year cut against it.
+   */
+  divergenceShare: number | null
+  /** the area and the city against their own peaks over the whole series */
+  fromPeak: {
+    area: number | null
+    areaPeakYear: number | null
+    city: number | null
+    cityPeakYear: number | null
+  }
+  /** the zone's price index over the same years */
+  zone: Growth | null
+  /** area minus zone, percentage points a year */
+  zoneExcessPct: number | null
+}
+
+/** How wide a spread between neighbouring windows marks a trend as fragile, points a year. */
+const FRAGILE_SPREAD_PP = 1.5
+/** Under this many sales a year, the yearly figures wobble more than the homes do. */
+const THIN_SAMPLE = 20
+/** A year counts as moving against the city from this many points of difference. */
+const DIVERGENCE_PP = 8
+
+export function readTrend(
+  years: number[],
+  values: Series,
+  counts: Series,
+  cityValues: Series,
+  zoneIndex: { years: number[]; values: Series } | null,
+): TrendRead | null {
+  const s = describeSeries(years, values)
+  const trend = s.growth10 ?? s.growthAll
+  if (!trend) return null
+  const { fromYear, toYear } = trend
+  const ai = years.indexOf(fromYear)
+  const bi = years.indexOf(toYear)
+
+  // The window moved a year at either end - only windows still two years long count.
+  const alternatives = [
+    growthBetween(years, values, fromYear - 1, toYear),
+    growthBetween(years, values, fromYear + 1, toYear),
+    growthBetween(years, values, fromYear, toYear - 1),
+  ].filter((g): g is Growth => g !== null && g.years >= 2)
+  const pcts = [trend.pct, ...alternatives.map((g) => g.pct)]
+  const low = Math.min(...pcts)
+  const high = Math.max(...pcts)
+  const windows = { low, high, fragile: high - low > FRAGILE_SPREAD_PP }
+
+  const inWindow: number[] = []
+  for (let k = ai; k <= bi; k++) {
+    const c = counts[k]
+    if (c !== null) inWindow.push(c)
+  }
+  let sample: TrendRead['sample'] = null
+  if (inWindow.length) {
+    const sorted = [...inWindow].sort((a, b) => a - b)
+    const median = sorted[Math.floor(sorted.length / 2)]
+    sample = { median, min: sorted[0], thin: median < THIN_SAMPLE }
+  }
+
+  const city = growthBetween(years, cityValues, fromYear, toYear)
+  const excessPct = city ? trend.pct - city.pct : null
+
+  const divergences: Divergence[] = []
+  let divergenceShare: number | null = null
+  if (city) {
+    const totalLogExcess =
+      Math.log(values[bi]! / values[ai]!) - Math.log(cityValues[bi]! / cityValues[ai]!)
+    const moves: { year: number; areaPct: number; cityPct: number; logDiff: number }[] = []
+    for (let k = ai + 1; k <= bi; k++) {
+      const a0 = values[k - 1]
+      const a1 = values[k]
+      const c0 = cityValues[k - 1]
+      const c1 = cityValues[k]
+      if (a0 === null || a1 === null || c0 === null || c1 === null) continue
+      moves.push({
+        year: years[k],
+        areaPct: (a1 / a0 - 1) * 100,
+        cityPct: (c1 / c0 - 1) * 100,
+        logDiff: Math.log(a1 / a0) - Math.log(c1 / c0),
+      })
+    }
+    moves.sort((x, y) => Math.abs(y.logDiff) - Math.abs(x.logDiff))
+    const top = moves.filter((m) => Math.abs(m.areaPct - m.cityPct) >= DIVERGENCE_PP).slice(0, 2)
+    // Only the years that push the same way as the gap can explain it; a year
+    // that cut the other way is listed, but it is not part of the answer.
+    const hasGap = Math.abs(totalLogExcess) > 1e-9
+    for (const m of top) {
+      divergences.push({
+        year: m.year,
+        areaPct: m.areaPct,
+        cityPct: m.cityPct,
+        aligned: hasGap && Math.sign(m.logDiff) === Math.sign(totalLogExcess),
+      })
+    }
+    const aligned = top.filter((_, i) => divergences[i].aligned)
+    if (aligned.length) {
+      const share = aligned.reduce((sum, m) => sum + m.logDiff, 0) / totalLogExcess
+      divergenceShare = Math.min(1, share)
+    }
+  }
+
+  const cityS = describeSeries(years, cityValues)
+  const zone = zoneIndex ? growthBetween(zoneIndex.years, zoneIndex.values, fromYear, toYear) : null
+
+  return {
+    trend,
+    windows,
+    sample,
+    city,
+    excessPct,
+    divergences,
+    divergenceShare,
+    fromPeak: {
+      area: s.fromPeakPct,
+      areaPeakYear: s.peak?.year ?? null,
+      city: cityS.fromPeakPct,
+      cityPeakYear: cityS.peak?.year ?? null,
+    },
+    zone,
+    zoneExcessPct: zone ? trend.pct - zone.pct : null,
+  }
+}
+
 /* ------------------------------------------------------------------ the year */
 
 /**

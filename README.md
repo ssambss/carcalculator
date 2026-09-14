@@ -139,9 +139,14 @@ color-coded cost breakdown and a side-by-side comparison table.
   the long-run rate of the area's price zone since 1988, the steadier yardstick
   for decades. Every area in one sortable table at each horizon; give a place
   its postal code and it is marked there and priced forward at its own area's
-  trend. Series that stop early are not continued. The long run since 1988 (the
-  1990s fall included) sits under it so the projection is read for what it is:
-  arithmetic on the past.
+  trend. Series that stop early are not continued. Under the selected area, a
+  **reading of its trend**: whether the figure survives moving the window a
+  year, how many sales it rests on, whether its gap to Helsinki built gradually
+  or arrived in one or two years out of step (the mark of a change in what
+  sold, not of homes gaining value), how it sits against its own zone, and what
+  it has given back since its peak — ending in a plain verdict on how much of
+  it to believe. The long run since 1988 (the 1990s fall included) sits under
+  it so the projection is read for what it is: arithmetic on the past.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.
