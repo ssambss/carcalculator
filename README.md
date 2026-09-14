@@ -127,7 +127,8 @@ color-coded cost breakdown and a side-by-side comparison table.
   Statistics Finland's price index for the place's whole price zone since
   1988, and the area's own last ten years of realised €/m² for the kind of
   home the place is — and what each compounds to at the purchase year and ten
-  and twenty years on. Stated as an index (today is 100, so "+36 %" is a value
+  and twenty years on, with your own home-value guess compounded over the same
+  years in each row's label as the yardstick between them. Stated as an index (today is 100, so "+36 %" is a value
   36 % higher in nominal euros), not applied to the asking price: the figures
   are about the area, and the two disagreeing is the point. Nothing there is
   highlighted — these are not costs, and the lowest growth is no prize. The

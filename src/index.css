@@ -808,6 +808,15 @@ select option {
   margin-top: 16px;
 }
 
+/* A figure that belongs to the whole group rather than to a column - said
+   once, in the divider, in the running text's case rather than the label's. */
+.cmp tr.cmp-group th .cmp-group-note {
+  margin-left: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* ————— Modal / car form ————— */
 .modal-overlay {
   position: fixed;

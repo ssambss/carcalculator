@@ -765,6 +765,10 @@ function HousingTable({
     c: costs.get(p.id)!,
     r: nominalRates(data, p.postalCode, seriesOf(p)),
   }))
+  // The reader's own guess, the figure rent-or-buy runs on. One number for
+  // every place, so it is said once per row - in the label, where the two
+  // area figures in the cells can be read against it - not five times over.
+  const guess = situation.homeValueGrowthPct
   const since = data.index.years[0]
   const highlight = list.length > 1
 
@@ -938,7 +942,10 @@ function HousingTable({
             {list.length > 0 && (
               <>
                 <tr className="cmp-group">
-                  <th colSpan={list.length + 1}>Projected value, nominal index</th>
+                  <th colSpan={list.length + 1}>
+                    Projected value, nominal index
+                    <span className="cmp-group-note">your guess {fmtPct(guess)}/yr</span>
+                  </th>
                 </tr>
                 <tr>
                   <th className="rowhead">Zone’s long run</th>
@@ -967,6 +974,10 @@ function HousingTable({
                     <th className="rowhead">
                       {i === 0 ? 'At purchase' : `+${offset} years`}{' '}
                       <span className="cmp-horizon">{targetYear + offset}</span>
+                      <br />
+                      <span className="cell-note">
+                        your guess {fmtPct(cumulativePct(guess, yearsFromNow + offset))}
+                      </span>
                     </th>
                     {list.map(({ p, r }) => (
                       <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
@@ -996,8 +1007,11 @@ function HousingTable({
           compounds Statistics Finland’s nominal price index for the place’s whole price zone at
           its average yearly change since {since}; under it, the area’s own last ten years of
           realised €/m² for the kind of home the place says it is — a flat by its rooms, a
-          terraced house as its own series, all flats until it says (Edit → Type). The two
-          disagreeing is the point, and neither is a forecast. A detached house is not in these
+          terraced house as its own series, all flats until it says (Edit → Type). The row label
+          carries what your own guess ({fmtPct(guess)}/yr, the figure rent-or-buy runs on)
+          compounds to over the same years — one number for every place, so it is said once,
+          where both area figures can be read against it. The two disagreeing is the point, and
+          none of the three is a forecast. A detached house is not in these
           statistics at all — they cover housing companies — so only the zone index applies to
           it. Change the purchase year in “Helsinki by area”.
           {list.some(({ r }) => r.area === null) && (
