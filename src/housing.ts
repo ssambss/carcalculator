@@ -18,7 +18,9 @@
  *    (~6 %) over at most 25 years, whatever rate they offer you. This is
  *    usually the one that binds.
  * 3. **Savings** — the price where the down payment plus transfer tax plus
- *    costs exhausts what you have.
+ *    costs exhausts what you have. The tax depends on what kind of home it
+ *    is — real estate pays twice what housing-company shares do — so a
+ *    detached house has a ceiling of its own, a little lower.
  * 4. **The loan-to-value rule** — a mortgage may only cover part of the price
  *    (95 % under the 2026 loan cap and the decided ASP reform), so cash has to
  *    bridge the rest no matter how strong the income is.
@@ -59,8 +61,10 @@ export interface HousingSituation {
   stressRatePct: number
   /** cash share of the price the loan may not cover, % — the LTV rule */
   minDownPaymentPct: number
-  /** varainsiirtovero, % of the price — check the current rate */
+  /** varainsiirtovero on housing-company shares — a flat, a terraced house — % of the price */
   transferTaxPct: number
+  /** varainsiirtovero on real estate — a detached house on its own plot — % of the price */
+  transferTaxRealEstatePct: number
   /** valuation, notary, arrangement fees — flat € */
   buyingCosts: number
   /** hoitovastike guess used for the ceiling; candidates carry their own */
@@ -104,7 +108,11 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // the rule banks apply in 2026 is still 10. The general loan cap has
   // allowed 5 % for everyone since 30.6.2026 anyway.
   minDownPaymentPct: 5,
+  // The rates since 1.1.2024: shares in a housing company 1.5 %, real estate
+  // 3 % (down from 2 and 4; the first-home exemption went the same day).
+  // Which one a place pays is not a choice - see transferTaxPctFor.
   transferTaxPct: 1.5,
+  transferTaxRealEstatePct: 3,
   buyingCosts: 0,
   maintenanceEstimatePerMonth: 250,
   useAspLoan: false,
@@ -148,6 +156,19 @@ export const HOME_TYPES: { key: HomeType; label: string; fi: string }[] = [
   { key: 'terraced', label: 'Terraced house', fi: 'rivitalo' },
   { key: 'detached', label: 'Detached house', fi: 'omakotitalo' },
 ]
+
+/**
+ * The transfer tax rate a place pays. Finland taxes the two ways a home
+ * changes hands differently: shares in a housing company — a flat, a
+ * terraced house — at one rate, real estate — a detached house on its own
+ * plot — at twice that. Which applies is not a choice but follows from what
+ * the place is, so it is read off the kind rather than typed per place. A
+ * place that has not said what it is is read as shares: the common case,
+ * and what the ceiling assumes unless asked about a detached house.
+ */
+export function transferTaxPctFor(homeType: HomeType | '', s: HousingSituation): number {
+  return homeType === 'detached' ? s.transferTaxRealEstatePct : s.transferTaxPct
+}
 
 /** A flat or house you are actually considering. */
 export interface PropertyListing {
@@ -312,7 +333,9 @@ function maxLoanForBudget(budget: number, s: HousingSituation): number {
 }
 
 /**
- * How high a price the whole situation reaches, and what stops it there.
+ * How high a price the whole situation reaches, and what stops it there —
+ * for a home of the given kind, since the tax rate, and with it the ceiling,
+ * differs between shares and real estate. Unsaid means shares.
  *
  * The closed forms, with L the largest permissible loan, S savings, c flat
  * costs, t transfer tax and d the minimum cash share:
@@ -325,7 +348,7 @@ function maxLoanForBudget(budget: number, s: HousingSituation): number {
  * price is whatever the cash equation needs — never more than L, never more
  * than the LTV cap allows.
  */
-export function affordability(s: HousingSituation): Affordability {
+export function affordability(s: HousingSituation, homeType: HomeType | '' = ''): Affordability {
   const budget = Math.max(
     0,
     (householdIncome(s) * s.housingSharePct) / 100 -
@@ -342,7 +365,7 @@ export function affordability(s: HousingSituation): Affordability {
   const maxLoanByStress = maxLoanForPayment(budget, s.stressRatePct, stressMonths)
   const loanCap = Math.min(maxLoanByPayment, maxLoanByStress)
 
-  const t = s.transferTaxPct / 100
+  const t = transferTaxPctFor(homeType, s) / 100
   const d = s.minDownPaymentPct / 100
   const cashForPrice = Math.max(0, householdSavings(s) - s.buyingCosts)
 
@@ -417,6 +440,8 @@ export interface PropertyCost {
   aspLoan: number
   regularLoan: number
   downPayment: number
+  /** varainsiirtovero at the rate for this kind of home */
+  transferTax: number
   /** € / month: the annuity at your own rate and term */
   loanPayment: number
   /** € / month: everything that leaves the account */
@@ -435,15 +460,19 @@ export interface PropertyCost {
 }
 
 /**
- * What buying this particular place would cost, measured against the ceiling.
+ * What buying this particular place would cost, measured against the ceiling
+ * for its kind of home.
  *
  * The loan is derived from *your* situation, not entered per property: price
  * plus tax plus costs, minus every euro of savings. That mirrors how people
- * actually buy — savings go in first, the loan covers the rest.
+ * actually buy — savings go in first, the loan covers the rest. The tax is
+ * the rate for what the place is (transferTaxPctFor), and so is the ceiling
+ * it is held against: a detached house pays more at closing, so the same
+ * price can be within reach as a flat and over the ceiling as a house.
  */
-export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: number): PropertyCost {
-  const t = s.transferTaxPct / 100
-  const loan = Math.max(0, p.price * (1 + t) + s.buyingCosts - householdSavings(s))
+export function propertyCost(p: PropertyListing, s: HousingSituation): PropertyCost {
+  const transferTax = (p.price * transferTaxPctFor(p.homeType, s)) / 100
+  const loan = Math.max(0, p.price + transferTax + s.buyingCosts - householdSavings(s))
   const downPayment = Math.max(0, p.price - loan)
   const split = splitLoan(loan, s)
   const loanPayment = split.payment
@@ -461,11 +490,12 @@ export function propertyCost(p: PropertyListing, s: HousingSituation, ceiling: n
     aspLoan: split.asp,
     regularLoan: split.regular,
     downPayment,
+    transferTax,
     loanPayment,
     totalPerMonth,
     costPerMonth: totalPerMonth - principal,
     pricePerM2: p.sizeM2 > 0 ? p.price / p.sizeM2 : null,
-    fits: p.price <= ceiling,
+    fits: p.price <= affordability(s, p.homeType).maxPrice,
     breakdown: {
       interest,
       principal,

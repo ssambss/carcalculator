@@ -19,6 +19,7 @@ import {
   propertyCost,
   shiftRates,
   splitLoan,
+  transferTaxPctFor,
   type HousingSituation,
   type PropertyListing,
 } from '../src/housing'
@@ -196,7 +197,7 @@ describe('buying together', () => {
       savings: 40000 + 20000,
     })
     expect(affordability(couple)).toEqual(affordability(summed))
-    expect(propertyCost(flat(), couple, 0)).toEqual(propertyCost(flat(), summed, 0))
+    expect(propertyCost(flat(), couple)).toEqual(propertyCost(flat(), summed))
   })
 
   it('keeps the partner fields inert until the toggle is on', () => {
@@ -217,7 +218,7 @@ describe('buying together', () => {
   it('puts the partner savings into a candidate loan', () => {
     // 249 000 × 1.015 − (40 000 + 20 000) = 192 735.
     const couple = situation({ buyingTogether: true, partnerSavings: 20000 })
-    const c = propertyCost(flat(), couple, 0)
+    const c = propertyCost(flat(), couple)
     expect(c.loan).toBeCloseTo(192735, 4)
   })
 })
@@ -302,7 +303,7 @@ describe('the ASP split', () => {
     // A cap below the loan: 212 735 € splits into 185 000 + 27 735. (The cap
     // is an arithmetic fixture here, not any municipality's current figure.)
     const s = asp({ aspMaxLoan: 185000 })
-    const c = propertyCost(flat(), s, affordability(s).maxPrice)
+    const c = propertyCost(flat(), s)
     expect(c.aspLoan).toBe(185000)
     expect(c.regularLoan).toBeCloseTo(27735, 0)
     expect(c.aspLoan + c.regularLoan).toBeCloseTo(c.loan, 4)
@@ -317,42 +318,41 @@ describe('the ASP split', () => {
 
 describe('what a candidate costs', () => {
   const s = situation()
-  const ceiling = affordability(s).maxPrice
 
   it('derives the loan from the buyer, not from a field on the flat', () => {
     // Price plus tax minus every euro of savings: 249 000 × 1.015 − 40 000.
-    const c = propertyCost(flat(), s, ceiling)
+    const c = propertyCost(flat(), s)
     expect(c.loan).toBeCloseTo(249000 * 1.015 - 40000, 4)
     expect(c.downPayment).toBeCloseTo(249000 - c.loan, 4)
   })
 
   it('prices the monthly bill: annuity plus the charges', () => {
-    const c = propertyCost(flat(), s, ceiling)
+    const c = propertyCost(flat(), s)
     // 212 735 at 3.5 %/25 y ≈ 1 065 €/mo, plus 245 + 0 + 20 of charges.
     expect(c.loanPayment).toBeCloseTo(1065, 0)
     expect(c.totalPerMonth).toBeCloseTo(c.loanPayment + 265, 6)
   })
 
   it('splits the first payment into interest and principal that add up', () => {
-    const c = propertyCost(flat(), s, ceiling)
+    const c = propertyCost(flat(), s)
     // First month interest: loan × 3.5 %/12 ≈ 620 €.
     expect(c.breakdown.interest).toBeCloseTo((c.loan * 0.035) / 12, 4)
     expect(c.breakdown.interest + c.breakdown.principal).toBeCloseTo(c.loanPayment, 4)
   })
 
   it('counts principal out of the cost, because it buys equity', () => {
-    const c = propertyCost(flat(), s, ceiling)
+    const c = propertyCost(flat(), s)
     expect(c.costPerMonth).toBeCloseTo(c.totalPerMonth - c.breakdown.principal, 6)
     expect(c.costPerMonth).toBeLessThan(c.totalPerMonth)
   })
 
-  it('measures against the ceiling', () => {
-    expect(propertyCost(flat({ price: 120000 }), s, ceiling).fits).toBe(true)
-    expect(propertyCost(flat({ price: 500000 }), s, ceiling).fits).toBe(false)
+  it('measures against the ceiling for its kind of home', () => {
+    expect(propertyCost(flat({ price: 120000 }), s).fits).toBe(true)
+    expect(propertyCost(flat({ price: 500000 }), s).fits).toBe(false)
   })
 
   it('handles a place cheap enough to buy outright', () => {
-    const c = propertyCost(flat({ price: 30000 }), s, ceiling)
+    const c = propertyCost(flat({ price: 30000 }), s)
     expect(c.loan).toBe(0)
     expect(c.loanPayment).toBe(0)
     expect(c.breakdown.interest).toBe(0)
@@ -361,16 +361,54 @@ describe('what a candidate costs', () => {
   })
 
   it('gives €/m² only when a size is known', () => {
-    expect(propertyCost(flat(), s, ceiling).pricePerM2).toBeCloseTo(249000 / 58, 4)
-    expect(propertyCost(flat({ sizeM2: 0 }), s, ceiling).pricePerM2).toBeNull()
+    expect(propertyCost(flat(), s).pricePerM2).toBeCloseTo(249000 / 58, 4)
+    expect(propertyCost(flat({ sizeM2: 0 }), s).pricePerM2).toBeNull()
   })
 
   it('keeps every breakdown key a declared category', () => {
     // The bar renders whatever the categories declare; a key that is not
     // declared is money that silently never shows.
-    const c = propertyCost(flat(), s, ceiling)
+    const c = propertyCost(flat(), s)
     const declared = HOUSING_CATEGORIES.map((cat) => cat.key).sort()
     expect(Object.keys(c.breakdown).sort()).toEqual(declared)
+  })
+})
+
+describe('the transfer tax follows the kind of home', () => {
+  const s = situation()
+
+  it('reads shares for a flat, a terraced house and a place that has not said', () => {
+    expect(transferTaxPctFor('', s)).toBe(1.5)
+    expect(transferTaxPctFor('flat', s)).toBe(1.5)
+    expect(transferTaxPctFor('terraced', s)).toBe(1.5)
+    expect(transferTaxPctFor('detached', s)).toBe(3)
+  })
+
+  it('charges a detached house the real-estate rate, and the loan carries it', () => {
+    const asFlat = propertyCost(flat(), s)
+    const asHouse = propertyCost(flat({ homeType: 'detached' }), s)
+    expect(asFlat.transferTax).toBeCloseTo(249000 * 0.015, 4)
+    expect(asHouse.transferTax).toBeCloseTo(249000 * 0.03, 4)
+    // The extra tax is cash the savings no longer cover, so it lands on the loan.
+    expect(asHouse.loan - asFlat.loan).toBeCloseTo(249000 * 0.015, 4)
+    expect(asHouse.loan).toBeCloseTo(249000 * 1.03 - 40000, 4)
+  })
+
+  it('lowers the ceiling for a detached house, and holds one against that', () => {
+    const shares = affordability(s).maxPrice
+    const houses = affordability(s, 'detached').maxPrice
+    // Stress-limited here, so price·(1+t) = S + L and the tax simply rescales the price.
+    expect(houses).toBeCloseTo((shares * 1.015) / 1.03, 4)
+    expect(houses).toBeLessThan(shares)
+    // The same price, between the two ceilings: a flat at it fits, a house does not.
+    const between = (shares + houses) / 2
+    expect(propertyCost(flat({ price: between }), s).fits).toBe(true)
+    expect(propertyCost(flat({ price: between, homeType: 'detached' }), s).fits).toBe(false)
+  })
+
+  it('is one ceiling again when the two rates are typed equal', () => {
+    const oneRate = situation({ transferTaxRealEstatePct: 1.5 })
+    expect(affordability(oneRate, 'detached')).toEqual(affordability(oneRate))
   })
 })
 
@@ -392,7 +430,7 @@ describe('over the years', () => {
   it('starts with the first bill the card shows', () => {
     // The breakdown bar states the first month; the chart's first point must
     // be the same number, or the two disagree in the same card.
-    const c = propertyCost(flat(), s, 0)
+    const c = propertyCost(flat(), s)
     const first = amortization(c.loan, s).months[0]
     expect(first.interest).toBeCloseTo(c.breakdown.interest, 6)
     expect(first.principal).toBeCloseTo(c.breakdown.principal, 6)

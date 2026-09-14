@@ -62,12 +62,16 @@ export function HousingView({ store }: { store: HousingStore }) {
 
   const ceiling = useMemo(() => affordability(data.situation), [data.situation])
 
+  // A detached house is real estate and pays the higher transfer tax, so its
+  // ceiling sits below a flat's - said under the hero figure when it differs.
+  const detachedCeiling = useMemo(
+    () => affordability(data.situation, 'detached').maxPrice,
+    [data.situation],
+  )
+
   const costs = useMemo(
-    () =>
-      new Map(
-        data.properties.map((p) => [p.id, propertyCost(p, data.situation, ceiling.maxPrice)]),
-      ),
-    [data.properties, data.situation, ceiling.maxPrice],
+    () => new Map(data.properties.map((p) => [p.id, propertyCost(p, data.situation)])),
+    [data.properties, data.situation],
   )
 
   const sorted = useMemo(
@@ -127,7 +131,7 @@ export function HousingView({ store }: { store: HousingStore }) {
           label: p.name || 'Unnamed place',
           price: p.price,
           loan: c?.loan ?? 0,
-          cashAtClosing: (c?.downPayment ?? 0) + (p.price * s.transferTaxPct) / 100 + s.buyingCosts,
+          cashAtClosing: (c?.downPayment ?? 0) + (c?.transferTax ?? 0) + s.buyingCosts,
           chargesPerMonth: p.maintenancePerMonth + p.financingChargePerMonth + p.otherPerMonth,
         }
       }),
@@ -171,7 +175,7 @@ export function HousingView({ store }: { store: HousingStore }) {
         <p className="field-hint field-error">Housing sync: {store.error}</p>
       )}
 
-      <CeilingCard ceiling={ceiling} />
+      <CeilingCard ceiling={ceiling} detachedMax={detachedCeiling} situation={data.situation} />
 
       <LoanSchedule
         situation={data.situation}
@@ -472,8 +476,10 @@ function SituationPanel({
       {/*
         The rules banks and the taxman apply, not facts this app knows: the
         stress rate is supervisory practice, the LTV cap and transfer tax are
-        law that changes. Defaults are the common case - check the current
-        rules before trusting a decision to them.
+        law that changes. The tax has two rates - housing-company shares and
+        real estate - and which one a place pays follows from its kind of
+        home, not from a choice here. Defaults are the common case - check the
+        current rules before trusting a decision to them.
       */}
       <div className="assumptions-heading">
         <div className="assumptions-title">The rules</div>
@@ -505,6 +511,15 @@ function SituationPanel({
           value={situation.transferTaxPct}
           onChange={(n) => set({ transferTaxPct: Math.max(0, n) })}
           unit="%"
+          hint="on housing-company shares — a flat, a terraced house"
+        />
+        <NumberField
+          compact
+          label="Tax, real estate"
+          value={situation.transferTaxRealEstatePct}
+          onChange={(n) => set({ transferTaxRealEstatePct: Math.max(0, n) })}
+          unit="%"
+          hint="transfer tax on real estate — a detached house on its own plot; applied by itself to a place that says it is one"
         />
         <NumberField
           compact
@@ -520,7 +535,16 @@ function SituationPanel({
 
 /* ------------------------------------------------------------------ ceiling */
 
-function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> }) {
+function CeilingCard({
+  ceiling,
+  detachedMax,
+  situation,
+}: {
+  ceiling: ReturnType<typeof affordability>
+  /** the same ceiling for a detached house, which pays the real-estate rate */
+  detachedMax: number
+  situation: HousingSituation
+}) {
   // A zero budget is nearly always a typo, not a fact about the household -
   // the classic being a loan's total balance typed into the €/mo field. Say
   // that outright instead of letting the generic note imply low income.
@@ -539,6 +563,13 @@ function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> })
         </div>
       </div>
       <p className="ceiling-note">{note}</p>
+      {ceiling.maxPrice > 0 && detachedMax !== ceiling.maxPrice && (
+        <p className="ceiling-note">
+          A detached house is real estate and pays {fmtNum(situation.transferTaxRealEstatePct)} %
+          transfer tax rather than {fmtNum(situation.transferTaxPct)} %, so for one the ceiling is{' '}
+          {fmtEur(detachedMax)}.
+        </p>
+      )}
       {ceiling.maxPrice > 0 && (
         <div className="stat-row">
           {ceiling.aspLoan > 0 && ceiling.regularLoan > 0 ? (

@@ -106,6 +106,10 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     stressRatePct: Math.max(0, toNum(s.stressRatePct, d.stressRatePct)),
     minDownPaymentPct: Math.min(100, Math.max(0, toNum(s.minDownPaymentPct, d.minDownPaymentPct))),
     transferTaxPct: Math.max(0, toNum(s.transferTaxPct, d.transferTaxPct)),
+    transferTaxRealEstatePct: Math.max(
+      0,
+      toNum(s.transferTaxRealEstatePct, d.transferTaxRealEstatePct),
+    ),
     buyingCosts: Math.max(0, toNum(s.buyingCosts, d.buyingCosts)),
     maintenanceEstimatePerMonth: Math.max(
       0,

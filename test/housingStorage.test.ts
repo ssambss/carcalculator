@@ -58,6 +58,15 @@ describe('normalising', () => {
     expect(s.housingSharePct).toBe(100)
   })
 
+  it('keeps both transfer tax rates, and defaults the real-estate one', () => {
+    // A file written before the second rate existed carries only the first.
+    const old = normalizeSituation({ transferTaxPct: 2 })
+    expect(old.transferTaxPct).toBe(2)
+    expect(old.transferTaxRealEstatePct).toBe(DEFAULT_HOUSING.transferTaxRealEstatePct)
+    expect(normalizeSituation({ transferTaxRealEstatePct: '4,0' }).transferTaxRealEstatePct).toBe(4)
+    expect(normalizeSituation({ transferTaxRealEstatePct: -1 }).transferTaxRealEstatePct).toBe(0)
+  })
+
   it('gives a property an id and timestamps when they are missing', () => {
     const p = normalizeProperty({ name: 'Kamppi', price: 249000 })
     expect(p.id).toBeTruthy()

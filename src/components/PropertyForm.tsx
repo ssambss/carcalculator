@@ -16,7 +16,8 @@ function postalHint(code: string): string {
 function typeHint(type: HomeType | '', rooms: number): string {
   if (!type) return 'read as all flats in the price data until you say'
   const kind = seriesKindFor(type, rooms)
-  if (kind === null) return 'not in the housing-company price data — no area trend; the zone index still applies'
+  if (kind === null)
+    return 'real estate: the higher transfer tax, by itself; not in the housing-company price data — no area trend, the zone index still applies'
   if (type === 'terraced') return 'one price series whatever the size'
   return rooms > 0
     ? `measured against ${kindLabel(kind).toLowerCase()} in its area`
