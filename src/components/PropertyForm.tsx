@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { ZONE_LABELS, findArea } from '../areas'
+import { ZONE_LABELS, findArea, kindLabel, seriesKindFor } from '../areas'
 import { HELSINKI_PRICES } from '../data/helsinkiPrices'
-import type { PropertyListing } from '../housing'
+import { HOME_TYPES, type HomeType, type PropertyListing } from '../housing'
 import { NumberField } from './NumberField'
 
 /** What the postal code field says under itself: the area it found, or why it found none. */
@@ -10,6 +10,17 @@ function postalHint(code: string): string {
   const area = findArea(HELSINKI_PRICES, code)
   if (area) return `${area.name} · price zone ${area.zone}, ${ZONE_LABELS[area.zone]}`
   return code.length < 5 ? 'five digits, e.g. 00730' : 'not a Helsinki postal code the price data covers'
+}
+
+/** What the type field says under itself: which price series the place will be read against. */
+function typeHint(type: HomeType | '', rooms: number): string {
+  if (!type) return 'read as all flats in the price data until you say'
+  const kind = seriesKindFor(type, rooms)
+  if (kind === null) return 'not in the housing-company price data — no area trend; the zone index still applies'
+  if (type === 'terraced') return 'one price series whatever the size'
+  return rooms > 0
+    ? `measured against ${kindLabel(kind).toLowerCase()} in its area`
+    : 'all flats — give the rooms to narrow it to a room-count series'
 }
 
 interface Props {
@@ -74,6 +85,37 @@ export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
               value={draft.sizeM2}
               onChange={(n) => set({ sizeM2: Math.max(0, n) })}
               unit="m²"
+            />
+            {/*
+              The type picks which of Statistics Finland's series the place is
+              measured against - flats by room count, terraced houses as one,
+              and a detached house as none. It matters more than it looks: an
+              area can publish seventeen years of terraced prices and almost
+              no flat ones, so the wrong default reads as "no data".
+            */}
+            <label className="field">
+              <span className="field-label">Type</span>
+              <span className="field-input-wrap">
+                <select
+                  value={draft.homeType}
+                  onChange={(e) => set({ homeType: e.target.value as HomeType | '' })}
+                >
+                  <option value="">Not said</option>
+                  {HOME_TYPES.map((t) => (
+                    <option key={t.key} value={t.key}>
+                      {t.label} — {t.fi}
+                    </option>
+                  ))}
+                </select>
+              </span>
+              <span className="field-hint">{typeHint(draft.homeType, draft.rooms)}</span>
+            </label>
+            <NumberField
+              label="Rooms"
+              value={draft.rooms}
+              onChange={(n) => set({ rooms: Math.max(0, Math.round(n)) })}
+              unit="rooms"
+              hint="the 2 of 2h+k — kitchen not counted"
             />
             <label className="field">
               <span className="field-label">Postal code</span>

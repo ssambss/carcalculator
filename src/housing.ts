@@ -135,6 +135,20 @@ export const DEFAULT_HOUSING: HousingSituation = {
   projectionYear: 0,
 }
 
+/**
+ * What kind of home a listing is, on the axis the price statistics are
+ * published along: flats (kerrostalo) by room count, terraced houses
+ * (rivitalo) as one series, and detached houses (omakotitalo), which the
+ * housing-company statistics do not cover at all. Empty means not said.
+ */
+export type HomeType = 'flat' | 'terraced' | 'detached'
+
+export const HOME_TYPES: { key: HomeType; label: string; fi: string }[] = [
+  { key: 'flat', label: 'Flat', fi: 'kerrostalo' },
+  { key: 'terraced', label: 'Terraced house', fi: 'rivitalo' },
+  { key: 'detached', label: 'Detached house', fi: 'omakotitalo' },
+]
+
 /** A flat or house you are actually considering. */
 export interface PropertyListing {
   id: string
@@ -146,6 +160,10 @@ export interface PropertyListing {
   sizeM2: number
   /** Helsinki postal code, e.g. "00730" — ties the place to its area's price history; empty elsewhere */
   postalCode: string
+  /** which published price series the place is measured against; '' = not said, read as all flats */
+  homeType: HomeType | ''
+  /** rooms — the 2 of "2h+k", kitchen not counted; 0 = not said */
+  rooms: number
   /** hoitovastike — the housing company's upkeep charge, € / month */
   maintenancePerMonth: number
   /** rahoitusvastike — the company's own loan, € / month; often optional to pay off */

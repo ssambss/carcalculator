@@ -125,12 +125,26 @@ color-coded cost breakdown and a side-by-side comparison table.
 - **Projected value, nominal index** (housing side-by-side): under the costs,
   two nominal growth rates per candidate — the average yearly change of
   Statistics Finland's price index for the place's whole price zone since
-  1988, and the area's own last ten years of realised €/m² for all flats —
-  and what each compounds to at the purchase year and ten and twenty years
-  on. Stated as an index (today is 100, so "+36 %" is a value 36 % higher in
-  nominal euros), not applied to the asking price: the figures are about the
-  area, and the two disagreeing is the point. Nothing there is highlighted —
-  these are not costs, and the lowest growth is no prize.
+  1988, and the area's own last ten years of realised €/m² for the kind of
+  home the place is — and what each compounds to at the purchase year and ten
+  and twenty years on. Stated as an index (today is 100, so "+36 %" is a value
+  36 % higher in nominal euros), not applied to the asking price: the figures
+  are about the area, and the two disagreeing is the point. Nothing there is
+  highlighted — these are not costs, and the lowest growth is no prize. The
+  rows show even before a place has a postal code, reading "—" with the
+  reason, rather than hiding.
+- **What kind of home a place is** (Edit → Type, Rooms): flat (*kerrostalo*)
+  with its room count, terraced house (*rivitalo*) or detached house
+  (*omakotitalo*). It picks which of Statistics Finland's series the place is
+  read against — flats by room count, terraced houses as one series whatever
+  the size — in the side-by-side and in "Your places, priced forward", which
+  otherwise use all flats. It matters more than it looks: Itä-Pakila publishes
+  seventeen unbroken years of terraced prices and almost no flat ones, so the
+  same address reads "stops at 2019" as a flat and "+1,1 %/yr" as a terraced
+  house. A detached house is in none of these tables (they cover housing
+  companies; a house on its own plot is sold as real estate) and says so —
+  only the zone's index applies to it. The area card's type chips open on the
+  first place's own kind.
 - **Helsinki by area** (housing mode). Statistics Finland's realised sale
   prices per square metre for every Helsinki postal-code area since 2009, by
   home type, drawn against the city with the ten-year trend continued to the

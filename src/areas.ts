@@ -34,6 +34,8 @@
  * here knows the numbers, only the shape.
  */
 
+import type { HomeType } from './housing'
+
 /* -------------------------------------------------------------------- types */
 
 /** One figure per year, null where Statistics Finland published none. */
@@ -45,16 +47,37 @@ export type SeriesKind = HouseType | 'flats'
 /** Statistics Finland's price zones of Helsinki: 1 the centre, 4 the outer suburbs */
 export type Zone = 1 | 2 | 3 | 4
 
-export const HOUSE_TYPES: { key: SeriesKind; label: string }[] = [
-  { key: 'studio', label: 'Studios' },
-  { key: 'two', label: 'Two rooms' },
-  { key: 'three', label: 'Three rooms or more' },
-  { key: 'flats', label: 'All flats' },
-  { key: 'terraced', label: 'Terraced houses' },
+export const HOUSE_TYPES: { key: SeriesKind; label: string; short: string }[] = [
+  { key: 'studio', label: 'Studios', short: '1 room' },
+  { key: 'two', label: 'Two rooms', short: '2 rooms' },
+  { key: 'three', label: 'Three rooms or more', short: '3+ rooms' },
+  { key: 'flats', label: 'All flats', short: 'all flats' },
+  { key: 'terraced', label: 'Terraced houses', short: 'terraced' },
 ]
 
 export const kindLabel = (kind: SeriesKind): string =>
   HOUSE_TYPES.find((t) => t.key === kind)?.label ?? kind
+
+/** the label a table cell has room for: "2 rooms", "terraced" */
+export const kindShort = (kind: SeriesKind): string =>
+  HOUSE_TYPES.find((t) => t.key === kind)?.short ?? kind
+
+/**
+ * Which published series a home of this kind is measured against. Flats go by
+ * room count, the way Statistics Finland splits them; a terraced house is one
+ * series whatever its size; a detached house is in none of them - these are
+ * the housing-company statistics, and a house on its own plot is sold as real
+ * estate, counted elsewhere. A flat that has not said its rooms reads as all
+ * flats, the count-weighted mean.
+ */
+export function seriesKindFor(type: HomeType, rooms: number): SeriesKind | null {
+  if (type === 'detached') return null
+  if (type === 'terraced') return 'terraced'
+  if (rooms <= 0) return 'flats'
+  if (rooms < 2) return 'studio'
+  if (rooms < 3) return 'two'
+  return 'three'
+}
 
 /** The zones in plain words - Statistics Finland only numbers them. */
 export const ZONE_LABELS: Record<Zone, string> = {
@@ -542,10 +565,14 @@ export function indexStats(years: number[], values: Series): IndexStats {
  *   which is exactly why it is the figure a table of mixed candidates can
  *   carry.
  * - **the area's own trend** — the last ten years of realised €/m² in that one
- *   postal code, for all flats (the count-weighted mean of the three room-count
- *   classes). A terraced house is priced off the flats around it here, which is
- *   wrong in the small and still the only choice available without a type field
- *   on the listing.
+ *   postal code, for the kind of home the place says it is: a flat by its room
+ *   count, a terraced house as its own series, and all flats (the
+ *   count-weighted mean of the three room-count classes) for a flat that has
+ *   not said. The kind matters more than it looks: Itä-Pakila publishes almost
+ *   no flat prices and seventeen unbroken years of terraced ones, so the same
+ *   address reads "stops at 2019" as a flat and "+1,1 %/yr" as a terraced house.
+ *   A detached house (`kind` null) has no series at all - the statistics cover
+ *   housing companies - and says so rather than borrowing one.
  *
  * A series that stopped more than two years before the data does yields no
  * trend — same rule as `outlook`, and for the same reason: compounding from a
@@ -555,6 +582,8 @@ export function indexStats(years: number[], values: Series): IndexStats {
 export interface NominalRates {
   /** the area the postal code resolves to, or null when the data has no such code */
   area: AreaRecord | null
+  /** the series the trend was read from; null for a kind the data does not cover */
+  kind: SeriesKind | null
   /** average yearly change of the zone's nominal price index, %/yr */
   longRunPct: number | null
   /** the first year the index covers */
@@ -569,29 +598,34 @@ export interface NominalRates {
   stale: boolean
 }
 
-export function nominalRates(data: PriceData, postalCode: string): NominalRates {
+export function nominalRates(
+  data: PriceData,
+  postalCode: string,
+  kind: SeriesKind | null = 'flats',
+): NominalRates {
   const area = findArea(data, postalCode)
   const idx = data.index
   const longRunSince = idx.years[0]
-  if (!area) {
-    return {
-      area: null,
-      longRunPct: null,
-      longRunSince,
-      trendPct: null,
-      trendYears: null,
-      latestYear: null,
-      stale: false,
-    }
+  const none = {
+    longRunPct: null,
+    longRunSince,
+    trendPct: null,
+    trendYears: null,
+    latestYear: null,
+    stale: false,
   }
+  if (!area) return { area: null, kind, ...none }
   const key = `zone${area.zone}` as IndexKey
   const longRunPct = indexStats(idx.years, idx.series[key].nominal).sinceStart?.pct ?? null
-  const summary = describeSeries(data.years, areaSeries(area, 'flats').values)
+  // The zone's index stands whatever the home is; only the area trend needs a series.
+  if (kind === null) return { area, kind, ...none, longRunPct }
+  const summary = describeSeries(data.years, areaSeries(area, kind).values)
   const latest = summary.latest
   const stale = latest !== null && data.years[data.years.length - 1] - latest.year > 2
   const trend = summary.growth10 ?? summary.growthAll
   return {
     area,
+    kind,
     longRunPct,
     longRunSince,
     trendPct: trend && !stale ? trend.pct : null,

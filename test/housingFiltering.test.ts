@@ -27,6 +27,8 @@ const place = (over: Partial<PropertyListing> = {}): PropertyListing => ({
   price: 249000,
   sizeM2: 58,
   postalCode: '',
+  homeType: '',
+  rooms: 0,
   maintenancePerMonth: 245,
   financingChargePerMonth: 0,
   otherPerMonth: 20,

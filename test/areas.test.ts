@@ -24,6 +24,7 @@ import {
   indexStats,
   nominalRates,
   outlook,
+  seriesKindFor,
   project,
   resolveProjectionYear,
   type AreaRecord,
@@ -276,6 +277,29 @@ describe('an index rather than a price', () => {
   })
 })
 
+describe('which series a home is read against', () => {
+  it('splits flats by rooms the way the statistics do', () => {
+    expect(seriesKindFor('flat', 1)).toBe('studio')
+    expect(seriesKindFor('flat', 2)).toBe('two')
+    expect(seriesKindFor('flat', 3)).toBe('three')
+    expect(seriesKindFor('flat', 5)).toBe('three')
+  })
+
+  it('reads a flat that has not said its rooms as all flats', () => {
+    expect(seriesKindFor('flat', 0)).toBe('flats')
+  })
+
+  it('gives a terraced house one series whatever its size', () => {
+    expect(seriesKindFor('terraced', 0)).toBe('terraced')
+    expect(seriesKindFor('terraced', 4)).toBe('terraced')
+  })
+
+  it('has no series for a detached house', () => {
+    // Real estate, not a housing company - it is simply not in these tables.
+    expect(seriesKindFor('detached', 5)).toBeNull()
+  })
+})
+
 describe('one place, nominally', () => {
   const d = HELSINKI_PRICES
 
@@ -329,6 +353,39 @@ describe('one place, nominally', () => {
       // Stale means the last figure is more than two years behind the data.
       expect(d.years[d.years.length - 1] - r.latestYear!).toBeGreaterThan(2)
     }
+  })
+
+  it('reads the same address differently by kind - the reason the kind exists', () => {
+    // Itä-Pakila (00680): terraced houses trade 20-75 a year, unbroken since
+    // 2009; flats barely publish at all. As a flat the address has nothing to
+    // say; as a terraced house it has seventeen years.
+    const asFlat = nominalRates(d, '00680', 'flats')
+    const asThree = nominalRates(d, '00680', 'three')
+    const asTerraced = nominalRates(d, '00680', 'terraced')
+    expect(asTerraced.kind).toBe('terraced')
+    expect(asTerraced.trendPct).not.toBeNull()
+    expect(asTerraced.trendYears).toBe(10)
+    expect(asTerraced.stale).toBe(false)
+    expect(asFlat.trendPct).toBeNull()
+    expect(asThree.trendPct).toBeNull()
+    // The zone's index is the same whatever the home: it is about the zone.
+    expect(asFlat.longRunPct).toBe(asTerraced.longRunPct)
+  })
+
+  it('keeps the zone index and drops the trend for a kind the data does not cover', () => {
+    const r = nominalRates(d, '00730', null)
+    expect(r.area?.name).toBe('Tapanila')
+    expect(r.kind).toBeNull()
+    expect(r.longRunPct).not.toBeNull()
+    expect(r.trendPct).toBeNull()
+    expect(r.trendYears).toBeNull()
+    expect(r.latestYear).toBeNull()
+    expect(r.stale).toBe(false)
+  })
+
+  it('defaults to all flats, as before the kind was asked', () => {
+    expect(nominalRates(d, '00730')).toEqual(nominalRates(d, '00730', 'flats'))
+    expect(nominalRates(d, '00730').kind).toBe('flats')
   })
 
   it('never reports a trend without the window it spans', () => {

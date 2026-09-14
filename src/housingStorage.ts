@@ -53,6 +53,8 @@ export function newProperty(): PropertyListing {
     price: 0,
     sizeM2: 0,
     postalCode: '',
+    homeType: '',
+    rooms: 0,
     maintenancePerMonth: 0,
     financingChargePerMonth: 0,
     otherPerMonth: 0,
@@ -137,6 +139,13 @@ export function normalizeProperty(raw: unknown): PropertyListing {
     sizeM2: Math.max(0, toNum(p.sizeM2, 0)),
     // Digits only, five at most: "00730", never "00730 Tapanila" or a typo's letters.
     postalCode: typeof p.postalCode === 'string' ? p.postalCode.replace(/\D/g, '').slice(0, 5) : '',
+    // Anything but the three known kinds is "not said" - a file written by a
+    // build that never had the field, or a hand edit, must not invent one.
+    homeType:
+      p.homeType === 'flat' || p.homeType === 'terraced' || p.homeType === 'detached'
+        ? p.homeType
+        : '',
+    rooms: Math.max(0, Math.round(toNum(p.rooms, 0))),
     maintenancePerMonth: Math.max(0, toNum(p.maintenancePerMonth, 0)),
     financingChargePerMonth: Math.max(0, toNum(p.financingChargePerMonth, 0)),
     otherPerMonth: Math.max(0, toNum(p.otherPerMonth, 0)),

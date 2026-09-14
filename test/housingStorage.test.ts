@@ -72,6 +72,21 @@ describe('normalising', () => {
     expect(normalizeProperty({ postalCode: 730 }).postalCode).toBe('')
   })
 
+  it('reads what kind of home a place is, and invents none when unsure', () => {
+    expect(normalizeProperty({ homeType: 'terraced', rooms: '4' }).homeType).toBe('terraced')
+    expect(normalizeProperty({ homeType: 'terraced', rooms: '4' }).rooms).toBe(4)
+    // A file from a build that never had the field, a typo, a Finnish word:
+    // all "not said" - the app must not guess a kind into somebody's data.
+    expect(normalizeProperty({}).homeType).toBe('')
+    expect(normalizeProperty({ homeType: 'kerrostalo' }).homeType).toBe('')
+    expect(normalizeProperty({ homeType: 'Flat' }).homeType).toBe('')
+    expect(normalizeProperty({}).rooms).toBe(0)
+    // Rooms are whole and never negative.
+    expect(normalizeProperty({ rooms: 2.6 }).rooms).toBe(3)
+    expect(normalizeProperty({ rooms: -1 }).rooms).toBe(0)
+    expect(normalizeProperty({ rooms: 'two' }).rooms).toBe(0)
+  })
+
   it('survives complete garbage without throwing', () => {
     expect(normalizeHousing(null).properties).toEqual([])
     expect(normalizeHousing('what').version).toBe(1)

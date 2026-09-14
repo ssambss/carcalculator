@@ -1,4 +1,4 @@
-import { useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useCallback, useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import {
   HORIZON_OFFSETS,
   HOUSE_TYPES,
@@ -9,10 +9,12 @@ import {
   findArea,
   indexStats,
   kindLabel,
+  kindShort,
   outlook,
   project,
   readTrend,
   resolveProjectionYear,
+  seriesKindFor,
   type AreaOutlook as Outlook,
   type AreaRecord,
   type Growth,
@@ -93,6 +95,18 @@ function busiestKind(area: AreaRecord | undefined): SeriesKind {
   return best
 }
 
+/** Helsinki as a whole, for one kind of home. */
+function cityOutlook(
+  data: PriceData,
+  kind: SeriesKind,
+  targetYear: number,
+  guess: number,
+  longRunCity: number | null,
+): Outlook {
+  const s = citySeries(data, kind)
+  return outlook(CITY_SUBJECT, data.years, s, s.values, null, targetYear, guess, longRunCity)
+}
+
 export function AreaOutlook({ situation, properties, onChange }: Props) {
   const data: PriceData = HELSINKI_PRICES
   const latestYear = data.years[data.years.length - 1]
@@ -109,7 +123,14 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
       }),
     [properties, data],
   )
-  const [kind, setKind] = useState<SeriesKind>(() => busiestKind(candidates[0]?.area))
+  // The chips open on what the first place says it is, else on what its area
+  // mostly trades - a card that opens on studios for a terraced house is a
+  // card that opens wrong.
+  const [kind, setKind] = useState<SeriesKind>(() => {
+    const first = candidates[0]
+    const own = first?.p.homeType ? seriesKindFor(first.p.homeType, first.p.rooms) : null
+    return own ?? busiestKind(first?.area)
+  })
   const [selected, setSelected] = useState<string>(() => candidates[0]?.area.code ?? CITY_CODE)
   const [horizon, setHorizon] = useState(0)
   const [sort, setSort] = useState<Sort>({ key: 'name', dir: 'asc' })
@@ -127,10 +148,10 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
     return { city: rate('helsinki'), zones, since: idx.years[0] }
   }, [data])
 
-  const city = useMemo(() => {
-    const s = citySeries(data, kind)
-    return outlook(CITY_SUBJECT, data.years, s, s.values, null, targetYear, guess, longRun.city)
-  }, [data, kind, targetYear, guess, longRun])
+  const city = useMemo(
+    () => cityOutlook(data, kind, targetYear, guess, longRun.city),
+    [data, kind, targetYear, guess, longRun],
+  )
 
   const rows = useMemo(
     () =>
@@ -151,6 +172,25 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
     [data, kind, city, targetYear, guess, longRun],
   )
   const byCode = useMemo(() => new Map(rows.map((r) => [r.code, r])), [rows])
+
+  // One area at one kind, on demand: a place that has said what it is is priced
+  // at its own kind's trend, which need not be the kind the chips are on.
+  const outlookFor = useCallback(
+    (area: AreaRecord, k: SeriesKind): Outlook => {
+      const c = k === kind ? city : cityOutlook(data, k, targetYear, guess, longRun.city)
+      return outlook(
+        { code: area.code, name: area.name, zone: area.zone },
+        data.years,
+        areaSeries(area, k),
+        c.values,
+        c.summary.volatilityPct,
+        targetYear,
+        guess,
+        longRun.zones[area.zone],
+      )
+    },
+    [data, kind, city, targetYear, guess, longRun],
+  )
   const pickedArea =
     selected === CITY_CODE ? null : (data.areas.find((a) => a.code === selected) ?? null)
   const picked = pickedArea ? byCode.get(pickedArea.code) : undefined
@@ -271,7 +311,7 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
       {candidates.length > 0 && (
         <Candidates
           candidates={candidates}
-          byCode={byCode}
+          outlookFor={outlookFor}
           kind={kind}
           yearsFromNow={yearsFromNow}
           targetYear={targetYear}
@@ -958,7 +998,7 @@ function Reading({
 
 function Candidates({
   candidates,
-  byCode,
+  outlookFor,
   kind,
   yearsFromNow,
   targetYear,
@@ -966,7 +1006,8 @@ function Candidates({
   onUse,
 }: {
   candidates: { p: PropertyListing; area: AreaRecord }[]
-  byCode: Map<string, Outlook>
+  outlookFor: (area: AreaRecord, kind: SeriesKind) => Outlook
+  /** the chips' kind - what a place that has not said what it is is priced at */
   kind: SeriesKind
   /** years from today to the purchase - asking prices are today's, not the data's last year */
   yearsFromNow: number
@@ -975,12 +1016,14 @@ function Candidates({
   onUse: (pct: number) => void
 }) {
   const years = HORIZON_OFFSETS.map((offset) => yearsFromNow + offset)
+  const anySaid = candidates.some(({ p }) => p.homeType)
   return (
     <div className="cmp-scroll">
       <div className="cmp-head">
         <div className="schedule-subtitle">Your places, priced forward</div>
         <div className="cmp-caption">
-          from today’s asking price · top figure at the area’s trend, under it at your guess (
+          from today’s asking price · top figure at the area’s trend
+          {anySaid ? ' for what the place says it is' : ''}, under it at your guess (
           {fmtPct(guess)}/yr)
         </div>
       </div>
@@ -1000,7 +1043,10 @@ function Candidates({
         </thead>
         <tbody>
           {candidates.map(({ p, area }) => {
-            const o = byCode.get(area.code)
+            // Its own kind when it has said; the chips' when not; none for a
+            // detached house, which these statistics do not cover.
+            const k: SeriesKind | null = p.homeType ? seriesKindFor(p.homeType, p.rooms) : kind
+            const o = k === null ? null : outlookFor(area, k)
             const projection = o?.projection
             // Only a trend that is actually continued (recent enough) prices a place forward.
             const trend = projection?.horizons[0]?.atTrend ? projection.trend : null
@@ -1010,6 +1056,7 @@ function Candidates({
                   {p.name || 'Unnamed place'}
                   <span className="zone-badge">
                     {area.code} {area.name} · z{area.zone}
+                    {p.homeType ? ` · ${k === null ? 'detached' : kindShort(k)}` : ''}
                   </span>
                 </th>
                 <td className="num">{fmtEur(p.price)}</td>
@@ -1029,10 +1076,12 @@ function Candidates({
                     <button className="link-btn" onClick={() => onUse(trend.pct)}>
                       Use {fmtPct(trend.pct)}/yr
                     </button>
+                  ) : k === null ? (
+                    <span className="cell-note">not in the data</span>
                   ) : projection?.stale ? (
                     <span className="cell-note">stops at {o?.summary.latest?.year}</span>
                   ) : (
-                    <span className="cell-note">no {kindLabel(kind).toLowerCase()} sales</span>
+                    <span className="cell-note">no {kindLabel(k).toLowerCase()} sales</span>
                   )}
                 </td>
               </tr>

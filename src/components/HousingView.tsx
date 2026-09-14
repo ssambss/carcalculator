@@ -2,12 +2,16 @@ import { useMemo, useState } from 'react'
 import {
   HORIZON_OFFSETS,
   cumulativePct,
+  kindShort,
   nominalRates,
   resolveProjectionYear,
+  seriesKindFor,
   type NominalRates,
+  type SeriesKind,
 } from '../areas'
 import { HELSINKI_PRICES } from '../data/helsinkiPrices'
 import {
+  HOME_TYPES,
   HOUSING_CATEGORIES,
   affordability,
   householdIncome,
@@ -582,6 +586,12 @@ function CeilingCard({ ceiling }: { ceiling: ReturnType<typeof affordability> })
 
 /* ---------------------------------------------------------------- the cards */
 
+/** "Flat · 2 rooms", "Terraced house" - what the place has said it is. */
+function homeChip(p: PropertyListing): string {
+  const label = HOME_TYPES.find((t) => t.key === p.homeType)?.label ?? ''
+  return p.rooms > 0 ? `${label} · ${p.rooms} ${p.rooms === 1 ? 'room' : 'rooms'}` : label
+}
+
 function PropertyCard({
   property: p,
   cost,
@@ -627,6 +637,7 @@ function PropertyCard({
             <path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.2L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" />
           </svg>
         </button>
+        {p.homeType && <span className="chip">{homeChip(p)}</span>}
         <span className={`chip${cost.fits ? '' : ' chip-over'}`}>
           {cost.fits ? 'within reach' : 'over the ceiling'}
         </span>
@@ -712,15 +723,23 @@ function PropertyCard({
 
 /* ---------------------------------------------------------------- the table */
 
+/** The series a place is read against: what it says it is, or all flats until it says. */
+const seriesOf = (p: PropertyListing): SeriesKind | null =>
+  p.homeType ? seriesKindFor(p.homeType, p.rooms) : 'flats'
+
 /**
- * What the area's own trend is worth saying about, when it is worth nothing:
- * a series that stopped years ago, or one too thin for a ten-year figure.
+ * Which series the area's own trend was read from, and - when it says nothing
+ * - why: a kind the data does not cover, none published, a series that stopped
+ * years ago, or one too thin for a ten-year figure.
  */
 function trendNote(r: NominalRates): string {
   if (!r.area) return 'no postal code'
-  if (r.stale) return `stops at ${r.latestYear}`
-  if (r.trendPct === null || r.trendYears === null) return 'too few years'
-  return `${r.trendYears} yrs to ${r.latestYear}`
+  if (r.kind === null) return 'detached · not in the data'
+  const k = kindShort(r.kind)
+  if (r.latestYear === null) return `${k} · none published`
+  if (r.stale) return `${k} · stops at ${r.latestYear}`
+  if (r.trendPct === null || r.trendYears === null) return `${k} · too few years`
+  return `${k} · ${r.trendYears} yrs to ${r.latestYear}`
 }
 
 function HousingTable({
@@ -744,9 +763,8 @@ function HousingTable({
   const list = properties.map((p) => ({
     p,
     c: costs.get(p.id)!,
-    r: nominalRates(data, p.postalCode),
+    r: nominalRates(data, p.postalCode, seriesOf(p)),
   }))
-  const anyArea = list.some(({ r }) => r.area !== null)
   const since = data.index.years[0]
   const highlight = list.length > 1
 
@@ -910,8 +928,14 @@ function HousingTable({
               horizons the rest of the housing side uses. Nothing here is
               highlighted: these are not costs, and marking the lowest growth
               as the winner would be exactly the wrong reading.
+
+              Shown even when not one place has an area yet. Hiding the block
+              until a postal code arrives made a feature that is merely
+              unfilled look absent - the cells say "no postal code" and the
+              note below says where to type one, which is the difference
+              between an empty answer and no question.
             */}
-            {anyArea && (
+            {list.length > 0 && (
               <>
                 <tr className="cmp-group">
                   <th colSpan={list.length + 1}>Projected value, nominal index</th>
@@ -964,16 +988,25 @@ function HousingTable({
           </tbody>
         </table>
       </div>
-      {anyArea && (
+      {list.length > 0 && (
         <p className="chart-note">
           The projection is an index, not a price: today is 100, so “+36 %” means a value 36 %
           higher in nominal euros — before inflation, and said about the area rather than about
           this particular flat, whose asking price above is untouched by it. The top figure
           compounds Statistics Finland’s nominal price index for the place’s whole price zone at
           its average yearly change since {since}; under it, the area’s own last ten years of
-          realised €/m² for all flats. The two disagreeing is the point — neither is a forecast,
-          and a terraced house is priced off the flats around it here. Change the purchase year
-          in “Helsinki by area”.
+          realised €/m² for the kind of home the place says it is — a flat by its rooms, a
+          terraced house as its own series, all flats until it says (Edit → Type). The two
+          disagreeing is the point, and neither is a forecast. A detached house is not in these
+          statistics at all — they cover housing companies — so only the zone index applies to
+          it. Change the purchase year in “Helsinki by area”.
+          {list.some(({ r }) => r.area === null) && (
+            <>
+              {' '}
+              A place reads “—” until it carries a Helsinki postal code (Edit → Postal code) —
+              the price data covers Helsinki and nowhere else.
+            </>
+          )}
         </p>
       )}
     </div>
