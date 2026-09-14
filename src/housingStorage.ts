@@ -52,6 +52,7 @@ export function newProperty(): PropertyListing {
     favorite: false,
     price: 0,
     sizeM2: 0,
+    postalCode: '',
     maintenancePerMonth: 0,
     financingChargePerMonth: 0,
     otherPerMonth: 0,
@@ -119,6 +120,7 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     homeValueGrowthPct: Math.max(-99, toNum(s.homeValueGrowthPct, d.homeValueGrowthPct)),
     gainsTaxPct: Math.min(100, Math.max(0, toNum(s.gainsTaxPct, d.gainsTaxPct))),
     ownerInvestPerMonth: Math.max(0, toNum(s.ownerInvestPerMonth, d.ownerInvestPerMonth)),
+    projectionYear: Math.max(0, Math.round(toNum(s.projectionYear, d.projectionYear))),
   }
 }
 
@@ -133,6 +135,8 @@ export function normalizeProperty(raw: unknown): PropertyListing {
     favorite: p.favorite === true,
     price: Math.max(0, toNum(p.price, 0)),
     sizeM2: Math.max(0, toNum(p.sizeM2, 0)),
+    // Digits only, five at most: "00730", never "00730 Tapanila" or a typo's letters.
+    postalCode: typeof p.postalCode === 'string' ? p.postalCode.replace(/\D/g, '').slice(0, 5) : '',
     maintenancePerMonth: Math.max(0, toNum(p.maintenancePerMonth, 0)),
     financingChargePerMonth: Math.max(0, toNum(p.financingChargePerMonth, 0)),
     otherPerMonth: Math.max(0, toNum(p.otherPerMonth, 0)),

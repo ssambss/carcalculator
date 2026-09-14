@@ -1796,3 +1796,123 @@ a.dialog-text {
   line-height: 1.45;
   max-width: 72ch;
 }
+
+/* ————— Helsinki by area ————— */
+/* The area picker is a native select dressed as the inputs: the option popup
+   stays the browser's, which is the one thing a styled select gets wrong, and
+   the list is eighty areas long. */
+.field-compact.field-wide {
+  width: 280px;
+  max-width: 100%;
+}
+
+.area-select {
+  width: 100%;
+  min-width: 0;
+  cursor: pointer;
+}
+
+/* A dashed stroke means "continued", never a grid: the legend key mirrors it. */
+.swatch-line.swatch-dash {
+  background: transparent;
+  height: 0;
+  border-top: 2px dashed;
+  border-radius: 0;
+}
+
+.chart-line.dashed {
+  stroke-dasharray: 5 4;
+}
+
+/* Helsinki as a whole is a reference, drawn in the axis ink, not a series. */
+.chart-line.reference {
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+}
+
+.chart-band {
+  fill-opacity: 0.12;
+}
+
+.chart-divider {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+/* Eighty rows: the table scrolls inside the card, with its head pinned. */
+.area-table-scroll {
+  max-height: 480px;
+  overflow: auto;
+}
+
+.area-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 2;
+}
+
+.area-table thead th.rowhead {
+  z-index: 3;
+}
+
+.sort-btn,
+.row-pick {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.sort-btn:hover,
+.row-pick:hover {
+  color: var(--accent);
+}
+
+.area-table th[aria-sort] .sort-btn {
+  color: var(--ink);
+}
+
+.cmp tr.selected th.rowhead {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.zone-badge {
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.candidate-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+}
+
+.candidate-name {
+  font-weight: 600;
+}
+
+.candidate-area {
+  color: var(--ink-3);
+}
+
+/* The card's inner table heads sit flush with the card's own padding. */
+.schedule-card .cmp-head {
+  padding: 0;
+}

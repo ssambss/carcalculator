@@ -12,6 +12,7 @@ import {
 import { newProperty } from '../housingStorage'
 import type { HousingStore } from '../useHousing'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
+import { AreaOutlook } from './AreaOutlook'
 import { BreakdownBar, Legend } from './BreakdownBar'
 import { LoanSchedule, type AnalysisSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
@@ -118,6 +119,12 @@ export function HousingView({ store }: { store: HousingStore }) {
         subjects={subjects}
         subjectId={subjectId}
         onSelectSubject={setSubjectId}
+        onChange={store.saveSituation}
+      />
+
+      <AreaOutlook
+        situation={data.situation}
+        properties={data.properties}
         onChange={store.saveSituation}
       />
 

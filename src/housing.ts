@@ -83,6 +83,8 @@ export interface HousingSituation {
   gainsTaxPct: number
   /** what the owner puts into investments each month on top of the housing costs, € — a fixed figure */
   ownerInvestPerMonth: number
+  /** the year the area price projection runs to; 0 = two years from now */
+  projectionYear: number
 }
 
 export const DEFAULT_HOUSING: HousingSituation = {
@@ -128,6 +130,9 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // Zero until the buyer says otherwise: the renter then invests only what the
   // housing costs leave, and the owner nothing - the conservative reading.
   ownerInvestPerMonth: 0,
+  // "Two years from now" until the buyer names the year - the horizon of
+  // somebody saving up, and one that moves with the calendar on its own.
+  projectionYear: 0,
 }
 
 /** A flat or house you are actually considering. */
@@ -139,6 +144,8 @@ export interface PropertyListing {
   /** asking price, € */
   price: number
   sizeM2: number
+  /** Helsinki postal code, e.g. "00730" — ties the place to its area's price history; empty elsewhere */
+  postalCode: string
   /** hoitovastike — the housing company's upkeep charge, € / month */
   maintenancePerMonth: number
   /** rahoitusvastike — the company's own loan, € / month; often optional to pay off */

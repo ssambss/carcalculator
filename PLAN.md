@@ -1156,6 +1156,73 @@ choice (the ceiling or a candidate) drives both cards. Buying wears the
 ownership blue (slot 1) the principal line already uses; renting gets slot 3,
 which passes the validator against it in both themes.
 
+**Helsinki by area (2026-09-14):** the home's growth in the rent-or-buy card
+was one typed guess; this card is where a guess can come from. Statistics
+Finland's realised €/m² of old dwellings per Helsinki postal-code area
+(StatFin `ashi` table 13mu, 2009–2025, four classes: studios, two rooms,
+three-plus, terraced houses; sales counts too), Helsinki as a whole back to
+2006 (13mx), the price index for Helsinki and its four price zones back to
+1988, nominal and real (13mz), and the newest quarter (15is). Fetched once by
+`scripts/fetch-helsinki-prices.mjs` into a generated `src/data/helsinkiPrices.ts`
+(~75 KB, 3 893 published figures) — never at runtime, because the app is
+static and offline. The postal code → zone mapping is Statistics Finland's
+quarterly-statistics regional division (`ashi_2018-05-02_luo_001`, the page
+its quality description links; zone 4 is "every other postal code"), found
+only after the API's own metadata, the 2020 classification PDF (new-build
+zones only) and the concept pages had all come up empty. `src/areas.ts` is
+the pure maths: trailing-window growth (a gap at the window's start shortens
+it; under half the window, no figure), peak and fall from it, the deviation
+of yearly log changes (four consecutive changes at least), a lognormal
+random-walk band (one σ, √t), the outlook per area against the city, and long
+index stats (worst peak-to-trough, down years). Decisions worth knowing:
+"all flats" is the count-weighted mean of the three flat classes, leaving out
+a class with a price but no count; the trend continued is the ten-year window
+(or all there is); a series that stops more than two years before the data
+ends is **not continued** — its trend is still shown, but eight years of
+compounding from a 2020 figure (Länsi-Pakila two-rooms, 8 sales, +6.3 %/yr →
+7 762 €) was a headline, not an estimate, and the sort by trend surfaced it
+within minutes; a place's asking price is priced forward from *today*, not
+from the data's last year. The card (`AreaOutlook.tsx`): type chips, a
+native `<select>` of the 82 areas grouped by zone, the projection year
+(`projectionYear`, 0 = two years from now, floored at the year after the
+data), the shared home-value guess; a hand-rolled SVG chart — the area in
+ownership blue against Helsinki in axis ink, a hairline where the data ends,
+the trend dashed with its band, the guess dashed in the renting teal, gaps
+lifting the pen, isolated years dotted, crosshair readout by pointer and
+keyboard; six tiles; the candidates priced forward with a one-click "use this
+trend as the home value"; every area in a sortable table with sticky head,
+candidates marked, a row click charting it; and the long run since 1988 with
+the zone table, because a series from 2009 has never seen a 43 % fall. Places
+gained `postalCode` (digits only, five at most; the form hint names the area
+and zone). What the data says for this household: Helsinki −14.5 % nominal
+from the 2021 peak, −26 % real; zone 3 (the candidates' Pakila/Tapanila ring)
++2.2 %/yr since 1988, +0.6 %/yr since 2015; zone 4 −0.5 %/yr since 2015 and
+below inflation over 37 years; the latest quarter (2026Q2, preliminary) still
+−4.3 % on a year earlier. 229 frontend tests; verified in Chromium (light,
+dark, 390 px, hover, keyboard, area switch, sort).
+
+**Ten and twenty years on (2026-09-14, user's ask — "a supporting factor for
+where to buy"):** every projection is now stated at three horizons — the
+purchase year, +10 and +20 (`HORIZON_OFFSETS`, `Projection.horizons`) — with
+chips that drive the chart's extent, the table's projection columns and the
+tiles. Two things changed with the longer view. First, a **third continued
+line**: the long-run rate of the area's whole price zone since 1988 (the 13mz
+index, `indexStats().sinceStart`), dashed in the reference ink — a ten-year
+window in one postal code is a thin base to compound two decades from, and
+the gap between it and the area's own trend is the finding (Itä-Pakila
+terraced: +1.1 %/yr own trend → 4 500 €/m² by 2048; zone 3's +2.2 %/yr →
+5 833; likely range 3 169–6 392). Second, staleness got stricter: a series
+that stops more than two years before the data now has **no horizons at
+all** — not at its trend, not at the reader's guess, not at the zone's rate.
+Sorting the +20 table by the long-run column surfaced Vallila–Hermanni
+terraced houses (last figure 2010, 6 sales) continued to 2048 at the guess;
+every line from a figure the market left behind is a headline. A horizons
+strip under the tiles shows the selected area at all three horizons three
+ways; the candidates became a table (asking price → 2028 / 2038 / 2048, trend
+above and guess below, from today's price); the chart's end labels are
+stacked so three never collide; arrow keys stride five years on a long axis.
+231 frontend tests; verified in Chromium at +10 and +20, light, dark, 390 px.
+
 Not done, deliberately: housing in the Excel export/import and JSON backup
 (the gist file is the durable copy for now — add a Properties sheet when
 someone actually edits these in a spreadsheet), and any scraper feed — oikotie
@@ -1164,6 +1231,17 @@ forbids scraping in its terms, so candidates are typed in by hand.
 ---
 
 ## Log
+
+- **2026-09-14** — **Ten and twenty years on.** Three horizons per area
+  (purchase, +10, +20) as chips; a third continued line at the zone's long-run
+  rate since 1988; stale series get no continuation at all; a horizons strip
+  and a candidates table. 231 frontend tests, verified in Chromium.
+- **2026-09-14** — **Helsinki by area.** Statistics Finland's €/m² per
+  postal-code area 2009–2025 embedded via a fetch script, with the ten-year
+  trend continued to the purchase year, a volatility band, the reader's guess
+  beside it, every area sortable, candidates priced forward by postal code,
+  and the 1988– index for the long run. Stale series (ending >2 years before
+  the data) are not continued. 229 frontend tests, verified in Chromium.
 
 - **2026-09-07** — **Owner invests a fixed sum.** The rent-or-buy card no
   longer hands the owner the ever-growing rent gap; a typed monthly figure

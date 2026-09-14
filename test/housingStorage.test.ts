@@ -65,6 +65,13 @@ describe('normalising', () => {
     expect(p.updatedAt).toBe(p.createdAt)
   })
 
+  it('keeps only the digits of a postal code, and no more than five', () => {
+    // A place saved before the field existed simply has none.
+    expect(normalizeProperty({ name: 'Kamppi' }).postalCode).toBe('')
+    expect(normalizeProperty({ postalCode: '00730 Tapanila' }).postalCode).toBe('00730')
+    expect(normalizeProperty({ postalCode: 730 }).postalCode).toBe('')
+  })
+
   it('survives complete garbage without throwing', () => {
     expect(normalizeHousing(null).properties).toEqual([])
     expect(normalizeHousing('what').version).toBe(1)

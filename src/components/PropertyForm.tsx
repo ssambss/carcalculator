@@ -1,6 +1,16 @@
 import { useState } from 'react'
+import { ZONE_LABELS, findArea } from '../areas'
+import { HELSINKI_PRICES } from '../data/helsinkiPrices'
 import type { PropertyListing } from '../housing'
 import { NumberField } from './NumberField'
+
+/** What the postal code field says under itself: the area it found, or why it found none. */
+function postalHint(code: string): string {
+  if (!code) return 'Helsinki only — links the place to its area in "Helsinki by area"'
+  const area = findArea(HELSINKI_PRICES, code)
+  if (area) return `${area.name} · price zone ${area.zone}, ${ZONE_LABELS[area.zone]}`
+  return code.length < 5 ? 'five digits, e.g. 00730' : 'not a Helsinki postal code the price data covers'
+}
 
 interface Props {
   initial: PropertyListing
@@ -65,6 +75,22 @@ export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
               onChange={(n) => set({ sizeM2: Math.max(0, n) })}
               unit="m²"
             />
+            <label className="field">
+              <span className="field-label">Postal code</span>
+              <span className="field-input-wrap">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={5}
+                  value={draft.postalCode}
+                  placeholder="00730"
+                  onChange={(e) =>
+                    set({ postalCode: e.target.value.replace(/\D/g, '').slice(0, 5) })
+                  }
+                />
+              </span>
+              <span className="field-hint">{postalHint(draft.postalCode)}</span>
+            </label>
             <label className="field">
               <span className="field-label">Notes</span>
               <span className="field-input-wrap">

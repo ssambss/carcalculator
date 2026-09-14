@@ -110,6 +110,17 @@ color-coded cost breakdown and a side-by-side comparison table.
     [public/sw.js](public/sw.js).
   - The GitHub API is never intercepted — sync has to be live or it would read a
     stale gist.
+- **Helsinki by area** (housing mode). Statistics Finland's realised sale
+  prices per square metre for every Helsinki postal-code area since 2009, by
+  home type, drawn against the city with the ten-year trend continued to the
+  year you plan to buy and ten and twenty years past it — a dashed line with a
+  band for how much the area has swung — beside your own home-value guess and
+  the long-run rate of the area's price zone since 1988, the steadier yardstick
+  for decades. Every area in one sortable table at each horizon; give a place
+  its postal code and it is marked there and priced forward at its own area's
+  trend. Series that stop early are not continued. The long run since 1988 (the
+  1990s fall included) sits under it so the projection is read for what it is:
+  arithmetic on the past.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.
@@ -134,6 +145,17 @@ than a rewrite. Both suites run on every push
 
 The design mockups (Claude Design canvas) live in [design/](design/) —
 open `design/car-tco-design.html` in a browser to view them.
+
+The Helsinki price data is a generated file, [src/data/helsinkiPrices.ts](src/data/helsinkiPrices.ts),
+not a runtime fetch — the app is static and has to work offline. Statistics
+Finland updates the yearly tables each May; refresh with
+
+```
+npm run fetch:prices   # rewrites src/data/helsinkiPrices.ts from the StatFin API
+```
+
+and commit the result. The script ([scripts/fetch-helsinki-prices.mjs](scripts/fetch-helsinki-prices.mjs))
+names the tables it reads and the classification the price zones come from.
 
 ## Deploying to GitHub Pages
 
