@@ -1,5 +1,13 @@
 import { useMemo, useState } from 'react'
 import {
+  HORIZON_OFFSETS,
+  cumulativePct,
+  nominalRates,
+  resolveProjectionYear,
+  type NominalRates,
+} from '../areas'
+import { HELSINKI_PRICES } from '../data/helsinkiPrices'
+import {
   HOUSING_CATEGORIES,
   affordability,
   householdIncome,
@@ -9,13 +17,24 @@ import {
   type PropertyCost,
   type PropertyListing,
 } from '../housing'
+import {
+  ALL_AREAS,
+  NO_PROPERTY_FILTERS,
+  areaFilterExists,
+  listPropertyAreas,
+  loadPropertySelection,
+  matchesPropertyFilters,
+  savePropertySelection,
+  type PropertyFilters,
+} from '../housingFiltering'
 import { newProperty } from '../housingStorage'
 import type { HousingStore } from '../useHousing'
-import { fmtEur, fmtEurExact, fmtNum } from '../format'
+import { fmtEur, fmtEurExact, fmtNum, fmtPct } from '../format'
 import { AreaOutlook } from './AreaOutlook'
 import { BreakdownBar, Legend } from './BreakdownBar'
 import { LoanSchedule, type AnalysisSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
+import { PropertyFilterBar } from './PropertyFilterBar'
 import { RentVsBuy } from './RentVsBuy'
 import { PropertyForm } from './PropertyForm'
 
@@ -55,8 +74,34 @@ export function HousingView({ store }: { store: HousingStore }) {
     [data.properties, costs],
   )
 
+  const [filters, setFilters] = useState<PropertyFilters>({ ...NO_PROPERTY_FILTERS })
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(loadPropertySelection)
+
+  const areaGroups = useMemo(() => listPropertyAreas(data.properties), [data.properties])
+
+  // An area the list no longer offers - its last place deleted, or given a
+  // different postal code - would otherwise hide everything with no way back
+  // but Clear, so the filter falls back to all areas rather than matching
+  // nothing. Kept out of state: the pick is still there if the place returns.
+  const active = useMemo<PropertyFilters>(
+    () => (areaFilterExists(areaGroups, filters.area) ? filters : { ...filters, area: ALL_AREAS }),
+    [areaGroups, filters],
+  )
+
+  const visible = useMemo(
+    () =>
+      sorted.filter((p) =>
+        matchesPropertyFilters(p, active, selectedIds, costs.get(p.id)?.fits ?? true),
+      ),
+    [sorted, active, selectedIds, costs],
+  )
+
+  // Cheapest among what is shown, like the car side: a badge on a card that
+  // was filtered out would be a claim about places the reader cannot see.
   const cheapestId =
-    sorted.length > 1 && (costs.get(sorted[0].id)?.totalPerMonth ?? 0) > 0 ? sorted[0].id : null
+    visible.length > 1 && (costs.get(visible[0].id)?.totalPerMonth ?? 0) > 0 ? visible[0].id : null
+
+  const fitsCount = data.properties.filter((p) => costs.get(p.id)?.fits ?? true).length
 
   // What the analysis cards can look at: the ceiling first, then each
   // candidate, in the order the cards show them.
@@ -92,9 +137,26 @@ export function HousingView({ store }: { store: HousingStore }) {
     setDraft(null)
   }
 
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      savePropertySelection(next)
+      return next
+    })
+  }
+
   function deleteProperty(p: PropertyListing) {
     if (!window.confirm(`Delete "${p.name || 'this place'}"?`)) return
     store.removeProperty(p.id)
+    setSelectedIds((prev) => {
+      if (!prev.has(p.id)) return prev
+      const next = new Set(prev)
+      next.delete(p.id)
+      savePropertySelection(next)
+      return next
+    })
   }
 
   return (
@@ -141,33 +203,70 @@ export function HousingView({ store }: { store: HousingStore }) {
         </div>
       ) : (
         <>
-          <Legend
-            breakdowns={sorted.map((p) => costs.get(p.id)!.breakdown)}
-            categories={HOUSING_CATEGORIES}
+          <PropertyFilterBar
+            filters={active}
+            onChange={setFilters}
+            areas={areaGroups}
+            selectedCount={selectedIds.size}
+            favoriteCount={data.properties.filter((p) => p.favorite).length}
+            fitsCount={fitsCount}
+            overCount={data.properties.length - fitsCount}
+            shownCount={visible.length}
+            totalCount={data.properties.length}
           />
-          <div className="card-grid">
-            {sorted.map((p) => (
-              <PropertyCard
-                key={p.id}
-                property={p}
-                cost={costs.get(p.id)!}
-                cheapest={p.id === cheapestId}
-                onToggleFavorite={() => store.toggleFavorite(p.id)}
-                onEdit={() => setDraft({ property: p, isNew: false })}
-                onDelete={() => deleteProperty(p)}
+          {visible.length === 0 ? (
+            <div className="card empty-state">
+              <div className="empty-title display">No places match</div>
+              <p className="empty-text">Adjust or clear the filters to see your places.</p>
+              {/* Both ways out: the grid's add tile is filtered away with the
+                  cards, and on a desktop the fab is not there to replace it. */}
+              <div className="empty-actions">
+                <button className="btn" onClick={() => setFilters({ ...NO_PROPERTY_FILTERS })}>
+                  Clear filters
+                </button>
+                <button className="btn btn-primary" onClick={addProperty}>
+                  Add place
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Legend
+                breakdowns={visible.map((p) => costs.get(p.id)!.breakdown)}
+                categories={HOUSING_CATEGORIES}
               />
-            ))}
-            {/* The desktop add lives here: the header has no housing buttons
-                and the fab only exists below 640px. */}
-            <button className="card add-card" onClick={addProperty}>
-              <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-                <path d="M8 3v10" />
-                <path d="M3 8h10" />
-              </svg>
-              Add place
-            </button>
-          </div>
-          <HousingTable properties={sorted} costs={costs} ceiling={ceiling.maxPrice} />
+              <div className="card-grid">
+                {visible.map((p) => (
+                  <PropertyCard
+                    key={p.id}
+                    property={p}
+                    cost={costs.get(p.id)!}
+                    cheapest={p.id === cheapestId}
+                    selected={selectedIds.has(p.id)}
+                    onToggleSelect={() => toggleSelected(p.id)}
+                    onToggleFavorite={() => store.toggleFavorite(p.id)}
+                    onEdit={() => setDraft({ property: p, isNew: false })}
+                    onDelete={() => deleteProperty(p)}
+                  />
+                ))}
+                {/* The desktop add lives here: the header has no housing buttons
+                    and the fab only exists below 640px. */}
+                <button className="card add-card" onClick={addProperty}>
+                  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                    <path d="M8 3v10" />
+                    <path d="M3 8h10" />
+                  </svg>
+                  Add place
+                </button>
+              </div>
+              <HousingTable
+                properties={visible}
+                costs={costs}
+                ceiling={ceiling.maxPrice}
+                situation={data.situation}
+              />
+            </>
+          )}
         </>
       )}
 
@@ -487,6 +586,8 @@ function PropertyCard({
   property: p,
   cost,
   cheapest,
+  selected,
+  onToggleSelect,
   onToggleFavorite,
   onEdit,
   onDelete,
@@ -494,13 +595,18 @@ function PropertyCard({
   property: PropertyListing
   cost: PropertyCost
   cheapest: boolean
+  selected: boolean
+  onToggleSelect: () => void
   onToggleFavorite: () => void
   onEdit: () => void
   onDelete: () => void
 }) {
   return (
-    <div className="card car-card">
+    <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
+        <label className="select-box" title="Select for comparison">
+          <input type="checkbox" checked={selected} onChange={onToggleSelect} />
+        </label>
         <div className="car-name display">{p.name || 'Unnamed place'}</div>
         <button
           className={`fav-btn${p.favorite ? ' active' : ''}`}
@@ -606,16 +712,42 @@ function PropertyCard({
 
 /* ---------------------------------------------------------------- the table */
 
+/**
+ * What the area's own trend is worth saying about, when it is worth nothing:
+ * a series that stopped years ago, or one too thin for a ten-year figure.
+ */
+function trendNote(r: NominalRates): string {
+  if (!r.area) return 'no postal code'
+  if (r.stale) return `stops at ${r.latestYear}`
+  if (r.trendPct === null || r.trendYears === null) return 'too few years'
+  return `${r.trendYears} yrs to ${r.latestYear}`
+}
+
 function HousingTable({
   properties,
   costs,
   ceiling,
+  situation,
 }: {
   properties: PropertyListing[]
   costs: Map<string, PropertyCost>
   ceiling: number
+  situation: HousingSituation
 }) {
-  const list = properties.map((p) => ({ p, c: costs.get(p.id)! }))
+  const data = HELSINKI_PRICES
+  const latestYear = data.years[data.years.length - 1]
+  const targetYear = resolveProjectionYear(situation.projectionYear, latestYear)
+  // The asking prices are today's, so the horizons are counted from today -
+  // the same reckoning "Your places, priced forward" uses.
+  const yearsFromNow = Math.max(0, targetYear - new Date().getFullYear())
+
+  const list = properties.map((p) => ({
+    p,
+    c: costs.get(p.id)!,
+    r: nominalRates(data, p.postalCode),
+  }))
+  const anyArea = list.some(({ r }) => r.area !== null)
+  const since = data.index.years[0]
   const highlight = list.length > 1
 
   function minClass(values: number[], i: number): string {
@@ -633,7 +765,10 @@ function HousingTable({
       <div className="cmp-head">
         <div className="cmp-title display">Side by side</div>
         <div className="cmp-caption">
-          per month, first year{highlight ? ' · lowest in each row highlighted' : ''}
+          per month, first year
+          {/* "lowest cost", not "lowest in each row": the growth rows below
+              are deliberately unmarked, and the lowest growth is no prize. */}
+          {highlight ? ' · lowest cost in each row highlighted' : ''}
         </div>
       </div>
       <div className="cmp-scroll">
@@ -769,9 +904,78 @@ function HousingTable({
                 </td>
               ))}
             </tr>
+            {/*
+              Where the value might go, as an index rather than a price. Two
+              rates per place, then what each compounds to at the three
+              horizons the rest of the housing side uses. Nothing here is
+              highlighted: these are not costs, and marking the lowest growth
+              as the winner would be exactly the wrong reading.
+            */}
+            {anyArea && (
+              <>
+                <tr className="cmp-group">
+                  <th colSpan={list.length + 1}>Projected value, nominal index</th>
+                </tr>
+                <tr>
+                  <th className="rowhead">Zone’s long run</th>
+                  {list.map(({ p, r }) => (
+                    <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
+                      {r.longRunPct === null ? '—' : `${fmtPct(r.longRunPct)}/yr`}
+                      <br />
+                      <span className="cell-note">
+                        {r.area ? `zone ${r.area.zone} · since ${since}` : 'no postal code'}
+                      </span>
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <th className="rowhead">Area’s own trend</th>
+                  {list.map(({ p, r }) => (
+                    <td key={p.id} className={`num${r.trendPct === null ? ' muted' : ''}`}>
+                      {r.trendPct === null ? '—' : `${fmtPct(r.trendPct)}/yr`}
+                      <br />
+                      <span className="cell-note">{trendNote(r)}</span>
+                    </td>
+                  ))}
+                </tr>
+                {HORIZON_OFFSETS.map((offset, i) => (
+                  <tr key={offset}>
+                    <th className="rowhead">
+                      {i === 0 ? 'At purchase' : `+${offset} years`}{' '}
+                      <span className="cmp-horizon">{targetYear + offset}</span>
+                    </th>
+                    {list.map(({ p, r }) => (
+                      <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
+                        {r.longRunPct === null
+                          ? '—'
+                          : fmtPct(cumulativePct(r.longRunPct, yearsFromNow + offset))}
+                        <br />
+                        <span className="cell-note">
+                          {r.trendPct === null
+                            ? '—'
+                            : fmtPct(cumulativePct(r.trendPct, yearsFromNow + offset))}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </>
+            )}
           </tbody>
         </table>
       </div>
+      {anyArea && (
+        <p className="chart-note">
+          The projection is an index, not a price: today is 100, so “+36 %” means a value 36 %
+          higher in nominal euros — before inflation, and said about the area rather than about
+          this particular flat, whose asking price above is untouched by it. The top figure
+          compounds Statistics Finland’s nominal price index for the place’s whole price zone at
+          its average yearly change since {since}; under it, the area’s own last ten years of
+          realised €/m² for all flats. The two disagreeing is the point — neither is a forecast,
+          and a terraced house is priced off the flats around it here. Change the purchase year
+          in “Helsinki by area”.
+        </p>
+      )}
     </div>
   )
 }

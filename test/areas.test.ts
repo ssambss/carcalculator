@@ -16,11 +16,13 @@ import {
   band,
   cagr,
   citySeries,
+  cumulativePct,
   describeSeries,
   findArea,
   growthOver,
   growthSince,
   indexStats,
+  nominalRates,
   outlook,
   project,
   resolveProjectionYear,
@@ -258,6 +260,83 @@ describe('the long run', () => {
 
   it('a series that only rose has no worst fall', () => {
     expect(indexStats(years(2000, 2002), [100, 110, 120]).worst).toBeNull()
+  })
+})
+
+describe('an index rather than a price', () => {
+  it('reads the same compounding as a percentage from today', () => {
+    // 2 % for ten years is 1.02^10 = 1.2190 - "+21,9 %", and the same number
+    // project() would put on a euro figure.
+    expect(cumulativePct(2, 10)).toBeCloseTo(21.899, 3)
+    expect(cumulativePct(2, 10)).toBeCloseTo(project(100, 2, 10) - 100, 9)
+    // Today is 100, whatever the rate.
+    expect(cumulativePct(7, 0)).toBe(0)
+    // Falling prices give a negative index, not a smaller positive one.
+    expect(cumulativePct(-3, 20)).toBeCloseTo(-45.621, 3)
+  })
+})
+
+describe('one place, nominally', () => {
+  const d = HELSINKI_PRICES
+
+  it('gives a Helsinki address its zone index and its own trend', () => {
+    // 00730 Tapanila, zone 3.
+    const r = nominalRates(d, '00730')
+    expect(r.area?.name).toBe('Tapanila')
+    expect(r.longRunSince).toBe(d.index.years[0])
+    // The zone's long run is the index's own average change since it starts -
+    // computed here the long way round, from the series.
+    const expected = indexStats(d.index.years, d.index.series.zone3.nominal).sinceStart?.pct
+    expect(r.longRunPct).toBeCloseTo(expected!, 9)
+    // Prices in Helsinki have risen over the whole index, and not by 20 % a year.
+    expect(r.longRunPct).toBeGreaterThan(0)
+    expect(r.longRunPct).toBeLessThan(10)
+  })
+
+  it('takes the area trend from all flats, count-weighted', () => {
+    const area = findArea(d, '00730')!
+    const r = nominalRates(d, '00730')
+    const summary = describeSeries(d.years, areaSeries(area, 'flats').values)
+    const trend = summary.growth10 ?? summary.growthAll
+    expect(r.latestYear).toBe(summary.latest?.year)
+    if (r.trendPct !== null) expect(r.trendPct).toBeCloseTo(trend!.pct, 9)
+  })
+
+  it('says nothing at all about an address the data has no area for', () => {
+    for (const code of ['02150', '', '  ', '99999']) {
+      const r = nominalRates(d, code)
+      expect(r.area).toBeNull()
+      expect(r.longRunPct).toBeNull()
+      expect(r.trendPct).toBeNull()
+      expect(r.latestYear).toBeNull()
+      expect(r.stale).toBe(false)
+      // The index's own start year is a fact about the data, not the address.
+      expect(r.longRunSince).toBe(d.index.years[0])
+    }
+  })
+
+  it('keeps the zone index but drops the trend when the area stopped trading', () => {
+    // Suomenlinna (00190) is the standing example of an area that publishes a
+    // handful of years at most; whichever areas are stale, the rule is the
+    // same one outlook() applies - no trend to continue, index unaffected.
+    const stale = d.areas
+      .map((a) => nominalRates(d, a.code))
+      .filter((r) => r.stale)
+    for (const r of stale) {
+      expect(r.trendPct).toBeNull()
+      expect(r.trendYears).toBeNull()
+      expect(r.longRunPct).not.toBeNull()
+      // Stale means the last figure is more than two years behind the data.
+      expect(d.years[d.years.length - 1] - r.latestYear!).toBeGreaterThan(2)
+    }
+  })
+
+  it('never reports a trend without the window it spans', () => {
+    for (const a of d.areas) {
+      const r = nominalRates(d, a.code)
+      expect(r.trendPct === null).toBe(r.trendYears === null)
+      if (r.trendYears !== null) expect(r.trendYears).toBeGreaterThan(0)
+    }
   })
 })
 

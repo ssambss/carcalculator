@@ -790,6 +790,24 @@ select option {
   color: var(--ink-3);
 }
 
+/* A divider inside a side-by-side table: the rows under it answer a different
+   question from the costs above, and should not read as one more cost. Not
+   sticky like a rowhead - it spans every column, so there is nothing to pin. */
+.cmp tr.cmp-group th {
+  padding: 24px 14px 6px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.cmp-card .chart-note {
+  margin-top: 16px;
+}
+
 /* ————— Modal / car form ————— */
 .modal-overlay {
   position: fixed;
@@ -1042,6 +1060,14 @@ a.dialog-text {
   font-size: 13px;
   color: var(--ink-3);
   max-width: 380px;
+}
+
+/* Two ways out of a filtered-empty list, side by side in the centred column. */
+.empty-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .app-footer {

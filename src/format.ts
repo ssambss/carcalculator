@@ -22,6 +22,16 @@ export const fmtEurExact = (v: number): string => eur2.format(v)
 /** plain number with fi grouping */
 export const fmtNum = (v: number): string => num.format(v)
 
+/**
+ * A rate or a change, signed: "+1,2 %" / "−0,8 %". One decimal, and a hair
+ * below zero reads "0 %" rather than "−0 %".
+ */
+export const fmtPct = (v: number): string => {
+  const r = Math.round(v * 10) / 10
+  const shown = r === 0 ? 0 : r
+  return `${shown > 0 ? '+' : ''}${num.format(shown)} %`
+}
+
 const dateTime = new Intl.DateTimeFormat('fi-FI', { dateStyle: 'short', timeStyle: 'short' })
 
 /** "26.8.2026 klo 19.05" style short timestamp; empty string for bad input */

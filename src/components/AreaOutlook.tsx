@@ -22,7 +22,7 @@ import {
 } from '../areas'
 import { HELSINKI_PRICES } from '../data/helsinkiPrices'
 import type { HousingSituation, PropertyListing } from '../housing'
-import { fmtEur, fmtNum } from '../format'
+import { fmtEur, fmtNum, fmtPct } from '../format'
 import { niceTicks } from './chartHelpers'
 import { NumberField } from './NumberField'
 import { TipRow } from './TwoLineChart'
@@ -57,13 +57,7 @@ const CITY_CODE = 'city'
 const CITY_SUBJECT = { code: CITY_CODE, name: 'Helsinki, all areas', zone: null }
 const ZONES: Zone[] = [1, 2, 3, 4]
 
-/** "+1,2 %" / "−0,8 %" - one decimal, the sign always shown; a hair below zero is "0 %", not "−0 %" */
-const signed = (v: number): string => {
-  const r = Math.round(v * 10) / 10
-  const shown = r === 0 ? 0 : r
-  return `${shown > 0 ? '+' : ''}${fmtNum(shown)} %`
-}
-const perYear = (g: Growth | null): string => (g ? `${signed(g.pct)}/yr` : '—')
+const perYear = (g: Growth | null): string => (g ? `${fmtPct(g.pct)}/yr` : '—')
 const perM2 = (v: number): string => `${fmtEur(v)}/m²`
 const horizonLabel = (i: number): string =>
   i === 0 ? 'At purchase' : `+${HORIZON_OFFSETS[i]} years`
@@ -503,20 +497,20 @@ function AreaChart({
         {trendPct !== null && proj.trend && (
           <span className="legend-item">
             <span className="swatch swatch-line swatch-dash" style={{ borderColor: AREA_COLOR }} />
-            continuing the {proj.trend.years}-year trend, {signed(trendPct)}/yr
+            continuing the {proj.trend.years}-year trend, {fmtPct(trendPct)}/yr
             {bandPath ? ', with its likely range' : ''}
           </span>
         )}
         {end && (
           <span className="legend-item">
             <span className="swatch swatch-line swatch-dash" style={{ borderColor: GUESS_COLOR }} />
-            at your guess, {signed(proj.guessPct)}/yr
+            at your guess, {fmtPct(proj.guessPct)}/yr
           </span>
         )}
         {end && proj.longRunPct !== null && (
           <span className="legend-item">
             <span className="swatch swatch-line swatch-dash" style={{ borderColor: REF_COLOR }} />
-            at {longRunName(area)}’s long run since {since}, {signed(proj.longRunPct)}/yr
+            at {longRunName(area)}’s long run since {since}, {fmtPct(proj.longRunPct)}/yr
           </span>
         )}
       </div>
@@ -683,14 +677,14 @@ function AreaChart({
                       <TipRow
                         color={GUESS_COLOR}
                         value={perM2(g)}
-                        label={`at your guess, ${signed(proj.guessPct)}/yr`}
+                        label={`at your guess, ${fmtPct(proj.guessPct)}/yr`}
                       />
                     )}
                     {l !== null && proj.longRunPct !== null && (
                       <TipRow
                         color={REF_COLOR}
                         value={perM2(l)}
-                        label={`at ${longRunName(area)}’s long run, ${signed(proj.longRunPct)}/yr`}
+                        label={`at ${longRunName(area)}’s long run, ${fmtPct(proj.longRunPct)}/yr`}
                       />
                     )}
                   </>
@@ -735,14 +729,14 @@ function Tiles({ o }: { o: Outlook }) {
       <div className="stat">
         <span className="stat-label">From the peak</span>
         <span className="stat-value">
-          {s.fromPeakPct !== null && s.fromPeakPct < -0.05 ? signed(s.fromPeakPct) : 'At the peak'}
+          {s.fromPeakPct !== null && s.fromPeakPct < -0.05 ? fmtPct(s.fromPeakPct) : 'At the peak'}
         </span>
         <span className="stat-sub">{s.peak ? `${s.peak.year}: ${perM2(s.peak.value)}` : ''}</span>
       </div>
       {p.longRunPct !== null && (
         <div className="stat">
           <span className="stat-label">{longRunName(o)}’s long run</span>
-          <span className="stat-value">{signed(p.longRunPct)}/yr</span>
+          <span className="stat-value">{fmtPct(p.longRunPct)}/yr</span>
           <span className="stat-sub">
             {o.zone === null ? 'the whole index since 1988' : `zone ${o.zone} · ${ZONE_LABELS[o.zone]} · since 1988`}
           </span>
@@ -849,7 +843,7 @@ function Candidates({
         <div className="schedule-subtitle">Your places, priced forward</div>
         <div className="cmp-caption">
           from today’s asking price · top figure at the area’s trend, under it at your guess (
-          {signed(guess)}/yr)
+          {fmtPct(guess)}/yr)
         </div>
       </div>
       <table className="cmp schedule-table">
@@ -895,7 +889,7 @@ function Candidates({
                 <td className="num">
                   {trend ? (
                     <button className="link-btn" onClick={() => onUse(trend.pct)}>
-                      Use {signed(trend.pct)}/yr
+                      Use {fmtPct(trend.pct)}/yr
                     </button>
                   ) : projection?.stale ? (
                     <span className="cell-note">stops at {o?.summary.latest?.year}</span>
@@ -966,7 +960,7 @@ function columns(latestYear: number, horizon: number, horizonYear: number | null
       value: (o) => o.summary.fromPeakPct,
       cell: (o) =>
         o.summary.fromPeakPct !== null && o.summary.fromPeakPct < -0.05
-          ? signed(o.summary.fromPeakPct)
+          ? fmtPct(o.summary.fromPeakPct)
           : 'at peak',
     },
     {
@@ -1141,20 +1135,20 @@ function LongRun({ data }: { data: PriceData }) {
         </div>
         <div className="stat">
           <span className="stat-label">Worst fall</span>
-          <span className="stat-value">{hel.worst ? signed(hel.worst.pct) : '—'}</span>
+          <span className="stat-value">{hel.worst ? fmtPct(hel.worst.pct) : '—'}</span>
           <span className="stat-sub">
             {hel.worst ? `${hel.worst.fromYear}–${hel.worst.toYear}` : ''}
-            {helReal.worst ? ` · ${signed(helReal.worst.pct)} in real terms` : ''}
+            {helReal.worst ? ` · ${fmtPct(helReal.worst.pct)} in real terms` : ''}
           </span>
         </div>
         <div className="stat">
           <span className="stat-label">From the {hel.peak?.year} peak</span>
           <span className="stat-value">
-            {hel.fromPeakPct !== null ? signed(hel.fromPeakPct) : '—'}
+            {hel.fromPeakPct !== null ? fmtPct(hel.fromPeakPct) : '—'}
           </span>
           <span className="stat-sub">
             {helReal.fromPeakPct !== null && helReal.peak
-              ? `${signed(helReal.fromPeakPct)} in real terms since ${helReal.peak.year}`
+              ? `${fmtPct(helReal.fromPeakPct)} in real terms since ${helReal.peak.year}`
               : ''}
           </span>
         </div>
@@ -1168,11 +1162,11 @@ function LongRun({ data }: { data: PriceData }) {
         <div className="stat">
           <span className="stat-label">Latest quarter · {latest.quarter}</span>
           <span className="stat-value">
-            {latest.yearChangePct !== null ? signed(latest.yearChangePct) : '—'}
+            {latest.yearChangePct !== null ? fmtPct(latest.yearChangePct) : '—'}
           </span>
           <span className="stat-sub">
             on a year earlier
-            {latest.realYearChangePct !== null ? ` · ${signed(latest.realYearChangePct)} real` : ''}
+            {latest.realYearChangePct !== null ? ` · ${fmtPct(latest.realYearChangePct)} real` : ''}
             {latest.preliminary ? ' · preliminary' : ''}
           </span>
         </div>
@@ -1201,11 +1195,11 @@ function LongRun({ data }: { data: PriceData }) {
                   <td className="num">{perYear(n.since2015)}</td>
                   <td className="num">
                     {n.fromPeakPct !== null && n.fromPeakPct < -0.05
-                      ? `${signed(n.fromPeakPct)} (${n.peak?.year})`
+                      ? `${fmtPct(n.fromPeakPct)} (${n.peak?.year})`
                       : 'at peak'}
                   </td>
                   <td className="num">
-                    {n.worst ? `${signed(n.worst.pct)} (${n.worst.fromYear}–${n.worst.toYear})` : '—'}
+                    {n.worst ? `${fmtPct(n.worst.pct)} (${n.worst.fromYear}–${n.worst.toYear})` : '—'}
                   </td>
                 </tr>
               )

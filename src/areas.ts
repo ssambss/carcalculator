@@ -195,6 +195,16 @@ export function project(value: number, pct: number, years: number): number {
 }
 
 /**
+ * The same compounding read as an index instead of a sum: how much higher (or
+ * lower) a value stands after `years` at `pct` a year, %. Today is 100, so
+ * +36 % means the index has gone 100 → 136 — a projected value stated without
+ * committing to a euro figure for the thing being projected.
+ */
+export function cumulativePct(pct: number, years: number): number {
+  return (Math.pow(1 + pct / 100, years) - 1) * 100
+}
+
+/**
  * One standard deviation around the trend after `years`, the random-walk way:
  * the drift is the trend, the spread grows with the square root of time, and
  * both live in log space so the band is symmetric in ratios, not in euros.
@@ -513,6 +523,81 @@ export function indexStats(years: number[], values: Series): IndexStats {
     fromPeakPct: s.fromPeakPct,
     worst: worst !== null && worst.pct < 0 ? worst : null,
     downYears,
+  }
+}
+
+/* ------------------------------------------------- one place, nominally */
+
+/**
+ * The two nominal rates that bear on one address, with no view of its price.
+ *
+ * The "Helsinki by area" card asks the reader to pick a type of home and a
+ * horizon before it says anything; a side-by-side table of candidates cannot
+ * ask that of every column, so this fixes both choices in a way it can then
+ * state plainly:
+ *
+ * - **the zone's long run** — the average yearly change of Statistics
+ *   Finland's *nominal* price index for the area's whole price zone, over
+ *   everything the index covers (1988 on). It needs no type of home at all,
+ *   which is exactly why it is the figure a table of mixed candidates can
+ *   carry.
+ * - **the area's own trend** — the last ten years of realised €/m² in that one
+ *   postal code, for all flats (the count-weighted mean of the three room-count
+ *   classes). A terraced house is priced off the flats around it here, which is
+ *   wrong in the small and still the only choice available without a type field
+ *   on the listing.
+ *
+ * A series that stopped more than two years before the data does yields no
+ * trend — same rule as `outlook`, and for the same reason: compounding from a
+ * figure the market left behind is a headline, not an estimate. The zone's
+ * long run survives that, since the index does not depend on the area trading.
+ */
+export interface NominalRates {
+  /** the area the postal code resolves to, or null when the data has no such code */
+  area: AreaRecord | null
+  /** average yearly change of the zone's nominal price index, %/yr */
+  longRunPct: number | null
+  /** the first year the index covers */
+  longRunSince: number
+  /** the area's own all-flats trend, %/yr — null when there is none to continue */
+  trendPct: number | null
+  /** the window that trend spans, years */
+  trendYears: number | null
+  /** the last year the area published a figure, whether or not it is recent */
+  latestYear: number | null
+  /** the series stopped long enough ago that nothing is continued from it */
+  stale: boolean
+}
+
+export function nominalRates(data: PriceData, postalCode: string): NominalRates {
+  const area = findArea(data, postalCode)
+  const idx = data.index
+  const longRunSince = idx.years[0]
+  if (!area) {
+    return {
+      area: null,
+      longRunPct: null,
+      longRunSince,
+      trendPct: null,
+      trendYears: null,
+      latestYear: null,
+      stale: false,
+    }
+  }
+  const key = `zone${area.zone}` as IndexKey
+  const longRunPct = indexStats(idx.years, idx.series[key].nominal).sinceStart?.pct ?? null
+  const summary = describeSeries(data.years, areaSeries(area, 'flats').values)
+  const latest = summary.latest
+  const stale = latest !== null && data.years[data.years.length - 1] - latest.year > 2
+  const trend = summary.growth10 ?? summary.growthAll
+  return {
+    area,
+    longRunPct,
+    longRunSince,
+    trendPct: trend && !stale ? trend.pct : null,
+    trendYears: trend && !stale ? trend.years : null,
+    latestYear: latest?.year ?? null,
+    stale,
   }
 }
 

@@ -1,3 +1,7 @@
+import {
+  loadSelection as loadStoredSelection,
+  saveSelection as saveStoredSelection,
+} from './selection'
 import type { CarListing, Powertrain } from './types'
 
 export interface Filters {
@@ -58,29 +62,14 @@ export function matchesFilters(
   return true
 }
 
-/* Selection is deliberately device-local (not synced): what one person picks
- * to compare shouldn't rearrange another device's view. */
+/* Kept as a car-side alias so callers need not repeat the key; the mechanics
+ * (and why selection is not synced) live in selection.ts. */
 const SELECTION_KEY = 'carcalculator.selection.v1'
 
 export function loadSelection(): Set<string> {
-  try {
-    const raw = localStorage.getItem(SELECTION_KEY)
-    if (raw) {
-      const parsed: unknown = JSON.parse(raw)
-      if (Array.isArray(parsed)) {
-        return new Set(parsed.filter((x): x is string => typeof x === 'string'))
-      }
-    }
-  } catch {
-    // corrupt or unavailable — start unselected
-  }
-  return new Set()
+  return loadStoredSelection(SELECTION_KEY)
 }
 
 export function saveSelection(ids: ReadonlySet<string>): void {
-  try {
-    localStorage.setItem(SELECTION_KEY, JSON.stringify([...ids]))
-  } catch {
-    // ignore
-  }
+  saveStoredSelection(SELECTION_KEY, ids)
 }

@@ -110,6 +110,27 @@ color-coded cost breakdown and a side-by-side comparison table.
     [public/sw.js](public/sw.js).
   - The GitHub API is never intercepted — sync has to be live or it would read a
     stale gist.
+- **Filtering the places** (housing mode): the car side's bar, asked of a
+  flat — search across name, notes, postal code and the area's own name; an
+  area dropdown that opens either one postal code or a whole price zone
+  ("show me the outer-suburb candidates"); **Within reach** / **Over the
+  ceiling** chips, which read the affordability ceiling rather than the
+  listing, so they move when income or the rules do; the synced ★ shortlist;
+  and per-card selection with a "Selected only" toggle. It narrows the cards,
+  legend, lowest-cost badge and the side-by-side table together, and leaves
+  the analysis cards above it alone — those have their own subject picker, and
+  dropping the one under study would be worse than showing it. An area
+  selection whose last place is deleted falls back to all areas instead of
+  blanking the view.
+- **Projected value, nominal index** (housing side-by-side): under the costs,
+  two nominal growth rates per candidate — the average yearly change of
+  Statistics Finland's price index for the place's whole price zone since
+  1988, and the area's own last ten years of realised €/m² for all flats —
+  and what each compounds to at the purchase year and ten and twenty years
+  on. Stated as an index (today is 100, so "+36 %" is a value 36 % higher in
+  nominal euros), not applied to the asking price: the figures are about the
+  area, and the two disagreeing is the point. Nothing there is highlighted —
+  these are not costs, and the lowest growth is no prize.
 - **Helsinki by area** (housing mode). Statistics Finland's realised sale
   prices per square metre for every Helsinki postal-code area since 2009, by
   home type, drawn against the city with the ten-year trend continued to the
