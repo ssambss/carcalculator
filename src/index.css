@@ -1985,3 +1985,148 @@ a.dialog-text {
   line-height: 1.5;
   max-width: 78ch;
 }
+
+/* ————— Lease mileage ————— */
+/* A date needs more room than a number: the native picker's icon sits inside. */
+.field-date {
+  width: 150px;
+}
+
+/* Logging a reading and adding a trip: fields and their button on one line,
+   the button on the inputs' baseline rather than the labels'. */
+.log-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.log-form .btn {
+  height: 36px;
+}
+
+.mileage-status .stat-row {
+  margin-top: 4px;
+}
+
+.mileage-verdict {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mileage-verdict p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 72ch;
+}
+
+.mileage-verdict b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.mileage-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.mileage-list li {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.mileage-list li:first-child {
+  border-top: 1px solid var(--line-soft);
+}
+
+.mileage-list-main {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+}
+
+.mileage-list-name {
+  font-weight: 600;
+}
+
+.mileage-list-date,
+.mileage-list-note {
+  color: var(--ink-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mileage-list li.flagged .mileage-list-note {
+  color: var(--danger);
+}
+
+/* A trip behind the last reading is already in the odometer: kept, but quiet. */
+.mileage-list li.past .mileage-list-name {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.mileage-more {
+  align-self: flex-start;
+  margin: -6px 0 0 -10px;
+}
+
+/* A period's notes stack under its name: its dates, how much is measured,
+   what is planned. They may wrap - a lease year's dates are the longest thing
+   in the table, and the figures beside them matter more. */
+.mileage-table th.rowhead {
+  white-space: normal;
+}
+
+.mileage-table th.rowhead .cell-note {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .field-date {
+    width: calc(50% - 8px);
+  }
+
+  .log-form .btn {
+    height: 44px;
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+
+  /* Five columns on a 360px screen: the padding gives way before the figures. */
+  .mileage-table th,
+  .mileage-table td {
+    padding: 10px 7px;
+  }
+
+  /* The note drops under the figure on a phone; the delete keeps its corner. */
+  .mileage-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .mileage-list-note {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .mileage-list .link-btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-height: 44px;
+  }
+}

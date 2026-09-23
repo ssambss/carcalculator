@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export type Mode = 'cars' | 'housing'
+export type Mode = 'cars' | 'housing' | 'mileage'
 
 const MODE_KEY = 'carcalculator.mode'
 
@@ -12,7 +12,7 @@ export function useMode(): [Mode, (m: Mode) => void] {
   const [mode, setMode] = useState<Mode>(() => {
     try {
       const saved = localStorage.getItem(MODE_KEY)
-      if (saved === 'cars' || saved === 'housing') return saved
+      if (saved === 'cars' || saved === 'housing' || saved === 'mileage') return saved
     } catch {
       // storage unavailable — start on cars
     }

@@ -23,10 +23,12 @@ import {
   stampEditedAt,
 } from './sync'
 import { useTheme } from './theme'
-import { useMode } from './mode'
+import { type Mode, useMode } from './mode'
 import { useScraperFilters } from './useScraperFilters'
 import { useHousing } from './useHousing'
+import { useMileage } from './useMileage'
 import { HousingView } from './components/HousingView'
+import { MileageView } from './components/MileageView'
 import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
@@ -35,6 +37,12 @@ import { FilterBar } from './components/FilterBar'
 import { ScraperFilterDialog } from './components/ScraperFilterDialog'
 import { SettingsPanel } from './components/SettingsPanel'
 import { SyncDialog, type SyncStatus } from './components/SyncDialog'
+
+const MODE_TITLES: Record<Mode, [string, string]> = {
+  cars: ['Car TCO', 'Total cost of ownership — compare your candidates'],
+  housing: ['Housing budget', 'What you could afford — and what each place would cost'],
+  mileage: ['Lease mileage', 'The km driven against what the contract allows'],
+}
 
 interface DraftState {
   car: CarListing
@@ -45,7 +53,7 @@ export default function App() {
   const [data, setData] = useState<AppData>(loadData)
   const [draft, setDraft] = useState<DraftState | null>(null)
   const [theme, toggleTheme] = useTheme()
-  // Which calculator this device is on - cars or housing. Local like the theme.
+  // Which calculator this device is on - cars, housing or mileage. Local like the theme.
   const [mode, setMode] = useMode()
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -61,6 +69,8 @@ export default function App() {
   // The housing side: its own gist file, so an old cached bundle that has
   // never heard of housing cannot strip it on sync.
   const housing = useHousing(syncConfig)
+  // The leased car's odometer log: a file of its own too, for the same reason.
+  const mileage = useMileage(syncConfig)
   const dataRef = useRef(data)
   const syncConfigRef = useRef(syncConfig)
   // The last data object that came from a non-edit source (initial load or a
@@ -333,12 +343,8 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div>
-          <h1 className="app-title display">{mode === 'cars' ? 'Car TCO' : 'Housing budget'}</h1>
-          <p className="app-subtitle">
-            {mode === 'cars'
-              ? 'Total cost of ownership — compare your candidates'
-              : 'What you could afford — and what each place would cost'}
-          </p>
+          <h1 className="app-title display">{MODE_TITLES[mode][0]}</h1>
+          <p className="app-subtitle">{MODE_TITLES[mode][1]}</p>
         </div>
         <div className="header-actions">
           <div className="mode-toggle" role="tablist" aria-label="Calculator">
@@ -357,6 +363,14 @@ export default function App() {
               onClick={() => setMode('housing')}
             >
               Housing
+            </button>
+            <button
+              className={`filter-chip${mode === 'mileage' ? ' active' : ''}`}
+              role="tab"
+              aria-selected={mode === 'mileage'}
+              onClick={() => setMode('mileage')}
+            >
+              Mileage
             </button>
           </div>
           <button
@@ -525,7 +539,9 @@ export default function App() {
         />
       </header>
 
-      {mode === 'housing' ? (
+      {mode === 'mileage' ? (
+        <MileageView store={mileage} />
+      ) : mode === 'housing' ? (
         <HousingView store={housing} />
       ) : (
         <>

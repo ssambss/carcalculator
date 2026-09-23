@@ -162,6 +162,18 @@ color-coded cost breakdown and a side-by-side comparison table.
   it has given back since its peak — ending in a plain verdict on how much of
   it to believe. The long run since 1988 (the 1990s fall included) sits under
   it so the projection is read for what it is: arithmetic on the past.
+- **Lease mileage** (third mode): a leased car's odometer against its
+  allowance. The contract's km are spread evenly from hand-over to return — a
+  straight line, because only the total at the return is charged — and each
+  logged reading says how far ahead of or behind that line you are, what
+  everyday driving can take per week and month from here, and where the
+  everyday pace leads by the return (with the excess fee, if you give it).
+  **Planned trips** are set aside from that budget before it is worked out;
+  once past, they are taken out of the everyday pace, so a trip is never
+  counted twice. Week-by-week (Monday to Sunday), month-by-month and
+  lease-year tables, and a chart of the driving against the line. Between two
+  readings the km are spread evenly over the days. Syncs to its own gist file
+  (`car-tco-mileage.json`), like housing.
 - Light "paper ledger" and dark "night cockpit" themes; the toggle remembers
   your choice, defaulting to the OS preference.
 - Number inputs accept both comma and dot decimals.
