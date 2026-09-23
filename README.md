@@ -32,7 +32,9 @@ color-coded cost breakdown and a side-by-side comparison table.
 - **Export → Spreadsheet** (`.xlsx`): every car as a row, every field as a
   column, with €/month, €/km and the total alongside for reading. Two sheets —
   the cars, and the assumptions they are costed against. **Export → Backup**
-  (`.json`) is the exact copy, for restoring.
+  (`.json`) is the exact copy, for restoring — of all three calculators: the
+  cars, the housing side and the lease mileage. A backup from before housing
+  or mileage was in it restores what it has and leaves the rest as it is.
 - **Import** takes either, picking by the file rather than asking. They mean
   different things, so they behave differently:
   - a **backup replaces** everything, because it is an exact copy;

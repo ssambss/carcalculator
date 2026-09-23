@@ -14,6 +14,8 @@ export interface MileageStore {
   removeReading: (id: string) => void
   saveTrip: (t: PlannedTrip) => void
   removeTrip: (id: string) => void
+  /** a restored backup, wholesale - restamped so its contract wins the next merge */
+  replace: (next: MileageData) => void
   syncNow: () => void
 }
 
@@ -131,10 +133,28 @@ export function useMileage(config: SyncConfig | null): MileageStore {
     [mutate],
   )
 
+  const replace = useCallback(
+    (next: MileageData) => {
+      mutate(() => ({ ...next, leaseUpdatedAt: new Date().toISOString() }))
+    },
+    [mutate],
+  )
+
   const syncNow = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
     if (config) void sync(config)
   }, [config, sync])
 
-  return { data, status, error, saveLease, saveReading, removeReading, saveTrip, removeTrip, syncNow }
+  return {
+    data,
+    status,
+    error,
+    saveLease,
+    saveReading,
+    removeReading,
+    saveTrip,
+    removeTrip,
+    replace,
+    syncNow,
+  }
 }

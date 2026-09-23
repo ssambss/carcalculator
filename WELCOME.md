@@ -281,7 +281,9 @@ updated, new rows get added, and anything you didn't touch is left alone.
 
 Deleting a row does *not* delete the car — do that in the app.
 
-**Export → Backup** is the other one: an exact copy, for keeping or restoring.
+**Export → Backup** is the other one: an exact copy of everything — the cars
+and the housing side — for keeping or restoring. (On a phone, Import and
+Export share the **⋯** button.)
 
 ---
 

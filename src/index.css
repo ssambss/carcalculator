@@ -519,17 +519,30 @@ select option {
   gap: 14px;
 }
 
+/* Wraps rather than squeezing: `overflow-wrap: anywhere` lets the name shrink
+   to a letter's width, so without a basis to hold it the chips win the row. */
 .car-card-head {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .car-name {
   font-size: 17px;
   font-weight: 600;
-  flex: 1;
+  flex: 1 1 10ch;
   overflow-wrap: anywhere;
+}
+
+/* A place's chips, under its name and in line with it (the checkbox and the
+   head's gap before it). */
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -6px;
+  padding-left: 24px;
 }
 
 .chip {
@@ -675,13 +688,27 @@ select option {
   font-size: 12px;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.1s;
   z-index: 5;
+  /* Not rendered until hovered: a transparent tip still counts toward the
+     page's scroll width, and one centred over a card's last segment reached
+     past a phone's edge - the whole page scrolled sideways by 45px. */
+  display: none;
 }
 
 .breakdown-seg:hover .seg-tip {
-  opacity: 1;
+  display: block;
+}
+
+/* The end segments anchor their tips to the bar's edge instead of centring. */
+.breakdown-seg:first-child .seg-tip {
+  left: 0;
+  transform: none;
+}
+
+.breakdown-seg:last-child .seg-tip {
+  left: auto;
+  right: 0;
+  transform: none;
 }
 
 /* ————— Comparison table ————— */
@@ -804,12 +831,31 @@ select option {
   border-bottom: 1px solid var(--line);
 }
 
+/* The table card has no padding of its own (the table runs edge to edge), so
+   the note under it brings the card's inset itself. */
 .cmp-card .chart-note {
-  margin-top: 16px;
+  margin: 16px 20px 18px;
 }
 
 /* A figure that belongs to the whole group rather than to a column - said
    once, in the divider, in the running text's case rather than the label's. */
+/* The group's label is its fold. A button resets text-transform, so it takes
+   the row's small caps back; sticky, so a phone scrolling the table sideways
+   does not carry it out of reach. */
+.cmp-group-toggle {
+  flex: none;
+  position: sticky;
+  left: 14px;
+  margin: -6px -8px;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.cmp-group-toggle:hover {
+  color: var(--ink);
+}
+
 .cmp tr.cmp-group th .cmp-group-note {
   margin-left: 12px;
   font-weight: 500;
@@ -1072,13 +1118,6 @@ a.dialog-text {
 }
 
 /* Two ways out of a filtered-empty list, side by side in the centred column. */
-.empty-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
 .app-footer {
   margin-top: 24px;
   font-size: 12px;
@@ -1526,10 +1565,29 @@ a.dialog-text {
 }
 
 /* ————— Housing mode ————— */
+/* A sibling of the buttons rather than one of them, so a phone can give it a
+   row of its own; on a desktop the auto margin keeps it beside them. */
 .mode-toggle {
   display: inline-flex;
   gap: 4px;
-  margin-right: 6px;
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .mode-toggle {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .mode-toggle .filter-chip {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .app-header {
+    row-gap: 12px;
+  }
 }
 
 /*
@@ -1546,6 +1604,37 @@ a.dialog-text {
   flex-direction: row;
   align-items: baseline;
   gap: 10px;
+}
+
+/* Title, the one-line summary while shut, and Edit / Done at the far end. On
+   a phone the title hides while shut, as the car panel's does. */
+.housing-panel-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  min-height: 44px;
+}
+
+/* Open, the title takes the row and its caption drops under it before Done
+   is pushed off the row - a wrapping row moves items down before shrinking. */
+.housing-panel-head .assumptions-heading {
+  flex-wrap: wrap;
+  row-gap: 0;
+  min-width: 0;
+}
+
+.housing-panel.expanded .housing-panel-head .assumptions-heading {
+  flex: 1 1 0;
+}
+
+.housing-panel-head .assumptions-summary-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.housing-panel-head .assumptions-toggle {
+  margin-left: auto;
 }
 
 .housing-panel .assumptions-heading + .assumptions-heading,
@@ -1594,26 +1683,64 @@ a.dialog-text {
   font-weight: 600;
 }
 
-/* The add tile at the end of the property grid — a button dressed as a card. */
-.add-card {
+/* ————— Folding sections ————— */
+/* The whole head is the button: title, and the caption or the answer. */
+.fold-toggle {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 180px;
-  border-style: dashed;
-  border-color: var(--line);
-  color: var(--ink-3);
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  flex: 1;
+  min-width: 0;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
   font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+  text-align: left;
 }
 
-.add-card:hover {
-  color: var(--accent);
-  border-color: var(--accent);
+.fold-toggle:hover .fold-chevron {
+  color: var(--ink);
+}
+
+.fold-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fold-chevron {
+  flex: none;
+  color: var(--ink-3);
+  transition: transform 0.15s;
+}
+
+.fold-toggle[aria-expanded='true'] .fold-chevron {
+  transform: rotate(90deg);
+}
+
+/* The folded card's answer: read, not skimmed past like a caption. */
+.fold-summary {
+  flex-basis: 100%;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Shut cards stack as a list: closer together than open ones. */
+.fold-card:not(.open) + .fold-card:not(.open) {
+  margin-top: 12px;
+}
+
+/* A part of a card that folds by itself. */
+.fold {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* ————— Loan schedule ————— */
