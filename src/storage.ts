@@ -112,21 +112,6 @@ export function saveData(data: AppData): void {
   }
 }
 
-export function exportJson(data: AppData): void {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `car-tco-${new Date().toISOString().slice(0, 10)}.json`
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-export async function importJson(file: File): Promise<AppData> {
-  const text = await file.text()
-  return normalizeData(JSON.parse(text))
-}
-
 /** Coerce unknown parsed JSON into a valid AppData, dropping anything malformed. */
 export function normalizeData(raw: unknown): AppData {
   const obj = isRecord(raw) ? raw : {}

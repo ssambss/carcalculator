@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { rentVsBuy, type HousingSituation, type RentVsBuy as Comparison } from '../housing'
 import { fmtEur, fmtNum } from '../format'
 import { pct, tableYears, yearOf } from './chartHelpers'
+import { FoldCard } from './Fold'
 import { SubjectChips, ViewToggle, type AnalysisSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
 import { TipRow, TipRule, TwoLineChart } from './TwoLineChart'
@@ -47,14 +48,26 @@ export function RentVsBuy({
   const asked = situation.rentPerMonth > 0
   const result = asked ? rentVsBuy(subject, situation) : null
 
-  return (
-    <div className="card schedule-card">
-      <div className="schedule-head">
-        <div className="cmp-title display">Rent instead, and invest the difference</div>
-        <div className="cmp-caption">the same money, two ways: a mortgage, or rent plus a portfolio</div>
-        {result && <ViewToggle view={view} onChange={setView} />}
-      </div>
+  const summary = result
+    ? [
+        usable.length > 1 ? subject.label : '',
+        `${leadText(result).toLowerCase()} after ${fmtNum(result.months.length / 12)} years`,
+        result.breakEvenReturnPct !== null
+          ? `break-even return ${fmtNum(Math.round(result.breakEvenReturnPct * 10) / 10)} %/yr`
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : 'type the rent a comparable place would cost, and it weighs the two'
 
+  return (
+    <FoldCard
+      id="housing.rentVsBuy"
+      title="Rent instead, and invest the difference"
+      caption="the same money, two ways: a mortgage, or rent plus a portfolio"
+      summary={summary}
+      actions={result && <ViewToggle view={view} onChange={setView} />}
+    >
       <SubjectChips
         subjects={usable}
         selected={subject}
@@ -134,8 +147,19 @@ export function RentVsBuy({
           </p>
         </>
       )}
-    </div>
+    </FoldCard>
   )
+}
+
+/** "Buying ahead by 212 573 €" - said the same in the folded head and in the tiles. */
+function leadText(result: Comparison): string {
+  const last = result.months[result.months.length - 1]
+  const gap = last.buyerNetWorth - last.renterNetWorth
+  return result.leader === 'buy'
+    ? `Buying ahead by ${fmtEur(gap)}`
+    : result.leader === 'rent'
+      ? `Renting ahead by ${fmtEur(-gap)}`
+      : 'Level'
 }
 
 /* -------------------------------------------------------------------- chart */
@@ -256,7 +280,6 @@ function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSub
     totalCharges,
   } = result
   const last = months[months.length - 1]
-  const gap = last.buyerNetWorth - last.renterNetWorth
   const years = fmtNum(months.length / 12)
 
   let breakEven: string
@@ -289,13 +312,7 @@ function Outcome({ result, subject }: { result: Comparison; subject: AnalysisSub
     <div className="stat-row">
       <div className="stat">
         <span className="stat-label">After {years} years</span>
-        <span className="stat-value">
-          {leader === 'buy'
-            ? `Buying ahead by ${fmtEur(gap)}`
-            : leader === 'rent'
-              ? `Renting ahead by ${fmtEur(-gap)}`
-              : 'Level'}
-        </span>
+        <span className="stat-value">{leadText(result)}</span>
         <span className="stat-sub">
           buying {fmtEur(last.buyerNetWorth)} · renting {fmtEur(last.renterNetWorth)}
         </span>

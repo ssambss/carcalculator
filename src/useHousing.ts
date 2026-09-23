@@ -13,6 +13,8 @@ export interface HousingStore {
   saveProperty: (p: PropertyListing) => void
   removeProperty: (id: string) => void
   toggleFavorite: (id: string) => void
+  /** everything at once, from a backup */
+  replace: (next: HousingData) => void
   syncNow: () => void
 }
 
@@ -125,10 +127,30 @@ export function useHousing(config: SyncConfig | null): HousingStore {
     [mutate],
   )
 
+  // A restored backup. The situation is stamped now, so it wins the next merge
+  // the way a restored car backup's assumptions do; the places keep their own
+  // stamps and merge with the gist per place, as restored cars do.
+  const replace = useCallback(
+    (next: HousingData) => {
+      mutate(() => ({ ...next, situationUpdatedAt: new Date().toISOString() }))
+    },
+    [mutate],
+  )
+
   const syncNow = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
     if (config) void sync(config)
   }, [config, sync])
 
-  return { data, status, error, saveSituation, saveProperty, removeProperty, toggleFavorite, syncNow }
+  return {
+    data,
+    status,
+    error,
+    saveSituation,
+    saveProperty,
+    removeProperty,
+    toggleFavorite,
+    replace,
+    syncNow,
+  }
 }

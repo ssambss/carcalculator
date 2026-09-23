@@ -28,6 +28,7 @@ import { HELSINKI_PRICES } from '../data/helsinkiPrices'
 import type { HousingSituation, PropertyListing } from '../housing'
 import { fmtEur, fmtNum, fmtPct } from '../format'
 import { niceTicks } from './chartHelpers'
+import { Fold, FoldCard } from './Fold'
 import { NumberField } from './NumberField'
 import { TipRow } from './TwoLineChart'
 import { useWidth } from './useWidth'
@@ -212,15 +213,26 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
     })
   }, [picked, city, data])
 
-  return (
-    <div className="card schedule-card">
-      <div className="schedule-head">
-        <div className="cmp-title display">Helsinki by area</div>
-        <div className="cmp-caption">
-          what homes have sold for per square metre, and what continuing the trend implies
-        </div>
-      </div>
+  // Folded, the card says where it is and what that area has done.
+  const shown = current.summary.latest
+  const trend = current.projection?.trend ?? null
+  const longRunPct = current.projection?.longRunPct ?? null
+  const summary = [
+    `${current === city ? 'Helsinki' : `${current.code} ${current.name}`}, ${kindLabel(kind).toLowerCase()}`,
+    shown ? `${perM2(shown.value)} in ${shown.year}` : '',
+    trend ? `trend ${perYear(trend)}` : '',
+    longRunPct !== null ? `${longRunName(current)}’s long run ${fmtPct(longRunPct)}/yr` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
+  return (
+    <FoldCard
+      id="housing.area"
+      title="Helsinki by area"
+      caption="what homes have sold for per square metre, and what continuing the trend implies"
+      summary={summary}
+    >
       <div className="schedule-subjects" role="tablist" aria-label="Which homes">
         {HOUSE_TYPES.map((t) => (
           <button
@@ -340,21 +352,27 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
 
       <LongRun data={data} />
 
-      <p className="chart-note">
-        Averages of realised sales of old flats and terraced houses per postal-code area, from
-        Statistics Finland ({data.source.split(',')[0]}, tables {data.tables.join(', ')}; yearly
-        figures to {latestYear}, updated {data.updated}). The trend continues the last ten years’
-        average yearly change; the likely range is one standard deviation of the area’s own yearly
-        moves (Helsinki’s where the area has too few years), widening with the square root of the
-        years — roughly two years in three, if the future is as unruly as the past. The zone’s long
-        run is the average yearly change of Statistics Finland’s price index for the area’s whole
-        price zone since {longRun.since}: over ten and twenty years it is the steadier yardstick, and
-        the gap between it and the area’s trend is worth more thought than either figure. None of it
-        is a forecast: a €/m² average mixes buildings, floors and renovations, a small area swings
-        on a handful of sales, and the 2022–2025 fall sits inside every ten-year figure here. All
-        figures are nominal — the long-run table below shows what inflation did to them.
-      </p>
-    </div>
+      <Fold
+        id="housing.area.about"
+        title="About these figures"
+        caption="where they come from, and what they cannot say"
+      >
+        <p className="chart-note">
+          Averages of realised sales of old flats and terraced houses per postal-code area, from
+          Statistics Finland ({data.source.split(',')[0]}, tables {data.tables.join(', ')}; yearly
+          figures to {latestYear}, updated {data.updated}). The trend continues the last ten years’
+          average yearly change; the likely range is one standard deviation of the area’s own yearly
+          moves (Helsinki’s where the area has too few years), widening with the square root of the
+          years — roughly two years in three, if the future is as unruly as the past. The zone’s long
+          run is the average yearly change of Statistics Finland’s price index for the area’s whole
+          price zone since {longRun.since}: over ten and twenty years it is the steadier yardstick, and
+          the gap between it and the area’s trend is worth more thought than either figure. None of it
+          is a forecast: a €/m² average mixes buildings, floors and renovations, a small area swings
+          on a handful of sales, and the 2022–2025 fall sits inside every ten-year figure here. All
+          figures are nominal — “The long run” above shows what inflation did to them.
+        </p>
+      </Fold>
+    </FoldCard>
   )
 }
 
@@ -1230,15 +1248,16 @@ function AreaTable({
   const ariaSort = (key: SortKey) =>
     sort.key === key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined
 
+  // Folded until asked for: eighty rows are a reference, and the picker above
+  // reaches every area without them.
   return (
-    <div>
-      <div className="cmp-head">
-        <div className="schedule-subtitle">Every area, {kindLabel(kind).toLowerCase()}</div>
-        <div className="cmp-caption">
-          {rows.length} areas with published sales · sort by a column, pick an area to chart it
-          {candidateCodes.size > 0 ? ' · your places marked' : ''}
-        </div>
-      </div>
+    <Fold
+      id="housing.area.every"
+      title={`Every area, ${kindLabel(kind).toLowerCase()}`}
+      caption={`${rows.length} areas with published sales · sort by a column, pick an area to chart it${
+        candidateCodes.size > 0 ? ' · your places marked' : ''
+      }`}
+    >
       <div className="cmp-scroll area-table-scroll">
         <table className="cmp area-table">
           <thead>
@@ -1286,7 +1305,7 @@ function AreaTable({
           </tbody>
         </table>
       </div>
-    </div>
+    </Fold>
   )
 }
 
@@ -1307,13 +1326,11 @@ function LongRun({ data }: { data: PriceData }) {
   const helReal = indexStats(idx.years, idx.series.helsinki.real)
   const { latest } = data
   return (
-    <>
-      <div className="cmp-head">
-        <div className="schedule-subtitle">The long run: Helsinki since {first}</div>
-        <div className="cmp-caption">
-          the price index, all old dwellings — the range a projection from 2009 has never seen
-        </div>
-      </div>
+    <Fold
+      id="housing.area.longRun"
+      title={`The long run: Helsinki since ${first}`}
+      caption="the price index, all old dwellings — the range a projection from 2009 has never seen"
+    >
       <div className="stat-row">
         <div className="stat">
           <span className="stat-label">Since {first}</span>
@@ -1394,6 +1411,6 @@ function LongRun({ data }: { data: PriceData }) {
           </tbody>
         </table>
       </div>
-    </>
+    </Fold>
   )
 }

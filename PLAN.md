@@ -1254,15 +1254,61 @@ for Helsinki as a whole; its tests are in `test/areaRead.test.ts`. Built in
 a worktree (`worktree-area-trend-read`) because another session was editing
 the housing view at the same time.
 
-Not done, deliberately: housing in the Excel export/import and JSON backup
-(the gist file is the durable copy for now — add a Properties sheet when
-someone actually edits these in a spreadsheet), and any scraper feed — oikotie
-forbids scraping in its terms, so candidates are typed in by hand.
+**Decluttered (2026-09-23, user's ask — "the UI for housing is quite
+cluttered … maybe they should be expandable", and the add button in the
+header like the car side):** measured first — nine screens on a desktop,
+fourteen on a phone, the first place six screens down. Now the places come
+straight after the ceiling, with the side-by-side under them, and the three
+analysis cards follow **folded** (`FoldCard` in `components/Fold.tsx`): shut,
+a card still gives its answer in one line under the title — the crossover
+year and the interest, who ends ahead and the break-even return, the area's
+€/m², trend and zone long run — so folding gives up the working, not the
+result. Inside "Helsinki by area" the eighty-row table, the long run and the
+notes on method fold on their own (`Fold`), and the side-by-side's projected
+value rows fold with the long note that only explains them. The situation
+panel folds on a desktop too, to the phone's one-line summary, but opens by
+itself while it still holds the defaults. Open or shut is device-local like
+the theme (`src/open.ts`, one map under `carcalculator.open`). The place form
+moved up into `App` beside the car one, so the header has **Add place**
+where it has Add car; the grid's add tile went with the reason for it.
+Result: the first place at 567 px on a desktop (was 5 818), 928 px on a phone
+(was 8 168).
+
+Found on the way and fixed: two chips beside a place's name left it a few
+letters wide ("T / a / p / a…") — chips got a row of their own, and the card
+head wraps rather than squeezes; the phone header was 45 px wider than the
+screen (five icons and the mode switch do not fit 360 px) — the switch has a
+full-width row of its own there and Import joins Export in one menu, via
+`useMedia` (`src/useMedia.ts`) so each width's accessible names are its own;
+and the breakdown bar's hidden tooltips, logged as known on 2026-09-07,
+widened every phone page — they are not rendered until hovered now, and the
+end segments anchor theirs to the bar's edge.
+
+**The JSON backup carries housing (2026-09-23).** `src/backup.ts`: the car
+data stays at the top level where every backup has had it, housing rides
+beside it under `housing`. An old backup restores its cars and leaves housing
+alone (the confirm says so); an old bundle reading a new backup finds its cars
+and drops the rest. A restore stamps the situation now, so it wins the next
+merge the way a restored car backup's assumptions do; places merge with the
+gist per place, as restored cars always have — so with sync on, a place
+deleted after the backup was taken stays deleted. Import and Export now show
+in both modes. Tests in `test/backup.test.ts`.
+
+Not done, deliberately: housing in the Excel export/import (add a Properties
+sheet when someone actually edits these in a spreadsheet), and any scraper
+feed — oikotie forbids scraping in its terms, so candidates are typed in by
+hand.
 
 ---
 
 ## Log
 
+- **2026-09-23** — **Housing decluttered.** Places straight after the
+  ceiling; analysis cards fold to a one-line answer, remembered per device;
+  situation panel folds on desktop; "Add place" in the header. Fixed on the
+  way: place names squeezed to a letter's width, the phone header and the
+  breakdown tooltips both widening phone pages. The JSON backup now carries
+  housing. 282 frontend tests, verified in Chromium at 1280, 390 and 360 px.
 - **2026-09-14** — **Reading the trend.** Under the selected area, five checks
   on its trend — window sensitivity, sample, the years out of step with the
   city and their share of the gap, the zone over the same years, the fall

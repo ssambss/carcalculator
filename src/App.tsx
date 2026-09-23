@@ -9,7 +9,8 @@ import {
   matchesFilters,
   saveSelection,
 } from './filtering'
-import { cloneLease, exportJson, importJson, loadData, newCar, saveData } from './storage'
+import { cloneLease, loadData, newCar, saveData } from './storage'
+import { exportBackup, importBackup } from './backup'
 import { exportExcel, importExcel } from './excel'
 import {
   type SyncConfig,
@@ -24,9 +25,13 @@ import {
 } from './sync'
 import { useTheme } from './theme'
 import { useMode } from './mode'
+import { NARROW, useMedia } from './useMedia'
 import { useScraperFilters } from './useScraperFilters'
 import { useHousing } from './useHousing'
+import type { PropertyListing } from './housing'
+import { newProperty } from './housingStorage'
 import { HousingView } from './components/HousingView'
+import { PropertyForm } from './components/PropertyForm'
 import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
@@ -41,13 +46,22 @@ interface DraftState {
   isNew: boolean
 }
 
+interface PlaceDraft {
+  property: PropertyListing
+  isNew: boolean
+}
+
 export default function App() {
   const [data, setData] = useState<AppData>(loadData)
   const [draft, setDraft] = useState<DraftState | null>(null)
+  // The housing form lives here beside the car one, so the header can open it.
+  const [placeDraft, setPlaceDraft] = useState<PlaceDraft | null>(null)
   const [theme, toggleTheme] = useTheme()
   // Which calculator this device is on - cars or housing. Local like the theme.
   const [mode, setMode] = useMode()
   const fileInput = useRef<HTMLInputElement>(null)
+  // A phone gets one menu for import and export - see the header.
+  const narrow = useMedia(NARROW)
 
   const [syncConfig, setSyncConfig] = useState<SyncConfig | null>(loadSyncConfig)
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(syncConfig ? 'syncing' : 'off')
@@ -309,11 +323,20 @@ export default function App() {
         return
       }
 
-      const imported = await importJson(file)
+      const imported = await importBackup(file)
+      const restored = imported.housing
       const ok = window.confirm(
-        `Replace current data (${data.cars.length} cars) with "${file.name}" (${imported.cars.length} cars)?`,
+        restored
+          ? `Replace everything here (${data.cars.length} cars, ${housing.data.properties.length} places) with "${file.name}" (${imported.data.cars.length} cars, ${restored.properties.length} places)?`
+          : [
+              `Replace the cars here (${data.cars.length}) with "${file.name}" (${imported.data.cars.length} cars)?`,
+              '',
+              'It is an older backup, from before housing was saved in it, so the housing side is left as it is.',
+            ].join('\n'),
       )
-      if (ok) updateData(() => imported)
+      if (!ok) return
+      updateData(() => imported.data)
+      if (restored) housing.replace(restored)
     } catch (error) {
       window.alert(
         error instanceof Error && isSpreadsheet
@@ -326,6 +349,7 @@ export default function App() {
   // On this person's own financing baseline (Assumptions -> New car), the same
   // one a car added from a Discord reaction arrives with.
   const addCar = () => setDraft({ car: newCar(data.settings.newCar), isNew: true })
+  const addPlace = () => setPlaceDraft({ property: newProperty(), isNew: true })
 
   const activeFilterCount = scraperFilters.set.filters.filter((f) => f.enabled).length
 
@@ -340,25 +364,27 @@ export default function App() {
               : 'What you could afford — and what each place would cost'}
           </p>
         </div>
+        {/* Beside the buttons on a desktop; on a phone a full-width row of its
+            own under the title, where the buttons have the title's row. */}
+        <div className="mode-toggle" role="tablist" aria-label="Calculator">
+          <button
+            className={`filter-chip${mode === 'cars' ? ' active' : ''}`}
+            role="tab"
+            aria-selected={mode === 'cars'}
+            onClick={() => setMode('cars')}
+          >
+            Cars
+          </button>
+          <button
+            className={`filter-chip${mode === 'housing' ? ' active' : ''}`}
+            role="tab"
+            aria-selected={mode === 'housing'}
+            onClick={() => setMode('housing')}
+          >
+            Housing
+          </button>
+        </div>
         <div className="header-actions">
-          <div className="mode-toggle" role="tablist" aria-label="Calculator">
-            <button
-              className={`filter-chip${mode === 'cars' ? ' active' : ''}`}
-              role="tab"
-              aria-selected={mode === 'cars'}
-              onClick={() => setMode('cars')}
-            >
-              Cars
-            </button>
-            <button
-              className={`filter-chip${mode === 'housing' ? ' active' : ''}`}
-              role="tab"
-              aria-selected={mode === 'housing'}
-              onClick={() => setMode('housing')}
-            >
-              Housing
-            </button>
-          </div>
           <button
             className="btn icon-btn"
             onClick={toggleTheme}
@@ -434,46 +460,73 @@ export default function App() {
             </svg>
             {syncConfig && <span className={`sync-dot ${syncStatus}`} />}
           </button>
-          {/* Import, export and add are the car data's tools; housing keeps its
-              own add button and is not in the spreadsheet or backup yet. */}
-          {mode === 'cars' && (
-          <>
-          <button className="btn" onClick={() => fileInput.current?.click()}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8 2v8" />
-              <path d="M5 7l3 3 3-3" />
-              <path d="M2 13h12" />
-            </svg>
-            <span className="btn-label">Import</span>
-          </button>
+          {/* Import and export, in either mode: the backup carries both
+              calculators, and the spreadsheet is the cars'. */}
+          {!narrow && (
+            <button className="btn" onClick={() => fileInput.current?.click()}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 2v8" />
+                <path d="M5 7l3 3 3-3" />
+                <path d="M2 13h12" />
+              </svg>
+              <span className="btn-label">Import</span>
+            </button>
+          )}
           {/*
             Two formats, because they are for different things: a spreadsheet to
             read and edit, a JSON backup that is exact. A menu rather than two
-            more buttons - the header is already full on a phone.
+            more buttons - the header is already full on a phone, where the menu
+            takes Import in as well: five icons and the mode switch do not fit
+            a 360px screen, and the page scrolled sideways to reach Export.
           */}
           <div className="menu-anchor">
             <button
-              className="btn"
+              className={narrow ? 'btn icon-btn' : 'btn'}
               aria-haspopup="true"
               aria-expanded={exportOpen}
+              aria-label={narrow ? 'Import and export' : undefined}
+              title={narrow ? 'Import and export' : undefined}
               onClick={() => setExportOpen((open) => !open)}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M8 10V2" />
-                <path d="M5 5l3-3 3 3" />
-                <path d="M2 13h12" />
-              </svg>
-              <span className="btn-label">Export</span>
+              {narrow ? (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <circle cx="3.5" cy="8" r="1.3" />
+                  <circle cx="8" cy="8" r="1.3" />
+                  <circle cx="12.5" cy="8" r="1.3" />
+                </svg>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8 10V2" />
+                    <path d="M5 5l3-3 3 3" />
+                    <path d="M2 13h12" />
+                  </svg>
+                  <span className="btn-label">Export</span>
+                </>
+              )}
             </button>
             {exportOpen && (
               <>
                 {/* Catches the next click anywhere, which is what closes it. */}
                 <button
                   className="menu-backdrop"
-                  aria-label="Close export menu"
+                  aria-label="Close menu"
                   onClick={() => setExportOpen(false)}
                 />
                 <div className="menu" role="menu">
+                  {narrow && (
+                    <button
+                      className="menu-item"
+                      role="menuitem"
+                      onClick={() => {
+                        setExportOpen(false)
+                        fileInput.current?.click()
+                      }}
+                    >
+                      <span className="menu-item-name">Import</span>
+                      <span className="menu-item-note">a spreadsheet or a backup</span>
+                    </button>
+                  )}
                   <button
                     className="menu-item"
                     role="menuitem"
@@ -484,7 +537,7 @@ export default function App() {
                       )
                     }}
                   >
-                    <span className="menu-item-name">Spreadsheet</span>
+                    <span className="menu-item-name">{narrow ? 'Export a spreadsheet' : 'Spreadsheet'}</span>
                     <span className="menu-item-note">.xlsx — every car in a grid, editable</span>
                   </button>
                   <button
@@ -492,25 +545,25 @@ export default function App() {
                     role="menuitem"
                     onClick={() => {
                       setExportOpen(false)
-                      exportJson(data)
+                      exportBackup(data, housing.data)
                     }}
                   >
-                    <span className="menu-item-name">Backup</span>
-                    <span className="menu-item-note">.json — exact, for restoring</span>
+                    <span className="menu-item-name">{narrow ? 'Export a backup' : 'Backup'}</span>
+                    <span className="menu-item-note">.json — cars and housing, exact, for restoring</span>
                   </button>
                 </div>
               </>
             )}
           </div>
-          <button className="btn btn-primary header-add" onClick={addCar}>
+          {/* Each mode's own add, in the same place: on a phone the fab stands
+              in for it. */}
+          <button className="btn btn-primary header-add" onClick={mode === 'cars' ? addCar : addPlace}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               <path d="M8 3v10" />
               <path d="M3 8h10" />
             </svg>
-            Add car
+            {mode === 'cars' ? 'Add car' : 'Add place'}
           </button>
-          </>
-          )}
         </div>
         <input
           ref={fileInput}
@@ -526,7 +579,11 @@ export default function App() {
       </header>
 
       {mode === 'housing' ? (
-        <HousingView store={housing} />
+        <HousingView
+          store={housing}
+          onAdd={addPlace}
+          onEdit={(property) => setPlaceDraft({ property, isNew: false })}
+        />
       ) : (
         <>
       <SettingsPanel
@@ -592,15 +649,19 @@ export default function App() {
           )}
         </>
       )}
+        </>
+      )}
 
-      <button className="fab" onClick={addCar} aria-label="Add car">
+      <button
+        className="fab"
+        onClick={mode === 'cars' ? addCar : addPlace}
+        aria-label={mode === 'cars' ? 'Add car' : 'Add place'}
+      >
         <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
           <path d="M8 3v10" />
           <path d="M3 8h10" />
         </svg>
       </button>
-        </>
-      )}
 
       <footer className="app-footer">
         Data is stored in this browser only — export a backup now and then.
@@ -613,6 +674,18 @@ export default function App() {
           settings={data.settings}
           onSave={saveCar}
           onCancel={() => setDraft(null)}
+        />
+      )}
+
+      {placeDraft && (
+        <PropertyForm
+          initial={placeDraft.property}
+          isNew={placeDraft.isNew}
+          onSave={(property) => {
+            housing.saveProperty(property)
+            setPlaceDraft(null)
+          }}
+          onCancel={() => setPlaceDraft(null)}
         />
       )}
 

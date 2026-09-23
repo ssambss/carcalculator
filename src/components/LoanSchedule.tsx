@@ -10,6 +10,7 @@ import {
 } from '../housing'
 import { fmtEur, fmtEurExact, fmtNum } from '../format'
 import { pct, tableYears, yearOf } from './chartHelpers'
+import { FoldCard } from './Fold'
 import { TipRow, TipRule, TwoLineChart } from './TwoLineChart'
 
 /**
@@ -123,14 +124,23 @@ export function LoanSchedule({
 
   if (!subject || schedule.months.length === 0) return null
 
-  return (
-    <div className="card schedule-card">
-      <div className="schedule-head">
-        <div className="cmp-title display">Over the loan’s life</div>
-        <div className="cmp-caption">how each payment splits between interest and what you own</div>
-        <ViewToggle view={view} onChange={setView} />
-      </div>
+  const { crossoverMonth: c, totalInterest } = schedule
+  const summary = [
+    chartable.length > 1 ? subject.label : '',
+    c === null ? '' : c === 1 ? 'half and half from the start' : `half and half in year ${yearOf(c)}`,
+    `${fmtEur(totalInterest)} of interest over ${fmtNum(schedule.months.length / 12)} years`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
+  return (
+    <FoldCard
+      id="housing.loan"
+      title="Over the loan’s life"
+      caption="how each payment splits between interest and what you own"
+      summary={summary}
+      actions={<ViewToggle view={view} onChange={setView} />}
+    >
       <SubjectChips
         subjects={chartable}
         selected={subject}
@@ -147,7 +157,7 @@ export function LoanSchedule({
       <Milestones schedule={schedule} />
 
       <RateTable loan={loan} situation={situation} />
-    </div>
+    </FoldCard>
   )
 }
 
