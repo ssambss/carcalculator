@@ -206,3 +206,34 @@ export async function addCarsToTco(listings, { now = new Date(), token } = {}) {
 
   return { added, skipped };
 }
+
+const EUR = new Intl.NumberFormat('fi-FI', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+
+/**
+ * The line posted to the channel when reacted cars land in the calculator.
+ *
+ * A reaction used to be silent: the car turned up in the app on its next sync
+ * and nothing said it had. The only way to know was to open the app and look.
+ * So each car is named exactly as its card will be, and priced, and the app
+ * is linked. Finnish, like the listing posts it answers.
+ *
+ * Links are in <angle brackets> so Discord does not unfurl each one into a
+ * second copy of the listing that is already in the channel.
+ */
+export function addedMessage(listings, { appUrl = config.tco.appUrl } = {}) {
+  const line = (listing) => {
+    const price = listing.price === null ? '' : ` · ${EUR.format(listing.price)}`;
+    return `${carName(listing)}${price} · <${listing.url}>`;
+  };
+  const open = appUrl ? `\nAvaa laskuri: <${appUrl}>` : '';
+  if (listings.length === 1) return `🧮 **Lisätty laskuriin:** ${line(listings[0])}${open}`;
+  return (
+    `🧮 **Lisätty laskuriin ${listings.length} autoa:**\n` +
+    listings.map((listing) => `• ${line(listing)}`).join('\n') +
+    open
+  );
+}

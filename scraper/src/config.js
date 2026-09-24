@@ -9,6 +9,12 @@
 // filters break pagination when combined with `page` (see the note on
 // buildSearchUrl in nettiauto.js).
 
+/** "owner/repo" -> its GitHub Pages address, or '' without one. */
+function pagesUrl(repository) {
+  const [owner, repo] = (repository ?? '').split('/');
+  return owner && repo ? `https://${owner.toLowerCase()}.github.io/${repo}/` : '';
+}
+
 export const config = {
   filters: {
     // 'auto' tries the gist and falls back to the file; 'gist' or 'file'
@@ -102,6 +108,10 @@ export const config = {
   // classic GitHub token with only the `gist` scope).
   tco: {
     pickUpReactions: true,
+    // Linked from the "added to the calculator" notice. Actions sets
+    // GITHUB_REPOSITORY, and the app is that repo's Pages site; CAR_TCO_APP_URL
+    // overrides it, and with neither the notice simply has no link.
+    appUrl: process.env.CAR_TCO_APP_URL ?? pagesUrl(process.env.GITHUB_REPOSITORY),
     gistToken: process.env.GIST_TOKEN ?? '',
     // Must match the app's sync target - see src/sync.ts in the repo root.
     gistFilename: 'car-tco-data.json',

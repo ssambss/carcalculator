@@ -442,6 +442,11 @@ with neither set the pickup is skipped and posting works as before):
 
 Worth knowing:
 
+- The channel is told when it happens. The run that adds a car posts
+  "🧮 Lisätty laskuriin", naming the car exactly as its card in the app, with
+  its price, the listing and a link to the calculator. Several cars in one run
+  share one message. The app link is the repo's Pages site, taken from the
+  `GITHUB_REPOSITORY` Actions sets, or `CAR_TCO_APP_URL` if you set it.
 - A car is added once. Removing the reaction later does nothing — delete the
   car in the app instead, and it stays deleted (the scraper re-adds a car only
   until it has verified the write survived the app's last-write-wins sync,

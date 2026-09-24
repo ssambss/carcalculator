@@ -10,6 +10,7 @@ import { after, describe, it } from 'node:test';
 
 import config from '../src/config.js';
 import {
+  addedMessage,
   carName,
   newCarDefaults,
   powertrainOf,
@@ -21,6 +22,7 @@ import {
   keyOf,
   loadState,
   needsTcoAdd,
+  isFirstTcoAdd,
   recordTcoAdd,
   recordTcoConfirmed,
   saveState,
@@ -147,6 +149,44 @@ describe('turning a listing into a calculator car', () => {
   });
 });
 
+describe('saying a reacted car has arrived', () => {
+  const polestar = {
+    id: '15998743',
+    title: 'Polestar 2',
+    subTitle: 'Long Range Dual Motor 78 kWh',
+    year: 2021,
+    mileage: 101000,
+    price: 28790,
+    url: 'https://www.nettiauto.com/polestar/2/15998743',
+  };
+  const appUrl = 'https://ssambss.github.io/carcalculator/';
+
+  it('names the car as its card will be, with price, listing and app', () => {
+    // A reaction used to be silent; the car just turned up on the next sync.
+    const text = addedMessage([polestar], { appUrl });
+    assert.match(text, /Lisätty laskuriin/);
+    assert.ok(text.includes(carName(polestar)), 'the card name, so it can be found in the app');
+    assert.match(text, /28\s790\s€/);
+    assert.ok(text.includes(`<${appUrl}>`));
+  });
+
+  it('keeps Discord from unfurling a second copy of the listing', () => {
+    assert.ok(addedMessage([polestar], { appUrl }).includes(`<${polestar.url}>`));
+  });
+
+  it('lists several cars in one message', () => {
+    const text = addedMessage([polestar, { ...polestar, id: '2', price: null }], { appUrl });
+    assert.match(text, /2 autoa/);
+    assert.equal(text.split('\n').filter((line) => line.startsWith('• ')).length, 2);
+  });
+
+  it('leaves out what it does not know', () => {
+    const text = addedMessage([{ ...polestar, price: null }], { appUrl: '' });
+    assert.doesNotMatch(text, /€/);
+    assert.doesNotMatch(text, /Avaa laskuri/);
+  });
+});
+
 describe('reaction plumbing', () => {
   it('extracts the webhook id used to recognise our own posts', () => {
     assert.equal(webhookIdFrom('https://discord.com/api/webhooks/123456/token-abc'), '123456');
@@ -161,6 +201,15 @@ describe('reaction plumbing', () => {
 });
 
 describe('add/confirm against last-write-wins sync', () => {
+  it('counts only the first write as news', async () => {
+    // A car written again after a sync race was already announced; a second
+    // "added to the calculator" would read as a second car.
+    const store = await loadState(await tempFile('seen.json'));
+    assert.equal(isFirstTcoAdd(store, K('15905450')), true);
+    recordTcoAdd(store, K('15905450'));
+    assert.equal(isFirstTcoAdd(store, K('15905450')), false);
+  });
+
   it('adds, then confirms, then leaves the car alone forever', async () => {
     const path = await tempFile('seen.json');
     const store = await loadState(path);

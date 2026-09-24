@@ -12,6 +12,7 @@
 //   id                    what a source's `sink` field names
 //   label                 for the run log
 //   add(listings, {token}) -> { added, skipped }, both arrays of listing ids
+//   addedMessage(listings) -> the channel's notice that they arrived; optional
 //
 // The token is always passed in, never read from configuration. A sink writes
 // into somebody's own gist, and whose is not a global fact - there used to be a
@@ -19,12 +20,13 @@
 // token, which would have been the wrong answer for every other tenant. It was
 // never called; it is gone rather than fixed.
 
-import { addCarsToTco } from './car-tco.js';
+import { addCarsToTco, addedMessage } from './car-tco.js';
 
 const carTco = {
   id: 'car-tco',
   label: 'the Car TCO calculator',
   add: addCarsToTco,
+  addedMessage,
 };
 
 export const SINKS = [carTco];

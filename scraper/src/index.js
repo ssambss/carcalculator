@@ -431,7 +431,17 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
 
     const { added, skipped } = await sink.add(batch, { token: gistToken });
     const keyById = new Map(batch.map((listing) => [listing.id, state.keyFor(listing)]));
+    // Read before recording - see isFirstTcoAdd.
+    const firstTime = added.filter((id) => state.isFirstTcoAdd(store, keyById.get(id)));
     for (const id of added) state.recordTcoAdd(store, keyById.get(id));
+    if (firstTime.length && sink.addedMessage) {
+      const arrived = firstTime.map((id) => batch.find((listing) => listing.id === id));
+      // The cars are in the calculator whatever happens here, so a failed
+      // notice is logged rather than failing the run.
+      await announceText(sink.addedMessage(arrived), { webhookUrl }).catch((error) =>
+        console.warn(`  could not post the added-to-calculator notice: ${error.message}`),
+      );
+    }
     for (const id of skipped) {
       // Already there: whoever put it there, it is confirmed present.
       state.recordTcoAdd(store, keyById.get(id));

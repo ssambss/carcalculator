@@ -379,6 +379,16 @@ export function needsTcoAdd(state, key) {
   return !entry || !entry.confirmedAt;
 }
 
+/**
+ * Is this the first time the car is being written to the calculator?
+ *
+ * Only then is it news. A car written again because a sync race ate the first
+ * write was already announced, and saying so twice reads as a second car.
+ */
+export function isFirstTcoAdd(state, key) {
+  return !state.tco[key]?.addedAt;
+}
+
 export function recordTcoAdd(state, key, now = new Date()) {
   const entry = state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
   entry.addedAt = entry.addedAt ?? now.toISOString();
