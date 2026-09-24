@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest'
 
-import { backupJson, parseBackup } from '../src/backup'
+import { NotABackupError, backupJson, importBackup, parseBackup } from '../src/backup'
 import { EMPTY_HOUSING, newProperty, type HousingData } from '../src/housingStorage'
 import { EMPTY_MILEAGE, newReading, type MileageData } from '../src/mileageStorage'
 import { newCar, normalizeData } from '../src/storage'
@@ -79,5 +79,42 @@ describe('the backup', () => {
     expect(back.housing?.properties[0].name).toBe('Half a place')
     expect(back.housing?.properties[0].price).toBe(215000)
     expect(back.housing?.situation).toEqual(EMPTY_HOUSING.situation)
+  })
+})
+
+describe('a file that is not a backup', () => {
+  // Read as a backup, any of these would be one with no cars, and the confirm
+  // would offer to empty the calculator. They are refused before anything is asked.
+
+  it('is refused, not read as an empty backup', () => {
+    for (const text of ['{"filters": []}', '[]', 'null', '"cars"', '{"cars": "none"}']) {
+      expect(() => parseBackup(text)).toThrow(NotABackupError)
+    }
+  })
+
+  it('is refused when it is not JSON at all, with the same plain message', () => {
+    expect(() => parseBackup('PK\u0003\u0004 not json')).toThrow(/not a backup from this app/)
+  })
+
+  it('names a VW Group data package for what it is', () => {
+    // The shape of an empty package from the portal - made-up identifiers.
+    const pkg = JSON.stringify({ vin: 'TESTVIN0000000000', user_id: 'someone', Data: [] })
+    expect(() => parseBackup(pkg)).toThrow(/vehicle data package/)
+  })
+
+  it('names a ZIP before trying to read it', async () => {
+    const zip = new File(['PK'], '20260923230947_TESTVIN0000000000_no_content_found.zip')
+    await expect(importBackup(zip)).rejects.toThrow(/ZIP file/)
+  })
+
+  it('still takes the emptiest real backup: a calculator with no cars yet', () => {
+    const empty = JSON.stringify(normalizeData({}))
+    expect(parseBackup(empty).data.cars).toEqual([])
+  })
+
+  it('still takes the oldest shape a backup ever had', () => {
+    // The first backups: version, settings and cars - no tombstones yet.
+    const first = JSON.stringify({ version: 1, settings: {}, cars: [{ name: 'Octavia' }] })
+    expect(parseBackup(first).data.cars[0].name).toBe('Octavia')
   })
 })

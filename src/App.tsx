@@ -10,7 +10,7 @@ import {
   saveSelection,
 } from './filtering'
 import { cloneLease, loadData, newCar, saveData } from './storage'
-import { exportBackup, importBackup } from './backup'
+import { NotABackupError, exportBackup, importBackup } from './backup'
 import { exportExcel, importExcel } from './excel'
 import {
   type SyncConfig,
@@ -334,11 +334,12 @@ export default function App() {
       const imported = await importBackup(file)
       // Counted only for what the file restores: an older backup has no
       // housing, or no mileage, and those sides are left as they are.
+      const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
       const tally = (cars: number, places: number | undefined, readings: number | undefined) =>
         [
-          `${cars} cars`,
-          places === undefined ? '' : `${places} places`,
-          readings === undefined ? '' : `${readings} readings`,
+          count(cars, 'car', 'cars'),
+          places === undefined ? '' : count(places, 'place', 'places'),
+          readings === undefined ? '' : count(readings, 'reading', 'readings'),
         ]
           .filter(Boolean)
           .join(', ')
@@ -374,9 +375,11 @@ export default function App() {
       if (imported.mileage) mileage.replace(imported.mileage)
     } catch (error) {
       window.alert(
-        error instanceof Error && isSpreadsheet
-          ? ['Could not read that spreadsheet.', '', error.message].join('\n')
-          : 'Could not read that file — it does not look like an export from this app.',
+        error instanceof NotABackupError
+          ? error.message
+          : error instanceof Error && isSpreadsheet
+            ? ['Could not read that spreadsheet.', '', error.message].join('\n')
+            : 'Could not read that file — it does not look like an export from this app.',
       )
     }
   }
