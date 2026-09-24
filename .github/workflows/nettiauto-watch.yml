@@ -78,7 +78,10 @@ jobs:
           # GIST_TOKEN does double duty: reading the filters made in the app,
           # and half of the reaction pickup. DISCORD_BOT_TOKEN is shared - one
           # bot reads every channel in every server it has been invited to.
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          #
+          # Posts go to #korvaraiskaus since 2026-09-24. The old #Molestar hook
+          # is still stored as DISCORD_WEBHOOK_URL; name it here to switch back.
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_KORVARAISKAUS }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
