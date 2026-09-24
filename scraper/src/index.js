@@ -30,8 +30,14 @@ const { default: config } = await import('./config.js');
 const { describeFilter, groupBySearch, loadFilters } = await import('./filters.js');
 const { evaluate } = await import('./filter.js');
 const { announce, announceText } = await import('./discord.js');
-const { crawlReadiness, failureSummary, needsPosting, postingReadiness, stalenessNotice } =
-  await import('./preflight.js');
+const {
+  channelAccessNotice,
+  crawlReadiness,
+  failureSummary,
+  needsPosting,
+  postingReadiness,
+  stalenessNotice,
+} = await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
@@ -357,8 +363,25 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
         '(see ../SETUP.md); otherwise check its View Channel and Read Message History ' +
         'permissions. Everything else for them is unaffected.',
     );
+    // The log line alone is what hid this in a green run. Recorded only once
+    // the alert is out, so a failed post is retried next run.
+    const notice = channelAccessNotice({
+      who: tenant.label,
+      blockedSince: store.reactionsBlockedSince ?? null,
+    });
+    if (notice && !dryRun) {
+      const sent = await announceText(notice, {
+        webhookUrl: config.discord.alertsWebhookUrl || webhookUrl,
+      }).then(
+        () => true,
+        () => false,
+      );
+      if (sent) store.reactionsBlockedSince = new Date().toISOString();
+    }
     return;
   }
+  // Readable again, so a later loss is news again.
+  delete store.reactionsBlockedSince;
   console.log(`Scanned ${scanned} Discord message(s); ${reacted.size} reacted listing(s).`);
   if (reacted.size === 0) return;
 

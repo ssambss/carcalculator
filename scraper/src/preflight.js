@@ -116,3 +116,26 @@ export function stalenessNotice({
     'arriving late rather than not at all. See PLAN.md, "the schedule".'
   );
 }
+
+/**
+ * What to tell the maintainer when the bot cannot read a channel it posts to,
+ * or null when that is not news.
+ *
+ * Once per loss, not per run or per twelve hours. A tenant who never invited
+ * the bot to their own server is a legitimate setup (README, "Several people,
+ * one watcher"), and repeating it every run would be noise. But nobody chooses
+ * to lose access by accident: on 2026-09-24 a new private channel left the bot
+ * out, and reactions did nothing in a run that finished green. Nobody knew
+ * until someone asked why. So the first run to find it blocked says so, and a
+ * run that can read the channel again clears the record, making a later loss
+ * news again.
+ */
+export function channelAccessNotice({ who, blockedSince = null }) {
+  if (blockedSince) return null;
+  return (
+    `🔒 Reactions are not being picked up for ${who}: the bot cannot read the channel ` +
+    'the listings are posted to. Add it to that channel (Edit Channel → Permissions) ' +
+    'with View Channel and Read Message History. Posting is unaffected. This is said ' +
+    'once, until access comes back and is lost again.'
+  );
+}

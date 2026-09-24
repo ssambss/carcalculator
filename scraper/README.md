@@ -73,9 +73,12 @@ because reading channel history is a bot operation: if the channel is in their
 server, the bot has to be invited there. `DISCORD_BOT_TOKEN` is shared, so one
 bot covers every server it has been added to.
 
-A tenant who has not invited it is not broken. The run notices, says so once,
-skips reactions for them alone and carries on for everyone else - they still get
-every post and add cars to the calculator by hand.
+A tenant who has not invited it is not broken. The run notices, skips reactions
+for them alone and carries on for everyone else - they still get every post and
+add cars to the calculator by hand. It posts one 🔒 alert to the alerts webhook
+the first time it finds a channel it cannot read, and stays quiet until access
+comes back and is lost again. A private channel the bot was never added to gets
+the same alert, since that is the case nobody chose.
 
 The step-by-step is [../SETUP.md](../SETUP.md). Two rules worth knowing here:
 

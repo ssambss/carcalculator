@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { backoffMs, isGone, isRetryableStatus, outcomeOf, retryAfterMs } from '../src/retry.js';
-import { crawlReadiness, stalenessNotice } from '../src/preflight.js';
+import { channelAccessNotice, crawlReadiness, stalenessNotice } from '../src/preflight.js';
 
 describe('which failures are worth another go', () => {
   it('retries the transient statuses', () => {
@@ -202,5 +202,24 @@ describe('noticing that the watcher went quiet', () => {
   it('stays quiet when switched off, or on a first run', () => {
     assert.equal(stalenessNotice({ ...base, lastRunAt: hoursAgo(6), staleAfterMinutes: 0 }), null);
     assert.equal(stalenessNotice({ ...base, lastRunAt: null }), null);
+  });
+});
+
+describe('noticing that the bot lost sight of a channel', () => {
+  it('says so the first time', () => {
+    // A private channel the bot was never added to made reactions do nothing in
+    // a green run, and nobody was told.
+    const notice = channelAccessNotice({ who: 'you' });
+    assert.match(notice, /not being picked up for you/);
+    assert.match(notice, /View Channel and Read Message History/);
+  });
+
+  it('does not repeat itself while the loss lasts', () => {
+    // A friend who never invited the bot is a legitimate setup; being told
+    // every run would be noise.
+    assert.equal(
+      channelAccessNotice({ who: 'you', blockedSince: '2026-09-24T13:00:00Z' }),
+      null,
+    );
   });
 });
