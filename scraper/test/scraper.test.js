@@ -24,6 +24,7 @@ import {
   loadFilters,
   normalizeFilter,
   normalizeFilters,
+  specOf,
 } from '../src/filters.js';
 import {
   buildListingUrl,
@@ -44,7 +45,9 @@ import {
   prune,
   record,
   recordFilterRun,
+  recordSpec,
   saveState,
+  specChanged,
   summarise,
   keyFor,
   keyOf,
@@ -817,6 +820,32 @@ describe('state', () => {
     assert.equal(isNewFilter(store, POLESTAR.id), true);
     recordFilterRun(store, POLESTAR);
     assert.equal(isNewFilter(store, POLESTAR.id), false);
+  });
+
+  it('notices when an edited filter keeps its id but changes its rules', async () => {
+    // A filter changed from Long Range to Standard Range went on rejecting
+    // cars for "variant does not say long range": its cached verdicts were
+    // keyed by id alone, and editing keeps the id.
+    const store = await loadState(await tempFile('seen.json'));
+    recordSpec(store, POLESTAR);
+    assert.equal(specChanged(store, POLESTAR), false);
+    const edited = { ...POLESTAR, variantMust: ['standard range'] };
+    assert.equal(specChanged(store, edited), true);
+  });
+
+  it('treats a record from before fingerprints as changed, so it is re-checked once', async () => {
+    const store = await loadState(await tempFile('seen.json'));
+    recordFilterRun(store, POLESTAR);
+    assert.equal(specChanged(store, POLESTAR), true);
+  });
+
+  it('fingerprints only what the matcher reads', () => {
+    // Renaming, pausing or changing postExisting re-evaluates nothing; the
+    // fingerprint is the same before and after normalising.
+    const same = specOf(POLESTAR);
+    assert.equal(specOf({ ...POLESTAR, name: 'Renamed', enabled: false, postExisting: false }), same);
+    assert.equal(specOf(normalizeFilter(POLESTAR)), same);
+    assert.notEqual(specOf({ ...POLESTAR, ranges: { price: { max: 30000 } } }), same);
   });
 
   it('forgets listings not seen for a long time', async () => {

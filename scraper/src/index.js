@@ -191,6 +191,16 @@ async function collectMatches(source, search, listings, filters) {
   let detailFetches = 0;
   let reusedVerdicts = 0;
 
+  // Per filter, once: hashing the spec for every listing would be wasted work.
+  const specChanged = new Map(
+    filters.map((filter) => [filter, state.specChanged(storeOf(filter), filter)]),
+  );
+  for (const filter of filters) {
+    if (specChanged.get(filter) && !state.isNewFilter(storeOf(filter), filter.id)) {
+      console.log(`  ${filter.name}: its spec changed, so every listing is checked afresh.`);
+    }
+  }
+
   for (const listing of listings) {
     const verdicts = new Map();
     let wantsDetail = false;
@@ -205,9 +215,12 @@ async function collectMatches(source, search, listings, filters) {
       // needs the detail page evidence.
       const key = state.keyFor(listing);
       const cached = state.verdictFor(store, key, filter.id);
+      // Only under the rules it was recorded with: an edited filter keeps its
+      // id, so without the spec check its old verdicts would outlive the edit.
       const canReuse =
         verdict.needsDetail &&
         cached &&
+        !specChanged.get(filter) &&
         !state.needsRecheck(store, listing, filter.id) &&
         (cached.status !== 'match' || state.wasAnnounced(store, key, filter.id));
 
@@ -262,6 +275,8 @@ async function collectMatches(source, search, listings, filters) {
       state.record(storeOf(filter), listing, filter.id, verdict, { detailChecked });
     }
   }
+
+  for (const filter of filters) state.recordSpec(storeOf(filter), filter);
 
   return { matches, rejected, detailFetches, reusedVerdicts };
 }

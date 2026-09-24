@@ -24,6 +24,7 @@
 // legal: it matches that whole listing page, which is exactly what you want
 // when scouting something you have no fixed spec for.
 
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -297,6 +298,48 @@ export function normalizeFilters(raw, { log = console.log } = {}) {
     out.push(filter);
   }
   return out;
+}
+
+/** JSON with sorted keys, so the same spec always prints the same. */
+function canonical(value) {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (value && typeof value === 'object') {
+    const keys = Object.keys(value).sort();
+    return `{${keys.map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value ?? null);
+}
+
+/**
+ * A short fingerprint of everything that decides a filter's verdicts.
+ *
+ * Editing a filter keeps its id, and verdicts are cached per id, so without
+ * this a spec change went unnoticed for up to two weeks. On 2026-09-24 a
+ * filter changed from Long Range to Standard Range kept rejecting cars for
+ * "variant does not say long range" and kept its old Long Range matches. The
+ * record keeps the fingerprint each filter last ran with, and a cached verdict
+ * is only reused while it still matches.
+ *
+ * Only what the matcher reads is in it. Renaming or pausing a filter, or
+ * changing whether it posts the cars already on sale, re-evaluates nothing.
+ */
+export function specOf(filter) {
+  const f = normalizeFilter(filter);
+  const spec = {
+    source: f.source,
+    search: f.search,
+    ranges: f.ranges,
+    variantMust: f.variantMust,
+    variantMustNot: f.variantMustNot,
+    textMust: f.textMust,
+    textMustNot: f.textMustNot,
+    packages: f.packages,
+    packageEvidence: f.packageEvidence,
+    acceptLesserPackages: f.acceptLesserPackages,
+    packageQualifiers: f.packageQualifiers,
+    implications: f.implications,
+  };
+  return createHash('sha256').update(canonical(spec)).digest('hex').slice(0, 16);
 }
 
 /** One line describing what a filter looks for, for the run log and --list. */

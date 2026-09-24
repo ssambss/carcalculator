@@ -482,7 +482,10 @@ A listing page is only fetched when the search card cannot settle the verdict â€
 which is where the option packages usually have to be read from. Verdicts are
 cached in the state file, so a steady-state run fetches almost no listing pages;
 rejected listings are re-read only if their price or mileage moved, or after two
-weeks.
+weeks. **Editing a filter throws its cache away.** The record keeps a
+fingerprint of the rules each filter last ran with, and a changed one means
+every listing is judged afresh on the next run. Renaming or pausing a filter
+doesn't count as a change.
 
 ## Matching the option packages
 

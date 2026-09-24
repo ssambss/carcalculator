@@ -18,6 +18,7 @@
 import config from './config.js';
 import { DEFAULT_STATE_PATH, storeFor } from './storage/index.js';
 import { fileStore } from './storage/file.js';
+import { specOf } from './filters.js';
 import { DEFAULT_SOURCE_ID } from './sources/index.js';
 
 export { DEFAULT_STATE_PATH };
@@ -280,6 +281,30 @@ export function record(state, listing, filterId, verdict, options = {}) {
 export function markAnnounced(state, key, filterId, now = new Date()) {
   const verdict = state.listings[key]?.filters?.[filterId];
   if (verdict) verdict.announcedAt = verdict.announcedAt ?? now.toISOString();
+}
+
+/**
+ * Has the filter's spec changed since its verdicts were recorded?
+ *
+ * If so, none of them may stand in for a fresh look: a rejection was a
+ * rejection under the old rules, and so was a match. A record from before
+ * fingerprints existed counts as changed, so every filter gets one full
+ * re-check the first time it runs with this code.
+ */
+export function specChanged(state, filter) {
+  return state.filters[filter.id]?.spec !== specOf(filter);
+}
+
+/**
+ * Note the spec a filter's verdicts were just formed under.
+ *
+ * Called once every listing has been judged, not when the run is stamped: a
+ * crawl that failed judged nothing, and recording the new spec then would let
+ * the old verdicts pass for new ones.
+ */
+export function recordSpec(state, filter) {
+  const entry = state.filters[filter.id] ?? (state.filters[filter.id] = { firstRunAt: null });
+  entry.spec = specOf(filter);
 }
 
 /** Has this filter ever completed a run? */
