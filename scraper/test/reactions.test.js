@@ -160,6 +160,45 @@ describe('reading a tenant\'s own channel', () => {
     });
     assert.equal(reacted.size, 0, 'the bot must not vote for a car on its own');
   });
+
+  it('lets people react to its plain notices without failing the run', async () => {
+    // The "added to the calculator" notice goes out through the same webhook
+    // as the listings, and a 👍 on it is only natural. It has text and no
+    // embed; a listing post whose embeds Discord withheld has neither.
+    const notice = {
+      id: 'n1',
+      webhook_id: '2',
+      content: '🧮 **Lisätty laskuriin:** Polestar 2 2021 · 101 tkm',
+      reactions: [{ count: 1 }],
+      embeds: [],
+    };
+    stubFetch([
+      ['webhooks/2', ok({ channel_id: 'c' })],
+      ['/channels/', ok([notice])],
+    ]);
+    const { reacted } = await fetchReactedListingIds({
+      botToken: 'b',
+      webhookUrl: 'https://discord.com/api/webhooks/2/alice',
+      scanMessages: 100,
+    });
+    assert.equal(reacted.size, 0);
+  });
+
+  it('still says so when Discord withholds a reacted listing post', async () => {
+    const stripped = { id: 'm1', webhook_id: '2', content: '', reactions: [{ count: 1 }], embeds: [] };
+    stubFetch([
+      ['webhooks/2', ok({ channel_id: 'c' })],
+      ['/channels/', ok([stripped])],
+    ]);
+    await assert.rejects(
+      fetchReactedListingIds({
+        botToken: 'b',
+        webhookUrl: 'https://discord.com/api/webhooks/2/alice',
+        scanMessages: 100,
+      }),
+      /Message Content Intent/,
+    );
+  });
 });
 
 describe('recovering a listing from a post', () => {

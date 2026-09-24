@@ -170,10 +170,14 @@ export async function fetchReactedListingIds({
       if (ourWebhookId && message.webhook_id && message.webhook_id !== ourWebhookId) continue;
       if (!hasQualifyingReaction(message, requiredEmoji)) continue;
       const listings = listingsIn(message);
-      // Every post of ours carries an embed. A reacted post of ours with none
-      // means Discord stripped them from the response, not that they're gone.
+      // Every listing post of ours carries an embed. A reacted post of ours
+      // with none means Discord stripped them from the response, not that
+      // they're gone - unless it has text: then it is one of our plain notices
+      // ("added to the calculator", a quiet schedule), and a 👍 on one of those
+      // must not fail the run as a missing Message Content Intent. Without the
+      // intent the text is stripped too, so that case is still caught.
       if (listings.length === 0 && (message.embeds ?? []).length === 0) {
-        strippedEmbeds += 1;
+        if (!message.content) strippedEmbeds += 1;
         continue;
       }
       for (const listing of listings) {

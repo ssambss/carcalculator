@@ -207,6 +207,9 @@ export async function addCarsToTco(listings, { now = new Date(), token } = {}) {
   return { added, skipped };
 }
 
+/** Under Discord's 2 000 characters, and under announceText's own 1 900 clamp. */
+const MESSAGE_BUDGET = 1900;
+
 const EUR = new Intl.NumberFormat('fi-FI', {
   style: 'currency',
   currency: 'EUR',
@@ -224,16 +227,34 @@ const EUR = new Intl.NumberFormat('fi-FI', {
  * Links are in <angle brackets> so Discord does not unfurl each one into a
  * second copy of the listing that is already in the channel.
  */
-export function addedMessage(listings, { appUrl = config.tco.appUrl } = {}) {
-  const line = (listing) => {
+export function addedMessage(
+  listings,
+  { appUrl = config.tco.appUrl, budget = MESSAGE_BUDGET } = {},
+) {
+  const described = (listing) => {
     const price = listing.price === null ? '' : ` · ${EUR.format(listing.price)}`;
-    return `${carName(listing)}${price} · <${listing.url}>`;
+    return `${carName(listing)}${price}`;
   };
+  const linked = (listing) => `${described(listing)} · <${listing.url}>`;
   const open = appUrl ? `\nAvaa laskuri: <${appUrl}>` : '';
-  if (listings.length === 1) return `🧮 **Lisätty laskuriin:** ${line(listings[0])}${open}`;
-  return (
-    `🧮 **Lisätty laskuriin ${listings.length} autoa:**\n` +
-    listings.map((listing) => `• ${line(listing)}`).join('\n') +
-    open
-  );
+  if (listings.length === 1) return `🧮 **Lisätty laskuriin:** ${linked(listings[0])}${open}`;
+
+  // Every car the run added, in the one message. When the links would push it
+  // past Discord's limit they go first: each car's listing post is in the
+  // channel above, and its card carries the link in its notes. Only a run
+  // adding dozens at once is cut short, and it says how many it left out.
+  const head = `🧮 **Lisätty laskuriin ${listings.length} autoa:**`;
+  for (const line of [linked, described]) {
+    const text = [head, ...listings.map((listing) => `• ${line(listing)}`)].join('\n') + open;
+    if (text.length <= budget) return text;
+  }
+  const lines = [];
+  let used = head.length + open.length + '\n…ja 999 muuta'.length;
+  for (const listing of listings) {
+    const next = `• ${described(listing)}`;
+    if (used + next.length + 1 > budget) break;
+    lines.push(next);
+    used += next.length + 1;
+  }
+  return [head, ...lines, `…ja ${listings.length - lines.length} muuta`].join('\n') + open;
 }

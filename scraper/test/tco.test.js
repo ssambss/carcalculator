@@ -180,6 +180,25 @@ describe('saying a reacted car has arrived', () => {
     assert.equal(text.split('\n').filter((line) => line.startsWith('• ')).length, 2);
   });
 
+  it('fits every car into the one message, dropping links before cars', () => {
+    // Twenty cars with links is well past Discord's limit. Cutting the text
+    // would silently drop cars from the notice; dropping the links does not.
+    const many = Array.from({ length: 20 }, (_, i) => ({ ...polestar, id: String(i), year: 2000 + i }));
+    const text = addedMessage(many, { appUrl });
+    assert.ok(text.length <= 1900);
+    for (const car of many) assert.ok(text.includes(carName(car)), `${car.year} is missing`);
+    assert.ok(text.includes(`<${appUrl}>`), 'the calculator link stays');
+  });
+
+  it('says how many it left out when even the names do not fit', () => {
+    const lots = Array.from({ length: 60 }, (_, i) => ({ ...polestar, id: String(i) }));
+    const text = addedMessage(lots, { appUrl });
+    assert.ok(text.length <= 1900);
+    const listed = text.split('\n').filter((line) => line.startsWith('• ')).length;
+    assert.match(text, new RegExp(`…ja ${60 - listed} muuta`));
+    assert.match(text, /60 autoa/);
+  });
+
   it('leaves out what it does not know', () => {
     const text = addedMessage([{ ...polestar, price: null }], { appUrl: '' });
     assert.doesNotMatch(text, /€/);
