@@ -17,15 +17,25 @@ on:
     # minutes - so moving off :00/:30 was not the fix it looked like.
     #
     # So ask for far more than we want and throttle in the watcher instead
-    # (fetch.minIntervalMinutes, default 25). Taking all twelve would be six
+    # (fetch.minIntervalMinutes, default 20). Taking all twelve would be six
     # times the load on a site that owes us nothing; asking for twelve and
     # crawling at most twice an hour converges on the rate we intend, whatever
     # GitHub delivers - and self-corrects if their scheduler improves.
     #
     # Every minute is off the quarter-hours, the most oversubscribed of all.
     - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+  # The schedule above is only the backstop. What actually keeps time is an
+  # outside cron (cron-job.org) calling this trigger every 30 minutes through
+  # the REST API with force: false: GitHub starts a dispatched run within
+  # seconds, every time, where it silently drops most scheduled firings - on
+  # the twelve-an-hour schedule, about 7 runs a day out of 288. See
+  # scraper/README.md, "Running it on a schedule".
   workflow_dispatch:
     inputs:
+      force:
+        description: 'Crawl even if the last crawl was under 20 minutes ago'
+        type: boolean
+        default: true
       dry_run:
         description: 'Check and report, but post nothing and save no state'
         type: boolean
@@ -82,12 +92,15 @@ jobs:
           # Posts go to #korvaraiskaus since 2026-09-24. The old #Molestar hook
           # is still stored as DISCORD_WEBHOOK_URL; name it here to switch back.
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_KORVARAISKAUS }}
+          # Failed runs and a quiet schedule go to the maintainer's #Molestar,
+          # not into the listings channel of somebody who cannot fix them.
+          DISCORD_ALERTS_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           node src/index.js \
             --notify-errors \
-            ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }} \
+            ${{ inputs.force && '--force' || '' }} \
             ${{ inputs.dry_run && '--dry-run' || '' }} \
             ${{ inputs.seed && '--seed' || '' }}
 
@@ -112,3 +125,19 @@ jobs:
           done
           echo "Could not push the state file after 3 attempts." >&2
           exit 1
+
+      # A dead man's switch at healthchecks.io. Nothing inside a run can report
+      # that runs have stopped - the week GitHub held every run as "possibly
+      # malicious" nothing failed, so nothing said so. This pings on every run,
+      # /fail on a red one, and healthchecks.io alerts when the pings stop
+      # coming. Optional: without the secret the step does nothing.
+      - name: Check in
+        if: ${{ always() && !inputs.dry_run }}
+        env:
+          HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+          OUTCOME: ${{ job.status }}
+        run: |
+          [ -n "$HEALTHCHECK_URL" ] || exit 0
+          suffix=''
+          [ "$OUTCOME" = success ] || suffix='/fail'
+          curl -fsS -m 10 --retry 3 -o /dev/null "$HEALTHCHECK_URL$suffix" || echo "Check-in failed." >&2

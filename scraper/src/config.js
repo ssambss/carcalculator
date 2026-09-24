@@ -53,8 +53,12 @@ export const config = {
      *
      * Set below the intended gap rather than at it, or a firing that arrives a
      * minute early gets thrown away and the next chance is five minutes later.
+     * The gap is measured from the end of the last crawl, so against the
+     * outside cron's 30 minutes it also has to absorb a slow crawl: at 25, one
+     * that took six minutes made the next trigger 24 minutes later - too soon -
+     * and the half-hour became an hour.
      */
-    minIntervalMinutes: 25,
+    minIntervalMinutes: 20,
   },
 
   /**
@@ -74,6 +78,10 @@ export const config = {
   discord: {
     // Never hardcode these - both are write-capable secrets.
     webhookUrl: process.env.DISCORD_WEBHOOK_URL ?? '',
+    // Where the watcher's own trouble goes - a failed run, a quiet schedule.
+    // Whoever maintains the watcher, not whoever reads the listings: they are
+    // the one who can fix it. Empty falls back to webhookUrl.
+    alertsWebhookUrl: process.env.DISCORD_ALERTS_WEBHOOK_URL ?? '',
     // Only needed for the reaction pickup below; posting works without it.
     botToken: process.env.DISCORD_BOT_TOKEN ?? '',
     username: 'Nettiauto-vahti',

@@ -835,8 +835,9 @@ async function main() {
   });
   if (stale) {
     console.warn(`\nWATCHER WAS QUIET: ${stale}`);
-    if (needsPosting(args) && tenants[0]?.webhookUrl) {
-      await announceText(`⏰ ${stale}`, { webhookUrl: tenants[0].webhookUrl }).catch(() => {});
+    const alertsTo = config.discord.alertsWebhookUrl || tenants[0]?.webhookUrl;
+    if (needsPosting(args) && alertsTo) {
+      await announceText(`⏰ ${stale}`, { webhookUrl: alertsTo }).catch(() => {});
       // Recorded on the same store the gap was read from, so the rate limit
       // survives even if this run then fails for some other reason.
       await state.saveState({ ...clock, staleNoticeAt: new Date().toISOString() }, clockStore);
@@ -1004,6 +1005,7 @@ try {
   if (process.env.DEBUG) console.error(error.stack);
   if (process.argv.includes('--notify-errors')) {
     await announceText(`⚠️ ${config.discord.username} failed: ${error.message}`, {
+      webhookUrl: config.discord.alertsWebhookUrl || config.discord.webhookUrl,
       dryRun: process.argv.includes('--dry-run'),
     }).catch(() => {});
   }

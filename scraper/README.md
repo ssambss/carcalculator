@@ -324,7 +324,7 @@ variables always win over the file, so CI secrets override it.
 | `filters.gistFilename` | `'car-tco-filters.json'` | Where the app syncs filters |
 | `fetch.delayMs` | `1500` | Gap between requests, per host |
 | `fetch.maxSearchPages` | `40` | Per search, not per run |
-| `fetch.minIntervalMinutes` | `25` | Least time between crawls, whatever the schedule delivers |
+| `fetch.minIntervalMinutes` | `20` | Least time between crawls, whatever the schedule delivers |
 | `fetch.retries` | `5` | Attempts per request, backing off exponentially with jitter |
 | `fetch.maxFailedPages` | `3` | Pages of one search that may fail before it is abandoned |
 | `liveness.staleAfterMinutes` | `120` | Say something when the last run was longer ago than this |
@@ -346,26 +346,56 @@ not a car at all, that is a new source — see *Sources* above.
 ## Running it on a schedule
 
 [`.github/workflows/nettiauto-watch.yml`](../.github/workflows/nettiauto-watch.yml)
-asks to run twelve times an hour and commits `data/seen.json` back to the repo so
-the record survives between runs.
+runs the watcher and commits `data/seen.json` back to the repo so the record
+survives between runs. Three things keep it running and make a stop visible.
 
-**Twelve, to get two.** GitHub runs scheduled jobs on best-effort shared capacity
-and drops most of them: measured over four days on a 30-minute schedule, **17 runs
-against an expected 185** — a 9 % hit rate with a median gap of 5.7 hours, and
-none of the misses ours (no cancelled runs, every run under three minutes). So the
-workflow over-asks and `fetch.minIntervalMinutes` decides which firing actually
-crawls, which converges on the intended rate without becoming six times the load
-on nettiauto if GitHub ever delivers them all. A gap past
-`liveness.staleAfterMinutes` posts a notice, because otherwise the degradation is
-invisible: every individual run succeeds. Set up:
+**An outside cron starts it, not GitHub's.** GitHub runs scheduled jobs on
+best-effort shared capacity and drops most of them. Measured on a 30-minute
+schedule: **17 runs against an expected 185** over four days, median gap 5.7
+hours. Asking for twelve an hour only raised that to about 7 runs a day out of
+288. A `workflow_dispatch` through the REST API, by contrast, starts within
+seconds every time. So [cron-job.org](https://cron-job.org) (free) calls it every
+30 minutes:
 
-1. Repo **Settings → Secrets and variables → Actions → New repository secret**,
-   named `DISCORD_WEBHOOK_URL`.
+| | |
+|---|---|
+| URL | `https://api.github.com/repos/<owner>/<repo>/actions/workflows/nettiauto-watch.yml/dispatches` |
+| Method | `POST` |
+| Headers | `Authorization: Bearer <token>`, `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28` |
+| Body | `{"ref":"main","inputs":{"force":false}}` |
+
+The token is a fine-grained one limited to this repository, with **Actions: Read
+and write** and nothing else. It can start and cancel workflow runs, not read
+code or secrets. `force: false` keeps `fetch.minIntervalMinutes` in charge, so
+the outside cron and GitHub's own schedule, still there as a backstop, never
+crawl twice within 20 minutes. The *Run workflow* button in the Actions tab
+defaults to `force: true`, so a deliberate run always crawls.
+
+**A dead man's switch says when it stops.** Nothing inside a run can report that
+runs have stopped happening. For a week in August–September 2026 GitHub held
+every run as "possibly malicious" (see the workflow's comments). Nothing
+failed, so nothing said so. Every run now checks in with
+[healthchecks.io](https://healthchecks.io) (free), adding `/fail` when the run
+went red. Set the check to a 30-minute period with a 1-hour grace, and connect
+its Discord or email integration. Its ping URL goes in the `HEALTHCHECK_URL`
+secret; without that secret the step does nothing.
+
+**Trouble goes to the maintainer.** A failed run (`--notify-errors`) and a quiet
+schedule (`liveness.staleAfterMinutes`) post to `DISCORD_ALERTS_WEBHOOK_URL`,
+falling back to the listings webhook when it is unset. Whoever reads the listings
+usually cannot fix the watcher.
+
+Set up:
+
+1. Repo **Settings → Secrets and variables → Actions → New repository secret**:
+   `DISCORD_WEBHOOK_URL` (the workflow maps whichever secret it names onto it),
+   and optionally an alerts webhook and `HEALTHCHECK_URL`.
 2. Add `GIST_TOKEN` too, if you want the filters made in the app to reach the
    scheduled runs. Without it they run on the committed `filters.json`, quietly
    and correctly, but a filter created in the UI never arrives.
 3. Commit `scraper/data/seen.json` (it must **not** be gitignored — it is how
    runs remember each other).
+4. The outside cron and the health check, as above.
 
 Locally instead, any scheduler works — Windows Task Scheduler or cron calling
 `node src/index.js` in this directory.
