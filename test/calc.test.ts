@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CATEGORIES,
   STANDARD_BALLOON_SHARE,
+  byOutOfPocket,
   calcLease,
   calcLoan,
   calcTco,
@@ -152,6 +153,16 @@ describe('the loan', () => {
     expect(resolveBalloon(loaned({ autoBalloon: false, balloon: 4000 }))).toBe(4000)
     // Cash and lease have no balloon to resolve.
     expect(resolveBalloon(car())).toBe(0)
+  })
+
+  it('reports the balloon it was built with, for the card to show', () => {
+    // The out-of-pocket headline leaves the balloon out, so the card names it
+    // beside the number - which needs the loan to say what it was.
+    expect(calcLoan(loaned({ autoBalloon: true })).balloon).toBe(7500)
+    expect(calcLoan(loaned()).balloon).toBe(0)
+    // Never more than was borrowed: a balloon bigger than the loan is the loan.
+    expect(calcLoan(loaned({ downPayment: 25000, balloon: 9000 })).balloon).toBe(5000)
+    expect(calcLoan(car()).balloon).toBe(0)
   })
 
   it('counts only the interest accrued by the time the car is sold', () => {
@@ -411,5 +422,35 @@ describe('a period of zero', () => {
     expect(Number.isFinite(result.perKm)).toBe(true)
     expect(result.perMonth).toBe(0)
     expect(result.perKm).toBe(0)
+  })
+})
+
+describe('the list order', () => {
+  const loan = (id: string, purchasePrice: number) =>
+    car({
+      id,
+      purchasePrice,
+      financing: {
+        method: 'loan',
+        downPayment: 0,
+        annualRatePct: 6,
+        termMonths: 60,
+        autoBalloon: false,
+        balloon: 0,
+      },
+    })
+  const order = (cars: CarListing[]) => {
+    const results = new Map(cars.map((c) => [c.id, calcTco(c, settings)]))
+    return [...cars].sort(byOutOfPocket(results)).map((c) => c.id)
+  }
+
+  it('puts the least out of pocket first', () => {
+    expect(order([loan('dear', 40000), loan('cheap', 20000)])).toEqual(['cheap', 'dear'])
+  })
+
+  it('does not let a cash car win for having no payment', () => {
+    // Its monthly figure is running costs alone; its price left on day one.
+    const cash = car({ id: 'cash', purchasePrice: 60000, insurancePerYear: 1200 })
+    expect(order([cash, loan('loan', 20000)])).toEqual(['loan', 'cash'])
   })
 })

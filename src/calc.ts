@@ -28,6 +28,8 @@ export interface LoanInfo {
   loanAmount: number
   monthlyPayment: number
   totalInterest: number
+  /** paid in one go when the term ends — not in `outOfPocketPerMonth` */
+  balloon: number
 }
 
 export interface LeaseInfo {
@@ -59,8 +61,11 @@ export interface TcoResult {
   runningPerMonth: number
   /**
    * What actually leaves the account each month during the financing term:
-   * the loan/lease payment plus running costs. The budget line — unlike
-   * `perMonth`, which is the economic cost with resale netted out.
+   * the loan/lease payment plus running costs. The budget line, and the
+   * headline everywhere — `perMonth` nets out a resale value that is only an
+   * estimate and arrives years later, which makes it the easier number to
+   * talk yourself into. Leaves out the down payment and a loan's balloon;
+   * the card says so beside it.
    */
   outOfPocketPerMonth: number
   loan: LoanInfo
@@ -113,7 +118,7 @@ export function resolveResaleValue(
     : car.expectedResaleValue
 }
 
-const NO_LOAN: LoanInfo = { loanAmount: 0, monthlyPayment: 0, totalInterest: 0 }
+const NO_LOAN: LoanInfo = { loanAmount: 0, monthlyPayment: 0, totalInterest: 0, balloon: 0 }
 
 /** Standardized final balloon payment for loan financing: 25 % of purchase price. */
 export const STANDARD_BALLOON_SHARE = 0.25
@@ -170,6 +175,7 @@ export function calcLoan(car: CarListing, horizonMonths?: number): LoanInfo {
     loanAmount: principal,
     monthlyPayment: payment,
     totalInterest,
+    balloon,
   }
 }
 
@@ -242,6 +248,21 @@ export function energyCostPerYear(car: CarListing, settings: Settings): number {
       return electric + fuel
     }
   }
+}
+
+/**
+ * List order: least out of pocket per month first.
+ *
+ * A cash car's monthly figure is its running costs alone - the price left the
+ * account on day one - so beside financed cars it would always come first and
+ * take the "lowest monthly" badge for not having a payment. Cash cars follow
+ * the financed ones instead, cheapest first among themselves; the comparison
+ * table leaves them out of its lowest-highlight for the same reason.
+ */
+export function byOutOfPocket(results: ReadonlyMap<string, TcoResult>) {
+  const monthly = (car: CarListing) => results.get(car.id)?.outOfPocketPerMonth ?? 0
+  const isCash = (car: CarListing) => Number(car.financing.method === 'cash')
+  return (a: CarListing, b: CarListing) => isCash(a) - isCash(b) || monthly(a) - monthly(b)
 }
 
 /** `yearsOverride` costs the car over a different window than its own (e.g. the

@@ -577,6 +577,14 @@ select option {
   color: var(--ink-3);
 }
 
+/* What the headline leaves out. It belongs to the number above it, so it
+   takes back most of the card's row gap rather than floating as its own row. */
+.hero-note {
+  margin-top: -10px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
 .badge-good {
   display: inline-flex;
   align-items: center;

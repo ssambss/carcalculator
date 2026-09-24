@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData, CarListing } from './types'
-import { calcTco } from './calc'
+import { byOutOfPocket, calcTco } from './calc'
 import {
   type Filters,
   NO_FILTERS,
@@ -210,10 +210,7 @@ export default function App() {
   )
 
   const sortedCars = useMemo(
-    () =>
-      [...data.cars].sort(
-        (a, b) => (results.get(a.id)?.perMonth ?? 0) - (results.get(b.id)?.perMonth ?? 0),
-      ),
+    () => [...data.cars].sort(byOutOfPocket(results)),
     [data.cars, results],
   )
 
@@ -226,7 +223,8 @@ export default function App() {
   )
 
   const cheapestId =
-    visibleCars.length > 1 && (results.get(visibleCars[0].id)?.total ?? 0) > 0
+    visibleCars.length > 1 &&
+    (results.get(visibleCars[0].id)?.outOfPocketPerMonth ?? 0) > 0
       ? visibleCars[0].id
       : null
 

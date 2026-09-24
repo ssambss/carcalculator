@@ -32,6 +32,20 @@ export function ComparisonTable({ cars, results, settings }: Props) {
         ? 'Lease payment / mo'
         : 'Loan payment / mo'
 
+  const anyFinanced = anyLoan || anyLease
+  const anyBalloon = tcos.some((t) => t.loan.balloon > 0)
+  // A cash car's monthly outlay is running costs alone - its price left the
+  // account on day one - so beside financed cars it would always look cheapest.
+  const outOfPocket = tcos.map((t, i) =>
+    anyFinanced && cars[i].financing.method === 'cash' ? Infinity : t.outOfPocketPerMonth,
+  )
+  const upfrontOf = (c: CarListing) =>
+    c.financing.method === 'cash'
+      ? c.purchasePrice
+      : c.financing.method === 'lease'
+        ? c.lease.upfront
+        : c.financing.downPayment
+
   // Absolute sums across different periods aren't comparable — no highlight there
   const suppressAbsolute = mixedPeriods && !normalized
 
@@ -94,6 +108,84 @@ export function ComparisonTable({ cars, results, settings }: Props) {
             </tr>
           </thead>
           <tbody>
+            {/* The monthly outlay leads: it is the budget line, where the costs
+                below net out a resale value that is only an estimate. */}
+            <tr className="total-row">
+              <th className="rowhead">Out of pocket / mo</th>
+              {cars.map((c, i) => (
+                <td
+                  key={c.id}
+                  className={`num${
+                    anyFinanced && c.financing.method === 'cash'
+                      ? ' muted'
+                      : minClass(outOfPocket, i)
+                  }`}
+                >
+                  {fmtEur(tcos[i].outOfPocketPerMonth)}
+                </td>
+              ))}
+            </tr>
+            {(anyLoan || anyLease) && (
+              <tr>
+                <th className="rowhead">{financedLabel}</th>
+                {cars.map((c, i) =>
+                  c.financing.method === 'cash' ? (
+                    <td key={c.id} className="num muted">
+                      —
+                    </td>
+                  ) : (
+                    <td key={c.id} className="num">
+                      {fmtEurExact(
+                        c.financing.method === 'lease'
+                          ? tcos[i].lease.monthlyPayment
+                          : tcos[i].loan.monthlyPayment,
+                      )}
+                    </td>
+                  ),
+                )}
+              </tr>
+            )}
+            <tr>
+              <th className="rowhead">Running costs / mo</th>
+              {cars.map((c, i) => (
+                <td
+                  key={c.id}
+                  className={`num${minClass(
+                    tcos.map((t) => t.runningPerMonth),
+                    i,
+                  )}`}
+                >
+                  {fmtEur(tcos[i].runningPerMonth)}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th className="rowhead">Paid up front</th>
+              {cars.map((c) => (
+                <td key={c.id} className={`num${upfrontOf(c) > 0 ? '' : ' muted'}`}>
+                  {fmtEur(upfrontOf(c))}
+                </td>
+              ))}
+            </tr>
+            {anyBalloon && (
+              <tr>
+                <th className="rowhead">Balloon at the end</th>
+                {cars.map((c, i) =>
+                  tcos[i].loan.balloon > 0 ? (
+                    <td key={c.id} className="num">
+                      {fmtEur(tcos[i].loan.balloon)}
+                    </td>
+                  ) : (
+                    <td key={c.id} className="num muted">
+                      —
+                    </td>
+                  ),
+                )}
+              </tr>
+            )}
+            <tr className="cmp-group">
+              <th colSpan={cars.length + 1}>Cost of ownership, resale netted out</th>
+            </tr>
             {visibleCategories.map((cat) => {
               const values = tcos.map((t) => t.breakdown[cat.key])
               return (
@@ -129,7 +221,7 @@ export function ComparisonTable({ cars, results, settings }: Props) {
               ))}
             </tr>
             <tr>
-              <th className="rowhead">Per month</th>
+              <th className="rowhead">Per month after resale</th>
               {cars.map((c, i) => (
                 <td
                   key={c.id}
@@ -139,20 +231,6 @@ export function ComparisonTable({ cars, results, settings }: Props) {
                   )}`}
                 >
                   {fmtEur(tcos[i].perMonth)}
-                </td>
-              ))}
-            </tr>
-            <tr>
-              <th className="rowhead">Running costs / mo</th>
-              {cars.map((c, i) => (
-                <td
-                  key={c.id}
-                  className={`num${minClass(
-                    tcos.map((t) => t.runningPerMonth),
-                    i,
-                  )}`}
-                >
-                  {fmtEur(tcos[i].runningPerMonth)}
                 </td>
               ))}
             </tr>
@@ -170,39 +248,6 @@ export function ComparisonTable({ cars, results, settings }: Props) {
                 </td>
               ))}
             </tr>
-            {(anyLoan || anyLease) && (
-              <tr>
-                <th className="rowhead">{financedLabel}</th>
-                {cars.map((c, i) =>
-                  c.financing.method === 'cash' ? (
-                    <td key={c.id} className="num muted">
-                      —
-                    </td>
-                  ) : (
-                    <td key={c.id} className="num">
-                      {fmtEurExact(
-                        c.financing.method === 'lease'
-                          ? tcos[i].lease.monthlyPayment
-                          : tcos[i].loan.monthlyPayment,
-                      )}
-                    </td>
-                  ),
-                )}
-              </tr>
-            )}
-            {(anyLoan || anyLease) && (
-              <tr>
-                <th className="rowhead">Out of pocket / mo</th>
-                {cars.map((c, i) => (
-                  <td
-                    key={c.id}
-                    className={`num${c.financing.method === 'cash' ? ' muted' : ''}`}
-                  >
-                    {fmtEur(tcos[i].outOfPocketPerMonth)}
-                  </td>
-                ))}
-              </tr>
-            )}
           </tbody>
         </table>
       </div>

@@ -447,16 +447,16 @@ const COLUMNS: Column[] = [
 
   // --- Computed from here down: written for reading, ignored on import. ---
   {
-    header: '→ € / month',
-    width: 13,
-    format: '#,##0',
-    get: (car, settings) => Math.round(calcTco(car, settings).perMonth),
-  },
-  {
     header: '→ Out of pocket / month',
     width: 21,
     format: '#,##0',
     get: (car, settings) => Math.round(calcTco(car, settings).outOfPocketPerMonth),
+  },
+  {
+    header: '→ After resale / month',
+    width: 20,
+    format: '#,##0',
+    get: (car, settings) => Math.round(calcTco(car, settings).perMonth),
   },
   {
     header: '→ € / km',

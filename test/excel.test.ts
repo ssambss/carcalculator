@@ -83,7 +83,7 @@ describe('the workbook that comes out', () => {
 
   it('includes the computed figures for reading', async () => {
     const [cars] = await sheetsOf(app([car({ autoResale: false, expectedResaleValue: 15000 })]))
-    const at = columnHeaders().indexOf('→ € / month')
+    const at = columnHeaders().indexOf('→ After resale / month')
     expect(typeof cars.data[1][at]).toBe('number')
     expect(cars.data[1][at]).toBeGreaterThan(0)
   })

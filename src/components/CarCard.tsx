@@ -32,6 +32,21 @@ export function CarCard({
 }: Props) {
   const isLoan = car.financing.method === 'loan'
   const isLease = car.financing.method === 'lease'
+  // The headline is what leaves the account each month, so whatever it leaves
+  // out has to sit right under it - a monthly figure that quietly skips a
+  // 12 000 € balloon is its own kind of watered down.
+  const heroNote = isLoan
+    ? [
+        `loan + running costs for ${fmtNum(car.financing.termMonths)} mo`,
+        car.financing.downPayment > 0 && `${fmtEur(car.financing.downPayment)} down`,
+        tco.loan.balloon > 0 && `${fmtEur(tco.loan.balloon)} balloon at the end`,
+      ]
+    : isLease
+      ? [
+          'lease + running costs',
+          car.lease.upfront > 0 && `${fmtEur(car.lease.upfront)} upfront per contract`,
+        ]
+      : ['running costs only', `${fmtEur(car.purchasePrice)} paid up front`]
   return (
     <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
@@ -74,8 +89,8 @@ export function CarCard({
 
       <div className="hero-row">
         <div>
-          <span className="hero-value display">{fmtEur(tco.perMonth)}</span>
-          <span className="hero-unit">/mo</span>
+          <span className="hero-value display">{fmtEur(tco.outOfPocketPerMonth)}</span>
+          <span className="hero-unit">/mo out of pocket</span>
         </div>
         {cheapest && (
           <span className="badge-good">
@@ -91,42 +106,38 @@ export function CarCard({
             >
               <path d="M2 6.5l2.5 2.5L10 3.5" />
             </svg>
-            Lowest cost
+            Lowest monthly
           </span>
         )}
       </div>
+      <div className="hero-note">{heroNote.filter(Boolean).join(' · ')}</div>
 
       <div className="stat-row">
+        {(isLoan || isLease) && (
+          <div className="stat">
+            <span className="stat-label">{isLoan ? 'Loan / mo' : 'Lease / mo'}</span>
+            <span className="stat-value">
+              {fmtEurExact(isLoan ? tco.loan.monthlyPayment : tco.lease.monthlyPayment)}
+            </span>
+          </div>
+        )}
         <div className="stat">
-          <span className="stat-label">Per km</span>
-          <span className="stat-value">{fmtEurExact(tco.perKm)}</span>
+          <span className="stat-label">Running / mo</span>
+          <span className="stat-value">{fmtEur(tco.runningPerMonth)}</span>
+        </div>
+        <div className="stat">
+          {/* Nothing is sold at the end of a lease, so there is no resale to net out. */}
+          <span className="stat-label">{isLease ? 'All-in / mo' : 'After resale / mo'}</span>
+          <span className="stat-value">{fmtEur(tco.perMonth)}</span>
         </div>
         <div className="stat">
           <span className="stat-label">Over {fmtNum(tco.years)} yrs</span>
           <span className="stat-value">{fmtEur(tco.total)}</span>
         </div>
         <div className="stat">
-          <span className="stat-label">Running / mo</span>
-          <span className="stat-value">{fmtEur(tco.runningPerMonth)}</span>
+          <span className="stat-label">Per km</span>
+          <span className="stat-value">{fmtEurExact(tco.perKm)}</span>
         </div>
-        <div className="stat">
-          <span className="stat-label">
-            {isLoan ? 'Loan / mo' : isLease ? 'Lease / mo' : 'Financing'}
-          </span>
-          <span className="stat-value">
-            {isLoan
-              ? fmtEurExact(tco.loan.monthlyPayment)
-              : isLease
-                ? fmtEurExact(tco.lease.monthlyPayment)
-                : 'Cash'}
-          </span>
-        </div>
-        {(isLoan || isLease) && (
-          <div className="stat">
-            <span className="stat-label">Out of pocket / mo</span>
-            <span className="stat-value">{fmtEur(tco.outOfPocketPerMonth)}</span>
-          </div>
-        )}
       </div>
 
       <BreakdownBar breakdown={tco.breakdown} total={tco.total} />

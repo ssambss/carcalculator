@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData } from './types'
-import { calcTco, type TcoResult } from './calc'
+import { byOutOfPocket, calcTco, type TcoResult } from './calc'
 import { type Filters, NO_FILTERS, listMakes, matchesFilters } from './filtering'
 import { fmtDateTime, fmtNum } from './format'
 import { pullGistPublic } from './sync'
@@ -62,9 +62,7 @@ export function ViewerApp({ gistId }: { gistId: string }) {
 
   const sortedCars = useMemo(() => {
     if (!data) return []
-    return [...data.cars].sort(
-      (a, b) => (results.get(a.id)?.perMonth ?? 0) - (results.get(b.id)?.perMonth ?? 0),
-    )
+    return [...data.cars].sort(byOutOfPocket(results))
   }, [data, results])
 
   const visibleCars = useMemo(
@@ -73,7 +71,8 @@ export function ViewerApp({ gistId }: { gistId: string }) {
   )
 
   const cheapestId =
-    visibleCars.length > 1 && (results.get(visibleCars[0].id)?.total ?? 0) > 0
+    visibleCars.length > 1 &&
+    (results.get(visibleCars[0].id)?.outOfPocketPerMonth ?? 0) > 0
       ? visibleCars[0].id
       : null
 
