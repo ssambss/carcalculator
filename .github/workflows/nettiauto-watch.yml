@@ -61,22 +61,26 @@ jobs:
       - name: Check for new listings
         working-directory: scraper
         env:
-          # The whole secret set, in one variable, parsed by src/tenants.js.
+          # Every secret is named, never `SECRETS_JSON: ${{ toJSON(secrets) }}`.
           #
-          # Actions only puts a secret in the environment if the workflow names
-          # it, so naming them individually would mean editing this file - and
-          # committing - every time somebody is added. This way onboarding is
-          # two secrets in the settings UI and nothing else:
+          # The whole set in one variable made onboarding commit-free, but
+          # dumping every secret into a step is what exfiltration looks like:
+          # from 2026-08-30 GitHub held each scheduled run as "this workflow
+          # file may be malicious" (conclusion action_required, no jobs), and
+          # the watcher sat silent for a week with nothing failing.
           #
-          #   TENANT_<NAME>_GIST_TOKEN   their gist token
-          #   TENANT_<NAME>_WEBHOOK      the webhook for their channel
-          #   TENANT_<NAME>_LABEL        optional, for names a secret cannot spell
+          # So adding somebody is two secrets in the settings UI plus their two
+          # lines here (src/tenants.js reads plain variables just the same):
           #
-          # Your own stay as DISCORD_WEBHOOK_URL and GIST_TOKEN. GIST_TOKEN does
-          # double duty: reading the filters made in the app, and half of the
-          # reaction pickup. DISCORD_BOT_TOKEN is shared - one bot reads every
-          # channel in the server.
-          SECRETS_JSON: ${{ toJSON(secrets) }}
+          #   TENANT_<NAME>_GIST_TOKEN: ${{ secrets.TENANT_<NAME>_GIST_TOKEN }}
+          #   TENANT_<NAME>_WEBHOOK:    ${{ secrets.TENANT_<NAME>_WEBHOOK }}
+          #
+          # GIST_TOKEN does double duty: reading the filters made in the app,
+          # and half of the reaction pickup. DISCORD_BOT_TOKEN is shared - one
+          # bot reads every channel in every server it has been invited to.
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           node src/index.js \
             --notify-errors \

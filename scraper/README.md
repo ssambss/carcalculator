@@ -50,8 +50,10 @@ who owns them, so two people watching the same model cost one fetch, not two,
 and a listing page that both need read costs one request. A tenth person is
 nearly free.
 
-A person is declared entirely by their secrets, so onboarding is two of them and
-no commit:
+A person is declared by their secrets, so onboarding is two of them, plus the
+two lines in the workflow that hand those secrets to the run (Actions passes a
+step only the secrets it names; passing them all at once with
+`toJSON(secrets)` got the workflow flagged as possibly malicious):
 
 | Secret | |
 |---|---|

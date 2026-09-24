@@ -189,9 +189,20 @@ turns the ten minutes below into confirmation rather than explanation.
 | `TENANT_ALICE_WEBHOOK` | the webhook from step 1 |
 | `TENANT_ALICE_LABEL` | *optional* — a display name a secret cannot spell, e.g. `Alice Mäkinen` |
 
-That is all of it. **No YAML to edit and nothing to commit** — the workflow hands
-the whole secret set to the watcher in one variable, so the secrets *are* the
-configuration. Removing someone is deleting their two secrets.
+6. **Their two lines in the workflow**, under the *Check for new listings*
+   step's `env:` in [.github/workflows/nettiauto-watch.yml](.github/workflows/nettiauto-watch.yml),
+   and commit:
+
+   ```yaml
+   TENANT_ALICE_GIST_TOKEN: ${{ secrets.TENANT_ALICE_GIST_TOKEN }}
+   TENANT_ALICE_WEBHOOK: ${{ secrets.TENANT_ALICE_WEBHOOK }}
+   ```
+
+   Actions only hands a step the secrets it names. The workflow used to pass
+   the whole set in one variable (`toJSON(secrets)`) so that onboarding needed
+   no commit, and GitHub flagged that as a possibly malicious workflow file
+   and held every scheduled run until someone approved it. Removing someone
+   means deleting their two secrets and their two lines.
 
 The names group by person rather than by kind (`GIST_TOKEN_ALICE`,
 `WEBHOOK_ALICE`) because GitHub sorts that page alphabetically: everything of
