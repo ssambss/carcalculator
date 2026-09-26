@@ -552,7 +552,8 @@ watcher reads `settings.newCar` out of the calculator the car is going into.
 Falls back field by field to `config.js`, so somebody on an older bundle gets a
 sensible car rather than one financed at 0 % over 0 months. Insurance, tax and
 maintenance stay at zero deliberately — nobody can guess them, and a guessed
-number reads as a real one.
+number reads as a real one. *(Reversed 2026-09-26: a card at zero understated
+its total by ~3 160 €/yr, so the yearly costs joined the baseline — see the log.)*
 
 ### The leak hunt
 
@@ -1303,6 +1304,13 @@ hand.
 
 ## Log
 
+- **2026-09-26** — **Yearly costs joined the new-car baseline.** Insurance,
+  tax, maintenance, tires and other now sit in *Assumptions → New car*
+  (shipped as 2 000 / 260 / 500 / 400 / 0 €/yr) and apply to a car typed in
+  and one from a reaction alike; the watcher reads them from `settings.newCar`
+  with `config.js` as the fallback. A baseline saved before this fills the new
+  fields from the shipped figures; cars already saved keep their own. 330
+  frontend and 243 scraper tests, verified in Chromium at 1280 and 390 px.
 - **2026-09-23** — **Housing decluttered.** Places straight after the
   ceiling; analysis cards fold to a one-line answer, remembered per device;
   situation panel folds on desktop; "Add place" in the header. Fixed on the

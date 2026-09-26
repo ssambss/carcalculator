@@ -345,14 +345,43 @@ describe('whose financing baseline a new car arrives on', () => {
     assert.equal(defaults.financing.downPayment, config.tco.carDefaults.financing.downPayment);
   });
 
-  it('leaves the costs nobody can guess at zero', () => {
-    // Insurance, tax and maintenance are not assumptions the app can make, and
-    // a guessed number reads as a real one. Deliberately untouched by this.
-    const car = toCarListing(listing, {
-      defaults: newCarDefaults(envelope({ newCar: { annualRatePct: 3 } })),
-    });
-    assert.equal(car.insurancePerYear, 0);
-    assert.equal(car.taxPerYear, 0);
-    assert.equal(car.maintenancePerYear, 0);
+  it('takes their yearly costs too', () => {
+    const defaults = newCarDefaults(
+      envelope({
+        newCar: {
+          insurancePerYear: 900,
+          taxPerYear: 150,
+          maintenancePerYear: 700,
+          tiresPerYear: 250,
+          otherPerYear: 60,
+        },
+      }),
+    );
+    const car = toCarListing(listing, { defaults });
+    assert.equal(car.insurancePerYear, 900);
+    assert.equal(car.taxPerYear, 150);
+    assert.equal(car.maintenancePerYear, 700);
+    assert.equal(car.tiresPerYear, 250);
+    assert.equal(car.otherPerYear, 60);
+  });
+
+  it('arrives with a typical year of costs when they have set none', () => {
+    // A card with every yearly cost at zero understates its total by a few
+    // thousand euros, which is the one thing a comparison must not do quietly.
+    for (const shape of [envelope({ newCar: { annualRatePct: 3 } }), envelope({}), null]) {
+      const car = toCarListing(listing, { defaults: newCarDefaults(shape) });
+      assert.equal(car.insurancePerYear, 2000);
+      assert.equal(car.taxPerYear, 260);
+      assert.equal(car.maintenancePerYear, 500);
+      assert.equal(car.tiresPerYear, 400);
+      assert.equal(car.otherPerYear, 0);
+    }
+  });
+
+  it('keeps a yearly cost they chose to zero, but not a negative one', () => {
+    // Zero is a real answer - somebody who fills in insurance per car, say.
+    const defaults = newCarDefaults(envelope({ newCar: { insurancePerYear: 0, taxPerYear: -5 } }));
+    assert.equal(defaults.insurancePerYear, 0);
+    assert.equal(defaults.taxPerYear, config.tco.carDefaults.taxPerYear);
   });
 });

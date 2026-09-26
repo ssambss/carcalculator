@@ -122,9 +122,9 @@ export const config = {
 
     // The *fallback* baseline for an added car, not the baseline.
     //
-    // The financing and consumption figures now come from whoever owns the
-    // calculator the car is going into - settings.newCar in their own data,
-    // which the app's Assumptions panel writes. This watcher runs for several
+    // The financing, consumption and yearly cost figures now come from whoever
+    // owns the calculator the car is going into - settings.newCar in their own
+    // data, which the app's Assumptions panel writes. This watcher runs for several
     // people, and a rate and term fixed here would have put one person's
     // assumptions about borrowing into everybody else's calculator.
     //
@@ -152,12 +152,13 @@ export const config = {
         autoBalloon: true,
         balloon: 0,
       },
-      // Left at zero rather than guessed; they are near-identical across
-      // candidates for the same model, so they barely affect a comparison.
-      insurancePerYear: 0,
-      taxPerYear: 0,
-      maintenancePerYear: 0,
-      tiresPerYear: 0,
+      // A typical mid-size car's year, so a fresh card's total is in the right
+      // place before anyone has a real quote. Matches DEFAULT_NEW_CAR in the
+      // app's src/storage.ts; their own settings.newCar wins over both.
+      insurancePerYear: 2000,
+      taxPerYear: 260,
+      maintenancePerYear: 500,
+      tiresPerYear: 400,
       otherPerYear: 0,
     },
   },

@@ -38,6 +38,12 @@ function car(overrides: Partial<CarListing> = {}): CarListing {
     autoResale: false,
     expectedResaleValue: 15000,
     fuelLPer100: 8,
+    // Not the new-car baseline's typical year: a test adds the costs it is about.
+    insurancePerYear: 0,
+    taxPerYear: 0,
+    maintenancePerYear: 0,
+    tiresPerYear: 0,
+    otherPerYear: 0,
     ...overrides,
   }
 }

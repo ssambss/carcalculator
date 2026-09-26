@@ -44,12 +44,52 @@ describe('the new-car baseline', () => {
       termMonths: 48,
       elecKwhPer100: 24,
       fuelLPer100: 8,
+      insurancePerYear: 900,
+      taxPerYear: 150,
+      maintenancePerYear: 700,
+      tiresPerYear: 250,
+      otherPerYear: 60,
     })
     expect(mine.financing.annualRatePct).toBe(3.4)
     expect(mine.financing.termMonths).toBe(48)
     expect(mine.financing.downPayment).toBe(5000)
     expect(mine.elecKwhPer100).toBe(24)
     expect(mine.fuelLPer100).toBe(8)
+    expect(mine.insurancePerYear).toBe(900)
+    expect(mine.taxPerYear).toBe(150)
+    expect(mine.maintenancePerYear).toBe(700)
+    expect(mine.tiresPerYear).toBe(250)
+    expect(mine.otherPerYear).toBe(60)
+  })
+
+  it('gives a blank car a typical year of running costs', () => {
+    const blank = newCar()
+    expect(blank.insurancePerYear).toBe(2000)
+    expect(blank.taxPerYear).toBe(260)
+    expect(blank.maintenancePerYear).toBe(500)
+    expect(blank.tiresPerYear).toBe(400)
+    expect(blank.otherPerYear).toBe(0)
+  })
+
+  it('gives a baseline saved before the yearly costs existed the shipped ones', () => {
+    // Everybody's settings.newCar predates these fields; they must fill in, not
+    // arrive as zeros that quietly drop the costs from every new card.
+    const old = normalizeData(
+      bare({ settings: { newCar: { annualRatePct: 3.4, termMonths: 48 } } }),
+    )
+    expect(old.settings.newCar.annualRatePct).toBe(3.4)
+    expect(old.settings.newCar.insurancePerYear).toBe(DEFAULT_NEW_CAR.insurancePerYear)
+    expect(old.settings.newCar.tiresPerYear).toBe(DEFAULT_NEW_CAR.tiresPerYear)
+  })
+
+  it('leaves the costs of a car already saved alone', () => {
+    // The new baseline is for new cards. A stored car keeps its own figures,
+    // zeros included, rather than suddenly gaining an insurance bill.
+    const data = normalizeData(
+      bare({ cars: [{ ...newCar(), id: 'c1', insurancePerYear: 0, taxPerYear: 0 }] }),
+    )
+    expect(data.cars[0].insurancePerYear).toBe(0)
+    expect(data.cars[0].taxPerYear).toBe(0)
   })
 
   it('gives data written before the setting existed the baseline, not zeros', () => {

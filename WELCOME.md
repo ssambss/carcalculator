@@ -187,7 +187,8 @@ Press **Edit** on the **Assumptions** panel and set:
 - **Ownership** — how many years you'd keep the car.
 
 Then look at **New car** just below, and set the interest rate and loan term you'd
-realistically be offered. Every car you add starts on those, so comparisons stay
+realistically be offered, and roughly what insurance, tax, maintenance and tires
+cost you a year. Every car you add starts on those, so comparisons stay
 apples-to-apples until you have a real quote for one of them.
 
 **Check:** the summary line at the top of the panel shows your numbers.

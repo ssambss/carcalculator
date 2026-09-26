@@ -74,7 +74,8 @@ export interface CarListing {
 }
 
 /**
- * The financing a car starts with before a dealer has quoted anything.
+ * The financing and running costs a car starts with before a dealer has quoted
+ * anything.
  *
  * Yours, not everybody's. The listing watcher used to add cars on one hardcoded
  * baseline, which meant one person's assumptions about rates and term landed in
@@ -94,6 +95,12 @@ export interface NewCarDefaults {
   elecKwhPer100: number
   /** l/100km assumed for petrol, diesel and a plug-in hybrid's engine */
   fuelLPer100: number
+  /** €/yr running costs a car starts with, until its own figures are known */
+  insurancePerYear: number
+  taxPerYear: number
+  maintenancePerYear: number
+  tiresPerYear: number
+  otherPerYear: number
 }
 
 export interface Settings {

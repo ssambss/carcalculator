@@ -409,12 +409,13 @@ React to any posted listing in Discord (any emoji, from anyone in the channel)
 and within a cycle the car is added to the Car TCO calculator's comparison.
 It arrives with the price, odometer and powertrain from the listing (a diesel
 is added as a diesel — filters can watch anything now), the nettiauto link in
-its notes, and whatever financing baseline that person has set, so candidates are
-comparable before any dealer has quoted a real rate. Everything else (insurance,
-tax, maintenance) is left at zero for you to fill in — nobody can guess those,
-and a guessed number reads as a real one.
+its notes, and whatever financing baseline and yearly costs (insurance, tax,
+maintenance, tires, other) that person has set, so candidates are comparable
+before any dealer has quoted a real rate or an insurer a real premium. Out of
+the box that is 2 000 € insurance, 260 € tax, 500 € maintenance and 400 € tires
+a year — replace them on the card once you have the car's own figures.
 
-The financing baseline is **theirs, not a fixed one**: the watcher reads
+The baseline is **theirs, not a fixed one**: the watcher reads
 `settings.newCar` out of the calculator the car is going into, which is what the
 app's *Assumptions → New car* panel writes. A rate and term fixed in the scraper
 would have put one person's assumptions about borrowing into everybody's

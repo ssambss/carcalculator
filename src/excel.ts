@@ -581,6 +581,46 @@ const SETTING_ROWS: SettingRow[] = [
     },
     format: '0.0',
   },
+  {
+    header: 'New car: insurance (€/yr)',
+    get: (s) => s.newCar.insurancePerYear,
+    set: (s, v) => {
+      s.newCar.insurancePerYear = Math.max(0, v)
+    },
+    format: '#,##0',
+  },
+  {
+    header: 'New car: vehicle tax (€/yr)',
+    get: (s) => s.newCar.taxPerYear,
+    set: (s, v) => {
+      s.newCar.taxPerYear = Math.max(0, v)
+    },
+    format: '#,##0',
+  },
+  {
+    header: 'New car: maintenance (€/yr)',
+    get: (s) => s.newCar.maintenancePerYear,
+    set: (s, v) => {
+      s.newCar.maintenancePerYear = Math.max(0, v)
+    },
+    format: '#,##0',
+  },
+  {
+    header: 'New car: tires (€/yr)',
+    get: (s) => s.newCar.tiresPerYear,
+    set: (s, v) => {
+      s.newCar.tiresPerYear = Math.max(0, v)
+    },
+    format: '#,##0',
+  },
+  {
+    header: 'New car: other (€/yr)',
+    get: (s) => s.newCar.otherPerYear,
+    set: (s, v) => {
+      s.newCar.otherPerYear = Math.max(0, v)
+    },
+    format: '#,##0',
+  },
 ]
 
 export const CARS_SHEET = 'Cars'

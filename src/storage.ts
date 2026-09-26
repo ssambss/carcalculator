@@ -18,7 +18,9 @@ const STORAGE_KEY = 'carcalculator.data.v1'
  * more to the point, a *common* baseline - candidates only compare if they are
  * financed alike until one of them has a real offer. The consumption figures sit
  * above the WLTP numbers on purpose: roughly what a mid-size car actually uses
- * in mixed Finnish driving.
+ * in mixed Finnish driving. The running costs are a typical mid-size car's year,
+ * there so a fresh card's total is not missing a few thousand euros before
+ * anyone has fetched an insurance quote.
  */
 export const DEFAULT_NEW_CAR: NewCarDefaults = {
   downPayment: 0,
@@ -26,6 +28,11 @@ export const DEFAULT_NEW_CAR: NewCarDefaults = {
   termMonths: 72,
   elecKwhPer100: 20,
   fuelLPer100: 6.5,
+  insurancePerYear: 2000,
+  taxPerYear: 260,
+  maintenancePerYear: 500,
+  tiresPerYear: 400,
+  otherPerYear: 0,
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -84,11 +91,11 @@ export function newCar(defaults: NewCarDefaults = DEFAULT_NEW_CAR): CarListing {
     fuelLPer100: defaults.fuelLPer100,
     elecKwhPer100: defaults.elecKwhPer100,
     electricSharePct: 50,
-    insurancePerYear: 0,
-    taxPerYear: 0,
-    maintenancePerYear: 0,
-    tiresPerYear: 0,
-    otherPerYear: 0,
+    insurancePerYear: defaults.insurancePerYear,
+    taxPerYear: defaults.taxPerYear,
+    maintenancePerYear: defaults.maintenancePerYear,
+    tiresPerYear: defaults.tiresPerYear,
+    otherPerYear: defaults.otherPerYear,
     createdAt: now,
     updatedAt: now,
   }
@@ -150,6 +157,11 @@ function normalizeNewCar(raw: unknown): NewCarDefaults {
     termMonths: Math.max(1, toNum(n.termMonths, DEFAULT_NEW_CAR.termMonths)),
     elecKwhPer100: Math.max(0, toNum(n.elecKwhPer100, DEFAULT_NEW_CAR.elecKwhPer100)),
     fuelLPer100: Math.max(0, toNum(n.fuelLPer100, DEFAULT_NEW_CAR.fuelLPer100)),
+    insurancePerYear: Math.max(0, toNum(n.insurancePerYear, DEFAULT_NEW_CAR.insurancePerYear)),
+    taxPerYear: Math.max(0, toNum(n.taxPerYear, DEFAULT_NEW_CAR.taxPerYear)),
+    maintenancePerYear: Math.max(0, toNum(n.maintenancePerYear, DEFAULT_NEW_CAR.maintenancePerYear)),
+    tiresPerYear: Math.max(0, toNum(n.tiresPerYear, DEFAULT_NEW_CAR.tiresPerYear)),
+    otherPerYear: Math.max(0, toNum(n.otherPerYear, DEFAULT_NEW_CAR.otherPerYear)),
   }
 }
 

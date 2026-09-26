@@ -98,8 +98,7 @@ export function powertrainOf(listing, fallback = config.tco.carDefaults.powertra
  *
  * Falls back field by field to src/config.js, so somebody whose app predates the
  * setting still gets a sensible car rather than a car financed at 0 % over 0
- * months. Only the fields the app actually owns are taken from it: insurance and
- * tax stay at zero because nobody can guess them, and that is deliberate.
+ * months, and with insurance and tax at a typical year rather than at nothing.
  */
 export function newCarDefaults(envelope) {
   const base = config.tco.carDefaults;
@@ -113,6 +112,11 @@ export function newCarDefaults(envelope) {
     ...base,
     elecKwhPer100: number(theirs.elecKwhPer100, base.elecKwhPer100),
     fuelLPer100: number(theirs.fuelLPer100, base.fuelLPer100),
+    insurancePerYear: number(theirs.insurancePerYear, base.insurancePerYear),
+    taxPerYear: number(theirs.taxPerYear, base.taxPerYear),
+    maintenancePerYear: number(theirs.maintenancePerYear, base.maintenancePerYear),
+    tiresPerYear: number(theirs.tiresPerYear, base.tiresPerYear),
+    otherPerYear: number(theirs.otherPerYear, base.otherPerYear),
     financing: {
       ...base.financing,
       downPayment: number(theirs.downPayment, base.financing.downPayment),

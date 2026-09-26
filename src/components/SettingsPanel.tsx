@@ -70,8 +70,9 @@ export function SettingsPanel({ settings, onChange }: Props) {
       {/*
         What a car starts on before any dealer has quoted a rate. A common
         baseline is the point - candidates only compare if they are financed
-        alike until one of them has a real offer. Applies to a car typed in here
-        and to one that arrives from a Discord reaction alike.
+        alike until one of them has a real offer. The same goes for the yearly
+        costs until a real insurance quote exists. Applies to a car typed in
+        here and to one that arrives from a Discord reaction alike.
       */}
       <div className="assumptions-heading">
         <div className="assumptions-title">New car</div>
@@ -112,6 +113,41 @@ export function SettingsPanel({ settings, onChange }: Props) {
           value={settings.newCar.fuelLPer100}
           onChange={(n) => setNewCar({ fuelLPer100: Math.max(0, n) })}
           unit="l/100km"
+        />
+        <NumberField
+          compact
+          label="Insurance"
+          value={settings.newCar.insurancePerYear}
+          onChange={(n) => setNewCar({ insurancePerYear: Math.max(0, n) })}
+          unit="€/yr"
+        />
+        <NumberField
+          compact
+          label="Vehicle tax"
+          value={settings.newCar.taxPerYear}
+          onChange={(n) => setNewCar({ taxPerYear: Math.max(0, n) })}
+          unit="€/yr"
+        />
+        <NumberField
+          compact
+          label="Maintenance"
+          value={settings.newCar.maintenancePerYear}
+          onChange={(n) => setNewCar({ maintenancePerYear: Math.max(0, n) })}
+          unit="€/yr"
+        />
+        <NumberField
+          compact
+          label="Tires"
+          value={settings.newCar.tiresPerYear}
+          onChange={(n) => setNewCar({ tiresPerYear: Math.max(0, n) })}
+          unit="€/yr"
+        />
+        <NumberField
+          compact
+          label="Other"
+          value={settings.newCar.otherPerYear}
+          onChange={(n) => setNewCar({ otherPerYear: Math.max(0, n) })}
+          unit="€/yr"
         />
       </div>
     </div>
