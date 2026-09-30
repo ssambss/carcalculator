@@ -33,8 +33,9 @@ color-coded cost breakdown and a side-by-side comparison table.
   column, with €/month, €/km and the total alongside for reading. Two sheets —
   the cars, and the assumptions they are costed against. **Export → Backup**
   (`.json`) is the exact copy, for restoring — of all three calculators: the
-  cars, the housing side and the lease mileage. A backup from before housing
-  or mileage was in it restores what it has and leaves the rest as it is.
+  cars, the housing side (its saving plan included) and the lease mileage. A
+  backup from before housing, mileage or the saving plan was in it restores
+  what it has and leaves the rest as it is.
 - **Import** takes either, picking by the file rather than asking. They mean
   different things, so they behave differently:
   - a **backup replaces** everything, because it is an exact copy;
@@ -164,6 +165,20 @@ color-coded cost breakdown and a side-by-side comparison table.
   it has given back since its peak — ending in a plain verdict on how much of
   it to believe. The long run since 1988 (the 1990s fall included) sits under
   it so the projection is read for what it is: arithmetic on the past.
+- **Saving up** (housing mode): the ceiling asked backwards — what a price
+  takes in cash (the minimum cash share, the transfer tax for its kind of
+  home, the buying costs, and whatever the budget cannot carry as a loan) —
+  for every place and for a target price you type, against where the saving
+  will be on the day you plan to buy. Set the day and what each of you puts in
+  a month, and log the balances now and then as the bank shows them: the card
+  says whether you are on the plan (a skipped deposit shows as a month
+  behind), when each place's sum is in the accounts, what a month it takes to
+  close a gap, and whether the loan then stays inside the ASP cap. With ASP on
+  it counts the account's 1 % and the bank's bonus interest (paid only at the
+  purchase, so added only there) and dates each saver's 20th deposit month
+  against the purchase — the rules in force since 1.6.2026. One click puts the
+  plan's figures into the situation's Savings, so the ceiling is the one at the
+  purchase. Syncs to its own gist file (`car-tco-saving.json`).
 - **Lease mileage** (third mode): a leased car's odometer against its
   allowance. The contract's km are spread evenly from hand-over to return — a
   straight line, because only the total at the return is charged — and each

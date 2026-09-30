@@ -29,6 +29,7 @@ import { NARROW, useMedia } from './useMedia'
 import { useScraperFilters } from './useScraperFilters'
 import { useHousing } from './useHousing'
 import { useMileage } from './useMileage'
+import { useSaving } from './useSaving'
 import type { PropertyListing } from './housing'
 import { newProperty } from './housingStorage'
 import { HousingView } from './components/HousingView'
@@ -85,6 +86,9 @@ export default function App() {
   const housing = useHousing(syncConfig)
   // The leased car's odometer log: a file of its own too, for the same reason.
   const mileage = useMileage(syncConfig)
+  // The housing side's saving plan and its balances: a file of its own as
+  // well, so a bundle that knows housing but not saving leaves it alone.
+  const saving = useSaving(syncConfig)
   const dataRef = useRef(data)
   const syncConfigRef = useRef(syncConfig)
   // The last data object that came from a non-edit source (initial load or a
@@ -333,29 +337,41 @@ export default function App() {
 
       const imported = await importBackup(file)
       // Counted only for what the file restores: an older backup has no
-      // housing, or no mileage, and those sides are left as they are.
+      // housing, no mileage or no saving plan, and those are left as they are.
       const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
-      const tally = (cars: number, places: number | undefined, readings: number | undefined) =>
+      const tally = (
+        cars: number,
+        places: number | undefined,
+        readings: number | undefined,
+        balances: number | undefined,
+      ) =>
         [
           count(cars, 'car', 'cars'),
           places === undefined ? '' : count(places, 'place', 'places'),
           readings === undefined ? '' : count(readings, 'reading', 'readings'),
+          balances === undefined ? '' : count(balances, 'saved balance', 'saved balances'),
         ]
           .filter(Boolean)
           .join(', ')
-      const kept = [imported.housing ? '' : 'housing', imported.mileage ? '' : 'mileage'].filter(
-        Boolean,
-      )
+      const kept = [
+        imported.housing ? '' : 'housing',
+        imported.mileage ? '' : 'mileage',
+        imported.saving ? '' : 'the saving plan',
+      ].filter(Boolean)
       const here = tally(
         data.cars.length,
         imported.housing ? housing.data.properties.length : undefined,
         imported.mileage ? mileage.data.readings.length : undefined,
+        imported.saving ? saving.data.readings.length : undefined,
       )
       const there = tally(
         imported.data.cars.length,
         imported.housing?.properties.length,
         imported.mileage?.readings.length,
+        imported.saving?.readings.length,
       )
+      const keptList =
+        kept.length > 1 ? `${kept.slice(0, -1).join(', ')} and ${kept[kept.length - 1]}` : kept[0]
       const ok = window.confirm(
         [
           `Replace what is here (${here}) with "${file.name}" (${there})?`,
@@ -363,8 +379,8 @@ export default function App() {
             ? [
                 '',
                 kept.length > 1
-                  ? 'It is an older backup, from before housing and mileage were saved in it, so those are left as they are.'
-                  : `It is an older backup, from before ${kept[0]} was saved in it, so that is left as it is.`,
+                  ? `It is an older backup, from before ${keptList} were saved in it, so those are left as they are.`
+                  : `It is an older backup, from before ${keptList} was saved in it, so that is left as it is.`,
               ]
             : []),
         ].join('\n'),
@@ -373,6 +389,7 @@ export default function App() {
       updateData(() => imported.data)
       if (imported.housing) housing.replace(imported.housing)
       if (imported.mileage) mileage.replace(imported.mileage)
+      if (imported.saving) saving.replace(imported.saving)
     } catch (error) {
       window.alert(
         error instanceof NotABackupError
@@ -587,7 +604,7 @@ export default function App() {
                     role="menuitem"
                     onClick={() => {
                       setExportOpen(false)
-                      exportBackup(data, housing.data, mileage.data)
+                      exportBackup(data, housing.data, mileage.data, saving.data)
                     }}
                   >
                     <span className="menu-item-name">{narrow ? 'Export a backup' : 'Backup'}</span>
@@ -627,6 +644,7 @@ export default function App() {
       ) : mode === 'housing' ? (
         <HousingView
           store={housing}
+          saving={saving}
           onAdd={addPlace}
           onEdit={(property) => setPlaceDraft({ property, isNew: false })}
         />

@@ -1295,6 +1295,61 @@ gist per place, as restored cars always have — so with sync on, a place
 deleted after the backup was taken stays deleted. Import and Export now show
 in both modes. Tests in `test/backup.test.ts`.
 
+**Saving up (2026-09-30, user's ask — "a calculator or watcher … to keep track
+of how much needs to be saved for a house"):** the ceiling asks what the
+savings reach; this card asks the other way round and then watches the
+accounts on their way there. `cashNeeded()` in `src/saving.ts` is the ceiling
+solved for the savings — `S = max(P·(d + t) + c, P·(1 + t) + c − L)`, with L
+the loan the budget carries, which depends on income alone — and the tests
+hold it to the round trip: `affordability` given exactly S lands on P, for
+every kind of home, single and couple. The watcher is the mileage side's
+shape: a balance logged now and then as the bank shows it (a check-in, not a
+ledger of deposits — one number to type, and a standing order deposits
+whether or not anyone writes it down), per saver when buying together; a plan
+line from each saver's first check-in at the planned deposit; the plan
+carried on to the purchase day with the account's interest, compounding
+monthly and spread evenly over each month so a mid-month check-in is not a
+deposit off. Closed forms throughout (`grow`, `balanceMonths`), so "what a
+month closes the gap" is a division — the projection is linear in the deposit
+— and "when is the sum in the accounts" a bisection on days.
+
+What it shows: saved now, the balance at the purchase, what the chosen goal
+(a typed target price and kind, or any place) takes and the margin, the
+monthly sum that lands exactly on it, whether the loan with that cash stays
+inside the ASP cap (the household's own rule since 2026-09-07), whether the
+latest check-in is on the plan (within 25 % of a month's deposits, since
+the account credits interest once a year — a skipped deposit shows as one
+behind), a chart of the saving against the plan line with the goal as a level,
+a table of every goal, and **Use the plan's figures**, which writes each
+saver's projected total into the situation's Savings — the field the ceiling
+reads, which the user had been filling with a hand-projected mid-2028 figure.
+Never automatic: the field is the person's.
+
+**The ASP rules, checked (Valtiokonttori, 1.6.2026):** eight saved quarters
+is the old system. Since 1.6.2026 it is **20 deposit months**, not
+necessarily in a row, 50–1 500 € each; a saver from before may keep to
+quarters, a quarter counting as three months. The account
+pays 1 % tax-free, and the bank adds a 2–4 % **bonus interest** for the first
+saving year and five calendar years after it, paid only at a purchase with an
+ASP loan — so the card adds it at the purchase and never to the balance on the
+way, and leaves it out of "when is the sum there". Both count towards the
+cash share (still 10 % in force; the 5 % and 40-year terms of the April 2026
+kehysriihi are to come "later in 2026", date unknown — the model keeps running
+them as decided). With ASP on, each saver's first deposit month dates their
+20th, held against the purchase day. Not modeled: the ASP loan's own limit of
+accepted deposits × 9 (× 19 at the reform's 5 %), which never binds at the
+reform's share for these figures but would under the 10 % in force.
+
+Its own gist file (`car-tco-saving.json`) and storage key, not keys in the
+housing file: a bundle that knows housing but not saving would normalize the
+new keys away and write the housing file back without them. In the backup
+under `saving`, like housing and mileage. Placed first among the folded cards
+— it is the one revisited monthly, and folded it is one line ("30 812 € by
+1.6.2028 · 12 027 € more than … takes · on the plan"). Fixed on the way: every
+analysis field on a phone was `50% − 6px` wide beside a 16 px gap, so two
+never fit a row and the rent-or-buy card's inputs stood one per line; now
+`50% − 8px`. `DateField` moved out of the mileage view into its own file.
+
 Not done, deliberately: housing in the Excel export/import (add a Properties
 sheet when someone actually edits these in a spreadsheet), and any scraper
 feed — oikotie forbids scraping in its terms, so candidates are typed in by
@@ -1304,6 +1359,14 @@ hand.
 
 ## Log
 
+- **2026-09-30** — **Saving up.** A card in housing mode: what each place (or
+  a typed target) takes in cash, the saving plan carried to the purchase day,
+  balances logged per saver against the plan line, the monthly sum that closes
+  a gap, the ASP 20-deposit-month clock and bonus interest (the 1.6.2026
+  rules), and one click to put the plan's
+  figures into Savings. Own gist file. Phone analysis fields fit two a row
+  again. 367 frontend tests, verified in Chrome at 1280 and 390 px, light and
+  dark.
 - **2026-09-26** — **Yearly costs joined the new-car baseline.** Insurance,
   tax, maintenance, tires and other now sit in *Assumptions → New car*
   (shipped as 2 000 / 260 / 500 / 400 / 0 €/yr) and apply to a car typed in

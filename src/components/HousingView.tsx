@@ -32,6 +32,7 @@ import {
   type PropertyFilters,
 } from '../housingFiltering'
 import type { HousingStore } from '../useHousing'
+import type { SavingStore } from '../useSaving'
 import { fmtEur, fmtEurExact, fmtNum, fmtPct } from '../format'
 import { useOpen } from '../open'
 import { AreaOutlook } from './AreaOutlook'
@@ -41,6 +42,7 @@ import { LoanSchedule, type AnalysisSubject } from './LoanSchedule'
 import { NumberField } from './NumberField'
 import { PropertyFilterBar } from './PropertyFilterBar'
 import { RentVsBuy } from './RentVsBuy'
+import { SavingCard } from './SavingCard'
 
 /** Why the ceiling stops where it does, in words somebody can act on. */
 const LIMIT_NOTE: Record<string, string> = {
@@ -51,10 +53,13 @@ const LIMIT_NOTE: Record<string, string> = {
 
 export function HousingView({
   store,
+  saving,
   onAdd,
   onEdit,
 }: {
   store: HousingStore
+  /** the saving plan and its check-ins - a gist file of their own */
+  saving: SavingStore
   /** open the form on a new place - the form itself is the app's, beside the car one */
   onAdd: () => void
   onEdit: (p: PropertyListing) => void
@@ -244,6 +249,15 @@ export function HousingView({
         </>
       )}
 
+      {/* First of the folded cards: the one that gets revisited, a balance
+          logged every month or so, and the one that feeds the ceiling. */}
+      <SavingCard
+        store={saving}
+        situation={data.situation}
+        places={sorted}
+        onChangeSituation={store.saveSituation}
+      />
+
       <LoanSchedule
         situation={data.situation}
         subjects={subjects}
@@ -325,6 +339,7 @@ function SituationPanel({
               value={situation.savings}
               onChange={(n) => set({ savings: Math.max(0, n) })}
               unit="€"
+              hint="cash at the purchase — “Saving up” below can work it out"
             />
             <NumberField
               compact

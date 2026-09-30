@@ -1,5 +1,6 @@
 // The JSON backup: all three calculators in one file, readable in both
-// directions across the versions that added housing and mileage to it.
+// directions across the versions that added housing, mileage and the saving
+// plan to it.
 //
 // The shape is the compatibility: the car data stays at the top level, where
 // every backup has had it, and housing and mileage sit beside it under a key
@@ -11,6 +12,7 @@ import { describe, expect, it } from 'vitest'
 import { NotABackupError, backupJson, importBackup, parseBackup } from '../src/backup'
 import { EMPTY_HOUSING, newProperty, type HousingData } from '../src/housingStorage'
 import { EMPTY_MILEAGE, newReading, type MileageData } from '../src/mileageStorage'
+import { EMPTY_SAVING, newSavingReading, type SavingData } from '../src/savingStorage'
 import { newCar, normalizeData } from '../src/storage'
 import type { AppData } from '../src/types'
 
@@ -31,15 +33,31 @@ const mileage = (): MileageData => ({
   readings: [newReading('2026-09-21', 71_830)],
 })
 
+const saving = (): SavingData => ({
+  ...structuredClone(EMPTY_SAVING),
+  plan: { ...EMPTY_SAVING.plan, targetDate: '2028-06-01', monthlyDeposit: 700 },
+  planUpdatedAt: '2026-09-30T00:00:00.000Z',
+  readings: [newSavingReading('2026-09-30', 'self', 1000), newSavingReading('2026-09-30', 'partner', 1000)],
+})
+
 describe('the backup', () => {
   it('carries all three calculators, and reads back exactly', () => {
     const d = cars()
     const h = housing()
     const m = mileage()
-    const back = parseBackup(backupJson(d, h, m))
+    const sv = saving()
+    const back = parseBackup(backupJson(d, h, m, sv))
     expect(back.data).toEqual(d)
     expect(back.housing).toEqual(h)
     expect(back.mileage).toEqual(m)
+    expect(back.saving).toEqual(sv)
+  })
+
+  it('reads a backup from before the saving plan was in it as having none, and keeps the rest', () => {
+    const back = parseBackup(JSON.stringify({ ...cars(), housing: housing(), mileage: mileage() }))
+    expect(back.housing?.properties[0].name).toBe('Tapanila 3h+k')
+    expect(back.mileage?.readings).toHaveLength(1)
+    expect(back.saving).toBeNull()
   })
 
   it('reads a backup from before mileage was in it as having none, and keeps its housing', () => {
@@ -49,7 +67,7 @@ describe('the backup', () => {
   })
 
   it('keeps the cars where a backup always had them', () => {
-    const raw = JSON.parse(backupJson(cars(), housing(), mileage()))
+    const raw = JSON.parse(backupJson(cars(), housing(), mileage(), saving()))
     expect(raw.cars[0].name).toBe('Octavia')
     expect(raw.housing.properties[0].name).toBe('Tapanila 3h+k')
   })
@@ -62,15 +80,17 @@ describe('the backup', () => {
     expect(back.data.cars[0].name).toBe('Octavia')
     expect(back.housing).toBeNull()
     expect(back.mileage).toBeNull()
+    expect(back.saving).toBeNull()
   })
 
   it('still gives an older copy of the app its cars', () => {
     // What a device on a cached bundle does with the file: normalizeData, and
     // nothing that knows about housing.
-    const seen = normalizeData(JSON.parse(backupJson(cars(), housing(), mileage())))
+    const seen = normalizeData(JSON.parse(backupJson(cars(), housing(), mileage(), saving())))
     expect(seen.cars[0].name).toBe('Octavia')
     expect(seen).not.toHaveProperty('housing')
     expect(seen).not.toHaveProperty('mileage')
+    expect(seen).not.toHaveProperty('saving')
   })
 
   it('normalises a mangled housing section rather than refusing the file', () => {

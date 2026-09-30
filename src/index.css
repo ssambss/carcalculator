@@ -1472,8 +1472,9 @@ a.dialog-text {
     width: calc(50% - 8px);
   }
 
+  /* Half the row less half the 16px column gap - at 6px, two never fit. */
   .analysis-fields .field-compact {
-    width: calc(50% - 6px);
+    width: calc(50% - 8px);
   }
 
   .filter-search {
@@ -2263,5 +2264,47 @@ a.dialog-text {
     grid-column: 2;
     grid-row: 1 / span 2;
     min-height: 44px;
+  }
+}
+
+/* ————— Saving up ————— */
+/* What a goal takes is a level to reach, not a series: solid, in the second
+   ink - dashed means "continued" everywhere in these charts. */
+.chart-goal {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+/* "Detached house" and the select's arrow, without either being cut. A phone
+   keeps the half-row width every analysis field has there. */
+@media (min-width: 641px) {
+  .field-compact.field-kind {
+    width: 170px;
+  }
+}
+
+/* The price and kind stack under a goal's name, a note under its figure. */
+.saving-table th.rowhead {
+  white-space: normal;
+}
+
+.saving-table .cell-note {
+  display: block;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.saving-use {
+  display: flex;
+  align-items: center;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  /* Four columns on a 360px screen: the padding gives way before the figures. */
+  .saving-table th,
+  .saving-table td {
+    padding: 10px 7px;
   }
 }

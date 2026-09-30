@@ -24,6 +24,7 @@ import { newReading, newTrip } from '../mileageStorage'
 import type { MileageStore } from '../useMileage'
 import { fmtEur, fmtNum } from '../format'
 import { niceTicks } from './chartHelpers'
+import { DateField } from './DateField'
 import { NumberField } from './NumberField'
 import { TipRow } from './TwoLineChart'
 import { useWidth } from './useWidth'
@@ -99,28 +100,6 @@ export function MileageView({ store }: { store: MileageStore }) {
 }
 
 /* ----------------------------------------------------------- lease terms */
-
-function DateField({
-  label,
-  value,
-  onChange,
-  hint,
-}: {
-  label: string
-  value: string
-  onChange: (iso: string) => void
-  hint?: string
-}) {
-  return (
-    <label className="field field-compact field-date">
-      <span className="field-label">{label}</span>
-      <span className="field-input-wrap">
-        <input type="date" value={value} onChange={(e) => onChange(e.target.value)} />
-      </span>
-      {hint && <span className="field-hint">{hint}</span>}
-    </label>
-  )
-}
 
 function LeasePanel({
   lease,

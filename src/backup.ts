@@ -3,10 +3,10 @@
  * restoring.
  *
  * The car data sits at the top level, exactly where a backup has always had it,
- * and housing and mileage ride beside it under a key each - so a backup from
- * before either existed still reads, and an older copy of the app handed a new
- * backup reads its cars and ignores the rest (`normalizeData` drops keys it does
- * not know).
+ * and housing, mileage and the saving plan ride beside it under a key each - so
+ * a backup from before any of them existed still reads, and an older copy of
+ * the app handed a new backup reads its cars and ignores the rest
+ * (`normalizeData` drops keys it does not know).
  *
  * Its own module rather than a pair of functions in `storage.ts`: the housing
  * side's storage imports the gist code, which imports `storage.ts`, and the
@@ -22,6 +22,7 @@ import type { AppData } from './types'
 import { normalizeData } from './storage'
 import { type HousingData, normalizeHousing } from './housingStorage'
 import { type MileageData, normalizeMileage } from './mileageStorage'
+import { type SavingData, normalizeSaving } from './savingStorage'
 
 export interface Backup {
   data: AppData
@@ -29,10 +30,17 @@ export interface Backup {
   housing: HousingData | null
   /** null for a backup written before mileage was in it - likewise */
   mileage: MileageData | null
+  /** null for a backup written before the saving plan was in it - likewise */
+  saving: SavingData | null
 }
 
-export function backupJson(data: AppData, housing: HousingData, mileage: MileageData): string {
-  return JSON.stringify({ ...data, housing, mileage }, null, 2)
+export function backupJson(
+  data: AppData,
+  housing: HousingData,
+  mileage: MileageData,
+  saving: SavingData,
+): string {
+  return JSON.stringify({ ...data, housing, mileage, saving }, null, 2)
 }
 
 /** Why a file was refused, in words for the person who picked it. Nothing was changed. */
@@ -84,11 +92,17 @@ export function parseBackup(text: string): Backup {
     data: normalizeData(raw),
     housing: section(raw, 'housing', normalizeHousing),
     mileage: section(raw, 'mileage', normalizeMileage),
+    saving: section(raw, 'saving', normalizeSaving),
   }
 }
 
-export function exportBackup(data: AppData, housing: HousingData, mileage: MileageData): void {
-  const blob = new Blob([backupJson(data, housing, mileage)], { type: 'application/json' })
+export function exportBackup(
+  data: AppData,
+  housing: HousingData,
+  mileage: MileageData,
+  saving: SavingData,
+): void {
+  const blob = new Blob([backupJson(data, housing, mileage, saving)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
