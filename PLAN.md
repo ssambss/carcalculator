@@ -1328,12 +1328,12 @@ Never automatic: the field is the person's.
 **The ASP rules, checked (Valtiokonttori, 1.6.2026):** eight saved quarters
 is the old system. Since 1.6.2026 it is **20 deposit months**, not
 necessarily in a row, 50–1 500 € each; a saver from before may keep to
-quarters, a quarter counting as three months. The account
-pays 1 % tax-free, and the bank adds a 2–4 % **bonus interest** for the first
-saving year and five calendar years after it, paid only at a purchase with an
-ASP loan — so the card adds it at the purchase and never to the balance on the
-way, and leaves it out of "when is the sum there". Both count towards the
-cash share (still 10 % in force; the 5 % and 40-year terms of the April 2026
+quarters, a quarter counting as three months. The account pays 1 %, and
+the bank adds a 2–4 % **bonus interest** for the first saving year and five
+calendar years after it, paid only at a purchase with an ASP loan — so the
+card adds it at the purchase and never to the balance on the way, and leaves
+it out of "when is the sum there". Both are tax-free, and both count towards
+the cash share (still 10 % in force; the 5 % and 40-year terms of the April 2026
 kehysriihi are to come "later in 2026", date unknown — the model keeps running
 them as decided). With ASP on, each saver's first deposit month dates their
 20th, held against the purchase day. Not modeled: the ASP loan's own limit of

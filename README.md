@@ -174,11 +174,11 @@ color-coded cost breakdown and a side-by-side comparison table.
   says whether you are on the plan (a skipped deposit shows as a month
   behind), when each place's sum is in the accounts, what a month it takes to
   close a gap, and whether the loan then stays inside the ASP cap. With ASP on
-  it counts the account's 1 % and the bank's bonus interest (paid only at the
-  purchase, so added only there) and dates each saver's 20th deposit month
-  against the purchase — the rules in force since 1.6.2026. One click puts the
-  plan's figures into the situation's Savings, so the ceiling is the one at the
-  purchase. Syncs to its own gist file (`car-tco-saving.json`).
+  it counts the account's 1 % and the bank's bonus interest, both tax-free
+  (the bonus is paid only at the purchase, so it is added only there), and
+  dates each saver's 20th deposit month against the purchase — the rules in
+  force since 1.6.2026. One click puts the plan's figures into the
+  situation's Savings, so the ceiling is the one at the purchase. Syncs to its own gist file (`car-tco-saving.json`).
 - **Lease mileage** (third mode): a leased car's odometer against its
   allowance. The contract's km are spread evenly from hand-over to return — a
   straight line, because only the total at the return is charged — and each

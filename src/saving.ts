@@ -21,10 +21,11 @@
  *   1.6.2026 may keep to quarters, and a quarter's deposit counts as three
  *   months - so either way, one deposit a month from the first reaches the
  *   20th month nineteen months later.
- * - The account pays **1 %** a year, tax-free, and the bank adds a **bonus
+ * - The account pays **1 %** a year, and the bank adds a **bonus
  *   interest** of 2–4 % (lisäkorko) for the first saving year and at most
  *   five calendar years after it - paid only at the purchase, and only with
- *   an ASP loan. Both count towards the cash share.
+ *   an ASP loan. All of it is tax-free, the bonus as much as the 1 % - so
+ *   nothing here is taxed - and both count towards the cash share.
  * - The cash share itself is the situation's minimum cash share - the model
  *   runs the decided reform's 5 %, the law in force still says 10 %.
  *

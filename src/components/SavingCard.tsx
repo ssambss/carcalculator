@@ -227,7 +227,7 @@ export function SavingCard({
           costs — and, where the budget cannot carry the rest of the price as a loan, the cash
           to bridge it.
           {situation.useAspLoan &&
-            ` The ASP rules are the ones in force since 1.6.2026: ${ASP_DEPOSIT_MONTHS} deposit months, not necessarily in a row, of ${fmtNum(ASP_MIN_DEPOSIT)}–${fmtNum(ASP_MAX_DEPOSIT)} € each, and 1 % interest, tax-free. A saver from before 1.6.2026 may keep to quarters, and a quarter's deposit counts as three months. The bank's bonus interest (lisäkorko, 2–4 %) runs for the first saving year and five calendar years after it, and is paid only at a purchase made with an ASP loan — so it is added at the purchase, never to the balance on the way. Both count towards the cash share. Check the current rules.`}
+            ` The ASP rules are the ones in force since 1.6.2026: ${ASP_DEPOSIT_MONTHS} deposit months, not necessarily in a row, of ${fmtNum(ASP_MIN_DEPOSIT)}–${fmtNum(ASP_MAX_DEPOSIT)} € each, and 1 % interest. A saver from before 1.6.2026 may keep to quarters, and a quarter's deposit counts as three months. The bank's bonus interest (lisäkorko, 2–4 %) runs for the first saving year and five calendar years after it, and is paid only at a purchase made with an ASP loan — so it is added at the purchase, never to the balance on the way. Both are tax-free, the bonus as much as the 1 %, so neither is taxed here, and both count towards the cash share. Check the current rules.`}
         </p>
       </Fold>
     </FoldCard>
@@ -336,7 +336,7 @@ function PlanFields({
             value={plan.bonusPct}
             onChange={(n) => set({ bonusPct: Math.max(0, n) })}
             unit="%/yr"
-            hint="lisäkorko, 2–4 % by the bank — paid at the purchase"
+            hint="lisäkorko, 2–4 % by the bank, tax-free — paid at the purchase"
           />
         )}
       </div>
