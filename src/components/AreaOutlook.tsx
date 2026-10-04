@@ -2,29 +2,32 @@ import { useCallback, useMemo, useState, type KeyboardEvent, type PointerEvent }
 import {
   HORIZON_OFFSETS,
   HOUSE_TYPES,
-  ZONE_LABELS,
   areaSeries,
   band,
   citySeries,
-  findArea,
+  coverage,
+  findPlace,
+  indexFrom,
   indexStats,
   kindLabel,
   kindShort,
+  longRunRate,
   outlook,
   project,
   readTrend,
   resolveProjectionYear,
   seriesKindFor,
+  zoneLabel,
   type AreaOutlook as Outlook,
   type AreaRecord,
   type Growth,
-  type IndexKey,
+  type IndexSeries,
+  type Place,
   type PriceData,
   type SeriesKind,
   type TrendRead,
-  type Zone,
 } from '../areas'
-import { HELSINKI_PRICES } from '../data/helsinkiPrices'
+import { AREA_PRICES } from '../data/areaPrices'
 import type { HousingSituation, PropertyListing } from '../housing'
 import { fmtEur, fmtNum, fmtPct } from '../format'
 import { niceTicks } from './chartHelpers'
@@ -34,13 +37,15 @@ import { TipRow } from './TwoLineChart'
 import { useWidth } from './useWidth'
 
 /**
- * Helsinki by area: what homes have sold for per square metre in each
- * postal-code area, and what continuing the trend implies - at the purchase,
- * and ten and twenty years after it.
+ * Prices by area: what homes have sold for per square metre in each
+ * postal-code area of Helsinki, Espoo and Vantaa, and what continuing the
+ * trend implies - at the purchase, and ten and twenty years after it.
  *
  * The rent-or-buy card takes the home's growth as one typed guess; this card
- * is where such a guess can come from. It leads with one area (a candidate's,
- * when a place carries a postal code) drawn against the city, continues its
+ * is where such a guess can come from. It reads one city at a time - the
+ * first candidate's, else Helsinki - since every figure in it (the city line,
+ * the zones, the long run) is that city's. It leads with one area (a
+ * candidate's, when a place carries a postal code) drawn against the city, continues its
  * trend as a dashed line with a band for how much the area has swung, and
  * puts two more lines beside it: the reader's own guess, and the long-run
  * rate of the area's whole price zone since 1988 - the steadier yardstick
@@ -50,7 +55,7 @@ import { useWidth } from './useWidth'
  * run itself, because a series that starts in 2009 has never seen the 1990s.
  *
  * The area wears the ownership blue (slot 1); the reader's guess the teal
- * (slot 3) the renting line already uses against it. Helsinki as a whole and
+ * (slot 3) the renting line already uses against it. The city as a whole and
  * the zone's long run are references, so they are drawn in the muted ink the
  * axes use - solid for what happened, dashed for what is continued.
  */
@@ -59,15 +64,14 @@ const AREA_COLOR = 'var(--series-1)'
 const GUESS_COLOR = 'var(--series-3)'
 const REF_COLOR = 'var(--ink-3)'
 const CITY_CODE = 'city'
-const CITY_SUBJECT = { code: CITY_CODE, name: 'Helsinki, all areas', zone: null }
-const ZONES: Zone[] = [1, 2, 3, 4]
+const citySubject = (data: PriceData) => ({ code: CITY_CODE, name: `${data.name}, all areas`, zone: null })
 
 const perYear = (g: Growth | null): string => (g ? `${fmtPct(g.pct)}/yr` : '—')
 const perM2 = (v: number): string => `${fmtEur(v)}/m²`
 const horizonLabel = (i: number): string =>
   i === 0 ? 'At purchase' : `+${HORIZON_OFFSETS[i]} years`
-/** the zone's name for the long-run line: "zone 3" for an area, "Helsinki" for the city */
-const longRunName = (o: Outlook): string => (o.zone === null ? 'Helsinki' : `zone ${o.zone}`)
+/** the zone's name for the long-run line: "zone 3" for an area, "Espoo-Kauniainen" for the city */
+const longRunName = (o: Outlook, data: PriceData): string => (o.zone === null ? data.indexName : `zone ${o.zone}`)
 
 interface Props {
   situation: HousingSituation
@@ -96,37 +100,59 @@ function busiestKind(area: AreaRecord | undefined): SeriesKind {
   return best
 }
 
-/** Helsinki as a whole, for one kind of home. */
-function cityOutlook(
-  data: PriceData,
-  kind: SeriesKind,
-  targetYear: number,
-  guess: number,
-  longRunCity: number | null,
-): Outlook {
+/** A city as a whole, for one kind of home. */
+function cityOutlook(data: PriceData, kind: SeriesKind, targetYear: number, guess: number): Outlook {
   const s = citySeries(data, kind)
-  return outlook(CITY_SUBJECT, data.years, s, s.values, null, targetYear, guess, longRunCity)
+  const longRun = longRunRate(data.index, data.index.city)
+  return outlook(citySubject(data), data.years, s, s.values, null, targetYear, guess, longRun)
 }
 
+/** One area for one kind of home, against its own city's outlook for the same kind. */
+function areaOutlook(
+  data: PriceData,
+  area: AreaRecord,
+  kind: SeriesKind,
+  city: Outlook,
+  targetYear: number,
+  guess: number,
+): Outlook {
+  return outlook(
+    { code: area.code, name: area.name, zone: area.zone },
+    data.years,
+    areaSeries(area, kind),
+    city.values,
+    city.summary.volatilityPct,
+    targetYear,
+    guess,
+    longRunRate(data.index, data.index.zones[area.zone]),
+  )
+}
+
+/** A candidate: one of the reader's places, and the city and area its postal code puts it in. */
+type Candidate = Place & { p: PropertyListing }
+
 export function AreaOutlook({ situation, properties, onChange }: Props) {
-  const data: PriceData = HELSINKI_PRICES
-  const latestYear = data.years[data.years.length - 1]
+  const cities = AREA_PRICES
+  // The cities share their years: one fetch, one set of tables.
+  const latestYear = cities[0].years[cities[0].years.length - 1]
   const targetYear = resolveProjectionYear(situation.projectionYear, latestYear)
   const guess = situation.homeValueGrowthPct
   const set = (patch: Partial<HousingSituation>) => onChange({ ...situation, ...patch })
 
-  // The places that carry a postal code the data knows.
-  const candidates = useMemo(
+  // The places that carry a postal code the data knows, in whichever city.
+  const candidates = useMemo<Candidate[]>(
     () =>
       properties.flatMap((p) => {
-        const area = findArea(data, p.postalCode)
-        return area ? [{ p, area }] : []
+        const place = findPlace(cities, p.postalCode)
+        return place ? [{ p, ...place }] : []
       }),
-    [properties, data],
+    [properties, cities],
   )
-  // The chips open on what the first place says it is, else on what its area
-  // mostly trades - a card that opens on studios for a terraced house is a
-  // card that opens wrong.
+  // The card opens on the first place's city, the chips on what that place
+  // says it is, else on what its area mostly trades - a card that opens on
+  // studios for a terraced house is a card that opens wrong.
+  const [cityKey, setCityKey] = useState<string>(() => candidates[0]?.data.key ?? cities[0].key)
+  const data = cities.find((c) => c.key === cityKey) ?? cities[0]
   const [kind, setKind] = useState<SeriesKind>(() => {
     const first = candidates[0]
     const own = first?.p.homeType ? seriesKindFor(first.p.homeType, first.p.rooms) : null
@@ -136,61 +162,39 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
   const [horizon, setHorizon] = useState(0)
   const [sort, setSort] = useState<Sort>({ key: 'name', dir: 'asc' })
 
-  // The long-run rates: the whole index for Helsinki and each zone, 1988 on.
-  const longRun = useMemo(() => {
-    const idx = data.index
-    const rate = (key: IndexKey) => indexStats(idx.years, idx.series[key].nominal).sinceStart?.pct ?? null
-    const zones: Record<Zone, number | null> = {
-      1: rate('zone1'),
-      2: rate('zone2'),
-      3: rate('zone3'),
-      4: rate('zone4'),
-    }
-    return { city: rate('helsinki'), zones, since: idx.years[0] }
-  }, [data])
+  // Another city opens on a place of yours there, if there is one, read as
+  // what it says it is - the same rule the card opens by; else on the city
+  // as a whole, since an area picked in the last city is not in this one.
+  function pickCity(key: string) {
+    const mine = candidates.find((c) => c.data.key === key)
+    setCityKey(key)
+    setSelected(mine?.area.code ?? CITY_CODE)
+    const own = mine?.p.homeType ? seriesKindFor(mine.p.homeType, mine.p.rooms) : null
+    if (own) setKind(own)
+  }
 
-  const city = useMemo(
-    () => cityOutlook(data, kind, targetYear, guess, longRun.city),
-    [data, kind, targetYear, guess, longRun],
-  )
+  const since = data.index.years[0]
+  const city = useMemo(() => cityOutlook(data, kind, targetYear, guess), [data, kind, targetYear, guess])
 
   const rows = useMemo(
     () =>
       data.areas
-        .map((a) =>
-          outlook(
-            { code: a.code, name: a.name, zone: a.zone },
-            data.years,
-            areaSeries(a, kind),
-            city.values,
-            city.summary.volatilityPct,
-            targetYear,
-            guess,
-            longRun.zones[a.zone],
-          ),
-        )
+        .map((a) => areaOutlook(data, a, kind, city, targetYear, guess))
         .filter((o) => o.summary.latest !== null),
-    [data, kind, city, targetYear, guess, longRun],
+    [data, kind, city, targetYear, guess],
   )
   const byCode = useMemo(() => new Map(rows.map((r) => [r.code, r])), [rows])
 
-  // One area at one kind, on demand: a place that has said what it is is priced
-  // at its own kind's trend, which need not be the kind the chips are on.
+  // One place at one kind, on demand, against its own city: a place that has
+  // said what it is is priced at its own kind's trend, which need not be the
+  // kind the chips are on, and a place in Vantaa is read against Vantaa
+  // whichever city the card is showing.
   const outlookFor = useCallback(
-    (area: AreaRecord, k: SeriesKind): Outlook => {
-      const c = k === kind ? city : cityOutlook(data, k, targetYear, guess, longRun.city)
-      return outlook(
-        { code: area.code, name: area.name, zone: area.zone },
-        data.years,
-        areaSeries(area, k),
-        c.values,
-        c.summary.volatilityPct,
-        targetYear,
-        guess,
-        longRun.zones[area.zone],
-      )
+    (place: Place, k: SeriesKind): Outlook => {
+      const c = place.data === data && k === kind ? city : cityOutlook(place.data, k, targetYear, guess)
+      return areaOutlook(place.data, place.area, k, c, targetYear, guess)
     },
-    [data, kind, city, targetYear, guess, longRun],
+    [data, kind, city, targetYear, guess],
   )
   const pickedArea =
     selected === CITY_CODE ? null : (data.areas.find((a) => a.code === selected) ?? null)
@@ -206,11 +210,14 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
   // the checks measure it against the city and its zone.
   const read = useMemo<TrendRead | null>(() => {
     if (!picked || picked.zone === null) return null
-    const zoneKey = `zone${picked.zone}` as IndexKey
-    return readTrend(data.years, picked.values, picked.counts, city.values, {
-      years: data.index.years,
-      values: data.index.series[zoneKey].nominal,
-    })
+    const zone = data.index.zones[picked.zone]
+    return readTrend(
+      data.years,
+      picked.values,
+      picked.counts,
+      city.values,
+      zone ? { years: data.index.years, values: zone.nominal } : null,
+    )
   }, [picked, city, data])
 
   // Folded, the card says where it is and what that area has done.
@@ -218,21 +225,49 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
   const trend = current.projection?.trend ?? null
   const longRunPct = current.projection?.longRunPct ?? null
   const summary = [
-    `${current === city ? 'Helsinki' : `${current.code} ${current.name}`}, ${kindLabel(kind).toLowerCase()}`,
+    `${current === city ? data.name : `${current.code} ${current.name}`}, ${kindLabel(kind).toLowerCase()}`,
     shown ? `${perM2(shown.value)} in ${shown.year}` : '',
     trend ? `trend ${perYear(trend)}` : '',
-    longRunPct !== null ? `${longRunName(current)}’s long run ${fmtPct(longRunPct)}/yr` : '',
+    longRunPct !== null ? `${longRunName(current, data)}’s long run ${fmtPct(longRunPct)}/yr` : '',
   ]
     .filter(Boolean)
     .join(' · ')
 
+  // The zones whose index starts too late for a long run, for the note at the end.
+  const lateZones = cities.flatMap((c) =>
+    c.zones.flatMap((z) => {
+      const from = indexFrom(c.index, c.index.zones[z])
+      return from !== null && from > c.index.years[0] ? [`${c.name} ${z}, from ${from}`] : []
+    }),
+  )
+
   return (
     <FoldCard
       id="housing.area"
-      title="Helsinki by area"
-      caption="what homes have sold for per square metre, and what continuing the trend implies"
+      title="Prices by area"
+      caption={`what homes have sold for per square metre in ${coverage(cities)}, and what continuing the trend implies`}
       summary={summary}
     >
+      {cities.length > 1 && (
+        <div className="schedule-subjects" role="tablist" aria-label="Which city">
+          {cities.map((c) => {
+            const mine = candidates.filter((x) => x.data === c).length
+            return (
+              <button
+                key={c.key}
+                role="tab"
+                aria-selected={c === data}
+                className={`filter-chip${c === data ? ' active' : ''}`}
+                onClick={() => pickCity(c.key)}
+              >
+                {c.name}
+                {mine > 0 && <span className="chip-note">{mine === 1 ? '1 place' : `${mine} places`}</span>}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       <div className="schedule-subjects" role="tablist" aria-label="Which homes">
         {HOUSE_TYPES.map((t) => (
           <button
@@ -256,9 +291,9 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
               value={selected}
               onChange={(e) => setSelected(e.target.value)}
             >
-              <option value={CITY_CODE}>{CITY_SUBJECT.name}</option>
-              {ZONES.map((z) => (
-                <optgroup key={z} label={`Zone ${z} · ${ZONE_LABELS[z]}`}>
+              <option value={CITY_CODE}>{citySubject(data).name}</option>
+              {data.zones.map((z) => (
+                <optgroup key={z} label={`Zone ${z} · ${zoneLabel(data, z)}`}>
                   {data.areas
                     .filter((a) => a.zone === z)
                     .map((a) => (
@@ -311,14 +346,29 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
         <p className="chart-note">
           No {kindLabel(kind).toLowerCase()} sales published for {pickedArea.code}{' '}
           {pickedArea.name} — Statistics Finland withholds an area’s figure when too few homes
-          changed hands. Showing Helsinki as a whole; try another type above.
+          changed hands. Showing {data.name} as a whole; try another type above.
         </p>
       )}
 
-      <AreaChart area={current} city={city} showCity={current !== city} horizon={horizon} since={longRun.since} />
-      <Tiles o={current} />
-      <Horizons o={current} horizon={horizon} since={longRun.since} />
-      {read && picked && <Reading o={picked} read={read} kind={kind} longRunPct={picked.projection?.longRunPct ?? null} />}
+      <AreaChart
+        data={data}
+        area={current}
+        city={city}
+        showCity={current !== city}
+        horizon={horizon}
+        since={since}
+      />
+      <Tiles o={current} data={data} since={since} />
+      <Horizons o={current} data={data} horizon={horizon} since={since} />
+      {read && picked && (
+        <Reading
+          o={picked}
+          read={read}
+          kind={kind}
+          cityName={data.name}
+          longRunPct={picked.projection?.longRunPct ?? null}
+        />
+      )}
 
       {candidates.length > 0 && (
         <Candidates
@@ -331,7 +381,7 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
           onUse={(pct) => set({ homeValueGrowthPct: Math.round(pct * 10) / 10 })}
         />
       )}
-      {properties.some((p) => !findArea(data, p.postalCode)) && (
+      {properties.some((p) => !findPlace(cities, p.postalCode)) && (
         <p className="chart-note">
           Give a place its postal code (Edit → Postal code) and it is marked in the table below
           and priced forward at its own area’s trend.
@@ -340,6 +390,7 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
 
       <AreaTable
         rows={rows}
+        cityName={data.name}
         kind={kind}
         latestYear={latestYear}
         horizon={horizon}
@@ -358,15 +409,28 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
         caption="where they come from, and what they cannot say"
       >
         <p className="chart-note">
-          Averages of realised sales of old flats and terraced houses per postal-code area, from
-          Statistics Finland ({data.source.split(',')[0]}, tables {data.tables.join(', ')}; yearly
-          figures to {latestYear}, updated {data.updated}). The trend continues the last ten years’
-          average yearly change; the likely range is one standard deviation of the area’s own yearly
-          moves (Helsinki’s where the area has too few years), widening with the square root of the
-          years — roughly two years in three, if the future is as unruly as the past. The zone’s long
-          run is the average yearly change of Statistics Finland’s price index for the area’s whole
-          price zone since {longRun.since}: over ten and twenty years it is the steadier yardstick, and
-          the gap between it and the area’s trend is worth more thought than either figure. None of it
+          Averages of realised sales of old flats and terraced houses per postal-code area of{' '}
+          {coverage(cities)}, from Statistics Finland ({data.source.split(',')[0]}, tables{' '}
+          {data.tables.join(', ')}; yearly figures to {latestYear}, updated {data.updated}). Each
+          area is read against its own city, and the price zones are Statistics Finland’s own
+          division of each city by price level and location.
+          {cities
+            .filter((c) => c.municipalities.length > 1)
+            .map(
+              (c) =>
+                ` ${c.municipalities.filter((m) => m !== c.name).join(' and ')} goes with ${c.name}, as in Statistics Finland’s index; the city line beside it is ${c.name}’s alone.`,
+            )}{' '}
+          The trend
+          continues the last ten years’ average yearly change; the likely range is one standard
+          deviation of the area’s own yearly moves (the city’s where the area has too few years),
+          widening with the square root of the years — roughly two years in three, if the future is
+          as unruly as the past. The zone’s long run is the average yearly change of Statistics
+          Finland’s price index for the area’s whole price zone since {since}: over ten and twenty
+          years it is the steadier yardstick, and the gap between it and the area’s trend is worth
+          more thought than either figure.
+          {lateZones.length > 0 &&
+            ` A zone whose index starts later (${lateZones.join('; ')}) has no long run: its few years are not that kind of figure.`}{' '}
+          None of it
           is a forecast: a €/m² average mixes buildings, floors and renovations, a small area swings
           on a handful of sales, and the 2022–2025 fall sits inside every ten-year figure here. All
           figures are nominal — “The long run” above shows what inflation did to them.
@@ -406,12 +470,14 @@ function stackLabels(items: { text: string; v: number; y: number }[]): { text: s
 }
 
 function AreaChart({
+  data,
   area,
   city,
   showCity,
   horizon,
   since,
 }: {
+  data: PriceData
   area: Outlook
   city: Outlook
   showCity: boolean
@@ -517,7 +583,7 @@ function AreaChart({
   if (trendEnd !== null) endItems.push({ text: `trend ${fmtEur(trendEnd)}`, v: trendEnd, y: y(trendEnd) })
   if (guessEnd !== null) endItems.push({ text: `your guess ${fmtEur(guessEnd)}`, v: guessEnd, y: y(guessEnd) })
   if (longEnd !== null)
-    endItems.push({ text: `${longRunName(area)} long run ${fmtEur(longEnd)}`, v: longEnd, y: y(longEnd) })
+    endItems.push({ text: `${longRunName(area, data)} long run ${fmtEur(longEnd)}`, v: longEnd, y: y(longEnd) })
   const endLabels = stackLabels(endItems)
   const latestX = x(latest.year)
   const latestY = Math.max(12, y(latest.value) - 8)
@@ -563,7 +629,7 @@ function AreaChart({
         {showCity && (
           <span className="legend-item">
             <span className="swatch swatch-line" style={{ background: REF_COLOR }} />
-            Helsinki, all areas
+            {city.name}
           </span>
         )}
         {trendPct !== null && proj.trend && (
@@ -582,7 +648,7 @@ function AreaChart({
         {end && proj.longRunPct !== null && (
           <span className="legend-item">
             <span className="swatch swatch-line swatch-dash" style={{ borderColor: REF_COLOR }} />
-            at {longRunName(area)}’s long run since {since}, {fmtPct(proj.longRunPct)}/yr
+            at {longRunName(area, data)}’s long run since {since}, {fmtPct(proj.longRunPct)}/yr
           </span>
         )}
       </div>
@@ -721,7 +787,7 @@ function AreaChart({
                       value={v === null ? 'not published' : perM2(v)}
                       label={v !== null && n !== null ? `${area.name} · ${fmtNum(n)} sales` : area.name}
                     />
-                    {c !== null && <TipRow color={REF_COLOR} value={perM2(c)} label="Helsinki" />}
+                    {c !== null && <TipRow color={REF_COLOR} value={perM2(c)} label={data.name} />}
                   </>
                 )
               })()}
@@ -756,7 +822,7 @@ function AreaChart({
                       <TipRow
                         color={REF_COLOR}
                         value={perM2(l)}
-                        label={`at ${longRunName(area)}’s long run, ${fmtPct(proj.longRunPct)}/yr`}
+                        label={`at ${longRunName(area, data)}’s long run, ${fmtPct(proj.longRunPct)}/yr`}
                       />
                     )}
                   </>
@@ -771,10 +837,14 @@ function AreaChart({
 
 /* -------------------------------------------------------------------- tiles */
 
-function Tiles({ o }: { o: Outlook }) {
+function Tiles({ o, data, since }: { o: Outlook; data: PriceData; since: number }) {
   const { summary: s, projection: p, vsCity } = o
   if (!s.latest || !p) return null
   const above = (pct: number) => `${fmtNum(Math.round(Math.abs(pct)))} % ${pct > 0 ? 'above' : 'below'}`
+  // A zone whose index starts too late for a long run still has a few years
+  // to show - said with their dates, and not called a long run.
+  const zoneIndex = o.zone !== null && p.longRunPct === null ? data.index.zones[o.zone] : undefined
+  const shortRun = zoneIndex ? indexStats(data.index.years, zoneIndex.nominal).sinceStart : null
   return (
     <div className="stat-row">
       <div className="stat">
@@ -807,16 +877,27 @@ function Tiles({ o }: { o: Outlook }) {
       </div>
       {p.longRunPct !== null && (
         <div className="stat">
-          <span className="stat-label">{longRunName(o)}’s long run</span>
+          <span className="stat-label">{longRunName(o, data)}’s long run</span>
           <span className="stat-value">{fmtPct(p.longRunPct)}/yr</span>
           <span className="stat-sub">
-            {o.zone === null ? 'the whole index since 1988' : `zone ${o.zone} · ${ZONE_LABELS[o.zone]} · since 1988`}
+            {o.zone === null
+              ? `the whole index since ${since}`
+              : `zone ${o.zone} · ${zoneLabel(data, o.zone)} · since ${since}`}
+          </span>
+        </div>
+      )}
+      {o.zone !== null && shortRun && (
+        <div className="stat">
+          <span className="stat-label">Zone {o.zone}’s index</span>
+          <span className="stat-value">{perYear(shortRun)}</span>
+          <span className="stat-sub">
+            {shortRun.fromYear}–{shortRun.toYear} only · too short for a long run
           </span>
         </div>
       )}
       {vsCity && o.code !== CITY_CODE && (
         <div className="stat">
-          <span className="stat-label">Against Helsinki</span>
+          <span className="stat-label">Against {data.name}</span>
           <span className="stat-value">
             {Math.abs(vsCity.nowPct) < 0.5 ? 'At the average' : above(vsCity.nowPct)}
           </span>
@@ -834,10 +915,22 @@ function Tiles({ o }: { o: Outlook }) {
 /* ----------------------------------------------------------------- horizons */
 
 /** The selected area continued to each horizon, three ways, side by side. */
-function Horizons({ o, horizon, since }: { o: Outlook; horizon: number; since: number }) {
+function Horizons({
+  o,
+  data,
+  horizon,
+  since,
+}: {
+  o: Outlook
+  data: PriceData
+  horizon: number
+  since: number
+}) {
   const p = o.projection
   if (!p || !o.summary.latest) return null
   const startYear = o.summary.latest.year
+  const zoneFrom = o.zone !== null ? indexFrom(data.index, data.index.zones[o.zone]) : null
+  const trendText = `The trend is the area’s own ${p.trend ? `${p.trend.years}-year` : ''} figure`
   return (
     <div className="cmp-scroll">
       <table className="cmp schedule-table">
@@ -847,7 +940,7 @@ function Horizons({ o, horizon, since }: { o: Outlook; horizon: number; since: n
             <th>At the trend</th>
             <th>Likely range</th>
             <th>At your guess</th>
-            <th>At {longRunName(o)}’s long run</th>
+            <th>At {longRunName(o, data)}’s long run</th>
           </tr>
         </thead>
         <tbody>
@@ -859,7 +952,9 @@ function Horizons({ o, horizon, since }: { o: Outlook; horizon: number; since: n
             <td className="num">{perM2(o.summary.latest.value)}</td>
             <td className="num muted">—</td>
             <td className="num">{perM2(o.summary.latest.value)}</td>
-            <td className="num">{perM2(o.summary.latest.value)}</td>
+            <td className={`num${p.longRunPct === null ? ' muted' : ''}`}>
+              {p.longRunPct === null ? '—' : perM2(o.summary.latest.value)}
+            </td>
           </tr>
           {p.horizons.map((h, i) => (
             <tr key={h.year} className={i === horizon ? 'marked' : undefined}>
@@ -882,7 +977,9 @@ function Horizons({ o, horizon, since }: { o: Outlook; horizon: number; since: n
       <p className="chart-note">
         {p.stale
           ? `The figures for this area stop at ${startYear}, so nothing is continued from them - a line compounded for decades from a number the market left behind would be a headline, not an estimate. The trend above is still what those years showed.`
-          : `The trend is the area’s own ${p.trend ? `${p.trend.years}-year` : ''} figure; the long run is the price index of ${o.zone === null ? 'all Helsinki' : `the whole zone ${o.zone}`} since ${since}. Where the three disagree, the disagreement is the finding.`}
+          : p.longRunPct === null && o.zone !== null
+            ? `${trendText}. ${data.name} zone ${o.zone} has no long run: Statistics Finland’s index for it starts only in ${zoneFrom ?? 'recent years'}, and a decade that holds the 2022–2025 fall is not a rate to compound for twenty years. “The long run” below shows what it has done since.`
+            : `${trendText}; the long run is the price index of ${o.zone === null ? `all ${data.indexName}` : `the whole zone ${o.zone}`} since ${since}. Where the three disagree, the disagreement is the finding.`}
       </p>
     </div>
   )
@@ -898,8 +995,8 @@ const pp = (v: number) => {
   return `${fmtNum(r)} ${r === 1 ? 'point' : 'points'} a year`
 }
 /** "2023 (+16,4 % against Helsinki’s −5,1 %)" */
-const divergenceText = (d: { year: number; areaPct: number; cityPct: number }) =>
-  `${d.year} (${fmtPct(d.areaPct)} against Helsinki’s ${fmtPct(d.cityPct)})`
+const divergenceText = (cityName: string) => (d: { year: number; areaPct: number; cityPct: number }) =>
+  `${d.year} (${fmtPct(d.areaPct)} against ${cityName}’s ${fmtPct(d.cityPct)})`
 
 /**
  * Why the area's trend reads the way it does, in the order a careful reader
@@ -912,11 +1009,13 @@ function Reading({
   o,
   read,
   kind,
+  cityName,
   longRunPct,
 }: {
   o: Outlook
   read: TrendRead
   kind: SeriesKind
+  cityName: string
   longRunPct: number | null
 }) {
   const { trend, windows, sample, city, excessPct, divergences, divergenceShare, fromPeak, zone, zoneExcessPct } = read
@@ -925,6 +1024,7 @@ function Reading({
   const concentrated = aligned.length > 0 && (divergenceShare ?? 0) >= 0.5
   const flagged = windows.fragile || (sample?.thin ?? false) || concentrated
   const zoneName = `zone ${o.zone}`
+  const yearText = divergenceText(cityName)
 
   return (
     <div className="reading">
@@ -952,17 +1052,17 @@ function Reading({
         )}
         {city && excessPct !== null && (
           <li className={concentrated ? 'flag' : undefined}>
-            <b>Against Helsinki.</b> {kindLabel(kind)} across the city over the same years:{' '}
+            <b>Against {cityName}.</b> {kindLabel(kind)} across the city over the same years:{' '}
             {fmtPct(city.pct)}/yr, so this area ran {excessPct >= 0 ? 'ahead' : 'behind'} by {pp(excessPct)}.{' '}
             {divergences.length === 0
               ? 'The gap built a little each year, with no single year out of step.'
               : concentrated
                 ? `${fmtNum(Math.round(divergenceShare! * 100))} % of that gap came in ${
                     aligned.length === 1 ? 'one year' : 'two years'
-                  } when the area moved against the city: ${aligned.map(divergenceText).join(' and ')}.${
+                  } when the area moved against the city: ${aligned.map(yearText).join(' and ')}.${
                     against.length ? ` ${against.map((d) => `${d.year} cut the other way (${fmtPct(d.areaPct)} against ${fmtPct(d.cityPct)})`).join('; ')}.` : ''
                   }`
-                : `The years out of step — ${divergences.map(divergenceText).join(' and ')} — ${
+                : `The years out of step — ${divergences.map(yearText).join(' and ')} — ${
                     aligned.length === 0 ? 'cut against the gap' : 'explain little of it'
                   }; it built in the years between.`}
           </li>
@@ -982,7 +1082,7 @@ function Reading({
               ? `${fmtPct(fromPeak.area)} since ${fromPeak.areaPeakYear}`
               : `at its peak in ${fromPeak.areaPeakYear}`}
             {fromPeak.city !== null && fromPeak.cityPeakYear !== null
-              ? `; Helsinki ${fromPeak.city < -0.05 ? `${fmtPct(fromPeak.city)} since ${fromPeak.cityPeakYear}` : 'at its peak'}${
+              ? `; ${cityName} ${fromPeak.city < -0.05 ? `${fmtPct(fromPeak.city)} since ${fromPeak.cityPeakYear}` : 'at its peak'}${
                   fromPeak.area < -0.05 && fromPeak.city < -0.05
                     ? fromPeak.area < fromPeak.city - 2
                       ? ' — the area has given back more than the city.'
@@ -1023,8 +1123,8 @@ function Candidates({
   guess,
   onUse,
 }: {
-  candidates: { p: PropertyListing; area: AreaRecord }[]
-  outlookFor: (area: AreaRecord, kind: SeriesKind) => Outlook
+  candidates: Candidate[]
+  outlookFor: (place: Place, kind: SeriesKind) => Outlook
   /** the chips' kind - what a place that has not said what it is is priced at */
   kind: SeriesKind
   /** years from today to the purchase - asking prices are today's, not the data's last year */
@@ -1060,11 +1160,11 @@ function Candidates({
           </tr>
         </thead>
         <tbody>
-          {candidates.map(({ p, area }) => {
+          {candidates.map(({ p, data, area }) => {
             // Its own kind when it has said; the chips' when not; none for a
             // detached house, which these statistics do not cover.
             const k: SeriesKind | null = p.homeType ? seriesKindFor(p.homeType, p.rooms) : kind
-            const o = k === null ? null : outlookFor(area, k)
+            const o = k === null ? null : outlookFor({ data, area }, k)
             const projection = o?.projection
             // Only a trend that is actually continued (recent enough) prices a place forward.
             const trend = projection?.horizons[0]?.atTrend ? projection.trend : null
@@ -1073,7 +1173,7 @@ function Candidates({
                 <th className="rowhead">
                   {p.name || 'Unnamed place'}
                   <span className="zone-badge">
-                    {area.code} {area.name} · z{area.zone}
+                    {area.code} {area.name} · {data.name} z{area.zone}
                     {p.homeType ? ` · ${k === null ? 'detached' : kindShort(k)}` : ''}
                   </span>
                 </th>
@@ -1214,6 +1314,7 @@ function sortRows(rows: Outlook[], sort: Sort, cols: Column[]): Outlook[] {
 
 function AreaTable({
   rows,
+  cityName,
   kind,
   latestYear,
   horizon,
@@ -1224,6 +1325,7 @@ function AreaTable({
   candidateCodes,
 }: {
   rows: Outlook[]
+  cityName: string
   kind: SeriesKind
   latestYear: number
   horizon: number
@@ -1253,7 +1355,7 @@ function AreaTable({
   return (
     <Fold
       id="housing.area.every"
-      title={`Every area, ${kindLabel(kind).toLowerCase()}`}
+      title={`Every area in ${cityName}, ${kindLabel(kind).toLowerCase()}`}
       caption={`${rows.length} areas with published sales · sort by a column, pick an area to chart it${
         candidateCodes.size > 0 ? ' · your places marked' : ''
       }`}
@@ -1311,55 +1413,60 @@ function AreaTable({
 
 /* ----------------------------------------------------------------- long run */
 
-const ZONE_ROWS: { key: IndexKey; label: string }[] = [
-  { key: 'helsinki', label: 'Helsinki' },
-  { key: 'zone1', label: `Zone 1 · ${ZONE_LABELS[1]}` },
-  { key: 'zone2', label: `Zone 2 · ${ZONE_LABELS[2]}` },
-  { key: 'zone3', label: `Zone 3 · ${ZONE_LABELS[3]}` },
-  { key: 'zone4', label: `Zone 4 · ${ZONE_LABELS[4]}` },
-]
-
 function LongRun({ data }: { data: PriceData }) {
   const idx = data.index
   const first = idx.years[0]
-  const hel = indexStats(idx.years, idx.series.helsinki.nominal)
-  const helReal = indexStats(idx.years, idx.series.helsinki.real)
+  const whole = indexStats(idx.years, idx.city.nominal)
+  const wholeReal = indexStats(idx.years, idx.city.real)
   const { latest } = data
+  // The city, then its zones. A zone whose index starts late gets its own
+  // figures, from its own first year - but no "since 1988", which it is not.
+  const rows: { key: string; label: string; series: IndexSeries }[] = [
+    { key: 'city', label: data.indexName, series: idx.city },
+    ...data.zones.flatMap((z) => {
+      const series = idx.zones[z]
+      if (!series) return []
+      const from = indexFrom(idx, series)
+      const late = from !== null && from > first ? ` · from ${from}` : ''
+      return [{ key: `zone${z}`, label: `Zone ${z} · ${zoneLabel(data, z)}${late}`, series }]
+    }),
+  ]
+  const sinceFirst = (g: Growth | null) => (g && g.fromYear === first ? perYear(g) : '—')
   return (
     <Fold
       id="housing.area.longRun"
-      title={`The long run: Helsinki since ${first}`}
+      title={`The long run: ${data.indexName} since ${first}`}
       caption="the price index, all old dwellings — the range a projection from 2009 has never seen"
     >
       <div className="stat-row">
         <div className="stat">
           <span className="stat-label">Since {first}</span>
-          <span className="stat-value">{perYear(hel.sinceStart)}</span>
-          <span className="stat-sub">{perYear(helReal.sinceStart)} after inflation</span>
+          <span className="stat-value">{perYear(whole.sinceStart)}</span>
+          <span className="stat-sub">{perYear(wholeReal.sinceStart)} after inflation</span>
         </div>
         <div className="stat">
           <span className="stat-label">Worst fall</span>
-          <span className="stat-value">{hel.worst ? fmtPct(hel.worst.pct) : '—'}</span>
+          <span className="stat-value">{whole.worst ? fmtPct(whole.worst.pct) : '—'}</span>
           <span className="stat-sub">
-            {hel.worst ? `${hel.worst.fromYear}–${hel.worst.toYear}` : ''}
-            {helReal.worst ? ` · ${fmtPct(helReal.worst.pct)} in real terms` : ''}
+            {whole.worst ? `${whole.worst.fromYear}–${whole.worst.toYear}` : ''}
+            {wholeReal.worst ? ` · ${fmtPct(wholeReal.worst.pct)} in real terms` : ''}
           </span>
         </div>
         <div className="stat">
-          <span className="stat-label">From the {hel.peak?.year} peak</span>
+          <span className="stat-label">From the {whole.peak?.year} peak</span>
           <span className="stat-value">
-            {hel.fromPeakPct !== null ? fmtPct(hel.fromPeakPct) : '—'}
+            {whole.fromPeakPct !== null ? fmtPct(whole.fromPeakPct) : '—'}
           </span>
           <span className="stat-sub">
-            {helReal.fromPeakPct !== null && helReal.peak
-              ? `${fmtPct(helReal.fromPeakPct)} in real terms since ${helReal.peak.year}`
+            {wholeReal.fromPeakPct !== null && wholeReal.peak
+              ? `${fmtPct(wholeReal.fromPeakPct)} in real terms since ${wholeReal.peak.year}`
               : ''}
           </span>
         </div>
         <div className="stat">
           <span className="stat-label">Down years</span>
           <span className="stat-value">
-            {hel.downYears} of {idx.years.length - 1}
+            {whole.downYears} of {idx.years.length - 1}
           </span>
           <span className="stat-sub">years that ended below the year before</span>
         </div>
@@ -1388,14 +1495,14 @@ function LongRun({ data }: { data: PriceData }) {
             </tr>
           </thead>
           <tbody>
-            {ZONE_ROWS.map(({ key, label }) => {
-              const n = indexStats(idx.years, idx.series[key].nominal)
-              const r = indexStats(idx.years, idx.series[key].real)
+            {rows.map(({ key, label, series }) => {
+              const n = indexStats(idx.years, series.nominal)
+              const r = indexStats(idx.years, series.real)
               return (
-                <tr key={key} className={key === 'helsinki' ? 'marked' : undefined}>
+                <tr key={key} className={key === 'city' ? 'marked' : undefined}>
                   <th className="rowhead">{label}</th>
-                  <td className="num">{perYear(n.sinceStart)}</td>
-                  <td className="num">{perYear(r.sinceStart)}</td>
+                  <td className="num">{sinceFirst(n.sinceStart)}</td>
+                  <td className="num">{sinceFirst(r.sinceStart)}</td>
                   <td className="num">{perYear(n.since2015)}</td>
                   <td className="num">
                     {n.fromPeakPct !== null && n.fromPeakPct < -0.05

@@ -1,15 +1,18 @@
 import { useState } from 'react'
-import { ZONE_LABELS, findArea, kindLabel, seriesKindFor } from '../areas'
-import { HELSINKI_PRICES } from '../data/helsinkiPrices'
+import { coverage, findPlace, kindLabel, seriesKindFor, zoneLabel } from '../areas'
+import { AREA_PRICES } from '../data/areaPrices'
 import { HOME_TYPES, type HomeType, type PropertyListing } from '../housing'
 import { NumberField } from './NumberField'
 
 /** What the postal code field says under itself: the area it found, or why it found none. */
 function postalHint(code: string): string {
-  if (!code) return 'Helsinki only — links the place to its area in "Helsinki by area"'
-  const area = findArea(HELSINKI_PRICES, code)
-  if (area) return `${area.name} · price zone ${area.zone}, ${ZONE_LABELS[area.zone]}`
-  return code.length < 5 ? 'five digits, e.g. 00730' : 'not a Helsinki postal code the price data covers'
+  if (!code) return `${coverage(AREA_PRICES)} — links the place to its area in "Prices by area"`
+  const found = findPlace(AREA_PRICES, code)
+  if (found) {
+    const { data, area } = found
+    return `${area.name} · ${data.name} price zone ${area.zone}, ${zoneLabel(data, area.zone)}`
+  }
+  return code.length < 5 ? 'five digits, e.g. 00730' : 'not a postal code the price data covers'
 }
 
 /** What the type field says under itself: which price series the place will be read against. */

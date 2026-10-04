@@ -179,7 +179,7 @@ export interface PropertyListing {
   /** asking price, € */
   price: number
   sizeM2: number
-  /** Helsinki postal code, e.g. "00730" — ties the place to its area's price history; empty elsewhere */
+  /** postal code, e.g. "00730" — ties a place in Helsinki, Espoo, Kauniainen or Vantaa to its area's price history; any other code is kept but read against nothing */
   postalCode: string
   /** which published price series the place is measured against; '' = not said, read as all flats */
   homeType: HomeType | ''

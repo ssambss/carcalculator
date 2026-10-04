@@ -1355,10 +1355,55 @@ sheet when someone actually edits these in a spreadsheet), and any scraper
 feed — oikotie forbids scraping in its terms, so candidates are typed in by
 hand.
 
+**Espoo and Vantaa (2026-10-04, user's ask — "more options for the future
+predictions alongside Helsinki"):** "Helsinki by area" became **Prices by
+area**, one city at a time behind city chips (each carrying how many of your
+places are there), and everything that card says is now the chosen city's:
+the city line, its zones, its long run, "Against Espoo". The data is one
+`PriceData` per city in `src/data/areaPrices.ts` (`AREA_PRICES`, ~158 KB),
+written by `scripts/fetch-area-prices.mjs` (renamed), whose `CITIES` list is
+the only place a city is named — 13mu postal codes by the municipality in
+their label, 13mx for the city as a whole, 13mz/15is for its index. Kauniainen
+(one postal code, 02700) goes with Espoo, because Statistics Finland's index
+is Espoo-Kauniainen; the city line beside it is Espoo's alone. Zones are named
+by price level outside Helsinki ("priciest / mid-priced / least expensive
+areas") — Espoo's zone 1 is Tapiola, Otaniemi, Matinkylä and Kauniainen, not
+a ring — and the 2025 €/m² confirm the order in both cities.
+
+**The zones were out of date, Helsinki's too.** The 2018 page the mapping was
+copied from had been superseded twice; the current divisions are in Statistics
+Finland's classification service as `alue_43_20260625` (2025 base, the one
+15is names) and `alue_43_20220407` (2020 base, the one 13mz names), each zone's
+postal codes listed in the item's note. The script now reads them from there —
+the current division first, the previous for a code it leaves out (only 00800
+Länsi-Herttoniemi, zone 2) — so the next base-year change arrives with the next
+fetch. Sixteen Helsinki areas moved (Kalasatama 2 → 1; Konala, Maunula,
+Oulunkylä, Roihuvuori 4 → 3; Tapaninvainio and Vartioharju 3 → 4; …); the
+candidates' Pakila/Tapanila ring stays zone 3, and every Helsinki price and
+index figure is identical to the old file.
+
+**Vantaa zone 3 has no long run.** The 2020 division split Vantaa into three
+zones where it had two, and zone 3 (Myyrmäki, Martinlaakso, Korso, Hakunila…)
+has no 2000-base index at all — only the 2015 base, 100 → 82.8 by 2025 (−1.9
+%/yr; −32 % real). The script takes the earliest base a zone has; `longRunRate()`
+refuses a series that starts after the index does, since a decade holding the
+2022–2025 fall is not a rate to compound for twenty years. The card says so
+where the long run would be (a "zone 3's index, 2015–2025 only" tile, the
+horizons note, the long-run table's row), and the "against its zone" check
+still runs on the 2015 series. Filters became per city (`zone:espoo:1`; an old
+`zone:3` falls back to all), search matches the city name, and switching city
+opens on one of your places there read as its own kind.
+
 ---
 
 ## Log
 
+- **2026-10-04** — **Espoo and Vantaa.** "Helsinki by area" is now "Prices by
+  area" across Helsinki, Espoo (with Kauniainen) and Vantaa, one city at a
+  time, each area against its own city and zones. Price zones now come from
+  Statistics Finland's classification service, not a 2018 page — sixteen
+  Helsinki areas reclassified. Vantaa zone 3's index starts in 2015 and gets
+  no long run. 377 frontend tests, verified in Edge at 1280 and 390 px.
 - **2026-09-30** — **Saving up.** A card in housing mode: what each place (or
   a typed target) takes in cash, the saving plan carried to the purchase day,
   balances logged per saver against the plan line, the monthly sum that closes

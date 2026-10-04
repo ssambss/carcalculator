@@ -11,7 +11,7 @@
     "test:all": "npm test && npm test --prefix scraper",
     "lint": "oxlint",
     "preview": "vite preview",
-    "fetch:prices": "node scripts/fetch-helsinki-prices.mjs"
+    "fetch:prices": "node scripts/fetch-area-prices.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

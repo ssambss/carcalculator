@@ -1,4 +1,4 @@
-// Helsinki by area: the arithmetic behind "continuing the trend", and the
+// Prices by area: the arithmetic behind "continuing the trend", and the
 // shape of the data file the fetch script writes.
 //
 // As with the rest of housing, the tests pin decisions rather than sums: how a
@@ -16,21 +16,36 @@ import {
   band,
   cagr,
   citySeries,
+  coverage,
   cumulativePct,
   describeSeries,
   findArea,
+  findPlace,
   growthOver,
   growthSince,
+  indexFrom,
   indexStats,
+  longRunRate,
   nominalRates,
   outlook,
   seriesKindFor,
   project,
   resolveProjectionYear,
+  zoneLabel,
   type AreaRecord,
+  type PriceData,
   type Series,
 } from '../src/areas'
-import { HELSINKI_PRICES } from '../src/data/helsinkiPrices'
+import { AREA_PRICES } from '../src/data/areaPrices'
+
+const city = (key: string): PriceData => {
+  const c = AREA_PRICES.find((x) => x.key === key)
+  if (!c) throw new Error(`no ${key} in the data`)
+  return c
+}
+const HELSINKI = city('helsinki')
+const ESPOO = city('espoo')
+const VANTAA = city('vantaa')
 
 const years = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, k) => from + k)
 
@@ -151,7 +166,7 @@ describe('picking a series', () => {
 
   it('aligns the city series to the area years', () => {
     const data = {
-      ...HELSINKI_PRICES,
+      ...HELSINKI,
       years: [2010, 2011],
       city: {
         years: [2009, 2010, 2011, 2012],
@@ -262,6 +277,21 @@ describe('the long run', () => {
   it('a series that only rose has no worst fall', () => {
     expect(indexStats(years(2000, 2002), [100, 110, 120]).worst).toBeNull()
   })
+
+  it('is a long run only when it covers everything the index does', () => {
+    const index = { years: years(1988, 2025), city: { nominal: [], real: [] }, zones: {} }
+    const full = { nominal: steady(38, 2), real: steady(38, 0) }
+    expect(longRunRate(index, full)).toBeCloseTo(2, 9)
+    expect(indexFrom(index, full)).toBe(1988)
+    // A zone added to the division later - Vantaa 3, from 2015: ten years
+    // holding the 2022-2025 fall are a figure, but not a long run.
+    const late = { nominal: steady(38, 2).map((v, k) => (k < 27 ? null : v)), real: steady(38, 0) }
+    expect(indexStats(index.years, late.nominal).sinceStart?.fromYear).toBe(2015)
+    expect(longRunRate(index, late)).toBeNull()
+    expect(indexFrom(index, late)).toBe(2015)
+    expect(longRunRate(index, undefined)).toBeNull()
+    expect(indexFrom(index, undefined)).toBeNull()
+  })
 })
 
 describe('an index rather than a price', () => {
@@ -301,25 +331,48 @@ describe('which series a home is read against', () => {
 })
 
 describe('one place, nominally', () => {
-  const d = HELSINKI_PRICES
+  const all = AREA_PRICES
+  const d = HELSINKI
 
   it('gives a Helsinki address its zone index and its own trend', () => {
     // 00730 Tapanila, zone 3.
-    const r = nominalRates(d, '00730')
+    const r = nominalRates(all, '00730')
+    expect(r.data?.key).toBe('helsinki')
     expect(r.area?.name).toBe('Tapanila')
     expect(r.longRunSince).toBe(d.index.years[0])
+    expect(r.zoneIndexFrom).toBe(d.index.years[0])
     // The zone's long run is the index's own average change since it starts -
     // computed here the long way round, from the series.
-    const expected = indexStats(d.index.years, d.index.series.zone3.nominal).sinceStart?.pct
+    const expected = indexStats(d.index.years, d.index.zones[3]!.nominal).sinceStart?.pct
     expect(r.longRunPct).toBeCloseTo(expected!, 9)
     // Prices in Helsinki have risen over the whole index, and not by 20 % a year.
     expect(r.longRunPct).toBeGreaterThan(0)
     expect(r.longRunPct).toBeLessThan(10)
   })
 
+  it('reads an Espoo address against Espoo’s zone, not Helsinki’s of the same number', () => {
+    // 02100 Tapiola is Espoo's zone 1; 00100 is Helsinki's.
+    const tapiola = nominalRates(all, '02100')
+    expect(tapiola.data?.key).toBe('espoo')
+    expect(tapiola.area?.zone).toBe(1)
+    expect(tapiola.longRunPct).toBeCloseTo(longRunRate(ESPOO.index, ESPOO.index.zones[1])!, 9)
+    expect(tapiola.longRunPct).not.toBeCloseTo(nominalRates(all, '00100').longRunPct!, 3)
+  })
+
+  it('gives no long run to a zone whose index starts late, but keeps the area’s trend', () => {
+    // 01600 Myyrmäki, Vantaa zone 3: the zone's index starts in 2015; the
+    // area itself trades hundreds of flats a year.
+    const r = nominalRates(all, '01600')
+    expect(r.data?.key).toBe('vantaa')
+    expect(r.area?.zone).toBe(3)
+    expect(r.longRunPct).toBeNull()
+    expect(r.zoneIndexFrom).toBeGreaterThan(r.longRunSince)
+    expect(r.trendPct).not.toBeNull()
+  })
+
   it('takes the area trend from all flats, count-weighted', () => {
     const area = findArea(d, '00730')!
-    const r = nominalRates(d, '00730')
+    const r = nominalRates(all, '00730')
     const summary = describeSeries(d.years, areaSeries(area, 'flats').values)
     const trend = summary.growth10 ?? summary.growthAll
     expect(r.latestYear).toBe(summary.latest?.year)
@@ -327,8 +380,10 @@ describe('one place, nominally', () => {
   })
 
   it('says nothing at all about an address the data has no area for', () => {
-    for (const code of ['02150', '', '  ', '99999']) {
-      const r = nominalRates(d, code)
+    // 33100 is Tampere's centre: a real postal code, outside the data.
+    for (const code of ['33100', '', '  ', '99999']) {
+      const r = nominalRates(all, code)
+      expect(r.data).toBeNull()
       expect(r.area).toBeNull()
       expect(r.longRunPct).toBeNull()
       expect(r.trendPct).toBeNull()
@@ -344,7 +399,7 @@ describe('one place, nominally', () => {
     // handful of years at most; whichever areas are stale, the rule is the
     // same one outlook() applies - no trend to continue, index unaffected.
     const stale = d.areas
-      .map((a) => nominalRates(d, a.code))
+      .map((a) => nominalRates(all, a.code))
       .filter((r) => r.stale)
     for (const r of stale) {
       expect(r.trendPct).toBeNull()
@@ -359,9 +414,9 @@ describe('one place, nominally', () => {
     // Itä-Pakila (00680): terraced houses trade 20-75 a year, unbroken since
     // 2009; flats barely publish at all. As a flat the address has nothing to
     // say; as a terraced house it has seventeen years.
-    const asFlat = nominalRates(d, '00680', 'flats')
-    const asThree = nominalRates(d, '00680', 'three')
-    const asTerraced = nominalRates(d, '00680', 'terraced')
+    const asFlat = nominalRates(all, '00680', 'flats')
+    const asThree = nominalRates(all, '00680', 'three')
+    const asTerraced = nominalRates(all, '00680', 'terraced')
     expect(asTerraced.kind).toBe('terraced')
     expect(asTerraced.trendPct).not.toBeNull()
     expect(asTerraced.trendYears).toBe(10)
@@ -373,7 +428,7 @@ describe('one place, nominally', () => {
   })
 
   it('keeps the zone index and drops the trend for a kind the data does not cover', () => {
-    const r = nominalRates(d, '00730', null)
+    const r = nominalRates(all, '00730', null)
     expect(r.area?.name).toBe('Tapanila')
     expect(r.kind).toBeNull()
     expect(r.longRunPct).not.toBeNull()
@@ -384,13 +439,13 @@ describe('one place, nominally', () => {
   })
 
   it('defaults to all flats, as before the kind was asked', () => {
-    expect(nominalRates(d, '00730')).toEqual(nominalRates(d, '00730', 'flats'))
-    expect(nominalRates(d, '00730').kind).toBe('flats')
+    expect(nominalRates(all, '00730')).toEqual(nominalRates(all, '00730', 'flats'))
+    expect(nominalRates(all, '00730').kind).toBe('flats')
   })
 
   it('never reports a trend without the window it spans', () => {
-    for (const a of d.areas) {
-      const r = nominalRates(d, a.code)
+    for (const a of all.flatMap((c) => c.areas)) {
+      const r = nominalRates(all, a.code)
       expect(r.trendPct === null).toBe(r.trendYears === null)
       if (r.trendYears !== null) expect(r.trendYears).toBeGreaterThan(0)
     }
@@ -412,46 +467,109 @@ describe('the projection year', () => {
 })
 
 describe('the data file', () => {
-  const d = HELSINKI_PRICES
   const contiguous = (ys: number[]) => ys.every((y, k) => k === 0 || y === ys[k - 1] + 1)
 
-  it('covers every Helsinki postal-code area from 2009, one figure per year', () => {
-    expect(d.years[0]).toBe(2009)
-    expect(contiguous(d.years)).toBe(true)
-    expect(d.areas.length).toBeGreaterThanOrEqual(80)
-    for (const a of d.areas) {
-      expect(a.code).toMatch(/^00\d{3}$/)
-      expect(a.name).toBeTruthy()
-      expect([1, 2, 3, 4]).toContain(a.zone)
-      for (const t of ['studio', 'two', 'three', 'terraced'] as const) {
-        expect(a.price[t]).toHaveLength(d.years.length)
-        expect(a.count[t]).toHaveLength(d.years.length)
+  it('has Helsinki, Espoo and Vantaa, sharing their years', () => {
+    expect(AREA_PRICES.map((c) => c.key)).toEqual(['helsinki', 'espoo', 'vantaa'])
+    for (const c of AREA_PRICES) {
+      expect(c.years).toEqual(HELSINKI.years)
+      expect(c.index.years).toEqual(HELSINKI.index.years)
+    }
+    // Statistics Finland prices Kauniainen with Espoo; so does the data.
+    expect(ESPOO.municipalities).toEqual(['Espoo', 'Kauniainen'])
+    expect(ESPOO.indexName).toBe('Espoo-Kauniainen')
+  })
+
+  it('covers every postal-code area of each city from 2009, one figure per year', () => {
+    expect(HELSINKI.years[0]).toBe(2009)
+    expect(contiguous(HELSINKI.years)).toBe(true)
+    // Statistics Finland's postal-code areas, give or take a new one: 82, 45 and 36 in 2025.
+    expect(HELSINKI.areas.length).toBeGreaterThanOrEqual(80)
+    expect(ESPOO.areas.length).toBeGreaterThanOrEqual(40)
+    expect(VANTAA.areas.length).toBeGreaterThanOrEqual(30)
+    const prefix: Record<string, RegExp> = { helsinki: /^00\d{3}$/, espoo: /^02\d{3}$/, vantaa: /^01\d{3}$/ }
+    for (const c of AREA_PRICES) {
+      for (const a of c.areas) {
+        expect(a.code).toMatch(prefix[c.key])
+        expect(a.name).toBeTruthy()
+        expect(c.zones).toContain(a.zone)
+        for (const t of ['studio', 'two', 'three', 'terraced'] as const) {
+          expect(a.price[t]).toHaveLength(c.years.length)
+          expect(a.count[t]).toHaveLength(c.years.length)
+        }
       }
+      expect(new Set(c.areas.map((a) => a.code)).size).toBe(c.areas.length)
     }
-    expect(new Set(d.areas.map((a) => a.code)).size).toBe(d.areas.length)
+    // A postal code is in one city only.
+    const codes = AREA_PRICES.flatMap((c) => c.areas.map((a) => a.code))
+    expect(new Set(codes).size).toBe(codes.length)
   })
 
-  it('has the city back to 2006 and the index back to 1988, both unbroken', () => {
-    expect(d.city.years[0]).toBe(2006)
-    expect(contiguous(d.city.years)).toBe(true)
-    expect(d.city.years).toEqual(expect.arrayContaining(d.years))
-    expect(d.index.years[0]).toBe(1988)
-    expect(contiguous(d.index.years)).toBe(true)
-    for (const key of ['helsinki', 'zone1', 'zone2', 'zone3', 'zone4', 'capitalRegion', 'finland'] as const) {
-      expect(d.index.series[key].nominal).toHaveLength(d.index.years.length)
-      expect(d.index.series[key].real).toHaveLength(d.index.years.length)
-      expect(d.index.series[key].nominal[d.index.years.length - 1]).not.toBeNull()
+  it('has each city back to 2006 and its index back to 1988, both unbroken', () => {
+    for (const c of AREA_PRICES) {
+      expect(c.city.years[0]).toBe(2006)
+      expect(contiguous(c.city.years)).toBe(true)
+      expect(c.city.years).toEqual(expect.arrayContaining(c.years))
+      expect(c.index.years[0]).toBe(1988)
+      expect(contiguous(c.index.years)).toBe(true)
+      const last = c.index.years.length - 1
+      for (const series of [c.index.city, ...c.zones.map((z) => c.index.zones[z]!)]) {
+        expect(series.nominal).toHaveLength(c.index.years.length)
+        expect(series.real).toHaveLength(c.index.years.length)
+        expect(series.nominal[last]).not.toBeNull()
+      }
+      // The city's own index is a long run everywhere.
+      expect(longRunRate(c.index, c.index.city)).not.toBeNull()
+      expect(c.latest.quarter).toMatch(/^\d{4}Q[1-4]$/)
     }
-    expect(d.latest.quarter).toMatch(/^\d{4}Q[1-4]$/)
+    expect(HELSINKI.zones).toEqual([1, 2, 3, 4])
+    expect(ESPOO.zones).toEqual([1, 2, 3])
+    expect(VANTAA.zones).toEqual([1, 2, 3])
   })
 
-  it('places the postal codes in Statistics Finland’s zones', () => {
-    expect(findArea(d, '00100')?.zone).toBe(1) // Helsinki keskusta
-    expect(findArea(d, '00530')?.zone).toBe(2) // Kallio
-    expect(findArea(d, '00730')?.zone).toBe(3) // Tapanila
-    expect(findArea(d, '00700')?.zone).toBe(4) // Malmi - "every other postal code"
-    expect(findArea(d, '00730')?.name).toBe('Tapanila')
-    expect(findArea(d, '')).toBeNull()
-    expect(findArea(d, '02100')).toBeNull()
+  it('places the postal codes in Statistics Finland’s current zones', () => {
+    expect(findArea(HELSINKI, '00100')?.zone).toBe(1) // Helsinki keskusta
+    expect(findArea(HELSINKI, '00530')?.zone).toBe(2) // Kallio
+    expect(findArea(HELSINKI, '00730')?.zone).toBe(3) // Tapanila
+    expect(findArea(HELSINKI, '00700')?.zone).toBe(4) // Malmi
+    // Moved up since the 2018 list the zones were once copied from by hand.
+    expect(findArea(HELSINKI, '00540')?.zone).toBe(1) // Kalasatama
+    expect(findArea(HELSINKI, '00730')?.name).toBe('Tapanila')
+    expect(findArea(ESPOO, '02100')?.zone).toBe(1) // Tapiola
+    expect(findArea(ESPOO, '02700')?.name).toBe('Kauniainen')
+    expect(findArea(ESPOO, '02320')?.zone).toBe(3) // Espoonlahti
+    expect(findArea(VANTAA, '01300')?.zone).toBe(1) // Tikkurila
+    expect(findArea(VANTAA, '01600')?.zone).toBe(3) // Myyrmäki
+    expect(findArea(HELSINKI, '')).toBeNull()
+    expect(findArea(HELSINKI, '02100')).toBeNull()
+  })
+
+  it('finds a postal code in whichever city has it', () => {
+    expect(findPlace(AREA_PRICES, '02100')?.data.key).toBe('espoo')
+    expect(findPlace(AREA_PRICES, ' 01300 ')?.data.key).toBe('vantaa')
+    expect(findPlace(AREA_PRICES, '00730')?.area.name).toBe('Tapanila')
+    expect(findPlace(AREA_PRICES, '33100')).toBeNull()
+    expect(findPlace(AREA_PRICES, '')).toBeNull()
+  })
+})
+
+describe('naming the zones', () => {
+  it('names Helsinki’s rings for where they are', () => {
+    expect(zoneLabel(HELSINKI, 1)).toBe('city centre')
+    expect(zoneLabel(HELSINKI, 4)).toBe('outer suburbs')
+  })
+
+  it('names another city’s zones for their price level', () => {
+    expect(ESPOO.zones.map((z) => zoneLabel(ESPOO, z))).toEqual([
+      'priciest areas',
+      'mid-priced areas',
+      'least expensive areas',
+    ])
+    expect(zoneLabel(VANTAA, 3)).toBe('least expensive areas')
+  })
+
+  it('says which municipalities the data covers', () => {
+    expect(coverage(AREA_PRICES)).toBe('Helsinki, Espoo, Kauniainen and Vantaa')
+    expect(coverage([HELSINKI])).toBe('Helsinki')
   })
 })

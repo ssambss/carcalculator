@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   HORIZON_OFFSETS,
+  coverage,
   cumulativePct,
   kindShort,
   nominalRates,
@@ -9,7 +10,7 @@ import {
   type NominalRates,
   type SeriesKind,
 } from '../areas'
-import { HELSINKI_PRICES } from '../data/helsinkiPrices'
+import { AREA_PRICES } from '../data/areaPrices'
 import {
   HOME_TYPES,
   HOUSING_CATEGORIES,
@@ -773,6 +774,18 @@ function trendNote(r: NominalRates): string {
   return `${k} · ${r.trendYears} yrs to ${r.latestYear}`
 }
 
+/**
+ * Whose index the zone's long run is: the city matters, since Espoo's zone 1
+ * and Helsinki's are different series - and a zone whose index starts too late
+ * for a long run says when it does start.
+ */
+function longRunNote(r: NominalRates): string {
+  if (!r.area || !r.data) return 'no postal code'
+  const zone = `${r.data.name} zone ${r.area.zone}`
+  if (r.longRunPct === null && r.zoneIndexFrom !== null) return `${zone} · index from ${r.zoneIndexFrom}`
+  return `${zone} · since ${r.longRunSince}`
+}
+
 function HousingTable({
   properties,
   costs,
@@ -784,8 +797,9 @@ function HousingTable({
   ceiling: number
   situation: HousingSituation
 }) {
-  const data = HELSINKI_PRICES
-  const latestYear = data.years[data.years.length - 1]
+  // The cities share their years: one fetch, one set of tables.
+  const years = AREA_PRICES[0].years
+  const latestYear = years[years.length - 1]
   const targetYear = resolveProjectionYear(situation.projectionYear, latestYear)
   // The asking prices are today's, so the horizons are counted from today -
   // the same reckoning "Your places, priced forward" uses.
@@ -794,13 +808,13 @@ function HousingTable({
   const list = properties.map((p) => ({
     p,
     c: costs.get(p.id)!,
-    r: nominalRates(data, p.postalCode, seriesOf(p)),
+    r: nominalRates(AREA_PRICES, p.postalCode, seriesOf(p)),
   }))
   // The reader's own guess, the figure rent-or-buy runs on. One number for
   // every place, so it is said once per row - in the label, where the two
   // area figures in the cells can be read against it - not five times over.
   const guess = situation.homeValueGrowthPct
-  const since = data.index.years[0]
+  const since = AREA_PRICES[0].index.years[0]
   const highlight = list.length > 1
 
   function minClass(values: number[], i: number): string {
@@ -998,9 +1012,7 @@ function HousingTable({
                         <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
                           {r.longRunPct === null ? '—' : `${fmtPct(r.longRunPct)}/yr`}
                           <br />
-                          <span className="cell-note">
-                            {r.area ? `zone ${r.area.zone} · since ${since}` : 'no postal code'}
-                          </span>
+                          <span className="cell-note">{longRunNote(r)}</span>
                         </td>
                       ))}
                     </tr>
@@ -1060,12 +1072,19 @@ function HousingTable({
           where both area figures can be read against it. The two disagreeing is the point, and
           none of the three is a forecast. A detached house is not in these
           statistics at all — they cover housing companies — so only the zone index applies to
-          it. Change the purchase year in “Helsinki by area”.
+          it. Change the purchase year in “Prices by area”.
+          {list.some(({ r }) => r.area !== null && r.longRunPct === null) && (
+            <>
+              {' '}
+              A zone whose index starts after {since} has no long run: its few years are not the
+              same kind of figure, so they are not compounded as one.
+            </>
+          )}
           {list.some(({ r }) => r.area === null) && (
             <>
               {' '}
-              A place reads “—” until it carries a Helsinki postal code (Edit → Postal code) —
-              the price data covers Helsinki and nowhere else.
+              A place reads “—” until it carries a postal code in {coverage(AREA_PRICES)} (Edit →
+              Postal code) — the price data covers those and nowhere else.
             </>
           )}
         </p>

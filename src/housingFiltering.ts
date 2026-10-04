@@ -11,15 +11,17 @@
  * what ties a place to its price history) and offers it at two grains: one
  * postal-code area, or a whole price zone — "show me the outer-suburb
  * candidates" is a question somebody actually asks, and picking four areas one
- * at a time is not an answer to it.
+ * at a time is not an answer to it. A zone is a city's: Espoo's zone 1 and
+ * Helsinki's are different places at different prices, so they are offered
+ * apart.
  *
  * Whether a place is within reach is not a property of the listing: it comes
  * from the ceiling, which moves with income, savings and the rules. So the
  * match takes it as an argument rather than reading it off the place.
  */
 
-import { ZONE_LABELS, findArea, type AreaRecord, type Zone } from './areas'
-import { HELSINKI_PRICES } from './data/helsinkiPrices'
+import { findPlace, zoneLabel, type AreaRecord, type Place, type Zone } from './areas'
+import { AREA_PRICES } from './data/areaPrices'
 import type { PropertyListing } from './housing'
 import { loadSelection, saveSelection } from './selection'
 
@@ -28,7 +30,7 @@ export type Reach = 'fits' | 'over'
 
 export interface PropertyFilters {
   query: string
-  /** 'all', `code:00730` for one area, `zone:3` for a whole price zone, or 'none' */
+  /** 'all', `code:00730` for one area, `zone:helsinki:3` for a whole price zone, or 'none' */
   area: string
   /** empty = both; otherwise which side of the ceiling */
   reach: Reach[]
@@ -47,12 +49,15 @@ export const NO_PROPERTY_FILTERS: PropertyFilters = {
 export const ALL_AREAS = 'all'
 export const NO_AREA = 'none'
 
-export const areaOf = (p: PropertyListing): AreaRecord | null =>
-  findArea(HELSINKI_PRICES, p.postalCode)
+export const placeOf = (p: PropertyListing): Place | null => findPlace(AREA_PRICES, p.postalCode)
+
+export const areaOf = (p: PropertyListing): AreaRecord | null => placeOf(p)?.area ?? null
 
 /* ------------------------------------------------------------ the area list */
 
 export interface AreaGroup {
+  /** the city's key; null for the group of places the price data has no area for */
+  city: string | null
   /** null for the group of places the price data has no area for */
   zone: Zone | null
   label: string
@@ -66,41 +71,52 @@ export interface AreaGroup {
  * nothing is just a way to make the view go blank.
  */
 export function listPropertyAreas(properties: PropertyListing[]): AreaGroup[] {
-  const byZone = new Map<Zone, Map<string, string>>()
+  const byZone = new Map<string, { place: Place; areas: Map<string, string> }>()
   let unplaced = 0
   for (const p of properties) {
-    const area = areaOf(p)
-    if (!area) {
+    const place = placeOf(p)
+    if (!place) {
       unplaced++
       continue
     }
-    const areas = byZone.get(area.zone) ?? new Map<string, string>()
-    areas.set(area.code, area.name)
-    byZone.set(area.zone, areas)
+    const key = zoneValue(place)
+    const group = byZone.get(key) ?? { place, areas: new Map<string, string>() }
+    group.areas.set(place.area.code, place.area.name)
+    byZone.set(key, group)
   }
 
+  // Cities in the data's order, Helsinki first; zones in theirs.
+  const rank = ({ data, area }: Place) => AREA_PRICES.indexOf(data) * 10 + area.zone
   const groups: AreaGroup[] = [...byZone.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([zone, areas]) => ({
-      zone,
-      label: `Zone ${zone} · ${ZONE_LABELS[zone]}`,
-      options: [
-        { value: `zone:${zone}`, label: `All of zone ${zone}` },
-        ...[...areas.entries()]
-          .sort((a, b) => a[1].localeCompare(b[1], 'fi'))
-          .map(([code, name]) => ({ value: `code:${code}`, label: `${code} ${name}` })),
-      ],
-    }))
+    .sort((a, b) => rank(a[1].place) - rank(b[1].place))
+    .map(([value, { place, areas }]) => {
+      const { data, area } = place
+      return {
+        city: data.key,
+        zone: area.zone,
+        label: `${data.name} · zone ${area.zone} · ${zoneLabel(data, area.zone)}`,
+        options: [
+          { value, label: `All of ${data.name} zone ${area.zone}` },
+          ...[...areas.entries()]
+            .sort((a, b) => a[1].localeCompare(b[1], 'fi'))
+            .map(([code, name]) => ({ value: `code:${code}`, label: `${code} ${name}` })),
+        ],
+      }
+    })
 
   if (unplaced > 0) {
     groups.push({
+      city: null,
       zone: null,
       label: 'Outside the price data',
-      options: [{ value: NO_AREA, label: `No Helsinki postal code (${unplaced})` }],
+      options: [{ value: NO_AREA, label: `No postal code the data covers (${unplaced})` }],
     })
   }
   return groups
 }
+
+/** "zone:espoo:1" - a whole price zone of one city. */
+const zoneValue = ({ data, area }: Place): string => `zone:${data.key}:${area.zone}`
 
 /** Does the area selection still name something the list offers? */
 export function areaFilterExists(groups: AreaGroup[], area: string): boolean {
@@ -110,9 +126,9 @@ export function areaFilterExists(groups: AreaGroup[], area: string): boolean {
 
 function matchesArea(p: PropertyListing, area: string): boolean {
   if (area === ALL_AREAS) return true
-  const found = areaOf(p)
+  const found = placeOf(p)
   if (area === NO_AREA) return found === null
-  if (area.startsWith('zone:')) return found !== null && String(found.zone) === area.slice(5)
+  if (area.startsWith('zone:')) return found !== null && zoneValue(found) === area
   if (area.startsWith('code:')) return p.postalCode.trim() === area.slice(5)
   return true
 }
@@ -142,8 +158,8 @@ export function matchesPropertyFilters(
   if (!matchesArea(p, f.area)) return false
   const q = f.query.trim().toLowerCase()
   if (q) {
-    const area = areaOf(p)
-    const haystack = [p.name, p.notes, p.postalCode, area?.name ?? '']
+    const place = placeOf(p)
+    const haystack = [p.name, p.notes, p.postalCode, place?.area.name ?? '', place?.data.name ?? '']
     if (!haystack.some((h) => h.toLowerCase().includes(q))) return false
   }
   return true

@@ -149,17 +149,20 @@ color-coded cost breakdown and a side-by-side comparison table.
   companies; a house on its own plot is sold as real estate) and says so —
   only the zone's index applies to it. The area card's type chips open on the
   first place's own kind.
-- **Helsinki by area** (housing mode). Statistics Finland's realised sale
-  prices per square metre for every Helsinki postal-code area since 2009, by
-  home type, drawn against the city with the ten-year trend continued to the
+- **Prices by area** (housing mode). Statistics Finland's realised sale
+  prices per square metre for every postal-code area of Helsinki, Espoo
+  (Kauniainen included, as in Statistics Finland's index) and Vantaa since
+  2009, by home type, one city at a time — each area drawn against its own
+  city, in its city's own price zones — with the ten-year trend continued to the
   year you plan to buy and ten and twenty years past it — a dashed line with a
   band for how much the area has swung — beside your own home-value guess and
   the long-run rate of the area's price zone since 1988, the steadier yardstick
-  for decades. Every area in one sortable table at each horizon; give a place
+  for decades (Vantaa's zone 3, whose index only starts in 2015, has none and
+  says so). Every area in one sortable table at each horizon; give a place
   its postal code and it is marked there and priced forward at its own area's
   trend. Series that stop early are not continued. Under the selected area, a
   **reading of its trend**: whether the figure survives moving the window a
-  year, how many sales it rests on, whether its gap to Helsinki built gradually
+  year, how many sales it rests on, whether its gap to the city built gradually
   or arrived in one or two years out of step (the mark of a change in what
   sold, not of homes gaining value), how it sits against its own zone, and what
   it has given back since its peak — ending in a plain verdict on how much of
@@ -216,16 +219,19 @@ than a rewrite. Both suites run on every push
 The design mockups (Claude Design canvas) live in [design/](design/) —
 open `design/car-tco-design.html` in a browser to view them.
 
-The Helsinki price data is a generated file, [src/data/helsinkiPrices.ts](src/data/helsinkiPrices.ts),
+The area price data is a generated file, [src/data/areaPrices.ts](src/data/areaPrices.ts),
 not a runtime fetch — the app is static and has to work offline. Statistics
 Finland updates the yearly tables each May; refresh with
 
 ```
-npm run fetch:prices   # rewrites src/data/helsinkiPrices.ts from the StatFin API
+npm run fetch:prices   # rewrites src/data/areaPrices.ts from the StatFin API
 ```
 
-and commit the result. The script ([scripts/fetch-helsinki-prices.mjs](scripts/fetch-helsinki-prices.mjs))
-names the tables it reads and the classification the price zones come from.
+and commit the result. The script ([scripts/fetch-area-prices.mjs](scripts/fetch-area-prices.mjs))
+names the tables it reads, reads the postal code → price zone division from
+Statistics Finland's classification service (the one the tables themselves
+name), and lists its cities in one `CITIES` line each — adding another city
+is a line there.
 
 ## Deploying to GitHub Pages
 
