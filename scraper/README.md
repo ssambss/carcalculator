@@ -289,6 +289,34 @@ everything already announced stays announced.
   are now called. Its verdicts are dropped, since no filter can claim them, so
   the first run afterwards reads a few more listing pages than usual.
 
+## The market record
+
+Beside the state file, every run keeps a **market record** in
+[data/market/](data/market/): every listing each search has read, kept after it
+leaves the site, with its asking price over time. It is what a resale curve and
+an "is this price fair" check are computed from, so it is the opposite of the
+state file in the ways that matter - nothing is pruned, it holds nobody's
+verdicts, and it is one shared file per search however many people watch it.
+
+- One file per search (`nettiauto-polestar-2.json`), one listing per line, so a
+  run's commit is the handful of listings that changed.
+- A price is added when it moves; a second change the same day replaces the
+  first, so a corrected typo is not a price cut. Days, not timestamps.
+- `completeAt` is the last crawl that read every page. A listing missing since
+  *then* has left the site; one missing only since a partial crawl may just have
+  been on a page that failed.
+- VINs are stored hashed: enough to recognise a car relisted under a new id, and
+  not the car's identity, since the record is public. Private sellers are
+  already only "Private seller" in the site's own data.
+- Dry runs do not write it. A record that cannot be written is logged and the
+  run carries on - it costs history, not anybody's posts.
+
+`node src/backfill-market.js` rebuilt it once from the git history of
+`data/seen.json`, which had committed each run's latest prices since
+2026-08-26. It builds from nothing (and refuses to overwrite a record without
+`--force`), since replaying old snapshots onto a newer record would put old
+prices after new ones.
+
 ## Commands
 
 ```sh
@@ -591,5 +619,8 @@ test/                   unit tests, no network
 test/sources.test.js    conformance: what every adapter has to get right
 test/tenants.test.js    who it runs for, and the half-configured cases
 test/reactions.test.js  reading channels across several servers
+src/market.js           the market record: every listing seen, prices over time
+src/backfill-market.js  one-off: that record rebuilt from seen.json's history
 data/seen.json          the record (commit this)
+data/market/            the market record, a file per search (commit this)
 ```

@@ -42,6 +42,7 @@ const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
+const { recordMarket } = await import('./market.js');
 const { BACKENDS, storeFor } = await import('./storage/index.js');
 const { describeTenant, loadTenants, postCapFor, selectTenants } = await import('./tenants.js');
 
@@ -567,6 +568,8 @@ async function crawlFor(contexts) {
   const groups = groupBySearch(filters);
   const everyListing = new Map();
   const results = new Map();
+  // Each search as it was read, for the market record - see market.js.
+  const reads = [];
   let detailFetches = 0;
   let reusedVerdicts = 0;
 
@@ -611,6 +614,16 @@ async function crawlFor(contexts) {
       listing.sourceId = group.source.id;
       everyListing.set(state.keyFor(listing), listing);
     }
+    reads.push({
+      sourceId: group.source.id,
+      search: group.search,
+      listings,
+      // Every page came back and the count agrees with the site's, give or take
+      // the odd advert withdrawn mid-crawl. Only then does "not seen since"
+      // mean a listing has left the site.
+      complete:
+        !pageFailures?.length && (total == null || listings.length >= total - Math.ceil(total * 0.02)),
+    });
 
     const result = await collectMatches(group.source, group.search, listings, group.filters);
     detailFetches += result.detailFetches;
@@ -625,7 +638,7 @@ async function crawlFor(contexts) {
     }
   }
 
-  return { groups, everyListing, results, detailFetches, reusedVerdicts, crawlFailures };
+  return { groups, everyListing, results, reads, detailFetches, reusedVerdicts, crawlFailures };
 }
 
 /**
@@ -1009,6 +1022,21 @@ async function main() {
       for (const { listing } of sorted) console.log(`  ${formatListing(listing)}`);
     }
     return 0;
+  }
+
+  // --- The market record: what the crawl read, whoever it was read for. ---
+  if (!args.dryRun) {
+    try {
+      for (const read of await recordMarket(crawled.reads)) {
+        console.log(
+          `Market record ${read.file}: ${read.total} listings ` +
+            `(${read.added} new, ${read.repriced} repriced).`,
+        );
+      }
+    } catch (error) {
+      // Costs history, not anybody's posts - so it is said, not fatal.
+      console.error(`Could not update the market record: ${error.message}`);
+    }
   }
 
   // --- Then each person's own posting, reactions and record. ---

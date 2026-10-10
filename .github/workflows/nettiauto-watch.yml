@@ -107,7 +107,10 @@ jobs:
       - name: Remember what was found
         if: ${{ !inputs.dry_run }}
         run: |
-          if git diff --quiet -- scraper/data/seen.json; then
+          # The market record (scraper/data/market/) rides along: new files
+          # included, so a newly watched model's record is committed too.
+          if [ -d scraper/data/market ]; then git add scraper/data/market; fi
+          if git diff --quiet -- scraper/data/seen.json && git diff --cached --quiet; then
             echo "State unchanged."
             exit 0
           fi
