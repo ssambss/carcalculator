@@ -84,6 +84,31 @@ color-coded cost breakdown and a side-by-side comparison table.
 - **Deleting is undoable** instead of asked about first — cars, places,
   odometer readings, trips and saved balances. Undo saves the item again with
   a fresh stamp, so it outlives a tombstone already pushed to the gist.
+- **Asking price against the market**: a car the listing watcher follows gets a
+  line under its costs — *2 300 € under the market*, *in line*, or *over* —
+  from the watcher's market record (every listing it has seen, kept after it
+  leaves the site, with its asking price over time; see the
+  [scraper README](scraper/README.md#the-market-record)). **Details** opens the
+  reasoning and the listings behind it:
+  - *Similar* starts narrow — same model and fuel, and for an electric car the
+    same battery (±4 kWh) and drive — and widens a step at a time until at
+    least ten listings qualify. The card says what it settled on.
+  - The typical price is a fit of log price against age and mileage, so a
+    listing seen in August counts at its age then, at the last price it asked.
+    Listings far off the rest (a typo, a wreck) are dropped and the fit redone.
+    Figures are rounded to 100 € — that is as exact as a fit through asking
+    prices is.
+  - The chart has every similar listing by mileage, priced as if it were this
+    car's age, with the typical line and the middle half shaded. Ink tones only:
+    the series colours stay with the cost categories.
+  - It is about *asking* prices; a deal usually lands lower, and the card says
+    so. A car it cannot judge says why: no model year yet, or too few similar
+    listings. Leases have no asking price and get nothing.
+  - The record is fetched from this repo at runtime (cached for offline use),
+    not bundled, because the watcher's commits do not redeploy the app.
+- **Model year** (Edit → Purchase & value) is what the market check reads a
+  car's age from. A car saved before the field existed takes it from its name,
+  where the watcher has always written it; the watcher now fills it in too.
 - **Open advert**: the first web address in a car's notes — where the watcher
   writes the nettiauto link — becomes a link on the card, and that line leaves
   the notes shown. Read from the notes rather than kept in a field of its own,

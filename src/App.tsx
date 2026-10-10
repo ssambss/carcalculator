@@ -14,6 +14,8 @@ import { cloneLease, loadData, newCar, saveData } from './storage'
 import { untombstone } from './tombstones'
 import { useUndoControls } from './undo'
 import { useHideOnScroll } from './useHideOnScroll'
+import { useMarket } from './useMarket'
+import { checkPrice, recordFor } from './market'
 import { NotABackupError, exportBackup, importBackup } from './backup'
 import { exportExcel, importExcel } from './excel'
 import {
@@ -235,6 +237,19 @@ export default function App() {
   const visibleCars = useMemo(
     () => sortedCars.filter((c) => matchesFilters(c, filters, selectedIds)),
     [sortedCars, filters, selectedIds],
+  )
+
+  // The watcher's market record, for the asking-price check on each card.
+  const market = useMarket(data.cars)
+  const priceChecks = useMemo(
+    () =>
+      new Map(
+        data.cars.map((c) => {
+          const file = recordFor(c, market.index)?.file
+          return [c.id, checkPrice(c, file ? market.records.get(file) : undefined)]
+        }),
+      ),
+    [data.cars, market],
   )
 
   // On the headline figure whichever order the cards are in.
@@ -733,6 +748,7 @@ export default function App() {
                     car={car}
                     tco={results.get(car.id)!}
                     badge={car.id === badge?.id ? badge.label : null}
+                    market={priceChecks.get(car.id)}
                     selected={selectedIds.has(car.id)}
                     onToggleSelect={() => toggleSelected(car.id)}
                     onToggleFavorite={() => toggleFavorite(car)}

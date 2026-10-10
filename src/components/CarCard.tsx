@@ -4,12 +4,16 @@ import { advertOf } from '../advert'
 import { fmtEur, fmtEurExact, fmtEurQuoted, fmtNum } from '../format'
 import { FINANCING_LABEL, POWERTRAIN_LABEL } from '../labels'
 import { BreakdownBar } from './BreakdownBar'
+import { MarketCheck } from './MarketCheck'
+import type { PriceCheckResult } from '../market'
 
 interface Props {
   car: CarListing
   tco: TcoResult
   /** what the lowest-monthly badge says on this card, if it has it - see lowestMonthly */
   badge: string | null
+  /** the asking price against similar listings, when the car has a market record */
+  market?: PriceCheckResult | null
   selected: boolean
   /** shared-view mode: no editing affordances, favorite star is display-only */
   readOnly?: boolean
@@ -24,6 +28,7 @@ export function CarCard({
   car,
   tco,
   badge,
+  market,
   selected,
   readOnly,
   onToggleSelect,
@@ -145,6 +150,8 @@ export function CarCard({
       </div>
 
       <BreakdownBar breakdown={tco.breakdown} total={tco.total} />
+
+      {market && <MarketCheck result={market} onEdit={readOnly ? undefined : onEdit} />}
 
       {notes && <div className="car-notes">{notes}</div>}
 

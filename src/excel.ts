@@ -191,6 +191,15 @@ const COLUMNS: Column[] = [
     },
   },
   {
+    header: 'Model year',
+    width: 11,
+    get: (car) => car.year || '',
+    set: (car, v) => {
+      const n = num(v)
+      if (n !== undefined) car.year = Math.max(0, Math.round(n))
+    },
+  },
+  {
     header: 'Keep for (years, 0 = shared)',
     width: 24,
     get: (car) => car.keepYears,

@@ -805,6 +805,152 @@ select option {
   gap: 5px;
 }
 
+/* ————— Market check ————— */
+/* The asking price against similar listings: one supporting line under the
+   costs, its reasoning and the listings behind it folded away. */
+.market-check {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.market-check.quiet {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.market-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+/* A status, so never colour alone: an arrow and the words carry it too. */
+.market-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.market-verdict.under {
+  color: var(--good-ink);
+}
+
+.market-verdict.over {
+  color: var(--danger);
+}
+
+.market-meta {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.market-toggle {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.market-details {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.market-details p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.market-details strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Listings are ink, never a series colour - those mean cost categories. On
+   sale is filled, gone is hollow, so the two differ in shape and not only in
+   tone; this car is the one strong mark. All carry the 2px surface ring. */
+.market-dot {
+  fill: var(--ink-3);
+  fill-opacity: 0.55;
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.market-dot.gone {
+  fill: var(--surface);
+  fill-opacity: 1;
+  stroke: var(--ink-3);
+  stroke-width: 1.5;
+}
+
+.market-dot.active {
+  fill: var(--ink-2);
+  fill-opacity: 1;
+}
+
+.market-dot.gone.active {
+  fill: var(--surface);
+  stroke: var(--ink);
+}
+
+.market-dot.this-car {
+  fill: var(--ink);
+  fill-opacity: 1;
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.market-line {
+  stroke: var(--ink-2);
+}
+
+.market-line-halo {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.market-band {
+  fill: var(--ink);
+  fill-opacity: 0.07;
+}
+
+.market-key {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.market-key.on-sale {
+  background: var(--ink-3);
+  opacity: 0.7;
+}
+
+.market-key.gone {
+  border: 1.5px solid var(--ink-3);
+}
+
+.market-key.this-car {
+  width: 11px;
+  height: 11px;
+  background: var(--ink);
+}
+
+.market-key-line {
+  background: var(--ink-2);
+}
+
 /* Where "Compare" scrolls the table to, with a little air above it. */
 .cmp-anchor {
   scroll-margin-top: 16px;

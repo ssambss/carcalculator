@@ -77,6 +77,7 @@ export function newCar(defaults: NewCarDefaults = DEFAULT_NEW_CAR): CarListing {
     powertrain: 'petrol',
     purchasePrice: 0,
     odometerKm: 0,
+    year: 0,
     autoResale: true,
     expectedResaleValue: 0,
     financing: {
@@ -177,6 +178,9 @@ function normalizeCar(raw: unknown, defaults: NewCarDefaults = DEFAULT_NEW_CAR):
     powertrain: isPowertrain(c.powertrain) ? c.powertrain : 'petrol',
     purchasePrice: toNum(c.purchasePrice, 0),
     odometerKm: toNum(c.odometerKm, 0),
+    // Saved before the field existed, a car's year is usually in its name -
+    // the watcher has always written it there.
+    year: Math.max(0, Math.round(toNum(c.year, yearFromName(typeof c.name === 'string' ? c.name : '')))),
     // Data saved before auto-estimates existed keeps its manual resale value
     autoResale:
       typeof c.autoResale === 'boolean' ? c.autoResale : !(toNum(c.expectedResaleValue, 0) > 0),
@@ -257,6 +261,19 @@ function isFinancingMethod(v: unknown): v is FinancingMethod {
  * a spreadsheet, a locale that puts commas in decimals. `1,95` silently becoming
  * the default petrol price is a worse answer than reading it.
  */
+/**
+ * The model year in a car's name: the last plausible year in it that is not
+ * the model itself - "Peugeot 2008 1.2 2021" is a 2021, "Peugeot 2008" says
+ * nothing. 0 when there is none.
+ */
+export function yearFromName(name: string): number {
+  const words = name.trim().split(/\s+/)
+  for (let i = words.length - 1; i >= 2; i -= 1) {
+    if (/^(19[89]\d|20[0-4]\d)$/.test(words[i])) return Number(words[i])
+  }
+  return 0
+}
+
 function toNum(v: unknown, fallback: number): number {
   if (typeof v === 'number') return Number.isFinite(v) ? v : fallback
   if (typeof v !== 'string') return fallback

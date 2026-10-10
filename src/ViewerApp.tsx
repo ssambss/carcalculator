@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData } from './types'
 import { calcTco, lowestMonthly, type TcoResult } from './calc'
 import { type CarSort, carComparator } from './carSort'
+import { checkPrice, recordFor } from './market'
+import { useMarket } from './useMarket'
 import { type Filters, NO_FILTERS, listMakes, matchesFilters } from './filtering'
 import { fmtDateTime, fmtNum } from './format'
 import { pullGistPublic } from './sync'
@@ -12,6 +14,7 @@ import { ComparisonTable } from './components/ComparisonTable'
 import { FilterBar } from './components/FilterBar'
 
 const NOOP = () => {}
+const NO_CARS: AppData['cars'] = []
 
 /**
  * Read-only shared view: fetches the data gist without a token (secret gists
@@ -73,6 +76,11 @@ export function ViewerApp({ gistId }: { gistId: string }) {
   )
 
   const badge = lowestMonthly(visibleCars, results)
+  const market = useMarket(data?.cars ?? NO_CARS)
+  const priceCheck = (car: AppData['cars'][number]) => {
+    const file = recordFor(car, market.index)?.file
+    return checkPrice(car, file ? market.records.get(file) : undefined)
+  }
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -184,6 +192,7 @@ export function ViewerApp({ gistId }: { gistId: string }) {
                     car={car}
                     tco={results.get(car.id)!}
                     badge={car.id === badge?.id ? badge.label : null}
+                    market={priceCheck(car)}
                     selected={selectedIds.has(car.id)}
                     readOnly
                     onToggleSelect={() => toggleSelected(car.id)}

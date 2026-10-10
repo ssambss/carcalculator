@@ -154,6 +154,7 @@ export function toCarListing(listing, { now = new Date(), defaults = config.tco.
     powertrain,
     purchasePrice: listing.price ?? 0,
     odometerKm: listing.mileage ?? 0,
+    year: listing.year ?? 0,
     autoResale: defaults.autoResale,
     expectedResaleValue: 0,
     financing: { ...defaults.financing },

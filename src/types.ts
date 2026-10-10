@@ -50,6 +50,11 @@ export interface CarListing {
   purchasePrice: number
   /** km on the clock when bought */
   odometerKm: number
+  /**
+   * Model year as listed (vuosimalli); 0 = not known. What the market check
+   * reads a car's age from - see market.ts.
+   */
+  year: number
   /** estimate the resale value from age and mileage instead of a manual figure */
   autoResale: boolean
   /** manually set resale value at the end of the ownership period (used when autoResale is off) */

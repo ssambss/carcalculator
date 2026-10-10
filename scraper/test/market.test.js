@@ -171,6 +171,12 @@ describe('the file', () => {
         ['2026-10-01', 32900],
         ['2026-10-04', 31900],
       ]);
+      // The index the app reads first lists the record, from the file itself.
+      const index = JSON.parse(await readFile(join(dir, 'index.json'), 'utf8'));
+      assert.deepEqual(
+        index.files.map((f) => [f.file, f.listings, f.search]),
+        [['nettiauto-polestar-2.json', 2, SEARCH]],
+      );
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

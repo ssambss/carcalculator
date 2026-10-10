@@ -87,7 +87,7 @@ describe('turning a listing into a calculator car', () => {
   it('covers every field the app knows, so nothing normalises to a surprise', async () => {
     // Field list mirrored from CarListing in src/types.ts (repo root).
     const expected = [
-      'id', 'name', 'notes', 'favorite', 'powertrain', 'purchasePrice', 'odometerKm',
+      'id', 'name', 'notes', 'favorite', 'powertrain', 'purchasePrice', 'odometerKm', 'year',
       'autoResale', 'expectedResaleValue', 'financing', 'fuelLPer100',
       'elecKwhPer100', 'electricSharePct', 'insurancePerYear', 'taxPerYear',
       'maintenancePerYear', 'tiresPerYear', 'otherPerYear', 'createdAt', 'updatedAt',

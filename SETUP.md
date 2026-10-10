@@ -293,6 +293,11 @@ Honest list, being worked through in [PLAN.md](PLAN.md):
 - ~~One webhook per fork.~~ **Fixed** — see *Adding someone else* above. Each
   person gets their own channel, their own gist and their own record, and a
   reaction in their channel adds the car to their calculator, not yours.
+- **The market check reads this repo's record**, not your fork's: the app
+  fetches `scraper/data/market/` from `raw.githubusercontent.com/ssambss/…`
+  at runtime. Point it at your own with `VITE_MARKET_BASE` at build time (the
+  folder's URL, ending in `/`) — in the Pages workflow's build step, say. Same
+  conflict rule as `seen.json` when pulling: keep yours.
 - **The watcher only reads nettiauto.** Making the source a pluggable module —
   so it can follow apartments or rentals — is Phases 1–5 of the plan.
 

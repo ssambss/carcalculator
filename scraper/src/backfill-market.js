@@ -18,7 +18,15 @@ import { readdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DEFAULT_MARKET_DIR, dayOf, emptyMarket, marketFileName, saveMarket, sight } from './market.js';
+import {
+  DEFAULT_MARKET_DIR,
+  dayOf,
+  emptyMarket,
+  marketFileName,
+  saveMarket,
+  sight,
+  writeMarketIndex,
+} from './market.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..', '..');
@@ -83,3 +91,4 @@ for (const market of markets.values()) {
   const repriced = listings.filter((entry) => entry.prices.length > 1).length;
   console.log(`${path}: ${listings.length} listings, ${repriced} with a price change.`);
 }
+await writeMarketIndex({ now: latest ? new Date(latest) : new Date() });

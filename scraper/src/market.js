@@ -13,7 +13,7 @@
 // than as the whole file.
 
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,6 +23,9 @@ export const MARKET_VERSION = 1;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_MARKET_DIR = resolve(HERE, '..', 'data', 'market');
+
+/** What the app reads first, to learn which searches have a record at all. */
+export const INDEX_FILE = 'index.json';
 
 /** "Polestar" -> "polestar", "Model 3" -> "model-3". */
 function slug(value) {
@@ -209,6 +212,37 @@ export async function saveMarket(market, { dir = DEFAULT_MARKET_DIR } = {}) {
 }
 
 /**
+ * The index: one line per record in the folder, from the files themselves -
+ * so a search nobody watches any more stays listed, its history still useful.
+ */
+export async function writeMarketIndex({ dir = DEFAULT_MARKET_DIR, now = new Date() } = {}) {
+  const names = (await readdir(dir).catch(() => []))
+    .filter((name) => name.endsWith('.json') && name !== INDEX_FILE)
+    .sort();
+  const files = [];
+  for (const name of names) {
+    let market;
+    try {
+      market = JSON.parse(await readFile(join(dir, name), 'utf8'));
+    } catch {
+      continue;
+    }
+    if (market?.version !== MARKET_VERSION) continue;
+    files.push({
+      file: name,
+      source: market.source,
+      search: market.search,
+      listings: Object.keys(market.listings ?? {}).length,
+      updatedAt: market.updatedAt,
+      completeAt: market.completeAt,
+    });
+  }
+  const index = { version: MARKET_VERSION, updatedAt: now.toISOString(), files };
+  await fileStore({ path: join(dir, INDEX_FILE) }).write(`${JSON.stringify(index, null, 2)}\n`);
+  return index;
+}
+
+/**
  * Record a whole run: every search it read, each into its own file.
  *
  * `reads` is what crawlFor read - the search, its listings, and whether every
@@ -228,5 +262,6 @@ export async function recordMarket(reads, { now = new Date(), dir = DEFAULT_MARK
       total: Object.keys(market.listings).length,
     });
   }
+  if (reads.length) await writeMarketIndex({ dir, now });
   return summary;
 }

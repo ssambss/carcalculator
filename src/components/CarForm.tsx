@@ -195,6 +195,12 @@ export function CarForm({ initial, isNew, settings, onSave, onCancel }: Props) {
                 onChange={(n) => set({ odometerKm: Math.max(0, n) })}
                 unit="km"
               />
+              <NumberField
+                label="Model year"
+                value={draft.year}
+                onChange={(n) => set({ year: Math.max(0, Math.round(n)) })}
+                hint="As listed. What the market check reads the car's age from."
+              />
               {draft.autoResale ? (
                 <div className="field span-2">
                   <span className="field-label">Expected value after {years} years</span>
