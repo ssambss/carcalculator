@@ -165,7 +165,9 @@ describe('the file', () => {
         now: at('2026-10-04'),
         dir,
       });
-      assert.deepEqual(summary, { file: 'nettiauto-polestar-2.json', added: 1, repriced: 1, total: 2 });
+      const { market: current, ...counts } = summary;
+      assert.deepEqual(counts, { file: 'nettiauto-polestar-2.json', added: 1, repriced: 1, total: 2 });
+      assert.equal(Object.keys(current.listings).length, 2);
       const saved = JSON.parse(await readFile(join(dir, 'nettiauto-polestar-2.json'), 'utf8'));
       assert.deepEqual(saved.listings['1'].prices, [
         ['2026-10-01', 32900],

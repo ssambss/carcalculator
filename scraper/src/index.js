@@ -42,7 +42,7 @@ const { fetchReactedListingIds } = await import('./reactions.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
-const { recordMarket } = await import('./market.js');
+const { marketFileName, recordMarket } = await import('./market.js');
 const { BACKENDS, storeFor } = await import('./storage/index.js');
 const { describeTenant, loadTenants, postCapFor, selectTenants } = await import('./tenants.js');
 
@@ -773,9 +773,20 @@ async function announceFor(context, crawled, args) {
   let batches = 0;
   for (const items of byFilter.values()) {
     const { filter } = items[0];
+    const source = sourceOf(filter);
+    // The asking price against the search's record, for the line under it. A
+    // source without a check, or a check that fails, posts without the line.
+    const market = crawled.markets?.get(marketFileName(source.id, filter.search));
+    for (const item of items) {
+      try {
+        item.market = source.checkPrice?.(item.listing, market) ?? null;
+      } catch {
+        item.market = null;
+      }
+    }
     const result = await announce(filter, items, {
       dryRun: args.dryRun,
-      source: sourceOf(filter),
+      source,
       webhookUrl: tenant.webhookUrl,
     });
     batches += result.batches;
@@ -1025,18 +1036,20 @@ async function main() {
   }
 
   // --- The market record: what the crawl read, whoever it was read for. ---
-  if (!args.dryRun) {
-    try {
-      for (const read of await recordMarket(crawled.reads)) {
-        console.log(
-          `Market record ${read.file}: ${read.total} listings ` +
-            `(${read.added} new, ${read.repriced} repriced).`,
-        );
-      }
-    } catch (error) {
-      // Costs history, not anybody's posts - so it is said, not fatal.
-      console.error(`Could not update the market record: ${error.message}`);
+  // Before the posting, which reads it for each post's price line. A dry run
+  // brings it up to date in memory only, so its preview has the line too.
+  crawled.markets = new Map();
+  try {
+    for (const read of await recordMarket(crawled.reads, { save: !args.dryRun })) {
+      crawled.markets.set(read.file, read.market);
+      console.log(
+        `Market record ${read.file}: ${read.total} listings ` +
+          `(${read.added} new, ${read.repriced} repriced)${args.dryRun ? ', not written' : ''}.`,
+      );
     }
+  } catch (error) {
+    // Costs history and the price line, not anybody's posts - said, not fatal.
+    console.error(`Could not update the market record: ${error.message}`);
   }
 
   // --- Then each person's own posting, reactions and record. ---

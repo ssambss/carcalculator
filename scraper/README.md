@@ -311,6 +311,17 @@ verdicts, and it is one shared file per search however many people watch it.
 - Dry runs do not write it. A record that cannot be written is logged and the
   run carries on - it costs history, not anybody's posts.
 
+**Posts carry a price line** from it: *Hinta vs. markkina — ▼ 2 300 €
+markkinahintaa halvempi, tyypillinen 36 100 € · 470 vastaavaa ilmoitusta*. The
+check is the source's (`checkPrice` on the adapter, in
+[src/sources/nettiauto-market.js](src/sources/nettiauto-market.js)), since what
+makes two listings similar - fuel, battery, drive - is the car's business, and a
+source without one simply posts without the line. It is a port of the app's
+`src/market.ts`: the two share no code by design, so they share test cases
+instead, and a change to one is a change to both. The record is brought up to
+date before posting, so a run's own crawl is in it; a dry run updates it in
+memory only, and its preview has the line too.
+
 `node src/backfill-market.js` rebuilt it once from the git history of
 `data/seen.json`, which had committed each run's latest prices since
 2026-08-26. It builds from nothing (and refuses to overwrite a record without

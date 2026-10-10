@@ -8,6 +8,7 @@
 import config from '../config.js';
 import { fetchText } from '../http.js';
 import { decodeEntities, htmlToText, oneLine, parseInteger, pick } from '../html.js';
+import { checkListingPrice } from './nettiauto-market.js';
 
 const ORIGIN = 'https://www.nettiauto.com';
 
@@ -404,6 +405,13 @@ export const nettiauto = {
   fetchAllListings,
   fetchListingDetail,
 
+  /**
+   * How a listing's asking price sits against its search's market record - the
+   * line a post carries under the price. Optional for a source: one without it
+   * simply posts without the line.
+   */
+  checkPrice: checkListingPrice,
+
   /** Recover a listing id from a posted link, for the reaction pickup. */
   listingIdFromUrl(url) {
     return /nettiauto\.com\/[^/]+\/[^/]+\/(\d+)/.exec(url ?? '')?.[1] ?? null;
@@ -427,6 +435,7 @@ export const nettiauto = {
       seller: 'Myyjä',
       packages: 'Varustepaketit (myyjän teksti)',
       caveats: 'Huom',
+      market: 'Hinta vs. markkina',
     },
     footer: 'nettiauto.com',
   },

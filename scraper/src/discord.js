@@ -66,7 +66,26 @@ export function accentColour(price, maxPrice = null) {
  * seller free text, so showing the phrase we matched on lets the reader judge
  * the call themselves instead of trusting the scraper.
  */
-export function buildEmbed(listing, verdict, filter = null, source = null) {
+/** Within this of typical, a price is in line with the market rather than a deal or a stretch. */
+const IN_LINE = 0.03;
+
+/**
+ * The market line: how the asking price sits against similar listings in the
+ * record. Rounded to the hundred, which is as exact as a fit through asking
+ * prices is; the arrow carries the direction for anyone not reading the words.
+ * Same thresholds and rounding as the card in the app.
+ */
+export function formatMarket(market) {
+  const round = (value) => Math.round(value / 100) * 100;
+  const share = market.diff / market.typical;
+  const head =
+    Math.abs(share) < IN_LINE
+      ? 'Markkinahinnan tasolla'
+      : `${share < 0 ? '▼' : '▲'} ${EUR.format(round(Math.abs(market.diff)))} markkinahintaa ${share < 0 ? 'halvempi' : 'kalliimpi'}`;
+  return `${head}\ntyypillinen ${EUR.format(round(market.typical))} · ${KM.format(market.count)} vastaavaa ilmoitusta`;
+}
+
+export function buildEmbed(listing, verdict, filter = null, source = null, market = null) {
   const from = source ?? (filter ? sourceOf(filter) : null);
   const labels = from?.presentation?.labels ?? {};
   const headline = [listing.year, listing.subTitle || listing.title].filter(Boolean).join(' ');
@@ -85,6 +104,16 @@ export function buildEmbed(listing, verdict, filter = null, source = null) {
       name: labels[field.key] ?? field.label ?? field.key,
       value: formatFact(value, field),
       inline: true,
+    });
+  }
+
+  // Right under the facts it is about, across the whole width: it is a
+  // sentence, not a number.
+  if (market && Number.isFinite(market.typical) && market.typical > 0) {
+    fields.push({
+      name: labels.market ?? 'Price vs market',
+      value: clamp(formatMarket(market), LIMITS.fieldValue),
+      inline: false,
     });
   }
 
@@ -180,7 +209,9 @@ export async function announce(
     const payload = {
       username,
       content: isFirstBatch ? heading : undefined,
-      embeds: batch.map(({ listing, verdict }) => buildEmbed(listing, verdict, filter, source)),
+      embeds: batch.map(({ listing, verdict, market }) =>
+        buildEmbed(listing, verdict, filter, source, market ?? null),
+      ),
       // Suppress link previews: the embeds already carry the images.
       allowed_mentions: { parse: [] },
     };

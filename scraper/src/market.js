@@ -248,20 +248,28 @@ export async function writeMarketIndex({ dir = DEFAULT_MARKET_DIR, now = new Dat
  * `reads` is what crawlFor read - the search, its listings, and whether every
  * page of it came back. A search that failed outright is not in it, which is
  * right: nothing was learned, and nothing should look as if it left the site.
+ *
+ * Each entry carries the record as it now stands, for the price line in the
+ * posts. With `save: false` - a dry run - the records are brought up to date
+ * in memory and nothing is written.
  */
-export async function recordMarket(reads, { now = new Date(), dir = DEFAULT_MARKET_DIR } = {}) {
+export async function recordMarket(
+  reads,
+  { now = new Date(), dir = DEFAULT_MARKET_DIR, save = true } = {},
+) {
   const summary = [];
   for (const { sourceId, search, listings, complete } of reads) {
     const market = await loadMarket(sourceId, search, { dir });
     const { added, repriced } = observe(market, listings, { now, complete });
-    await saveMarket(market, { dir });
+    if (save) await saveMarket(market, { dir });
     summary.push({
       file: marketFileName(sourceId, search),
       added,
       repriced,
       total: Object.keys(market.listings).length,
+      market,
     });
   }
-  if (reads.length) await writeMarketIndex({ dir, now });
+  if (save && reads.length) await writeMarketIndex({ dir, now });
   return summary;
 }

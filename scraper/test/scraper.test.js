@@ -34,7 +34,7 @@ import {
   parseSearchPage,
 } from '../src/sources/nettiauto.js';
 import { checkRanges, describeRanges, factOf } from '../src/fields.js';
-import { accentColour, buildEmbed } from '../src/discord.js';
+import { accentColour, buildEmbed, formatMarket } from '../src/discord.js';
 import { needsPosting, postingReadiness } from '../src/preflight.js';
 import {
   hasSeen,
@@ -930,6 +930,25 @@ describe('discord embed', () => {
     const embed = buildEmbed(item, evaluate(item, null, POLESTAR), POLESTAR);
     assert.ok(embed.title.length <= 256);
     for (const field of embed.fields) assert.ok(field.value.length <= 1024, `${field.name} too long`);
+  });
+
+  it('says how the price sits against the market, when there is a check', () => {
+    const item = listing({ usp: 'Pilot- ja Plus-paketit' });
+    const market = { typical: 32_340, diff: -2_340, pricierShare: 0.87, count: 470 };
+    const embed = buildEmbed(item, evaluate(item, null, POLESTAR), POLESTAR, null, market);
+    const field = embed.fields.find((f) => f.name === 'Hinta vs. markkina');
+    assert.ok(field, 'expected the market field');
+    assert.equal(field.inline, false);
+    // Rounded to the hundred, as the card in the app is.
+    assert.equal(field.value.replace(/\s/g, ' '), '▼ 2 300 € markkinahintaa halvempi tyypillinen 32 300 € · 470 vastaavaa ilmoitusta');
+    // Without a check, no field - not an empty one.
+    const plain = buildEmbed(item, evaluate(item, null, POLESTAR), POLESTAR);
+    assert.equal(plain.fields.some((f) => f.name === 'Hinta vs. markkina'), false);
+  });
+
+  it('calls a price within three percent of typical in line, and a dear one dear', () => {
+    assert.match(formatMarket({ typical: 30_000, diff: 600, count: 50 }), /^Markkinahinnan tasolla/);
+    assert.match(formatMarket({ typical: 30_000, diff: 3_000, count: 50 }).replace(/\s/g, ' '), /^▲ 3 000 € markkinahintaa kalliimpi/);
   });
 
   it('renders a missing price and mileage without crashing', () => {
