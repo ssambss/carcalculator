@@ -19,6 +19,13 @@ export const fmtEur = (v: number): string => eur0.format(v)
 /** cents shown: "458,80 €" */
 export const fmtEurExact = (v: number): string => eur2.format(v)
 
+/**
+ * A rate as it was quoted: whole euros when it has no cents ("690 €"), the
+ * cents when it does ("458,80 €") - a lease rate typed in round is not 690,00.
+ */
+export const fmtEurQuoted = (v: number): string =>
+  Math.abs(v - Math.round(v)) < 0.005 ? eur0.format(v) : eur2.format(v)
+
 /** plain number with fi grouping */
 export const fmtNum = (v: number): string => num.format(v)
 

@@ -22,6 +22,7 @@ import {
 } from '../mileage'
 import { newReading, newTrip } from '../mileageStorage'
 import type { MileageStore } from '../useMileage'
+import { useUndo } from '../undo'
 import { fmtEur, fmtNum } from '../format'
 import { niceTicks } from './chartHelpers'
 import { DateField } from './DateField'
@@ -305,6 +306,7 @@ function StatusCard({
 const LOG_SHOWN = 6
 
 function LogCard({ store, line, today }: { store: MileageStore; line: Timeline; today: number }) {
+  const offerUndo = useUndo()
   const [date, setDate] = useState(() => isoOf(today))
   const [text, setText] = useState('')
   const [error, setError] = useState('')
@@ -391,9 +393,11 @@ function LogCard({ store, line, today }: { store: MileageStore; line: Timeline; 
               <button
                 className="link-btn danger"
                 onClick={() => {
-                  if (window.confirm(`Delete the reading of ${fmtDay(dayOf(r.date)!)}?`)) {
-                    store.removeReading(r.id)
-                  }
+                  store.removeReading(r.id)
+                  offerUndo({
+                    message: `Deleted the reading of ${fmtDay(dayOf(r.date)!)}`,
+                    undo: () => store.saveReading(r),
+                  })
                 }}
                 aria-label={`Delete the reading of ${fmtDay(dayOf(r.date)!)}`}
               >
@@ -415,6 +419,7 @@ function LogCard({ store, line, today }: { store: MileageStore; line: Timeline; 
 /* ----------------------------------------------------------------- trips */
 
 function TripsCard({ store, status }: { store: MileageStore; status: MileageStatus }) {
+  const offerUndo = useUndo()
   const [name, setName] = useState('')
   const [date, setDate] = useState('')
   const [text, setText] = useState('')
@@ -498,7 +503,11 @@ function TripsCard({ store, status }: { store: MileageStore; status: MileageStat
                 <button
                   className="link-btn danger"
                   onClick={() => {
-                    if (window.confirm(`Delete "${t.name || 'this trip'}"?`)) store.removeTrip(t.id)
+                    store.removeTrip(t.id)
+                    offerUndo({
+                      message: `Deleted "${t.name || 'a trip'}"`,
+                      undo: () => store.saveTrip(t),
+                    })
                   }}
                   aria-label={`Delete ${t.name || 'the trip'}`}
                 >

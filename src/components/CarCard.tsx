@@ -1,13 +1,15 @@
 import type { CarListing } from '../types'
 import type { TcoResult } from '../calc'
-import { fmtEur, fmtEurExact, fmtNum } from '../format'
+import { advertOf } from '../advert'
+import { fmtEur, fmtEurExact, fmtEurQuoted, fmtNum } from '../format'
 import { FINANCING_LABEL, POWERTRAIN_LABEL } from '../labels'
 import { BreakdownBar } from './BreakdownBar'
 
 interface Props {
   car: CarListing
   tco: TcoResult
-  cheapest: boolean
+  /** what the lowest-monthly badge says on this card, if it has it - see lowestMonthly */
+  badge: string | null
   selected: boolean
   /** shared-view mode: no editing affordances, favorite star is display-only */
   readOnly?: boolean
@@ -21,7 +23,7 @@ interface Props {
 export function CarCard({
   car,
   tco,
-  cheapest,
+  badge,
   selected,
   readOnly,
   onToggleSelect,
@@ -47,6 +49,8 @@ export function CarCard({
           car.lease.upfront > 0 && `${fmtEur(car.lease.upfront)} upfront per contract`,
         ]
       : ['running costs only', `${fmtEur(car.purchasePrice)} paid up front`]
+  const advert = advertOf(car.notes)
+  const notes = advert ? advert.notes : car.notes
   return (
     <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
@@ -92,7 +96,7 @@ export function CarCard({
           <span className="hero-value display">{fmtEur(tco.outOfPocketPerMonth)}</span>
           <span className="hero-unit">/mo out of pocket</span>
         </div>
-        {cheapest && (
+        {badge && (
           <span className="badge-good">
             <svg
               width="12"
@@ -106,7 +110,7 @@ export function CarCard({
             >
               <path d="M2 6.5l2.5 2.5L10 3.5" />
             </svg>
-            Lowest monthly
+            {badge}
           </span>
         )}
       </div>
@@ -117,7 +121,7 @@ export function CarCard({
           <div className="stat">
             <span className="stat-label">{isLoan ? 'Loan / mo' : 'Lease / mo'}</span>
             <span className="stat-value">
-              {fmtEurExact(isLoan ? tco.loan.monthlyPayment : tco.lease.monthlyPayment)}
+              {fmtEurQuoted(isLoan ? tco.loan.monthlyPayment : tco.lease.monthlyPayment)}
             </span>
           </div>
         )}
@@ -142,19 +146,38 @@ export function CarCard({
 
       <BreakdownBar breakdown={tco.breakdown} total={tco.total} />
 
-      {car.notes && <div className="car-notes">{car.notes}</div>}
+      {notes && <div className="car-notes">{notes}</div>}
 
-      {!readOnly && (
+      {(!readOnly || advert) && (
         <div className="car-actions">
-          <button className="link-btn" onClick={onEdit}>
-            Edit
-          </button>
-          <button className="link-btn" onClick={onDuplicate}>
-            Duplicate
-          </button>
-          <button className="link-btn danger" onClick={onDelete}>
-            Delete
-          </button>
+          {!readOnly && (
+            <>
+              <button className="link-btn" onClick={onEdit}>
+                Edit
+              </button>
+              <button className="link-btn" onClick={onDuplicate}>
+                Duplicate
+              </button>
+              <button className="link-btn danger" onClick={onDelete}>
+                Delete
+              </button>
+            </>
+          )}
+          {advert && (
+            <a
+              className="link-btn advert-link"
+              href={advert.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={advert.url}
+            >
+              Open advert
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M4.5 2.5h5v5" />
+                <path d="M9.5 2.5L3 9" />
+              </svg>
+            </a>
+          )}
         </div>
       )}
     </div>

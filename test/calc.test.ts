@@ -19,6 +19,7 @@ import {
   energyCostPerYear,
   estimateResaleValue,
   isLeased,
+  lowestMonthly,
   resolveBalloon,
   resolveResaleValue,
   resolveYears,
@@ -458,5 +459,51 @@ describe('the list order', () => {
     // Its monthly figure is running costs alone; its price left on day one.
     const cash = car({ id: 'cash', purchasePrice: 60000, insurancePerYear: 1200 })
     expect(order([cash, loan('loan', 20000)])).toEqual(['loan', 'cash'])
+  })
+})
+
+describe('the lowest-monthly badge', () => {
+  const financed = (id: string, purchasePrice: number, method: 'loan' | 'lease' = 'loan') =>
+    car({
+      id,
+      purchasePrice,
+      financing: {
+        method,
+        downPayment: 0,
+        annualRatePct: 6,
+        termMonths: 60,
+        autoBalloon: false,
+        balloon: 0,
+      },
+      lease: { ...newCar().lease, monthlyPayment: 400, termMonths: 36 },
+    })
+  const badge = (cars: CarListing[]) =>
+    lowestMonthly(cars, new Map(cars.map((c) => [c.id, calcTco(c, settings)])))
+
+  it('goes to the lowest out of pocket, whatever order the cards are in', () => {
+    const cars = [financed('dear', 40000), financed('cheap', 20000)]
+    expect(badge(cars)).toEqual({ id: 'cheap', label: 'Lowest monthly' })
+    expect(badge([...cars].reverse())?.id).toBe('cheap')
+  })
+
+  it('says it is only the lowest of the financed when a cash car is beside it', () => {
+    // The cash car's running costs alone are lower, so a plain "lowest" would be wrong.
+    const cash = car({ id: 'cash', purchasePrice: 15000 })
+    expect(badge([cash, financed('loan', 20000)])).toEqual({
+      id: 'loan',
+      label: 'Lowest of the financed',
+    })
+  })
+
+  it('names what it compares among cash cars alone: the running costs', () => {
+    const thirsty = car({ id: 'thirsty', fuelLPer100: 9 })
+    const frugal = car({ id: 'frugal', fuelLPer100: 5 })
+    expect(badge([thirsty, frugal])).toEqual({ id: 'frugal', label: 'Lowest running costs' })
+  })
+
+  it('is not given with one car, or when nothing leaves the account', () => {
+    expect(badge([financed('only', 20000)])).toBeNull()
+    const free = car({ id: 'a', fuelLPer100: 0 })
+    expect(badge([free, { ...free, id: 'b' }])).toBeNull()
   })
 })

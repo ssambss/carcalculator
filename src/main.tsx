@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { ViewerApp } from './ViewerApp.tsx'
+import { UndoProvider } from './components/UndoProvider.tsx'
 
 // A ?view=<gist-id> link opens the token-free read-only shared view
 function getViewGistId(): string | null {
@@ -13,7 +14,15 @@ function getViewGistId(): string | null {
 const viewGistId = getViewGistId()
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>{viewGistId ? <ViewerApp gistId={viewGistId} /> : <App />}</StrictMode>,
+  <StrictMode>
+    {viewGistId ? (
+      <ViewerApp gistId={viewGistId} />
+    ) : (
+      <UndoProvider>
+        <App />
+      </UndoProvider>
+    )}
+  </StrictMode>,
 )
 
 /*

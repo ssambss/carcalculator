@@ -230,6 +230,122 @@ button:disabled {
   z-index: 20;
 }
 
+/* Out of the way while the page scrolls down under it - see useHideOnScroll.
+   Keyboard focus brings it back, wherever the page is. */
+.fab {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.fab.stepped-aside {
+  transform: translateY(calc(100% + 30px));
+  opacity: 0;
+}
+
+.fab.stepped-aside:focus-visible {
+  transform: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab {
+    transition: none;
+  }
+}
+
+/* ————— Dock: the undo toast and the compare bar ————— */
+/* Centred over the page on a desktop; on a phone, the row left of the add
+   button. Clicks pass through the gaps to the page beneath. */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+.dock > * {
+  pointer-events: auto;
+}
+
+/* The slot stays mounted for the status region, so it carries no gap of its
+   own when empty - the toast spaces itself from the bar below. */
+.dock-slot .toast {
+  margin-bottom: 8px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 4px 5px 4px 18px;
+  border-radius: 999px;
+  background: var(--tip-bg);
+  color: var(--tip-ink);
+  box-shadow: var(--fab-shadow);
+  font-size: 13px;
+}
+
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  margin-right: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toast-action {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tip-ink) 14%, transparent);
+  color: var(--tip-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.toast-action:hover {
+  background: color-mix(in srgb, var(--tip-ink) 24%, transparent);
+}
+
+.toast-action.quiet {
+  background: none;
+  font-weight: 500;
+}
+
+.toast-action.quiet:hover {
+  background: color-mix(in srgb, var(--tip-ink) 14%, transparent);
+}
+
+.toast-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  opacity: 0.75;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
 /* ————— Cards & panels ————— */
 .card {
   background: var(--surface);
@@ -431,6 +547,30 @@ select option {
   display: inline-flex;
   align-items: baseline;
   gap: 10px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* The phone's fold. On a desktop there is room, so the button is not there
+   and what it folds sits in the bar's own row as before. */
+.filter-toggle {
+  display: none;
+}
+
+.filter-more {
+  display: contents;
+}
+
+/* Last in the row, at its far end: an order, not a filter. */
+.filter-sort {
+  order: 1;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-sort-label {
   font-size: 13px;
   color: var(--ink-3);
 }
@@ -655,6 +795,19 @@ select option {
 
 .link-btn.danger {
   color: var(--danger);
+}
+
+/* The listing the car came from, at the far end of the actions. */
+.advert-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Where "Compare" scrolls the table to, with a little air above it. */
+.cmp-anchor {
+  scroll-margin-top: 16px;
 }
 
 /* ————— Breakdown bar ————— */
@@ -1456,15 +1609,15 @@ a.dialog-text {
     display: flex;
   }
 
-  .housing-panel .check-row {
+  .folding-panel .check-row {
     display: none;
   }
 
-  .housing-panel.expanded .check-row {
+  .folding-panel.expanded .check-row {
     display: flex;
   }
 
-  .housing-panel.expanded .assumptions-heading {
+  .folding-panel.expanded .assumptions-heading {
     display: flex;
   }
 
@@ -1477,14 +1630,101 @@ a.dialog-text {
     width: calc(50% - 8px);
   }
 
+  /* The search and the fold's button share the first row. */
   .filter-search {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .filter-search,
   .filter-select,
   .filter-chip {
     height: 44px;
+  }
+
+  .filter-toggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .filter-more {
+    display: none;
+  }
+
+  .filter-bar.open .filter-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .filter-sort {
+    order: 0;
+    margin-left: 0;
+  }
+
+  .dock {
+    left: 16px;
+    right: 16px;
+    bottom: 22px;
+    transform: none;
+    align-items: stretch;
+    max-width: none;
+  }
+
+  /* Clear of the add button: its 18px inset, its 56px, and a gap. */
+  .dock.beside-fab {
+    right: calc(18px + 56px + 10px);
+  }
+
+  .toast {
+    min-height: 56px;
+    padding-left: 16px;
+  }
+
+  .toast-action,
+  .toast-close {
+    height: 44px;
+  }
+
+  .toast-close {
+    width: 40px;
+  }
+
+  /* A long message wraps to a second line rather than losing the name. */
+  .toast {
+    border-radius: 24px;
+  }
+
+  .toast-text {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  /* Two cars beside the row names on a phone. A full model name in one line
+     made its column wider than the screen, with the figures right-aligned off
+     the end of it - so names wrap, and the row names give up their width. */
+  .car-cmp th,
+  .car-cmp td {
+    padding: 10px 8px;
+  }
+
+  .car-cmp thead th:not(.rowhead) {
+    white-space: normal;
+    min-width: 92px;
+    vertical-align: bottom;
+  }
+
+  .car-cmp th.rowhead {
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .car-cmp .swatch-label {
+    white-space: nowrap;
   }
 
   .hero-value {
@@ -1600,16 +1840,17 @@ a.dialog-text {
 }
 
 /*
-  The situation panel stacks its groups instead of using the car panel's single
-  strip: three headed groups plus a checkbox do not read as one row.
+  A panel that folds to one line on every width - the housing situation and
+  the car assumptions. It stacks its groups rather than running them as one
+  strip: several headed groups do not read as one row.
 */
-.assumptions.housing-panel {
+.assumptions.folding-panel {
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
 }
 
-.housing-panel .assumptions-heading {
+.folding-panel .assumptions-heading {
   flex-direction: row;
   align-items: baseline;
   gap: 10px;
@@ -1617,7 +1858,7 @@ a.dialog-text {
 
 /* Title, the one-line summary while shut, and Edit / Done at the far end. On
    a phone the title hides while shut, as the car panel's does. */
-.housing-panel-head {
+.folding-panel-head {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -1627,34 +1868,34 @@ a.dialog-text {
 
 /* Open, the title takes the row and its caption drops under it before Done
    is pushed off the row - a wrapping row moves items down before shrinking. */
-.housing-panel-head .assumptions-heading {
+.folding-panel-head .assumptions-heading {
   flex-wrap: wrap;
   row-gap: 0;
   min-width: 0;
 }
 
-.housing-panel.expanded .housing-panel-head .assumptions-heading {
+.folding-panel.expanded .folding-panel-head .assumptions-heading {
   flex: 1 1 0;
 }
 
-.housing-panel-head .assumptions-summary-text {
+.folding-panel-head .assumptions-summary-text {
   flex: 1;
   min-width: 0;
 }
 
-.housing-panel-head .assumptions-toggle {
+.folding-panel-head .assumptions-toggle {
   margin-left: auto;
 }
 
-.housing-panel .assumptions-heading + .assumptions-heading,
-.housing-panel .assumptions-fields + .assumptions-heading,
-.housing-panel .check-row + .assumptions-heading {
+.folding-panel .assumptions-heading + .assumptions-heading,
+.folding-panel .assumptions-fields + .assumptions-heading,
+.folding-panel .check-row + .assumptions-heading {
   margin-top: 8px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
 }
 
-.housing-panel .check-row {
+.folding-panel .check-row {
   max-width: 62ch;
 }
 

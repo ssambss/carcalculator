@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { HousingSituation, PropertyListing } from './housing'
 import { type HousingData, loadHousing, saveHousing, syncHousing } from './housingStorage'
 import type { SyncConfig } from './sync'
+import { untombstone } from './tombstones'
 
 export type HousingSyncStatus = 'off' | 'syncing' | 'synced' | 'error'
 
@@ -98,6 +99,8 @@ export function useHousing(config: SyncConfig | null): HousingStore {
         properties: current.properties.some((x) => x.id === stamped.id)
           ? current.properties.map((x) => (x.id === stamped.id ? stamped : x))
           : [...current.properties, stamped],
+        // Saving a deleted place again is how its delete is undone.
+        tombstones: untombstone(current.tombstones, stamped.id),
       }))
     },
     [mutate],

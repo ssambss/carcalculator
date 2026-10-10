@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { CarListing, Settings } from '../types'
 import { CATEGORIES, calcTco, type TcoResult } from '../calc'
-import { fmtEur, fmtEurExact, fmtNum } from '../format'
+import { fmtEur, fmtEurExact, fmtEurQuoted, fmtNum } from '../format'
 
 interface Props {
   cars: CarListing[]
@@ -93,7 +93,7 @@ export function ComparisonTable({ cars, results, settings }: Props) {
         )}
       </div>
       <div className="cmp-scroll">
-        <table className="cmp">
+        <table className="cmp car-cmp">
           <thead>
             <tr>
               <th className="rowhead">Cost</th>
@@ -135,7 +135,7 @@ export function ComparisonTable({ cars, results, settings }: Props) {
                     </td>
                   ) : (
                     <td key={c.id} className="num">
-                      {fmtEurExact(
+                      {fmtEurQuoted(
                         c.financing.method === 'lease'
                           ? tcos[i].lease.monthlyPayment
                           : tcos[i].loan.monthlyPayment,
@@ -191,11 +191,14 @@ export function ComparisonTable({ cars, results, settings }: Props) {
               return (
                 <tr key={cat.key}>
                   <th className="rowhead">
-                    <span
-                      className="swatch"
-                      style={{ background: `var(--series-${cat.series})` }}
-                    />
-                    {cat.label}
+                    {/* One unit, so a narrow column never leaves the dot alone on a line. */}
+                    <span className="swatch-label">
+                      <span
+                        className="swatch"
+                        style={{ background: `var(--series-${cat.series})` }}
+                      />
+                      {cat.label}
+                    </span>
                   </th>
                   {cars.map((c, i) => (
                     <td key={c.id} className={`num${minClass(values, i, true)}`}>

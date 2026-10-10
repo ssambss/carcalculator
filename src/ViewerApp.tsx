@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData } from './types'
-import { byOutOfPocket, calcTco, type TcoResult } from './calc'
+import { calcTco, lowestMonthly, type TcoResult } from './calc'
+import { type CarSort, carComparator } from './carSort'
 import { type Filters, NO_FILTERS, listMakes, matchesFilters } from './filtering'
 import { fmtDateTime, fmtNum } from './format'
 import { pullGistPublic } from './sync'
@@ -24,6 +25,7 @@ export function ViewerApp({ gistId }: { gistId: string }) {
   const [theme, toggleTheme] = useTheme()
   const [filters, setFilters] = useState<Filters>({ ...NO_FILTERS })
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [sort, setSort] = useState<CarSort>('outOfPocket')
   const lastLoadRef = useRef(0)
 
   const load = useCallback(async () => {
@@ -62,19 +64,15 @@ export function ViewerApp({ gistId }: { gistId: string }) {
 
   const sortedCars = useMemo(() => {
     if (!data) return []
-    return [...data.cars].sort(byOutOfPocket(results))
-  }, [data, results])
+    return [...data.cars].sort(carComparator(sort, results))
+  }, [data, results, sort])
 
   const visibleCars = useMemo(
     () => sortedCars.filter((c) => matchesFilters(c, filters, selectedIds)),
     [sortedCars, filters, selectedIds],
   )
 
-  const cheapestId =
-    visibleCars.length > 1 &&
-    (results.get(visibleCars[0].id)?.outOfPocketPerMonth ?? 0) > 0
-      ? visibleCars[0].id
-      : null
+  const badge = lowestMonthly(visibleCars, results)
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -165,6 +163,8 @@ export function ViewerApp({ gistId }: { gistId: string }) {
             favoriteCount={data.cars.filter((c) => c.favorite).length}
             shownCount={visibleCars.length}
             totalCount={data.cars.length}
+            sort={sort}
+            onSortChange={setSort}
           />
           {visibleCars.length === 0 ? (
             <div className="card empty-state">
@@ -183,7 +183,7 @@ export function ViewerApp({ gistId }: { gistId: string }) {
                     key={car.id}
                     car={car}
                     tco={results.get(car.id)!}
-                    cheapest={car.id === cheapestId}
+                    badge={car.id === badge?.id ? badge.label : null}
                     selected={selectedIds.has(car.id)}
                     readOnly
                     onToggleSelect={() => toggleSelected(car.id)}

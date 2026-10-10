@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AppData, CarListing } from './types'
-import { byOutOfPocket, calcTco } from './calc'
+import { calcTco, lowestMonthly } from './calc'
+import { carComparator, useCarSort } from './carSort'
 import {
   type Filters,
   NO_FILTERS,
@@ -10,6 +11,9 @@ import {
   saveSelection,
 } from './filtering'
 import { cloneLease, loadData, newCar, saveData } from './storage'
+import { untombstone } from './tombstones'
+import { useUndoControls } from './undo'
+import { useHideOnScroll } from './useHideOnScroll'
 import { NotABackupError, exportBackup, importBackup } from './backup'
 import { exportExcel, importExcel } from './excel'
 import {
@@ -39,6 +43,7 @@ import { Legend } from './components/BreakdownBar'
 import { CarCard } from './components/CarCard'
 import { CarForm } from './components/CarForm'
 import { ComparisonTable } from './components/ComparisonTable'
+import { CompareBar, UndoToast } from './components/Dock'
 import { FilterBar } from './components/FilterBar'
 import { ScraperFilterDialog } from './components/ScraperFilterDialog'
 import { SettingsPanel } from './components/SettingsPanel'
@@ -71,6 +76,12 @@ export default function App() {
   const fileInput = useRef<HTMLInputElement>(null)
   // A phone gets one menu for import and export - see the header.
   const narrow = useMedia(NARROW)
+  // Deletes happen at once and are offered back, rather than asked about first.
+  const undo = useUndoControls()
+  // The phone's add button steps aside while the page scrolls down under it.
+  const fabHidden = useHideOnScroll(narrow)
+  const [sort, setSort] = useCarSort()
+  const tableRef = useRef<HTMLDivElement>(null)
 
   const [syncConfig, setSyncConfig] = useState<SyncConfig | null>(loadSyncConfig)
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(syncConfig ? 'syncing' : 'off')
@@ -214,8 +225,8 @@ export default function App() {
   )
 
   const sortedCars = useMemo(
-    () => [...data.cars].sort(byOutOfPocket(results)),
-    [data.cars, results],
+    () => [...data.cars].sort(carComparator(sort, results)),
+    [data.cars, results, sort],
   )
 
   const [filters, setFilters] = useState<Filters>({ ...NO_FILTERS })
@@ -226,11 +237,10 @@ export default function App() {
     [sortedCars, filters, selectedIds],
   )
 
-  const cheapestId =
-    visibleCars.length > 1 &&
-    (results.get(visibleCars[0].id)?.outOfPocketPerMonth ?? 0) > 0
-      ? visibleCars[0].id
-      : null
+  // On the headline figure whichever order the cards are in.
+  const badge = lowestMonthly(visibleCars, results)
+  // Ticked cars that still exist - a selection outlives a car deleted elsewhere.
+  const selectedCount = data.cars.filter((c) => selectedIds.has(c.id)).length
 
   function toggleFavorite(car: CarListing) {
     const stamped = { ...car, favorite: !car.favorite, updatedAt: new Date().toISOString() }
@@ -240,17 +250,35 @@ export default function App() {
     }))
   }
 
-  function toggleSelected(id: string) {
+  function setSelected(id: string, on: boolean) {
     setSelectedIds((prev) => {
+      if (prev.has(id) === on) return prev
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+      if (on) next.add(id)
+      else next.delete(id)
       saveSelection(next)
       return next
     })
   }
 
-  function saveCar(car: CarListing) {
+  const toggleSelected = (id: string) => setSelected(id, !selectedIds.has(id))
+
+  /** The ticked cars alone, and straight to the table that compares them. */
+  function compareSelected() {
+    setFilters({ ...NO_FILTERS, selectedOnly: true })
+    // After the narrowed list has rendered - a click's update commits before
+    // the next frame.
+    requestAnimationFrame(() =>
+      tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    )
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set())
+    saveSelection(new Set())
+  }
+
+  function putCar(car: CarListing) {
     const stamped = { ...car, updatedAt: new Date().toISOString() }
     updateData((d) => {
       const exists = d.cars.some((c) => c.id === stamped.id)
@@ -259,24 +287,32 @@ export default function App() {
         cars: exists
           ? d.cars.map((c) => (c.id === stamped.id ? stamped : c))
           : [...d.cars, stamped],
+        // Saving a deleted car again is how its delete is undone. The fresh
+        // stamp is what lets it outlive a tombstone already pushed to the gist.
+        tombstones: untombstone(d.tombstones, stamped.id),
       }
     })
+  }
+
+  function saveCar(car: CarListing) {
+    putCar(car)
     setDraft(null)
   }
 
   function deleteCar(car: CarListing) {
-    if (!window.confirm(`Delete "${car.name || 'this car'}"?`)) return
+    const wasSelected = selectedIds.has(car.id)
     updateData((d) => ({
       ...d,
       cars: d.cars.filter((c) => c.id !== car.id),
       tombstones: { ...d.tombstones, [car.id]: new Date().toISOString() },
     }))
-    setSelectedIds((prev) => {
-      if (!prev.has(car.id)) return prev
-      const next = new Set(prev)
-      next.delete(car.id)
-      saveSelection(next)
-      return next
+    setSelected(car.id, false)
+    undo.offer({
+      message: `Deleted "${car.name || 'a car'}"`,
+      undo: () => {
+        putCar(car)
+        if (wasSelected) setSelected(car.id, true)
+      },
     })
   }
 
@@ -672,10 +708,12 @@ export default function App() {
             filters={filters}
             onChange={setFilters}
             makes={listMakes(data.cars)}
-            selectedCount={selectedIds.size}
+            selectedCount={selectedCount}
             favoriteCount={data.cars.filter((c) => c.favorite).length}
             shownCount={visibleCars.length}
             totalCount={data.cars.length}
+            sort={sort}
+            onSortChange={setSort}
           />
           {visibleCars.length === 0 ? (
             <div className="card empty-state">
@@ -694,7 +732,7 @@ export default function App() {
                     key={car.id}
                     car={car}
                     tco={results.get(car.id)!}
-                    cheapest={car.id === cheapestId}
+                    badge={car.id === badge?.id ? badge.label : null}
                     selected={selectedIds.has(car.id)}
                     onToggleSelect={() => toggleSelected(car.id)}
                     onToggleFavorite={() => toggleFavorite(car)}
@@ -704,11 +742,13 @@ export default function App() {
                   />
                 ))}
               </div>
-              <ComparisonTable
-                cars={visibleCars}
-                results={results}
-                settings={data.settings}
-              />
+              <div ref={tableRef} className="cmp-anchor">
+                <ComparisonTable
+                  cars={visibleCars}
+                  results={results}
+                  settings={data.settings}
+                />
+              </div>
             </>
           )}
         </>
@@ -716,9 +756,22 @@ export default function App() {
         </>
       )}
 
+      <div className={`dock${mode !== 'mileage' ? ' beside-fab' : ''}`}>
+        <UndoToast offer={undo.current} onUndo={undo.take} onDismiss={undo.dismiss} />
+        {mode === 'cars' && (
+          <CompareBar
+            count={selectedCount}
+            comparing={filters.selectedOnly}
+            onCompare={compareSelected}
+            onShowAll={() => setFilters({ ...NO_FILTERS })}
+            onClear={clearSelection}
+          />
+        )}
+      </div>
+
       {mode !== 'mileage' && (
         <button
-          className="fab"
+          className={`fab${fabHidden ? ' stepped-aside' : ''}`}
           onClick={mode === 'cars' ? addCar : addPlace}
           aria-label={mode === 'cars' ? 'Add car' : 'Add place'}
         >

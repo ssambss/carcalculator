@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SavingPlan, SavingReading } from './saving'
 import { type SavingData, loadSaving, saveSaving, syncSaving } from './savingStorage'
 import type { SyncConfig } from './sync'
+import { untombstone } from './tombstones'
 
 export type SavingSyncStatus = 'off' | 'syncing' | 'synced' | 'error'
 
@@ -93,6 +94,8 @@ export function useSaving(config: SyncConfig | null): SavingStore {
         return {
           ...current,
           readings: [...current.readings.filter((r) => !ids.has(r.id)), ...stamped],
+          // Saving a deleted balance again is how its delete is undone.
+          tombstones: stamped.reduce((t, r) => untombstone(t, r.id), current.tombstones),
         }
       })
     },

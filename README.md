@@ -70,6 +70,24 @@ color-coded cost breakdown and a side-by-side comparison table.
   shortlist, and per-card selection with a "Selected only" toggle. Filters
   narrow the cards, legend, lowest-cost badge and the comparison table
   together; selection is device-local while favorites travel with the data.
+  On a phone everything but the search folds behind one **Filters** button,
+  which counts what is narrowing while it is shut.
+- **Sorting** the cards: out of pocket (the default), after resale / mo, per
+  km, newest added or name — remembered per device. There is no "total": with
+  per-car periods it would compare different windows. The **lowest-monthly
+  badge** is always on the headline figure, whatever the order, and says what
+  it compared — *Lowest of the financed* beside a cash car, *Lowest running
+  costs* among cash cars alone.
+- **Compare**: tick two or more cards and a bar offers to show just those,
+  scrolled to the side-by-side table. On a phone the table's names wrap, so
+  two cars fit beside the row names.
+- **Deleting is undoable** instead of asked about first — cars, places,
+  odometer readings, trips and saved balances. Undo saves the item again with
+  a fresh stamp, so it outlives a tombstone already pushed to the gist.
+- **Open advert**: the first web address in a car's notes — where the watcher
+  writes the nettiauto link — becomes a link on the card, and that line leaves
+  the notes shown. Read from the notes rather than kept in a field of its own,
+  so a device on an older cached bundle has nothing to strip.
 - **Scraper filters** (funnel button in the header): the saved searches the
   listing watcher runs, editable here — make and model (paste any nettiauto
   link and it fills both), year, odometer and price limits, phrases the advert

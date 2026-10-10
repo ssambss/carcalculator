@@ -265,6 +265,28 @@ export function byOutOfPocket(results: ReadonlyMap<string, TcoResult>) {
   return (a: CarListing, b: CarListing) => isCash(a) - isCash(b) || monthly(a) - monthly(b)
 }
 
+/**
+ * The card that gets the badge, and what it can honestly claim. Ranked on the
+ * headline whatever order the cards are shown in, cash cars after financed ones
+ * as above - so beside a cash car the winner is only the lowest of the
+ * financed, and among cash cars alone the lowest is their running costs.
+ */
+export function lowestMonthly(
+  cars: readonly CarListing[],
+  results: ReadonlyMap<string, TcoResult>,
+): { id: string; label: string } | null {
+  if (cars.length < 2) return null
+  const first = [...cars].sort(byOutOfPocket(results))[0]
+  if ((results.get(first.id)?.outOfPocketPerMonth ?? 0) <= 0) return null
+  const isCash = (car: CarListing) => car.financing.method === 'cash'
+  const label = isCash(first)
+    ? 'Lowest running costs'
+    : cars.some(isCash)
+      ? 'Lowest of the financed'
+      : 'Lowest monthly'
+  return { id: first.id, label }
+}
+
 /** `yearsOverride` costs the car over a different window than its own (e.g. the
  *  comparison table's same-period view) — everything recomputes for that window. */
 export function calcTco(car: CarListing, settings: Settings, yearsOverride?: number): TcoResult {

@@ -36,6 +36,7 @@ import type { HousingStore } from '../useHousing'
 import type { SavingStore } from '../useSaving'
 import { fmtEur, fmtEurExact, fmtNum, fmtPct } from '../format'
 import { useOpen } from '../open'
+import { useUndo } from '../undo'
 import { AreaOutlook } from './AreaOutlook'
 import { BreakdownBar, Legend } from './BreakdownBar'
 import { Chevron } from './Fold'
@@ -93,6 +94,7 @@ export function HousingView({
 
   const [filters, setFilters] = useState<PropertyFilters>({ ...NO_PROPERTY_FILTERS })
   const [selectedIds, setSelectedIds] = useState<Set<string>>(loadPropertySelection)
+  const offerUndo = useUndo()
 
   const areaGroups = useMemo(() => listPropertyAreas(data.properties), [data.properties])
 
@@ -158,14 +160,15 @@ export function HousingView({
   }
 
   function deleteProperty(p: PropertyListing) {
-    if (!window.confirm(`Delete "${p.name || 'this place'}"?`)) return
+    const wasSelected = selectedIds.has(p.id)
     store.removeProperty(p.id)
-    setSelectedIds((prev) => {
-      if (!prev.has(p.id)) return prev
-      const next = new Set(prev)
-      next.delete(p.id)
-      savePropertySelection(next)
-      return next
+    if (wasSelected) toggleSelected(p.id)
+    offerUndo({
+      message: `Deleted "${p.name || 'a place'}"`,
+      undo: () => {
+        store.saveProperty(p)
+        if (wasSelected) toggleSelected(p.id)
+      },
     })
   }
 
@@ -305,8 +308,8 @@ function SituationPanel({
   const summary = `${fmtNum(householdIncome(situation))} €/mo net · ${fmtNum(householdSavings(situation))} € saved · ${fmtNum(situation.ratePct)} % / ${fmtNum(situation.termYears)} yrs${situation.buyingTogether ? ' · two borrowers' : ''}`
 
   return (
-    <div className={`card assumptions housing-panel${expanded ? ' expanded' : ''}`}>
-      <div className="housing-panel-head">
+    <div className={`card assumptions folding-panel${expanded ? ' expanded' : ''}`}>
+      <div className="folding-panel-head">
         <div className="assumptions-heading">
           <div className="assumptions-title">Your situation</div>
           <div className="assumptions-caption">what the ceiling is computed from</div>

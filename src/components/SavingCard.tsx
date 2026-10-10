@@ -28,6 +28,7 @@ import {
 } from '../saving'
 import { newSavingReading } from '../savingStorage'
 import type { SavingStore } from '../useSaving'
+import { useUndo } from '../undo'
 import { fmtEur, fmtNum } from '../format'
 import { niceTicks } from './chartHelpers'
 import { DateField } from './DateField'
@@ -667,6 +668,7 @@ function CheckIns({
 }) {
   const together = s.buyingTogether
   const { plan, readings } = store.data
+  const offerUndo = useUndo()
   const [date, setDate] = useState(() => isoOf(today))
   const [mine, setMine] = useState('')
   const [theirs, setTheirs] = useState('')
@@ -800,9 +802,11 @@ function CheckIns({
               <button
                 className="link-btn danger"
                 onClick={() => {
-                  if (window.confirm(`Delete the balance of ${fmtDay(dayOf(r.date)!)}?`)) {
-                    store.removeReading(r.id)
-                  }
+                  store.removeReading(r.id)
+                  offerUndo({
+                    message: `Deleted the balance of ${fmtDay(dayOf(r.date)!)}`,
+                    undo: () => store.saveReadings([r]),
+                  })
                 }}
                 aria-label={`Delete the balance of ${fmtDay(dayOf(r.date)!)}`}
               >

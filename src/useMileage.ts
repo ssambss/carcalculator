@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MileageLease, OdometerReading, PlannedTrip } from './mileage'
 import { type MileageData, loadMileage, saveMileage, syncMileage } from './mileageStorage'
 import type { SyncConfig } from './sync'
+import { untombstone } from './tombstones'
 
 export type MileageSyncStatus = 'off' | 'syncing' | 'synced' | 'error'
 
@@ -92,6 +93,8 @@ export function useMileage(config: SyncConfig | null): MileageStore {
         readings: current.readings.some((x) => x.id === stamped.id)
           ? current.readings.map((x) => (x.id === stamped.id ? stamped : x))
           : [...current.readings, stamped],
+        // Saving a deleted reading again is how its delete is undone.
+        tombstones: untombstone(current.tombstones, stamped.id),
       }))
     },
     [mutate],
@@ -105,6 +108,7 @@ export function useMileage(config: SyncConfig | null): MileageStore {
         trips: current.trips.some((x) => x.id === stamped.id)
           ? current.trips.map((x) => (x.id === stamped.id ? stamped : x))
           : [...current.trips, stamped],
+        tombstones: untombstone(current.tombstones, stamped.id),
       }))
     },
     [mutate],
