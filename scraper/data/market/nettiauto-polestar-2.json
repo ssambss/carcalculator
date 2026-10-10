@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"polestar","model":"2"},
-  "updatedAt": "2026-10-10T14:57:44.872Z",
-  "completeAt": "2026-10-10T14:57:44.872Z",
+  "updatedAt": "2026-10-10T17:01:43.628Z",
+  "completeAt": "2026-10-10T17:01:43.628Z",
   "listings": {
     "12959170": {"title":"78 kWh, PILOT JA PLUS paketit 78Kw AWD LONG RANGE DUAL 9,4 tkm Lasik, 360-kamera. 20\". Harman, Adapt vak. 20\" alut","year":2021,"mileage":9400,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"723ce4f0f4732307","first":"2026-08-26","last":"2026-10-10","prices":[["2026-08-26",42900],["2026-09-24",36900]]},
     "13046482": {"title":"78 kWh, PiLOT ja PLUS paketit, Vetok!!, 78 Kw Long Range Dual Motor AWD, Adaptivak .Harman Kardon, Lasikat, Nav","year":2021,"mileage":13800,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"565bc4831c5376c4","first":"2026-08-26","last":"2026-10-10","prices":[["2026-08-26",42900],["2026-09-24",42200]]},
