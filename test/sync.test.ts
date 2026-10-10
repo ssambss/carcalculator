@@ -56,9 +56,12 @@ describe('merging two copies', () => {
 
   it('breaks a tie towards the preferred side', () => {
     // Same timestamp on both, which happens when a write is echoed back. The
-    // local copy wins so the user's own screen does not flicker.
-    const mine = car('c', daysAgo(30), { purchasePrice: 100 })
-    const theirs = car('c', daysAgo(30), { purchasePrice: 200 })
+    // local copy wins so the user's own screen does not flicker. One stamp for
+    // both: two calls to daysAgo can land a millisecond apart, which made this
+    // a tie only on a fast enough machine.
+    const at = daysAgo(30)
+    const mine = car('c', at, { purchasePrice: 100 })
+    const theirs = car('c', at, { purchasePrice: 200 })
     expect(mergeData(data([mine]), data([theirs])).cars[0].purchasePrice).toBe(100)
   })
 
