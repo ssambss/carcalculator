@@ -23,7 +23,9 @@
 //   fetchAllListings     (search, { onProgress }) -> { listings, total }
 //   fetchListingDetail   (search, id) -> detail | null
 //   listingIdFromUrl     recover an id from a posted link
-//   sink                 where a reacted listing goes, or null for nowhere
+//   checkListing         (url) -> { status: on-sale | gone | unknown, why };
+//                        optional, see cleanup.js
+//   sink                where a reacted listing goes, or null for nowhere
 //   presentation         embed labels and locale
 
 import { nettiauto } from './nettiauto.js';

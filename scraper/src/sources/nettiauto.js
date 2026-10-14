@@ -291,12 +291,19 @@ export async function fetchAllListings(search, { onProgress } = {}) {
 
 const AD_STATUS_RE = /class="[^"]*ad-status[^"]*"[^>]*>([\s\S]*?)<\/div>/;
 const SOLD_RE = /ilmoitus on poistettu|varattu|myyty/i;
+/** The header nettiauto puts over a taken-down advert: "Poistettu myynnistä". */
+const SOLD_HEADER_RE = /class="[^"]*details-page-header__item-price_sold[^"]*"/;
+/** schema.org's ways of saying an offer is over. */
+const OFF_SALE_RE = /\/(OutOfStock|SoldOut|Discontinued)$/;
 
 export function parseDetailPage(html) {
   let schemaName = null;
   let seller = null;
   let locality = null;
   let price = null;
+  let advertFound = false;
+  let offSale = false;
+  let searchPage = false;
 
   for (const match of html.matchAll(
     /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
@@ -304,7 +311,13 @@ export function parseDetailPage(html) {
     const payload = parseJsonLd(match[1]);
     if (!payload) continue;
     const types = [payload['@type']].flat();
+    if (types.includes('SearchResultsPage')) searchPage = true;
     if (!types.includes('Car') && !types.includes('Product')) continue;
+    // The advert's own car, not whatever else the page might list as a product.
+    if (types.includes('Car')) {
+      advertFound = true;
+      if (OFF_SALE_RE.test(payload.offers?.availability ?? '')) offSale = true;
+    }
     schemaName = text(payload.name) ?? schemaName;
     seller = text(payload.offers?.seller?.name) ?? seller;
     locality = text(payload.offers?.seller?.address?.addressLocality) ?? locality;
@@ -322,6 +335,15 @@ export function parseDetailPage(html) {
   const uspHtml =
     /class="[^"]*unique-selling-point[^"]*"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';
 
+  // A taken-down advert stays up for weeks, marked rather than deleted: its
+  // data says OutOfStock and a header over the price says so in words. Only
+  // once it is purged does the link start landing on the model's search page.
+  // Anything else is a page this cannot read, and says nothing either way.
+  offSale ||= SOLD_HEADER_RE.test(html);
+  let availability = null;
+  if (advertFound) availability = offSale ? 'removed' : 'on-sale';
+  else if (searchPage) availability = 'missing';
+
   return {
     schemaName,
     seller,
@@ -329,7 +351,8 @@ export function parseDetailPage(html) {
     price,
     description: htmlToText(descriptionHtml),
     usp: oneLine(uspHtml),
-    sold: SOLD_RE.test(oneLine(AD_STATUS_RE.exec(html)?.[1] ?? '')),
+    availability,
+    sold: offSale || SOLD_RE.test(oneLine(AD_STATUS_RE.exec(html)?.[1] ?? '')),
   };
 }
 
@@ -342,6 +365,34 @@ export async function fetchListingDetail(search, id) {
   const html = await fetchText(buildListingUrl(search, id), { label: `listing ${id}` });
   if (!html) return null;
   return parseDetailPage(html);
+}
+
+const LISTING_URL_RE = /nettiauto\.com\/([^/?#]+)\/([^/?#]+)\/(\d+)/;
+
+/**
+ * Is the advert behind a link still up? For the calculator's cards, whose
+ * links are whatever was pasted or posted.
+ *
+ * Fetched at the address the crawl would build rather than the one given, so
+ * a card's link and a crawled listing are read the same way - which is what
+ * lets one stand in for the other when the answer needs checking.
+ *
+ * Returns `{ status, why }`: 'on-sale', 'gone', or 'unknown' for a page this
+ * cannot read. Throws when the site could not be reached at all.
+ */
+export async function checkListing(url) {
+  const match = LISTING_URL_RE.exec(url ?? '');
+  if (!match) return { status: 'unknown', why: 'not a nettiauto advert link' };
+  const [, make, model, id] = match;
+  const html = await fetchText(buildListingUrl({ make, model }, id), { label: `listing ${id}` });
+  if (html === null) return { status: 'gone', why: 'the advert page no longer exists' };
+  const { availability } = parseDetailPage(html);
+  if (availability === 'on-sale') return { status: 'on-sale', why: null };
+  if (availability === 'removed') return { status: 'gone', why: 'nettiauto marks it removed from sale' };
+  if (availability === 'missing') {
+    return { status: 'gone', why: 'the advert is gone and its link now opens the search' };
+  }
+  return { status: 'unknown', why: 'the page did not look like an advert' };
 }
 
 /**
@@ -404,6 +455,13 @@ export const nettiauto = {
 
   fetchAllListings,
   fetchListingDetail,
+
+  /**
+   * Whether the advert behind a calculator card's link is still up, so a card
+   * for a car that has sold can be cleared away. Optional for a source: cards
+   * linking to one without it are left alone.
+   */
+  checkListing,
 
   /**
    * How a listing's asking price sits against its search's market record - the

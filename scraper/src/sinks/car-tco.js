@@ -1,4 +1,5 @@
-// Sink: a reacted listing becomes a car in the Car TCO calculator.
+// Sink: a reacted listing becomes a car in the Car TCO calculator - and a card
+// whose advert has come down leaves it again (see cleanup.js).
 //
 // A *sink* is where a listing goes when someone reacts to it in Discord. It is
 // a different axis from the source: nettiauto listings land here because they
@@ -12,7 +13,7 @@
 // state.needsTcoAdd).
 
 import config from '../config.js';
-import { findTcoGist, readTcoData, writeTcoData } from '../gist.js';
+import { findTcoGist, readGistFile, readTcoData, writeTcoData } from '../gist.js';
 
 /**
  * Segments of a variant name that are pure measurements.
@@ -212,6 +213,85 @@ export async function addCarsToTco(listings, { now = new Date(), token } = {}) {
   return { added, skipped };
 }
 
+const URL_RE = /https?:\/\/[^\s<>"']+/i;
+
+/**
+ * The advert a card came from: the first web address in its notes.
+ *
+ * The same rule as the app's "Open advert" link (src/advert.ts in the repo
+ * root), so the advert checked is the one the card links to - whether the
+ * watcher wrote it there or it was pasted in by hand.
+ */
+export function advertUrlOf(notes) {
+  const match = URL_RE.exec(notes ?? '');
+  // Prose around a link ends it with punctuation that is not part of it.
+  return match ? match[0].replace(/[.,;:!?)\]]+$/, '') : null;
+}
+
+/** The calculator's cards that link to an advert, as the cleanup needs them. */
+export async function linkedCards({ token } = {}) {
+  const gistId = await findTcoGist(token);
+  // Somebody whose gist holds only filters has never connected the calculator,
+  // and a file in a shape this does not know is not one to delete from: either
+  // way, no cards.
+  const envelope = await readGistFile(gistId, config.tco.gistFilename, token);
+  const cars = Array.isArray(envelope?.data?.cars) ? envelope.data.cars : [];
+  return cars
+    .map((car) => ({
+      id: car.id,
+      name: car.name || 'Auto',
+      url: advertUrlOf(car.notes),
+      favorite: Boolean(car.favorite),
+      price: typeof car.purchasePrice === 'number' && car.purchasePrice > 0 ? car.purchasePrice : null,
+      updatedAt: car.updatedAt ?? null,
+    }))
+    .filter((card) => card.url);
+}
+
+/**
+ * Delete cards from the calculator, leaving a tombstone for each.
+ *
+ * The tombstone is what makes it stick. The app merges per car, and a phone
+ * still holding the card would otherwise push it straight back on its next
+ * sync; with one, the merge drops the card everywhere - unless somebody edits
+ * it after the deletion, which the app takes as wanting it back.
+ *
+ * Read again right before the write, as late as possible, and a card edited
+ * since it was looked at is left alone: whoever is working on it now has the
+ * better claim than a check made a minute ago.
+ */
+export async function removeCarsFromTco(cards, { now = new Date(), token } = {}) {
+  if (cards.length === 0) return { removed: [] };
+
+  const gistId = await findTcoGist(token);
+  const envelope = await readTcoData(gistId, token);
+  const wanted = new Map(cards.map((card) => [card.id, card]));
+  const removed = [];
+  envelope.data.cars = envelope.data.cars.filter((car) => {
+    const card = wanted.get(car.id);
+    if (!card || (car.updatedAt ?? null) !== card.updatedAt) return true;
+    removed.push(car.id);
+    return false;
+  });
+
+  if (removed.length > 0) {
+    const stamp = now.toISOString();
+    const tombstones = { ...envelope.data.tombstones };
+    for (const id of removed) tombstones[id] = stamp;
+    // In the app's own order, so its next merge has nothing to rewrite.
+    envelope.data.tombstones = Object.fromEntries(
+      Object.keys(tombstones)
+        .sort()
+        .map((id) => [id, tombstones[id]]),
+    );
+    envelope.app = envelope.app ?? 'carcalculator';
+    envelope.savedAt = stamp;
+    await writeTcoData(gistId, envelope, token);
+  }
+
+  return { removed };
+}
+
 /** Under Discord's 2 000 characters, and under announceText's own 1 900 clamp. */
 const MESSAGE_BUDGET = 1900;
 
@@ -244,22 +324,68 @@ export function addedMessage(
   const open = appUrl ? `\nAvaa laskuri: <${appUrl}>` : '';
   if (listings.length === 1) return `🧮 **Lisätty laskuriin:** ${linked(listings[0])}${open}`;
 
-  // Every car the run added, in the one message. When the links would push it
-  // past Discord's limit they go first: each car's listing post is in the
-  // channel above, and its card carries the link in its notes. Only a run
-  // adding dozens at once is cut short, and it says how many it left out.
   const head = `🧮 **Lisätty laskuriin ${listings.length} autoa:**`;
+  return fitList(head, listings, { linked, described, tail: open, budget });
+}
+
+/**
+ * A heading and a line per car, in one message.
+ *
+ * When the links would push it past Discord's limit they go first: each car's
+ * listing post is in the channel above, and its card carries the link in its
+ * notes. Only a run with dozens at once is cut short, and it says how many it
+ * left out.
+ */
+function fitList(head, items, { linked, described, tail = '', budget }) {
   for (const line of [linked, described]) {
-    const text = [head, ...listings.map((listing) => `• ${line(listing)}`)].join('\n') + open;
+    const text = [head, ...items.map((item) => `• ${line(item)}`)].join('\n') + tail;
     if (text.length <= budget) return text;
   }
   const lines = [];
-  let used = head.length + open.length + '\n…ja 999 muuta'.length;
-  for (const listing of listings) {
-    const next = `• ${described(listing)}`;
+  let used = head.length + tail.length + '\n…ja 999 muuta'.length;
+  for (const item of items) {
+    const next = `• ${described(item)}`;
     if (used + next.length + 1 > budget) break;
     lines.push(next);
     used += next.length + 1;
   }
-  return [head, ...lines, `…ja ${listings.length - lines.length} muuta`].join('\n') + open;
+  return [head, ...lines, `…ja ${items.length - lines.length} muuta`].join('\n') + tail;
+}
+
+/** "Polestar 2 … · 27 790 €" - a card as the app shows it, by its own name. */
+function describeCard(card) {
+  const price = card.price === null ? '' : ` · ${EUR.format(card.price)}`;
+  return `${card.name}${price}`;
+}
+
+const linkCard = (card) => `${describeCard(card)} · <${card.url}>`;
+
+/**
+ * The line posted when cards are cleared away because their adverts came down.
+ *
+ * Deleting somebody's cards without a word would be the quiet kind of
+ * automation that makes people stop trusting the calculator. Named as the
+ * cards were, so they can be recognised, and linked, so anyone who doubts it
+ * can open the advert and see it marked removed.
+ */
+export function removedMessage(cards, { budget = MESSAGE_BUDGET } = {}) {
+  if (cards.length === 1) {
+    return `🧹 **Poistettu laskurista, ilmoitus poistunut:** ${linkCard(cards[0])}`;
+  }
+  const head = `🧹 **Poistettu laskurista ${cards.length} autoa, ilmoitukset poistuneet:**`;
+  return fitList(head, cards, { linked: linkCard, described: describeCard, budget });
+}
+
+/** A starred card stays in the calculator, but its advert going is still news. */
+export function keptMessage(cards, { budget = MESSAGE_BUDGET } = {}) {
+  if (cards.length === 1) {
+    return (
+      '⭐ **Tähdellä merkityn auton ilmoitus on poistunut, kortti jäi laskuriin:** ' +
+      linkCard(cards[0])
+    );
+  }
+  const head =
+    `⭐ **${cards.length} tähdellä merkityn auton ilmoitus on poistunut, ` +
+    'kortit jäivät laskuriin:**';
+  return fitList(head, cards, { linked: linkCard, described: describeCard, budget });
 }

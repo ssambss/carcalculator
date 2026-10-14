@@ -14,19 +14,38 @@
 //   add(listings, {token}) -> { added, skipped }, both arrays of listing ids
 //   addedMessage(listings) -> the channel's notice that they arrived; optional
 //
+// and, for clearing away cards whose advert has come down (see cleanup.js),
+// optionally all of:
+//
+//   cards({token})          -> [{ id, name, url, favorite, price, updatedAt }],
+//                              the cards that link to an advert
+//   remove(cards, {token})  -> { removed }, the card ids actually deleted
+//   removedMessage(cards), keptMessage(cards) -> the channel's notices
+//
 // The token is always passed in, never read from configuration. A sink writes
 // into somebody's own gist, and whose is not a global fact - there used to be a
 // `ready()` here that answered "is this sink usable?" by checking the *owner's*
 // token, which would have been the wrong answer for every other tenant. It was
 // never called; it is gone rather than fixed.
 
-import { addCarsToTco, addedMessage } from './car-tco.js';
+import {
+  addCarsToTco,
+  addedMessage,
+  keptMessage,
+  linkedCards,
+  removeCarsFromTco,
+  removedMessage,
+} from './car-tco.js';
 
 const carTco = {
   id: 'car-tco',
   label: 'the Car TCO calculator',
   add: addCarsToTco,
   addedMessage,
+  cards: linkedCards,
+  remove: removeCarsFromTco,
+  removedMessage,
+  keptMessage,
 };
 
 export const SINKS = [carTco];

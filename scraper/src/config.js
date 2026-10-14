@@ -120,6 +120,21 @@ export const config = {
     // How far back through the channel to look for reactions, in messages.
     scanMessages: 300,
 
+    // Cards whose advert has come down are deleted from the calculator, so it
+    // holds cars that can still be bought. A card is checked only if it links
+    // to an advert (the first address in its notes, as for the app's "Open
+    // advert"), and only on a site whose source can check one. See cleanup.js.
+    removeGone: {
+      enabled: true,
+      // A card the crawl did not just see has its advert opened at most this
+      // often. A card is deleted on the second check in a row to find it gone,
+      // so this is also roughly how long a sold car lingers.
+      recheckHours: 6,
+      // A starred card is kept, with a note in the channel instead: it may be
+      // the car that was bought, and its numbers are the record of why.
+      keepFavorites: true,
+    },
+
     // The *fallback* baseline for an added car, not the baseline.
     //
     // The financing, consumption and yearly cost figures now come from whoever

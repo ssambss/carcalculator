@@ -499,6 +499,48 @@ Worth knowing:
 - To require a specific emoji instead of any reaction, set
   `tco.requiredEmoji` (e.g. `'✅'`) in [src/config.js](src/config.js).
 
+## Sold cars leave the calculator
+
+Every run also looks at the calculator's cards, and deletes the ones whose
+advert has come down, so the page holds cars that can still be bought. A card
+counts if it links to an advert: the first address in its notes, the same one
+the app's *Open advert* button opens. That covers every reacted car and any
+card with a nettiauto link pasted in by hand. Cards linking anywhere else, or
+nowhere, are left alone.
+
+How it decides, in [src/cleanup.js](src/cleanup.js):
+
+- **The crawl is the cheap answer.** A card whose listing the crawl just saw is
+  on sale and costs nothing. The rest have their advert opened, each at most
+  every `tco.removeGone.recheckHours` (6). A car that drops out of a watched
+  search is opened the same run.
+- **Gone means nettiauto says so.** A taken-down advert stays up for weeks,
+  marked *Poistettu myynnistä* (and `OutOfStock` in its data); once purged, its
+  link lands on the model's search. Either counts, as does a 404. A page that
+  reads as neither is "could not tell" and the card stays.
+- **Gone twice.** A card is deleted on the second check in a row to find it
+  gone, a recheck apart, so a sold car lingers about six hours. One odd page
+  cannot cost a card.
+- **The check has to prove itself.** Before any "gone" in a run is believed,
+  an advert the crawl just saw is opened the same way. If that does not read as
+  on sale, nettiauto has changed under the parser and nothing is deleted. A
+  redesign would otherwise read every advert as removed and empty the
+  calculator in two runs.
+- **Starred cards stay.** A starred car may be the one that was bought, and its
+  numbers are the record of why. The channel is told once ("⭐ … kortti jäi
+  laskuriin"), and unstarring it lets the next check delete it. Set
+  `tco.removeGone.keepFavorites = false` to delete starred cards too.
+
+A deletion is written to the gist with a tombstone, the same way a delete in
+the app is, so a phone still holding the card drops it on its next sync instead
+of pushing it back. Editing the card after that brings it back, and the watcher
+leaves a card it has deleted once alone for good. The reaction on its post
+won't re-add it either. The channel gets "🧹 Poistettu laskurista" naming each
+deleted card, with its price and advert link.
+
+`tco.removeGone.enabled = false` turns it off. A `--dry-run` opens the adverts
+and says what it would delete, deleting nothing.
+
 ## How the nettiauto source reads nettiauto
 
 Everything below is one adapter's business, in
@@ -619,6 +661,7 @@ src/state.js            what has been seen and announced, per filter
 src/storage/index.js    where that record lives: a file, or your gist
 src/discord.js          webhook payloads, labelled by the source
 src/reactions.js        reading reactions off our own posts
+src/cleanup.js          which cards' adverts have come down
 src/gist.js             the GitHub gist plumbing
 src/http.js             paced (per host), retrying fetch
 src/html.js             entity decoding and text extraction
@@ -630,6 +673,7 @@ test/                   unit tests, no network
 test/sources.test.js    conformance: what every adapter has to get right
 test/tenants.test.js    who it runs for, and the half-configured cases
 test/reactions.test.js  reading channels across several servers
+test/cleanup.test.js    clearing sold cars away, and the guards on it
 src/market.js           the market record: every listing seen, prices over time
 src/backfill-market.js  one-off: that record rebuilt from seen.json's history
 data/seen.json          the record (commit this)

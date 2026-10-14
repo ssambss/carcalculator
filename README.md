@@ -294,7 +294,8 @@ base so any repo name works).
 
 [scraper/](scraper/) holds a companion: a Node script that watches listing sites
 for things matching your filters and posts anything new to a Discord channel.
-React to a post there and the car appears in this calculator.
+React to a post there and the car appears in this calculator. When a card's
+advert comes down, the watcher deletes the card again (starred ones stay).
 
 Which site a filter reads is its **source** — an adapter under
 [scraper/src/sources/](scraper/src/sources/). `nettiauto` is the only one so

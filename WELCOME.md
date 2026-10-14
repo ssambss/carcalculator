@@ -228,6 +228,19 @@ those for a particular car and a particular person, and a made-up number looks
 exactly like a real one. Get a quote, type it in, and the comparison becomes worth
 trusting.
 
+## Sold cars clear themselves away
+
+When a car's advert comes down, its card is deleted from your calculator within
+about half a day, and Discord tells you which ones went. That applies to any card
+with a nettiauto link in its notes: the ones that came from a reaction, and any
+where you pasted the link in yourself.
+
+**Starred cards are kept.** It might be the one you bought. You get a message
+that its advert is gone, and the card stays until you unstar it.
+
+If a card goes that you wanted to keep, add it again by hand. The watcher never
+deletes the same car twice.
+
 ## Reading the numbers
 
 Two monthly figures, answering different questions. Both are shown because people
@@ -352,6 +365,7 @@ a file of it.
 - Get a Discord channel, theirs or yours.
 - Make a search with the funnel button; set your Assumptions.
 - Listings arrive in Discord. React to one and it lands in the calculator.
+- When a car sells, its card deletes itself. Starred cards stay.
 - Fill in insurance and tax yourself — the blanks are deliberate.
 - **€ / month** is what the car costs; **out of pocket** is what leaves your
   account. Depreciation is usually the biggest line.

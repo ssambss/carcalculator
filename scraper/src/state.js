@@ -71,7 +71,9 @@ function emptyState() {
     // Filter id -> { name, firstRunAt, lastRunAt }. Knowing a filter has run
     // before is what makes "post what is already on sale" a one-off.
     filters: {},
-    // Reaction pickups: listing id -> { addedAt, confirmedAt }. See recordTcoAdd.
+    // A listing's life in the calculator: listing id -> { addedAt, confirmedAt }
+    // from reaction pickups (see recordTcoAdd), plus checkedAt, goneSince,
+    // keptAt and removedAt from clearing away sold cars (see noteGone).
     tco: {},
   };
 }
@@ -372,11 +374,13 @@ export function prune(state, { forgetAfterDays = config.state.forgetAfterDays, n
  *  - never added -> add it;
  *  - added but not yet seen present in the gist -> add again (a race ate it);
  *  - seen present once (`confirmedAt`) -> leave it alone forever, so a car
- *    the user deliberately deletes in the app stays deleted.
+ *    the user deliberately deletes in the app stays deleted;
+ *  - cleared away because its advert came down (`removedAt`) -> never again,
+ *    or the reaction still sitting on its post would bring it straight back.
  */
 export function needsTcoAdd(state, key) {
   const entry = state.tco[key];
-  return !entry || !entry.confirmedAt;
+  return !entry || (!entry.confirmedAt && !entry.removedAt);
 }
 
 /**
@@ -389,14 +393,69 @@ export function isFirstTcoAdd(state, key) {
   return !state.tco[key]?.addedAt;
 }
 
+function tcoEntry(state, key) {
+  return state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
+}
+
 export function recordTcoAdd(state, key, now = new Date()) {
-  const entry = state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
+  const entry = tcoEntry(state, key);
   entry.addedAt = entry.addedAt ?? now.toISOString();
 }
 
 export function recordTcoConfirmed(state, key, now = new Date()) {
-  const entry = state.tco[key] ?? (state.tco[key] = { addedAt: null, confirmedAt: null });
+  const entry = tcoEntry(state, key);
   entry.confirmedAt = entry.confirmedAt ?? now.toISOString();
+}
+
+/**
+ * Is a card's advert due to be opened again?
+ *
+ * Only cards the crawl did not just see get this far, so this is what keeps a
+ * card for a model nobody watches from costing a page every run. The clock is
+ * the last time the page was actually opened, not the last time the crawl saw
+ * the car: a car that drops out of a watched search is checked that same run.
+ */
+export function cardCheckDue(state, key, { everyHours, now = new Date() } = {}) {
+  const checkedAt = Date.parse(state.tco[key]?.checkedAt ?? '');
+  return !Number.isFinite(checkedAt) || now - checkedAt >= everyHours * 60 * 60 * 1000;
+}
+
+/** The advert is up: seen in the crawl, or opened and found on sale. */
+export function noteListed(state, key, { opened = false, now = new Date() } = {}) {
+  // Seen in the crawl with nothing on record: nothing to note, and no entry
+  // made for every card that is simply fine.
+  if (!state.tco[key] && !opened) return;
+  const entry = tcoEntry(state, key);
+  if (opened) entry.checkedAt = now.toISOString();
+  delete entry.goneSince;
+  delete entry.keptAt;
+}
+
+/** Opened, and could not tell. Counts as a check, so it is not reopened every run. */
+export function noteChecked(state, key, now = new Date()) {
+  tcoEntry(state, key).checkedAt = now.toISOString();
+}
+
+/**
+ * Opened, and the advert is gone. Returns true when an earlier check said so
+ * too - two looks, a recheck apart, before a card is deleted, so one bad page
+ * from the site cannot cost anybody a card.
+ */
+export function noteGone(state, key, now = new Date()) {
+  const entry = tcoEntry(state, key);
+  const before = Boolean(entry.goneSince);
+  entry.checkedAt = now.toISOString();
+  entry.goneSince = entry.goneSince ?? now.toISOString();
+  return before;
+}
+
+/** A starred card whose advert is gone: said once, then left be. */
+export function recordTcoKept(state, key, now = new Date()) {
+  tcoEntry(state, key).keptAt = now.toISOString();
+}
+
+export function recordTcoRemoved(state, key, now = new Date()) {
+  tcoEntry(state, key).removedAt = now.toISOString();
 }
 
 /** Counts for the run summary; per filter when asked for one. */

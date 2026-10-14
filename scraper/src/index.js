@@ -39,6 +39,7 @@ const {
   stalenessNotice,
 } = await import('./preflight.js');
 const { fetchReactedListingIds } = await import('./reactions.js');
+const { findGoneCards } = await import('./cleanup.js');
 const { sinkFor } = await import('./sinks/index.js');
 const { sourceOf } = await import('./sources/index.js');
 const state = await import('./state.js');
@@ -454,6 +455,87 @@ async function pickUpReactions(listings, store, { dryRun, sources, tenant }) {
     }
     if (skipped.length) {
       console.log(`${skipped.length} reacted listing(s) were already in ${sink.label}.`);
+    }
+  }
+}
+
+/**
+ * Delete the calculator cards whose advert has come down.
+ *
+ * Every run, for each calculator this run's sources feed. What counts as gone,
+ * and why it takes two looks, is in cleanup.js; this is the reading, the
+ * deleting and the saying so.
+ */
+async function clearGoneCards(listed, store, { dryRun, sources, tenant }) {
+  const options = config.tco.removeGone;
+  // Their calculator, read and written with their token - see pickUpReactions.
+  const token = tenant.gistToken;
+  if (!token) {
+    console.log(`  ${tenant.label} has no gist token, so their cards are not checked.`);
+    return;
+  }
+
+  const sinks = new Map();
+  for (const source of sources) {
+    const sink = sinkFor(source);
+    if (sink?.cards && sink.remove) sinks.set(sink.id, sink);
+  }
+
+  for (const sink of sinks.values()) {
+    const cards = await sink.cards({ token });
+    const { remove, kept, opened } = await findGoneCards(cards, {
+      store,
+      listed,
+      sources,
+      recheckHours: options.recheckHours,
+      keepFavorites: options.keepFavorites,
+      log: (line) => console.log(`  ${line}`),
+    });
+    console.log(
+      `${cards.length} card(s) in ${sink.label} link to an advert; opened ${opened} of them.`,
+    );
+
+    if (dryRun) {
+      for (const { card, why } of remove) console.log(`  [dry-run] would delete ${card.name} (${why})`);
+      for (const { card } of kept) console.log(`  [dry-run] would keep starred ${card.name}`);
+      continue;
+    }
+
+    if (remove.length) {
+      const { removed } = await sink.remove(
+        remove.map(({ card }) => card),
+        { token },
+      );
+      const done = remove.filter(({ card }) => removed.includes(card.id));
+      for (const { key } of done) state.recordTcoRemoved(store, key);
+      for (const { card } of remove) {
+        console.log(
+          removed.includes(card.id)
+            ? `  deleted ${card.name}`
+            : `  left ${card.name} alone: it was edited or deleted while being checked`,
+        );
+      }
+      if (done.length && sink.removedMessage) {
+        // The cards are gone whatever happens here, so a failed notice is
+        // logged rather than failing the run.
+        await announceText(sink.removedMessage(done.map(({ card }) => card)), {
+          webhookUrl: tenant.webhookUrl,
+        }).catch((error) => console.warn(`  could not post the deleted-cards notice: ${error.message}`));
+      }
+    }
+
+    if (kept.length && sink.keptMessage) {
+      // Recorded only once the notice is out, so a failed post is tried again.
+      const sent = await announceText(sink.keptMessage(kept.map(({ card }) => card)), {
+        webhookUrl: tenant.webhookUrl,
+      }).then(
+        () => true,
+        (error) => {
+          console.warn(`  could not post the kept-cards notice: ${error.message}`);
+          return false;
+        },
+      );
+      if (sent) for (const { key } of kept) state.recordTcoKept(store, key);
     }
   }
 }
@@ -1066,6 +1148,20 @@ async function main() {
           sources,
           tenant: context.tenant,
         });
+      }
+      if (config.tco.removeGone.enabled) {
+        console.log(`\n${label}checking calculator cards for adverts that came down...`);
+        try {
+          await clearGoneCards(crawled.everyListing, context.store, {
+            dryRun: args.dryRun,
+            sources,
+            tenant: context.tenant,
+          });
+        } catch (error) {
+          // Housekeeping, and it is tried again next run: said, not allowed to
+          // cost this person their posts.
+          console.error(`  ${label}could not check the calculator's cards: ${error.message}`);
+        }
       }
       await announceFor(context, crawled, args);
     } catch (error) {
