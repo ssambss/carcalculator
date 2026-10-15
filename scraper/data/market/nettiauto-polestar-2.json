@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"polestar","model":"2"},
-  "updatedAt": "2026-10-15T05:02:04.741Z",
-  "completeAt": "2026-10-15T05:02:04.741Z",
+  "updatedAt": "2026-10-15T07:01:54.159Z",
+  "completeAt": "2026-10-15T07:01:54.159Z",
   "listings": {
     "12959170": {"title":"78 kWh, PILOT JA PLUS paketit 78Kw AWD LONG RANGE DUAL 9,4 tkm Lasik, 360-kamera. 20\". Harman, Adapt vak. 20\" alut","year":2021,"mileage":9400,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"723ce4f0f4732307","first":"2026-08-26","last":"2026-10-15","prices":[["2026-08-26",42900],["2026-09-24",36900]]},
     "13046482": {"title":"78 kWh, PiLOT ja PLUS paketit, Vetok!!, 78 Kw Long Range Dual Motor AWD, Adaptivak .Harman Kardon, Lasikat, Nav","year":2021,"mileage":13800,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"565bc4831c5376c4","first":"2026-08-26","last":"2026-10-15","prices":[["2026-08-26",42900],["2026-09-24",42200]]},
@@ -708,7 +708,7 @@
     "16014272": {"title":"78 kWh, Launch Edition, 300kW, 78kWh / Tähän autoon saatavissa Veho-turva lisäturva! *** Ilmainen kotiinkuljetus","year":2021,"mileage":63000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Veho Turku","vin":"d2f52f9109e56aea","first":"2026-09-28","last":"2026-10-15","prices":[["2026-09-28",32900],["2026-10-09",32800]]},
     "16014289": {"title":"69 kWh, Standard Range Single Motor, 170kW, 69kWh","year":2023,"mileage":83000,"fuel":null,"drive":null,"battery":null,"seller":"J. Rinta-Jouppi Porvoo","vin":null,"first":"2026-09-28","last":"2026-10-06","prices":[["2026-09-28",27700]]},
     "16014303": {"title":"Long Range Single Motor, 170kW, 78kWh | (TEHTY MYYNTIVARAUS!)","year":2023,"mileage":53850,"fuel":"Sähkö","drive":"Etuveto","battery":78,"seller":"Bilia Kaivoksela","vin":"bc4f33e9da1fecf4","first":"2026-09-28","last":"2026-10-15","prices":[["2026-09-28",32500],["2026-10-09",32300]]},
-    "16014306": {"title":"Standard Range Single Motor, 170kW, 69kWh","year":2023,"mileage":98000,"fuel":"Sähkö","drive":"Etuveto","battery":69,"seller":"Bilia Kaivoksela","vin":"f3848022e80988f7","first":"2026-09-28","last":"2026-10-15","prices":[["2026-09-28",26800]]},
+    "16014306": {"title":"Standard Range Single Motor, 170kW, 69kWh","year":2023,"mileage":98000,"fuel":"Sähkö","drive":"Etuveto","battery":69,"seller":"Bilia Kaivoksela","vin":"f3848022e80988f7","first":"2026-09-28","last":"2026-10-15","prices":[["2026-09-28",26800],["2026-10-15",26700]]},
     "16014531": {"title":"Long Range Dual Motor Performance, 350kW, 78kWh | (TEHTY MYYNTIVARAUS!)","year":2023,"mileage":61000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Bilia Kaivoksela","vin":"cc5c24a3cd7b89c9","first":"2026-09-28","last":"2026-10-12","prices":[["2026-09-28",39800],["2026-10-09",39600]]},
     "16015168": {"title":"82 kWh, Long range Dual motor Prime","year":2026,"mileage":3000,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Bilia Polestar Helsinki","vin":"ef5c503c82be4fa9","first":"2026-09-28","last":"2026-10-12","prices":[["2026-09-28",52690],["2026-10-06",52490]]},
     "16015172": {"title":"82 kWh, Long range Dual motor Prime","year":2027,"mileage":1,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Bilia Polestar Helsinki","vin":"6075e7c39d771d6f","first":"2026-09-28","last":"2026-10-15","prices":[["2026-09-28",53790]]},
@@ -897,6 +897,7 @@
     "16047342": {"title":"78 kWh, Long Range Dual Motor, 300kW, 78kWh (MY23) / Plus- ja Pilot-pkt. / Vetokoukku / 360° / Lämpöpumppu / H&K / Lasikatto","year":2023,"mileage":55000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"KIESI Espoo Koskelo","vin":"95e1856e1b0b6b49","first":"2026-10-14","last":"2026-10-15","prices":[["2026-10-14",35990]]},
     "16047447": {"title":"78 kWh, Long Range Dual Motor, 300kW, 78kWh","year":2024,"mileage":56000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"J. Rinta-Jouppi Kotka","vin":"b169ed23dd71bc0c","first":"2026-10-14","last":"2026-10-15","prices":[["2026-10-14",34880]]},
     "16047898": {"title":"78 kWh, Launch Edition, 300kW, 78kWh","year":2021,"mileage":151000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Rinta-Joupin Autoliike, Mikkeli","vin":"08a20066352140d9","first":"2026-10-14","last":"2026-10-15","prices":[["2026-10-14",28290]]},
-    "16047943": {"title":"78 kWh, Long Range Dual Motor 78kW","year":2023,"mileage":35000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Rinta-Joupin Autoliike, Hyvinkää","vin":"470c0cb594eea1fa","first":"2026-10-14","last":"2026-10-15","prices":[["2026-10-14",36890]]}
+    "16047943": {"title":"78 kWh, Long Range Dual Motor 78kW","year":2023,"mileage":35000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Rinta-Joupin Autoliike, Hyvinkää","vin":"470c0cb594eea1fa","first":"2026-10-14","last":"2026-10-15","prices":[["2026-10-14",36890]]},
+    "16048432": {"title":"82 kWh, Long Range Dual Motor 78kWh","year":2023,"mileage":53000,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Kamux Lappeenranta","vin":"f81bdadcc4340e78","first":"2026-10-15","last":"2026-10-15","prices":[["2026-10-15",35890]]}
   }
 }
