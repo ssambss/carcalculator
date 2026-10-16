@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"polestar","model":"2"},
-  "updatedAt": "2026-10-16T19:01:44.390Z",
-  "completeAt": "2026-10-16T19:01:44.390Z",
+  "updatedAt": "2026-10-16T20:58:41.977Z",
+  "completeAt": "2026-10-16T20:58:41.977Z",
   "listings": {
     "12959170": {"title":"78 kWh, PILOT JA PLUS paketit 78Kw AWD LONG RANGE DUAL 9,4 tkm Lasik, 360-kamera. 20\". Harman, Adapt vak. 20\" alut","year":2021,"mileage":9400,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"723ce4f0f4732307","first":"2026-08-26","last":"2026-10-16","prices":[["2026-08-26",42900],["2026-09-24",36900]]},
     "13046482": {"title":"78 kWh, PiLOT ja PLUS paketit, Vetok!!, 78 Kw Long Range Dual Motor AWD, Adaptivak .Harman Kardon, Lasikat, Nav","year":2021,"mileage":13800,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"565bc4831c5376c4","first":"2026-08-26","last":"2026-10-16","prices":[["2026-08-26",42900],["2026-09-24",42200]]},
@@ -924,6 +924,7 @@
     "16051680": {"title":"78 kWh, Long Range Dual Motor, 350kW, 78kWh","year":2022,"mileage":120000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Bilar99 - Raisio","vin":"c738f83d35d620d5","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",32790]]},
     "16051978": {"title":"78 kWh, Long Range Single Motor 78 kWh / Pilot Lite / 360-kamera / High Perf. Audio / ACC / LED / Keyless / Muistipenkit","year":2023,"mileage":80000,"fuel":"Sähkö","drive":"Etuveto","battery":78,"seller":"Automyynti Karon Tuusula","vin":"6184cfe836509c39","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",31800]]},
     "16052054": {"title":"1 kWh, Long range Dual motor","year":2022,"mileage":121000,"fuel":"Sähkö","drive":"Neliveto","battery":1,"seller":"Kamux Oulunportti","vin":"a58f12f2e7744a6d","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",30900]]},
-    "16052205": {"title":"82 kWh, Long range Dual motor, 310kW, 82kWh / Suomi-auto / 1-om /Pilot / 360 kamera / Huippu kuntoinen","year":2024,"mileage":57000,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Levorannan Autoliike Oy, Rauma","vin":"6b7db4d580a42a40","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",39720]]}
+    "16052205": {"title":"82 kWh, Long range Dual motor, 310kW, 82kWh / Suomi-auto / 1-om /Pilot / 360 kamera / Huippu kuntoinen","year":2024,"mileage":57000,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Levorannan Autoliike Oy, Rauma","vin":"6b7db4d580a42a40","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",39720]]},
+    "16052647": {"title":"78 kWh, Pilot + Pixel + Plus","year":2021,"mileage":187000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Novoset Oy","vin":"1af5dcfba8cd6266","first":"2026-10-16","last":"2026-10-16","prices":[["2026-10-16",24770]]}
   }
 }
