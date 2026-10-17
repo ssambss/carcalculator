@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"polestar","model":"2"},
-  "updatedAt": "2026-10-17T05:01:40.884Z",
-  "completeAt": "2026-10-17T05:01:40.884Z",
+  "updatedAt": "2026-10-17T06:06:34.851Z",
+  "completeAt": "2026-10-17T06:06:34.851Z",
   "listings": {
     "12959170": {"title":"78 kWh, PILOT JA PLUS paketit 78Kw AWD LONG RANGE DUAL 9,4 tkm Lasik, 360-kamera. 20\". Harman, Adapt vak. 20\" alut","year":2021,"mileage":9400,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"723ce4f0f4732307","first":"2026-08-26","last":"2026-10-17","prices":[["2026-08-26",42900],["2026-09-24",36900]]},
     "13046482": {"title":"78 kWh, PiLOT ja PLUS paketit, Vetok!!, 78 Kw Long Range Dual Motor AWD, Adaptivak .Harman Kardon, Lasikat, Nav","year":2021,"mileage":13800,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Kesman","vin":"565bc4831c5376c4","first":"2026-08-26","last":"2026-10-17","prices":[["2026-08-26",42900],["2026-09-24",42200]]},
@@ -54,7 +54,7 @@
     "15754154": {"title":"78 kWh, Long Range Dual Motor Performance 300kW, 78kWh ** Vetokoukku / H&K / Lasikatto / 360 / PIXEL LED / Muistipenkki **","year":2021,"mileage":29000,"fuel":null,"drive":null,"battery":null,"seller":"Saka Finland Oy Varisto","vin":null,"first":"2026-08-26","last":"2026-08-30","prices":[["2026-08-26",36900]]},
     "15754296": {"title":"78 kWh, Long Range Dual Motor, 300kW, 78kWh / Plus paketti / 1 omistaja / Panoraamakatto / Suomi-auto / 2x renkaat / Apple carpl","year":2023,"mileage":77000,"fuel":null,"drive":null,"battery":null,"seller":"AKR Auto- ja koneliike Oy","vin":null,"first":"2026-08-26","last":"2026-10-09","prices":[["2026-08-26",33900],["2026-09-24",32900]]},
     "15755196": {"title":"78 kWh, Launch Edition, 300kW, 78kWh","year":2021,"mileage":111000,"fuel":null,"drive":null,"battery":null,"seller":"J. Rinta-Jouppi Tampere, Lielahti","vin":null,"first":"2026-08-26","last":"2026-09-29","prices":[["2026-08-26",28800],["2026-09-24",27300]]},
-    "15755351": {"title":"Long Range 300kw Performance","year":2021,"mileage":116000,"fuel":"Sähkö","drive":"Neliveto","battery":null,"seller":"J. Rinta-Jouppi Porvoo","vin":"0d2cdfdebbde5623","first":"2026-08-26","last":"2026-10-17","prices":[["2026-08-26",29600],["2026-09-24",28100]]},
+    "15755351": {"title":"Long Range 300kw Performance","year":2021,"mileage":116000,"fuel":"Sähkö","drive":"Neliveto","battery":null,"seller":"J. Rinta-Jouppi Porvoo","vin":"0d2cdfdebbde5623","first":"2026-08-26","last":"2026-10-17","prices":[["2026-08-26",29600],["2026-09-24",28100],["2026-10-17",27800]]},
     "15757202": {"title":"78 kWh, Launch Edition, 300kW, 78kWh","year":2021,"mileage":125000,"fuel":null,"drive":null,"battery":null,"seller":"LänsiAuto Helsinki","vin":null,"first":"2026-08-26","last":"2026-08-30","prices":[["2026-08-26",27950],["2026-08-27",27890]]},
     "15757497": {"title":"78 kWh, Long Range Dual Motor, 300kW, 78kWh / MY2022 / Pilot-pkt. / ACC / 360° Kamera / Pixel-LED / Muistipenkki / BLIS","year":2022,"mileage":113000,"fuel":null,"drive":null,"battery":null,"seller":"KIESI Espoo Koskelo","vin":null,"first":"2026-08-26","last":"2026-08-30","prices":[["2026-08-26",28390]]},
     "15757545": {"title":"82 kWh, Long range Dual motor, 310kW, 82kWh (MY24) / Pilot & Plus-pkt. / Ilmalämpöpumppu / 360° / H&K / Panorama / Pixel-LED","year":2024,"mileage":39000,"fuel":null,"drive":null,"battery":null,"seller":"KIESI Espoo Koskelo","vin":null,"first":"2026-08-26","last":"2026-08-30","prices":[["2026-08-26",43290]]},
@@ -925,6 +925,7 @@
     "16051978": {"title":"78 kWh, Long Range Single Motor 78 kWh / Pilot Lite / 360-kamera / High Perf. Audio / ACC / LED / Keyless / Muistipenkit","year":2023,"mileage":80000,"fuel":"Sähkö","drive":"Etuveto","battery":78,"seller":"Automyynti Karon Tuusula","vin":"6184cfe836509c39","first":"2026-10-16","last":"2026-10-17","prices":[["2026-10-16",31800]]},
     "16052054": {"title":"1 kWh, Long range Dual motor","year":2022,"mileage":121000,"fuel":"Sähkö","drive":"Neliveto","battery":1,"seller":"Kamux Oulunportti","vin":"a58f12f2e7744a6d","first":"2026-10-16","last":"2026-10-17","prices":[["2026-10-16",30900]]},
     "16052205": {"title":"82 kWh, Long range Dual motor, 310kW, 82kWh / Suomi-auto / 1-om /Pilot / 360 kamera / Huippu kuntoinen","year":2024,"mileage":57000,"fuel":"Sähkö","drive":"Neliveto","battery":82,"seller":"Levorannan Autoliike Oy, Rauma","vin":"6b7db4d580a42a40","first":"2026-10-16","last":"2026-10-17","prices":[["2026-10-16",39720]]},
-    "16052647": {"title":"78 kWh, Pilot + Pixel + Plus","year":2021,"mileage":187000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Novoset Oy","vin":"1af5dcfba8cd6266","first":"2026-10-16","last":"2026-10-17","prices":[["2026-10-16",24770]]}
+    "16052647": {"title":"78 kWh, Pilot + Pixel + Plus","year":2021,"mileage":187000,"fuel":"Sähkö","drive":"Neliveto","battery":78,"seller":"Novoset Oy","vin":"1af5dcfba8cd6266","first":"2026-10-16","last":"2026-10-17","prices":[["2026-10-16",24770]]},
+    "16052749": {"title":"82 kWh, Long range Single motor Plus Pack (MY25)","year":2025,"mileage":35000,"fuel":"Sähkö","drive":"Takaveto","battery":82,"seller":"Etelä-Suomen Autotalo Oy","vin":"7ef13bb5f48f837a","first":"2026-10-17","last":"2026-10-17","prices":[["2026-10-17",45900]]}
   }
 }
