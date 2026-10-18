@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-18T17:36:59.740Z",
+  "updatedAt": "2026-10-18T19:01:36.581Z",
   "files": [
     {
       "file": "nettiauto-bmw-320.json",
@@ -21,8 +21,8 @@
         "model": "2"
       },
       "listings": 924,
-      "updatedAt": "2026-10-18T17:36:59.740Z",
-      "completeAt": "2026-10-18T17:36:59.740Z"
+      "updatedAt": "2026-10-18T19:01:36.581Z",
+      "completeAt": "2026-10-18T19:01:36.581Z"
     }
   ]
 }
