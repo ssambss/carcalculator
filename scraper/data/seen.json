@@ -2,12 +2,12 @@
   "version": 3,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-10-19T17:02:09.368Z",
-  "runs": 445,
+  "updatedAt": "2026-10-19T19:01:58.902Z",
+  "runs": 446,
   "listings": {
     "nettiauto:12959170": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/12959170",
@@ -33,7 +33,7 @@
     },
     "nettiauto:13046482": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/13046482",
@@ -475,7 +475,7 @@
     },
     "nettiauto:15381360": {
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15381360",
@@ -1443,7 +1443,7 @@
     },
     "nettiauto:15680653": {
       "firstSeenAt": "2026-08-26T15:13:40.657Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15680653",
@@ -1535,7 +1535,7 @@
     },
     "nettiauto:15695973": {
       "firstSeenAt": "2026-08-26T15:12:02.484Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15695973",
@@ -1627,7 +1627,7 @@
     },
     "nettiauto:15701268": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15701268",
@@ -1802,7 +1802,7 @@
     },
     "nettiauto:15707898": {
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-10-19T17:02:07.686Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15707898",
@@ -2092,7 +2092,7 @@
     },
     "nettiauto:15727392": {
       "firstSeenAt": "2026-08-26T15:12:41.777Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.041Z",
       "detailCheckedAt": "2026-09-24T12:53:30.274Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15727392",
@@ -2113,7 +2113,7 @@
     },
     "nettiauto:15727705": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15727705",
@@ -2359,7 +2359,7 @@
     },
     "nettiauto:15738748": {
       "firstSeenAt": "2026-08-26T15:12:52.688Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15738748",
@@ -2385,7 +2385,7 @@
     },
     "nettiauto:15738962": {
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15738962",
@@ -3728,7 +3728,7 @@
     },
     "nettiauto:15767852": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15767852",
@@ -3750,7 +3750,7 @@
     },
     "nettiauto:15767880": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15767880",
@@ -3994,7 +3994,7 @@
     },
     "nettiauto:15772843": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15772843",
@@ -4196,7 +4196,7 @@
     },
     "nettiauto:15779777": {
       "firstSeenAt": "2026-08-26T15:13:33.454Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15779777",
@@ -4577,7 +4577,7 @@
     },
     "nettiauto:15786832": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15786832",
@@ -4753,7 +4753,7 @@
     },
     "nettiauto:15789736": {
       "firstSeenAt": "2026-08-26T15:12:08.374Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": "2026-08-26T15:12:08.374Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15789736",
@@ -4978,7 +4978,7 @@
     },
     "nettiauto:15791609": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15791609",
@@ -5065,7 +5065,7 @@
     },
     "nettiauto:15794287": {
       "firstSeenAt": "2026-08-26T15:12:22.068Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-19T09:01:53.822Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15794287",
@@ -5086,7 +5086,7 @@
     },
     "nettiauto:15794414": {
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15794414",
@@ -5427,7 +5427,7 @@
     },
     "nettiauto:15800091": {
       "firstSeenAt": "2026-08-26T15:13:02.443Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": "2026-09-24T12:54:20.624Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15800091",
@@ -5730,7 +5730,7 @@
     },
     "nettiauto:15805026": {
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15805026",
@@ -5751,7 +5751,7 @@
     },
     "nettiauto:15805468": {
       "firstSeenAt": "2026-08-26T15:12:49.542Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15805468",
@@ -6227,7 +6227,7 @@
     },
     "nettiauto:15812953": {
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15812953",
@@ -6359,7 +6359,7 @@
     },
     "nettiauto:15814607": {
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": "2026-10-08T17:01:46.140Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15814607",
@@ -6422,7 +6422,7 @@
     },
     "nettiauto:15816005": {
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15816005",
@@ -6509,7 +6509,7 @@
     },
     "nettiauto:15819400": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15819400",
@@ -6574,7 +6574,7 @@
     },
     "nettiauto:15820427": {
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15820427",
@@ -6665,7 +6665,7 @@
     },
     "nettiauto:15820857": {
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15820857",
@@ -6754,7 +6754,7 @@
     },
     "nettiauto:15821459": {
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15821459",
@@ -6845,7 +6845,7 @@
     },
     "nettiauto:15822480": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15822480",
@@ -6891,7 +6891,7 @@
     },
     "nettiauto:15823327": {
       "firstSeenAt": "2026-08-26T15:13:40.657Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15823327",
@@ -6962,7 +6962,7 @@
     },
     "nettiauto:15824861": {
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15824861",
@@ -6983,7 +6983,7 @@
     },
     "nettiauto:15825004": {
       "firstSeenAt": "2026-08-26T15:14:21.826Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15825004",
@@ -7303,7 +7303,7 @@
     },
     "nettiauto:15828486": {
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15828486",
@@ -8252,7 +8252,7 @@
     },
     "nettiauto:15841628": {
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.042Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15841628",
@@ -8296,7 +8296,7 @@
     },
     "nettiauto:15841853": {
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15841853",
@@ -8723,7 +8723,7 @@
     },
     "nettiauto:15849907": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15849907",
@@ -8814,7 +8814,7 @@
     },
     "nettiauto:15850681": {
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15850681",
@@ -8933,7 +8933,7 @@
     },
     "nettiauto:15851612": {
       "firstSeenAt": "2026-08-26T15:20:20.221Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": "2026-08-26T15:20:20.221Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15851612",
@@ -9028,7 +9028,7 @@
     },
     "nettiauto:15853239": {
       "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15853239",
@@ -9220,7 +9220,7 @@
     },
     "nettiauto:15855322": {
       "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15855322",
@@ -9475,7 +9475,7 @@
     },
     "nettiauto:15858755": {
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15858755",
@@ -9567,7 +9567,7 @@
     },
     "nettiauto:15859464": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15859464",
@@ -10046,7 +10046,7 @@
     },
     "nettiauto:15863385": {
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15863385",
@@ -10331,7 +10331,7 @@
     },
     "nettiauto:15866383": {
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": "2026-10-19T13:01:58.222Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15866383",
@@ -10577,7 +10577,7 @@
     },
     "nettiauto:15868446": {
       "firstSeenAt": "2026-08-26T15:12:28.881Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": "2026-09-24T12:53:38.759Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15868446",
@@ -10897,7 +10897,7 @@
     },
     "nettiauto:15871785": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15871785",
@@ -10919,7 +10919,7 @@
     },
     "nettiauto:15871788": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15871788",
@@ -11010,7 +11010,7 @@
     },
     "nettiauto:15872794": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15872794",
@@ -11663,7 +11663,7 @@
     },
     "nettiauto:15880983": {
       "firstSeenAt": "2026-08-26T15:14:14.416Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": "2026-08-26T15:14:14.416Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15880983",
@@ -11751,7 +11751,7 @@
     },
     "nettiauto:15883701": {
       "firstSeenAt": "2026-08-26T15:13:48.417Z",
-      "lastSeenAt": "2026-10-19T17:02:07.686Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": "2026-08-26T15:13:48.417Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15883701",
@@ -11910,7 +11910,7 @@
     },
     "nettiauto:15885696": {
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": "2026-09-24T12:54:23.655Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15885696",
@@ -12423,7 +12423,7 @@
     },
     "nettiauto:15890179": {
       "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15890179",
@@ -12742,7 +12742,7 @@
     },
     "nettiauto:15893357": {
       "firstSeenAt": "2026-08-26T15:13:45.535Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": "2026-08-26T15:13:45.535Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15893357",
@@ -12791,7 +12791,7 @@
     },
     "nettiauto:15893553": {
       "firstSeenAt": "2026-08-26T15:13:19.398Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15893553",
@@ -12997,7 +12997,7 @@
     },
     "nettiauto:15894982": {
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": "2026-08-26T15:14:20.272Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15894982",
@@ -13108,7 +13108,7 @@
     },
     "nettiauto:15895963": {
       "firstSeenAt": "2026-08-26T15:13:54.495Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15895963",
@@ -13229,7 +13229,7 @@
     },
     "nettiauto:15896598": {
       "firstSeenAt": "2026-08-26T15:14:20.272Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15896598",
@@ -13562,7 +13562,7 @@
     },
     "nettiauto:15898729": {
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15898729",
@@ -14129,7 +14129,7 @@
     },
     "nettiauto:15901461": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15901461",
@@ -14263,7 +14263,7 @@
     },
     "nettiauto:15902784": {
       "firstSeenAt": "2026-08-26T15:14:03.013Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15902784",
@@ -14307,7 +14307,7 @@
     },
     "nettiauto:15903249": {
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15903249",
@@ -14555,7 +14555,7 @@
     },
     "nettiauto:15905041": {
       "firstSeenAt": "2026-08-26T15:13:41.514Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15905041",
@@ -15095,7 +15095,7 @@
     },
     "nettiauto:15908976": {
       "firstSeenAt": "2026-08-26T15:13:00.507Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": "2026-09-24T12:54:16.434Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15908976",
@@ -15722,7 +15722,7 @@
     },
     "nettiauto:15913117": {
       "firstSeenAt": "2026-08-26T15:12:06.352Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": "2026-10-14T13:02:12.616Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15913117",
@@ -15945,7 +15945,7 @@
     },
     "nettiauto:15914476": {
       "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15914476",
@@ -16036,7 +16036,7 @@
     },
     "nettiauto:15915814": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15915814",
@@ -16057,7 +16057,7 @@
     },
     "nettiauto:15915854": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15915854",
@@ -16079,7 +16079,7 @@
     },
     "nettiauto:15915861": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15915861",
@@ -16125,7 +16125,7 @@
     },
     "nettiauto:15916134": {
       "firstSeenAt": "2026-08-26T15:14:00.758Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": "2026-08-26T15:14:00.758Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15916134",
@@ -16460,7 +16460,7 @@
     },
     "nettiauto:15918145": {
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15918145",
@@ -16481,7 +16481,7 @@
     },
     "nettiauto:15918379": {
       "firstSeenAt": "2026-08-26T15:13:44.265Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15918379",
@@ -16593,7 +16593,7 @@
     },
     "nettiauto:15918775": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15918775",
@@ -17246,7 +17246,7 @@
     },
     "nettiauto:15924224": {
       "firstSeenAt": "2026-08-26T15:13:18.095Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": "2026-09-24T12:54:50.617Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15924224",
@@ -17854,7 +17854,7 @@
     },
     "nettiauto:15926866": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15926866",
@@ -18470,7 +18470,7 @@
     },
     "nettiauto:15929324": {
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15929324",
@@ -18514,7 +18514,7 @@
     },
     "nettiauto:15929527": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15929527",
@@ -19003,7 +19003,7 @@
     },
     "nettiauto:15932444": {
       "firstSeenAt": "2026-08-26T15:14:18.794Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15932444",
@@ -19071,7 +19071,7 @@
     },
     "nettiauto:15932839": {
       "firstSeenAt": "2026-08-26T15:14:27.844Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15932839",
@@ -19523,7 +19523,7 @@
     },
     "nettiauto:15934192": {
       "firstSeenAt": "2026-08-26T15:13:08.395Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15934192",
@@ -20274,7 +20274,7 @@
     },
     "nettiauto:15936663": {
       "firstSeenAt": "2026-08-26T15:12:16.250Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15936663",
@@ -20943,7 +20943,7 @@
     },
     "nettiauto:15939263": {
       "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15939263",
@@ -22181,7 +22181,7 @@
     },
     "nettiauto:15943921": {
       "firstSeenAt": "2026-08-26T15:13:05.424Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": "2026-09-24T12:54:31.971Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15943921",
@@ -22458,7 +22458,7 @@
     },
     "nettiauto:15944865": {
       "firstSeenAt": "2026-08-26T15:14:26.931Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15944865",
@@ -22979,7 +22979,7 @@
     },
     "nettiauto:15946748": {
       "firstSeenAt": "2026-08-26T15:12:44.303Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": "2026-09-24T12:53:56.292Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15946748",
@@ -23816,7 +23816,7 @@
     },
     "nettiauto:15949736": {
       "firstSeenAt": "2026-08-27T13:38:09.462Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15949736",
@@ -24427,7 +24427,7 @@
     },
     "nettiauto:15952033": {
       "firstSeenAt": "2026-08-28T19:33:17.004Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15952033",
@@ -25272,7 +25272,7 @@
     },
     "nettiauto:15985216": {
       "firstSeenAt": "2026-09-24T12:52:11.484Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.042Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15985216",
@@ -25317,7 +25317,7 @@
     },
     "nettiauto:16001080": {
       "firstSeenAt": "2026-09-24T12:52:12.896Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.042Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16001080",
@@ -25633,7 +25633,7 @@
     },
     "nettiauto:15991986": {
       "firstSeenAt": "2026-09-24T12:52:25.940Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15991986",
@@ -25697,7 +25697,7 @@
     },
     "nettiauto:16007388": {
       "firstSeenAt": "2026-09-24T12:52:32.481Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16007388",
@@ -25739,7 +25739,7 @@
     },
     "nettiauto:15979959": {
       "firstSeenAt": "2026-09-24T12:52:34.664Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15979959",
@@ -25908,7 +25908,7 @@
     },
     "nettiauto:16005428": {
       "firstSeenAt": "2026-09-24T12:52:51.192Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16005428",
@@ -25992,7 +25992,7 @@
     },
     "nettiauto:15990219": {
       "firstSeenAt": "2026-09-24T12:53:02.539Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15990219",
@@ -26253,7 +26253,7 @@
     },
     "nettiauto:16006202": {
       "firstSeenAt": "2026-09-24T12:53:30.824Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-13T07:01:55.880Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16006202",
@@ -26377,7 +26377,7 @@
     },
     "nettiauto:15959444": {
       "firstSeenAt": "2026-09-24T12:53:42.884Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15959444",
@@ -26421,7 +26421,7 @@
     },
     "nettiauto:15989634": {
       "firstSeenAt": "2026-09-24T12:53:46.265Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": "2026-09-24T12:53:46.265Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15989634",
@@ -26443,7 +26443,7 @@
     },
     "nettiauto:16007380": {
       "firstSeenAt": "2026-09-24T12:53:47.549Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": "2026-09-24T12:53:47.549Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16007380",
@@ -26465,7 +26465,7 @@
     },
     "nettiauto:15964476": {
       "firstSeenAt": "2026-09-24T12:53:56.292Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15964476",
@@ -26508,7 +26508,7 @@
     },
     "nettiauto:16004208": {
       "firstSeenAt": "2026-09-24T12:53:56.292Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16004208",
@@ -26706,7 +26706,7 @@
     },
     "nettiauto:15986568": {
       "firstSeenAt": "2026-09-24T12:54:07.119Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": "2026-09-24T12:54:07.119Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15986568",
@@ -26838,7 +26838,7 @@
     },
     "nettiauto:15973429": {
       "firstSeenAt": "2026-09-24T12:54:19.079Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15973429",
@@ -26860,7 +26860,7 @@
     },
     "nettiauto:15964519": {
       "firstSeenAt": "2026-09-24T12:54:22.454Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": "2026-09-24T12:54:22.454Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15964519",
@@ -26925,7 +26925,7 @@
     },
     "nettiauto:15990198": {
       "firstSeenAt": "2026-09-24T12:54:28.436Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": "2026-09-24T12:54:28.436Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15990198",
@@ -27034,7 +27034,7 @@
     },
     "nettiauto:15979633": {
       "firstSeenAt": "2026-09-24T12:54:38.599Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": "2026-09-24T12:54:38.599Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15979633",
@@ -27100,7 +27100,7 @@
     },
     "nettiauto:15974303": {
       "firstSeenAt": "2026-09-24T12:54:43.195Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": "2026-09-24T12:54:43.195Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15974303",
@@ -27144,7 +27144,7 @@
     },
     "nettiauto:15965972": {
       "firstSeenAt": "2026-09-24T12:54:44.824Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15965972",
@@ -27165,7 +27165,7 @@
     },
     "nettiauto:15971560": {
       "firstSeenAt": "2026-09-24T12:54:44.824Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15971560",
@@ -27231,7 +27231,7 @@
     },
     "nettiauto:16004697": {
       "firstSeenAt": "2026-09-24T12:54:49.414Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": "2026-09-24T12:54:49.414Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16004697",
@@ -27339,7 +27339,7 @@
     },
     "nettiauto:16007091": {
       "firstSeenAt": "2026-09-24T12:54:50.618Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16007091",
@@ -27361,7 +27361,7 @@
     },
     "nettiauto:15982559": {
       "firstSeenAt": "2026-09-24T12:54:50.618Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15982559",
@@ -27404,7 +27404,7 @@
     },
     "nettiauto:15992093": {
       "firstSeenAt": "2026-09-24T12:54:50.618Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15992093",
@@ -27447,7 +27447,7 @@
     },
     "nettiauto:15959583": {
       "firstSeenAt": "2026-09-24T12:54:50.618Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15959583",
@@ -27489,7 +27489,7 @@
     },
     "nettiauto:15985925": {
       "firstSeenAt": "2026-09-24T12:54:50.619Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15985925",
@@ -27533,7 +27533,7 @@
     },
     "nettiauto:15980662": {
       "firstSeenAt": "2026-09-24T12:54:50.619Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15980662",
@@ -27620,7 +27620,7 @@
     },
     "nettiauto:15957740": {
       "firstSeenAt": "2026-09-24T12:54:50.619Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15957740",
@@ -27729,7 +27729,7 @@
     },
     "nettiauto:15967974": {
       "firstSeenAt": "2026-09-24T12:54:50.620Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15967974",
@@ -27773,7 +27773,7 @@
     },
     "nettiauto:15987760": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15987760",
@@ -27794,7 +27794,7 @@
     },
     "nettiauto:16005324": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16005324",
@@ -27859,7 +27859,7 @@
     },
     "nettiauto:15968001": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15968001",
@@ -27902,7 +27902,7 @@
     },
     "nettiauto:16005158": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16005158",
@@ -27923,7 +27923,7 @@
     },
     "nettiauto:15998877": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15998877",
@@ -27989,7 +27989,7 @@
     },
     "nettiauto:15962099": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15962099",
@@ -28010,7 +28010,7 @@
     },
     "nettiauto:15998372": {
       "firstSeenAt": "2026-09-24T12:54:50.621Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15998372",
@@ -28032,7 +28032,7 @@
     },
     "nettiauto:15998373": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15998373",
@@ -28054,7 +28054,7 @@
     },
     "nettiauto:15998374": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15998374",
@@ -28076,7 +28076,7 @@
     },
     "nettiauto:15998376": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15998376",
@@ -28120,7 +28120,7 @@
     },
     "nettiauto:15957341": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15957341",
@@ -28164,7 +28164,7 @@
     },
     "nettiauto:15980653": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15980653",
@@ -28230,7 +28230,7 @@
     },
     "nettiauto:16002977": {
       "firstSeenAt": "2026-09-24T12:54:50.622Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16002977",
@@ -28251,7 +28251,7 @@
     },
     "nettiauto:15956505": {
       "firstSeenAt": "2026-09-24T12:54:50.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15956505",
@@ -28273,7 +28273,7 @@
     },
     "nettiauto:15956486": {
       "firstSeenAt": "2026-09-24T12:54:50.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15956486",
@@ -28336,7 +28336,7 @@
     },
     "nettiauto:15956456": {
       "firstSeenAt": "2026-09-24T12:54:50.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15956456",
@@ -28358,7 +28358,7 @@
     },
     "nettiauto:15966730": {
       "firstSeenAt": "2026-09-24T12:54:50.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15966730",
@@ -28380,7 +28380,7 @@
     },
     "nettiauto:15976391": {
       "firstSeenAt": "2026-09-24T12:54:50.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15976391",
@@ -28422,7 +28422,7 @@
     },
     "nettiauto:15957182": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15957182",
@@ -28443,7 +28443,7 @@
     },
     "nettiauto:15977843": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15977843",
@@ -28464,7 +28464,7 @@
     },
     "nettiauto:15979801": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15979801",
@@ -28485,7 +28485,7 @@
     },
     "nettiauto:15979935": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15979935",
@@ -28506,7 +28506,7 @@
     },
     "nettiauto:15980387": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15980387",
@@ -28527,7 +28527,7 @@
     },
     "nettiauto:16006102": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16006102",
@@ -28548,7 +28548,7 @@
     },
     "nettiauto:15958237": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15958237",
@@ -28569,7 +28569,7 @@
     },
     "nettiauto:15985469": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15985469",
@@ -28591,7 +28591,7 @@
     },
     "nettiauto:15999308": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15999308",
@@ -28613,7 +28613,7 @@
     },
     "nettiauto:15975731": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15975731",
@@ -28635,7 +28635,7 @@
     },
     "nettiauto:15993613": {
       "firstSeenAt": "2026-09-24T12:54:50.624Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15993613",
@@ -28657,7 +28657,7 @@
     },
     "nettiauto:16005047": {
       "firstSeenAt": "2026-09-24T12:54:50.625Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16005047",
@@ -28679,7 +28679,7 @@
     },
     "nettiauto:15990498": {
       "firstSeenAt": "2026-09-24T12:54:50.625Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15990498",
@@ -28700,7 +28700,7 @@
     },
     "nettiauto:15990499": {
       "firstSeenAt": "2026-09-24T12:54:50.625Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15990499",
@@ -28721,7 +28721,7 @@
     },
     "nettiauto:15958417": {
       "firstSeenAt": "2026-09-24T12:54:50.625Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15958417",
@@ -28829,7 +28829,7 @@
     },
     "nettiauto:16007968": {
       "firstSeenAt": "2026-09-24T16:03:37.452Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16007968",
@@ -28894,7 +28894,7 @@
     },
     "nettiauto:16008570": {
       "firstSeenAt": "2026-09-25T07:31:51.355Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16008570",
@@ -28979,7 +28979,7 @@
     },
     "nettiauto:16008944": {
       "firstSeenAt": "2026-09-25T09:32:06.391Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16008944",
@@ -29089,7 +29089,7 @@
     },
     "nettiauto:16009881": {
       "firstSeenAt": "2026-09-25T13:32:04.626Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16009881",
@@ -29112,7 +29112,7 @@
     },
     "nettiauto:16009888": {
       "firstSeenAt": "2026-09-25T13:32:04.636Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16009888",
@@ -29133,7 +29133,7 @@
     },
     "nettiauto:16009947": {
       "firstSeenAt": "2026-09-25T14:01:48.263Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16009947",
@@ -29176,7 +29176,7 @@
     },
     "nettiauto:16010399": {
       "firstSeenAt": "2026-09-25T15:31:46.807Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16010399",
@@ -29218,7 +29218,7 @@
     },
     "nettiauto:16011121": {
       "firstSeenAt": "2026-09-26T11:02:28.522Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16011121",
@@ -29364,7 +29364,7 @@
     },
     "nettiauto:16013093": {
       "firstSeenAt": "2026-09-28T09:02:12.400Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16013093",
@@ -29386,7 +29386,7 @@
     },
     "nettiauto:16013388": {
       "firstSeenAt": "2026-09-28T09:02:12.400Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16013388",
@@ -29430,7 +29430,7 @@
     },
     "nettiauto:16013218": {
       "firstSeenAt": "2026-09-28T09:02:12.404Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16013218",
@@ -29558,7 +29558,7 @@
     },
     "nettiauto:16014168": {
       "firstSeenAt": "2026-09-28T13:02:07.051Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": "2026-10-12T15:02:07.484Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16014168",
@@ -29600,7 +29600,7 @@
     },
     "nettiauto:16014303": {
       "firstSeenAt": "2026-09-28T13:02:11.719Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16014303",
@@ -29622,7 +29622,7 @@
     },
     "nettiauto:16014272": {
       "firstSeenAt": "2026-09-28T13:02:11.720Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16014272",
@@ -29708,7 +29708,7 @@
     },
     "nettiauto:16015172": {
       "firstSeenAt": "2026-09-28T17:02:16.529Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.061Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16015172",
@@ -29729,7 +29729,7 @@
     },
     "nettiauto:16016157": {
       "firstSeenAt": "2026-09-29T09:02:07.814Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16016157",
@@ -29772,7 +29772,7 @@
     },
     "nettiauto:16015900": {
       "firstSeenAt": "2026-09-29T09:02:07.821Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16015900",
@@ -29815,7 +29815,7 @@
     },
     "nettiauto:16016304": {
       "firstSeenAt": "2026-09-29T11:02:00.176Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16016304",
@@ -29837,7 +29837,7 @@
     },
     "nettiauto:16016520": {
       "firstSeenAt": "2026-09-29T11:02:00.181Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16016520",
@@ -29859,7 +29859,7 @@
     },
     "nettiauto:16016445": {
       "firstSeenAt": "2026-09-29T11:02:00.187Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16016445",
@@ -29903,7 +29903,7 @@
     },
     "nettiauto:16016668": {
       "firstSeenAt": "2026-09-29T13:01:58.026Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16016668",
@@ -29989,7 +29989,7 @@
     },
     "nettiauto:16018334": {
       "firstSeenAt": "2026-09-30T07:28:16.993Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16018334",
@@ -30031,7 +30031,7 @@
     },
     "nettiauto:16019000": {
       "firstSeenAt": "2026-09-30T11:02:04.160Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": "2026-10-19T15:01:59.838Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16019000",
@@ -30074,7 +30074,7 @@
     },
     "nettiauto:16019075": {
       "firstSeenAt": "2026-09-30T11:02:04.165Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16019075",
@@ -30095,7 +30095,7 @@
     },
     "nettiauto:16019059": {
       "firstSeenAt": "2026-09-30T11:02:04.169Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16019059",
@@ -30135,7 +30135,7 @@
     },
     "nettiauto:16019121": {
       "firstSeenAt": "2026-09-30T13:02:12.407Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16019121",
@@ -30157,7 +30157,7 @@
     },
     "nettiauto:16019331": {
       "firstSeenAt": "2026-09-30T13:02:12.411Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16019331",
@@ -30305,7 +30305,7 @@
     },
     "nettiauto:16020711": {
       "firstSeenAt": "2026-10-01T07:02:09.082Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16020711",
@@ -30327,7 +30327,7 @@
     },
     "nettiauto:16021197": {
       "firstSeenAt": "2026-10-01T08:59:30.951Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16021197",
@@ -30349,7 +30349,7 @@
     },
     "nettiauto:16021493": {
       "firstSeenAt": "2026-10-01T11:01:51.785Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16021493",
@@ -30371,7 +30371,7 @@
     },
     "nettiauto:16021407": {
       "firstSeenAt": "2026-10-01T11:01:51.803Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16021407",
@@ -30478,7 +30478,7 @@
     },
     "nettiauto:16022257": {
       "firstSeenAt": "2026-10-01T15:02:20.669Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16022257",
@@ -30500,7 +30500,7 @@
     },
     "nettiauto:16022672": {
       "firstSeenAt": "2026-10-01T16:19:50.186Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16022672",
@@ -30585,7 +30585,7 @@
     },
     "nettiauto:16023413": {
       "firstSeenAt": "2026-10-02T09:01:54.419Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16023413",
@@ -30649,7 +30649,7 @@
     },
     "nettiauto:16023643": {
       "firstSeenAt": "2026-10-02T09:01:54.425Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16023643",
@@ -30691,7 +30691,7 @@
     },
     "nettiauto:16023856": {
       "firstSeenAt": "2026-10-02T11:01:57.130Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16023856",
@@ -30712,7 +30712,7 @@
     },
     "nettiauto:16024413": {
       "firstSeenAt": "2026-10-02T12:57:47.195Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16024413",
@@ -30734,7 +30734,7 @@
     },
     "nettiauto:16024485": {
       "firstSeenAt": "2026-10-02T12:57:47.207Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16024485",
@@ -30756,7 +30756,7 @@
     },
     "nettiauto:16025027": {
       "firstSeenAt": "2026-10-02T15:02:03.224Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16025027",
@@ -30843,7 +30843,7 @@
     },
     "nettiauto:16025399": {
       "firstSeenAt": "2026-10-02T18:21:14.626Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16025399",
@@ -30864,7 +30864,7 @@
     },
     "nettiauto:16025436": {
       "firstSeenAt": "2026-10-02T21:01:46.058Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16025436",
@@ -30991,7 +30991,7 @@
     },
     "nettiauto:16028137": {
       "firstSeenAt": "2026-10-05T08:56:56.920Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16028137",
@@ -31014,7 +31014,7 @@
     },
     "nettiauto:16027995": {
       "firstSeenAt": "2026-10-05T08:56:56.924Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16027995",
@@ -31122,7 +31122,7 @@
     },
     "nettiauto:16028765": {
       "firstSeenAt": "2026-10-05T13:01:47.605Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16028765",
@@ -31144,7 +31144,7 @@
     },
     "nettiauto:16028870": {
       "firstSeenAt": "2026-10-05T13:01:47.625Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16028870",
@@ -31166,7 +31166,7 @@
     },
     "nettiauto:16029529": {
       "firstSeenAt": "2026-10-05T15:02:02.170Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": "2026-10-19T15:02:00.145Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16029529",
@@ -31251,7 +31251,7 @@
     },
     "nettiauto:16029756": {
       "firstSeenAt": "2026-10-05T17:02:07.839Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16029756",
@@ -31402,7 +31402,7 @@
     },
     "nettiauto:16031960": {
       "firstSeenAt": "2026-10-06T17:02:51.157Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.042Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16031960",
@@ -31489,7 +31489,7 @@
     },
     "nettiauto:16033134": {
       "firstSeenAt": "2026-10-07T11:02:10.330Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033134",
@@ -31510,7 +31510,7 @@
     },
     "nettiauto:16033373": {
       "firstSeenAt": "2026-10-07T11:02:10.334Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033373",
@@ -31531,7 +31531,7 @@
     },
     "nettiauto:16033003": {
       "firstSeenAt": "2026-10-07T11:02:10.338Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033003",
@@ -31552,7 +31552,7 @@
     },
     "nettiauto:16033514": {
       "firstSeenAt": "2026-10-07T13:02:03.582Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033514",
@@ -31574,7 +31574,7 @@
     },
     "nettiauto:16033546": {
       "firstSeenAt": "2026-10-07T13:02:03.583Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033546",
@@ -31595,7 +31595,7 @@
     },
     "nettiauto:16033437": {
       "firstSeenAt": "2026-10-07T13:02:03.587Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033437",
@@ -31617,7 +31617,7 @@
     },
     "nettiauto:16033766": {
       "firstSeenAt": "2026-10-07T13:02:03.589Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16033766",
@@ -31681,7 +31681,7 @@
     },
     "nettiauto:16034218": {
       "firstSeenAt": "2026-10-07T15:02:04.107Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16034218",
@@ -31724,7 +31724,7 @@
     },
     "nettiauto:16034085": {
       "firstSeenAt": "2026-10-07T15:02:04.113Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16034085",
@@ -31767,7 +31767,7 @@
     },
     "nettiauto:16035010": {
       "firstSeenAt": "2026-10-08T09:02:05.840Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16035010",
@@ -31811,7 +31811,7 @@
     },
     "nettiauto:16035881": {
       "firstSeenAt": "2026-10-08T13:01:52.849Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": "2026-10-08T13:01:52.849Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16035881",
@@ -31832,7 +31832,7 @@
     },
     "nettiauto:16036036": {
       "firstSeenAt": "2026-10-08T13:01:52.860Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16036036",
@@ -31854,7 +31854,7 @@
     },
     "nettiauto:16036031": {
       "firstSeenAt": "2026-10-08T13:01:52.860Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16036031",
@@ -31919,7 +31919,7 @@
     },
     "nettiauto:16035792": {
       "firstSeenAt": "2026-10-08T13:01:52.861Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16035792",
@@ -31984,7 +31984,7 @@
     },
     "nettiauto:16036683": {
       "firstSeenAt": "2026-10-08T17:03:27.438Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": "2026-10-08T17:03:27.438Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16036683",
@@ -32006,7 +32006,7 @@
     },
     "nettiauto:16036543": {
       "firstSeenAt": "2026-10-08T17:03:27.443Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16036543",
@@ -32028,7 +32028,7 @@
     },
     "nettiauto:16036468": {
       "firstSeenAt": "2026-10-08T17:03:27.452Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16036468",
@@ -32050,7 +32050,7 @@
     },
     "nettiauto:16037344": {
       "firstSeenAt": "2026-10-09T09:02:02.555Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": "2026-10-09T09:02:02.555Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16037344",
@@ -32092,7 +32092,7 @@
     },
     "nettiauto:16037466": {
       "firstSeenAt": "2026-10-09T09:02:03.912Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16037466",
@@ -32113,7 +32113,7 @@
     },
     "nettiauto:16037499": {
       "firstSeenAt": "2026-10-09T11:02:09.646Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16037499",
@@ -32134,7 +32134,7 @@
     },
     "nettiauto:16037591": {
       "firstSeenAt": "2026-10-09T11:02:10.200Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-09T11:02:10.200Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16037591",
@@ -32177,7 +32177,7 @@
     },
     "nettiauto:16037526": {
       "firstSeenAt": "2026-10-09T11:02:10.207Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16037526",
@@ -32299,7 +32299,7 @@
     },
     "nettiauto:16038096": {
       "firstSeenAt": "2026-10-09T13:02:12.128Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038096",
@@ -32320,7 +32320,7 @@
     },
     "nettiauto:16038119": {
       "firstSeenAt": "2026-10-09T13:02:12.129Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038119",
@@ -32342,7 +32342,7 @@
     },
     "nettiauto:16038058": {
       "firstSeenAt": "2026-10-09T13:02:12.129Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038058",
@@ -32364,7 +32364,7 @@
     },
     "nettiauto:16038102": {
       "firstSeenAt": "2026-10-09T13:02:12.129Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038102",
@@ -32386,7 +32386,7 @@
     },
     "nettiauto:16038123": {
       "firstSeenAt": "2026-10-09T13:02:12.129Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038123",
@@ -32408,7 +32408,7 @@
     },
     "nettiauto:16038032": {
       "firstSeenAt": "2026-10-09T13:02:12.130Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038032",
@@ -32473,7 +32473,7 @@
     },
     "nettiauto:16038795": {
       "firstSeenAt": "2026-10-09T15:02:04.996Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16038795",
@@ -32516,7 +32516,7 @@
     },
     "nettiauto:16039765": {
       "firstSeenAt": "2026-10-10T13:02:04.818Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": "2026-10-14T14:43:23.312Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16039765",
@@ -32537,7 +32537,7 @@
     },
     "nettiauto:16039851": {
       "firstSeenAt": "2026-10-10T13:02:04.821Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16039851",
@@ -32559,7 +32559,7 @@
     },
     "nettiauto:16039837": {
       "firstSeenAt": "2026-10-10T13:02:04.825Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16039837",
@@ -32603,7 +32603,7 @@
     },
     "nettiauto:16040761": {
       "firstSeenAt": "2026-10-11T13:01:50.340Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16040761",
@@ -32643,7 +32643,7 @@
     },
     "nettiauto:16041442": {
       "firstSeenAt": "2026-10-12T07:02:11.126Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16041442",
@@ -32687,7 +32687,7 @@
     },
     "nettiauto:16041568": {
       "firstSeenAt": "2026-10-12T08:38:43.364Z",
-      "lastSeenAt": "2026-10-19T17:02:07.694Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16041568",
@@ -32708,7 +32708,7 @@
     },
     "nettiauto:16041862": {
       "firstSeenAt": "2026-10-12T08:38:43.373Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16041862",
@@ -32730,7 +32730,7 @@
     },
     "nettiauto:16041850": {
       "firstSeenAt": "2026-10-12T08:38:43.374Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16041850",
@@ -32751,7 +32751,7 @@
     },
     "nettiauto:16041926": {
       "firstSeenAt": "2026-10-12T09:01:56.380Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16041926",
@@ -32816,7 +32816,7 @@
     },
     "nettiauto:16042506": {
       "firstSeenAt": "2026-10-12T13:02:04.243Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16042506",
@@ -32838,7 +32838,7 @@
     },
     "nettiauto:16042499": {
       "firstSeenAt": "2026-10-12T13:02:04.243Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16042499",
@@ -32904,7 +32904,7 @@
     },
     "nettiauto:16043763": {
       "firstSeenAt": "2026-10-13T07:01:55.562Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": "2026-10-13T07:01:55.562Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16043763",
@@ -32925,7 +32925,7 @@
     },
     "nettiauto:16044205": {
       "firstSeenAt": "2026-10-13T09:01:48.201Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044205",
@@ -32947,7 +32947,7 @@
     },
     "nettiauto:16044229": {
       "firstSeenAt": "2026-10-13T09:01:48.216Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044229",
@@ -32968,7 +32968,7 @@
     },
     "nettiauto:16044227": {
       "firstSeenAt": "2026-10-13T09:01:48.217Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044227",
@@ -32989,7 +32989,7 @@
     },
     "nettiauto:16044065": {
       "firstSeenAt": "2026-10-13T09:01:48.220Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044065",
@@ -33010,7 +33010,7 @@
     },
     "nettiauto:16044011": {
       "firstSeenAt": "2026-10-13T09:01:48.222Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044011",
@@ -33032,7 +33032,7 @@
     },
     "nettiauto:16044250": {
       "firstSeenAt": "2026-10-13T09:01:48.222Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044250",
@@ -33054,7 +33054,7 @@
     },
     "nettiauto:16044575": {
       "firstSeenAt": "2026-10-13T11:01:49.781Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044575",
@@ -33076,7 +33076,7 @@
     },
     "nettiauto:16044532": {
       "firstSeenAt": "2026-10-13T11:01:49.788Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044532",
@@ -33142,7 +33142,7 @@
     },
     "nettiauto:16045141": {
       "firstSeenAt": "2026-10-13T13:02:06.954Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": "2026-10-13T13:02:06.954Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045141",
@@ -33163,7 +33163,7 @@
     },
     "nettiauto:16044906": {
       "firstSeenAt": "2026-10-13T13:02:06.962Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044906",
@@ -33185,7 +33185,7 @@
     },
     "nettiauto:16044928": {
       "firstSeenAt": "2026-10-13T13:02:06.967Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16044928",
@@ -33206,7 +33206,7 @@
     },
     "nettiauto:16045274": {
       "firstSeenAt": "2026-10-13T15:01:53.305Z",
-      "lastSeenAt": "2026-10-19T17:02:07.687Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045274",
@@ -33250,7 +33250,7 @@
     },
     "nettiauto:16045469": {
       "firstSeenAt": "2026-10-13T15:01:53.643Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-13T15:01:53.643Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045469",
@@ -33271,7 +33271,7 @@
     },
     "nettiauto:16045203": {
       "firstSeenAt": "2026-10-13T15:01:53.649Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045203",
@@ -33292,7 +33292,7 @@
     },
     "nettiauto:16045428": {
       "firstSeenAt": "2026-10-13T15:01:53.650Z",
-      "lastSeenAt": "2026-10-19T17:02:07.705Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045428",
@@ -33313,7 +33313,7 @@
     },
     "nettiauto:16045883": {
       "firstSeenAt": "2026-10-13T19:01:57.328Z",
-      "lastSeenAt": "2026-10-19T17:02:07.706Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045883",
@@ -33334,7 +33334,7 @@
     },
     "nettiauto:16045898": {
       "firstSeenAt": "2026-10-13T19:01:57.328Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16045898",
@@ -33376,7 +33376,7 @@
     },
     "nettiauto:16046158": {
       "firstSeenAt": "2026-10-14T07:02:02.188Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.046Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046158",
@@ -33395,7 +33395,7 @@
     },
     "nettiauto:16046447": {
       "firstSeenAt": "2026-10-14T09:01:49.910Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-14T09:01:49.910Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046447",
@@ -33438,7 +33438,7 @@
     },
     "nettiauto:16046435": {
       "firstSeenAt": "2026-10-14T09:01:49.915Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046435",
@@ -33460,7 +33460,7 @@
     },
     "nettiauto:16046322": {
       "firstSeenAt": "2026-10-14T09:01:49.920Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046322",
@@ -33481,7 +33481,7 @@
     },
     "nettiauto:16046704": {
       "firstSeenAt": "2026-10-14T09:46:28.782Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046704",
@@ -33503,7 +33503,7 @@
     },
     "nettiauto:16046713": {
       "firstSeenAt": "2026-10-14T09:46:28.783Z",
-      "lastSeenAt": "2026-10-19T17:02:07.689Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046713",
@@ -33524,7 +33524,7 @@
     },
     "nettiauto:16046673": {
       "firstSeenAt": "2026-10-14T09:46:28.785Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046673",
@@ -33546,7 +33546,7 @@
     },
     "nettiauto:16046670": {
       "firstSeenAt": "2026-10-14T09:46:28.785Z",
-      "lastSeenAt": "2026-10-19T17:02:07.696Z",
+      "lastSeenAt": "2026-10-19T19:01:58.051Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16046670",
@@ -33589,7 +33589,7 @@
     },
     "nettiauto:16047342": {
       "firstSeenAt": "2026-10-14T13:02:15.527Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16047342",
@@ -33610,7 +33610,7 @@
     },
     "nettiauto:16047330": {
       "firstSeenAt": "2026-10-14T13:02:15.531Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16047330",
@@ -33653,7 +33653,7 @@
     },
     "nettiauto:16047898": {
       "firstSeenAt": "2026-10-14T17:02:16.169Z",
-      "lastSeenAt": "2026-10-19T17:02:07.690Z",
+      "lastSeenAt": "2026-10-19T19:01:58.045Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16047898",
@@ -33675,7 +33675,7 @@
     },
     "nettiauto:16047943": {
       "firstSeenAt": "2026-10-14T17:02:16.177Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16047943",
@@ -33697,7 +33697,7 @@
     },
     "nettiauto:16048432": {
       "firstSeenAt": "2026-10-15T07:01:54.154Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16048432",
@@ -33738,7 +33738,7 @@
     },
     "nettiauto:16048700": {
       "firstSeenAt": "2026-10-15T09:01:55.003Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16048700",
@@ -33782,7 +33782,7 @@
     },
     "nettiauto:16048817": {
       "firstSeenAt": "2026-10-15T09:58:03.210Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.060Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16048817",
@@ -33869,7 +33869,7 @@
     },
     "nettiauto:16049205": {
       "firstSeenAt": "2026-10-15T13:01:54.620Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16049205",
@@ -33890,7 +33890,7 @@
     },
     "nettiauto:16049296": {
       "firstSeenAt": "2026-10-15T13:01:54.623Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16049296",
@@ -33954,7 +33954,7 @@
     },
     "nettiauto:16049724": {
       "firstSeenAt": "2026-10-15T14:52:42.159Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-15T14:52:42.159Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16049724",
@@ -33973,7 +33973,7 @@
     },
     "nettiauto:16049914": {
       "firstSeenAt": "2026-10-15T14:52:43.576Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": "2026-10-15T17:02:01.493Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16049914",
@@ -33995,7 +33995,7 @@
     },
     "nettiauto:16049774": {
       "firstSeenAt": "2026-10-15T14:52:43.585Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16049774",
@@ -34016,7 +34016,7 @@
     },
     "nettiauto:16050414": {
       "firstSeenAt": "2026-10-15T21:01:40.524Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16050414",
@@ -34037,7 +34037,7 @@
     },
     "nettiauto:16050485": {
       "firstSeenAt": "2026-10-16T07:01:57.438Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16050485",
@@ -34058,7 +34058,7 @@
     },
     "nettiauto:16050544": {
       "firstSeenAt": "2026-10-16T07:01:57.440Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16050544",
@@ -34080,7 +34080,7 @@
     },
     "nettiauto:16050669": {
       "firstSeenAt": "2026-10-16T09:02:05.520Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16050669",
@@ -34101,7 +34101,7 @@
     },
     "nettiauto:16050952": {
       "firstSeenAt": "2026-10-16T09:02:05.521Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.055Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16050952",
@@ -34144,7 +34144,7 @@
     },
     "nettiauto:16051502": {
       "firstSeenAt": "2026-10-16T13:02:03.048Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16051502",
@@ -34163,7 +34163,7 @@
     },
     "nettiauto:16051680": {
       "firstSeenAt": "2026-10-16T13:02:03.049Z",
-      "lastSeenAt": "2026-10-19T17:02:07.693Z",
+      "lastSeenAt": "2026-10-19T19:01:58.049Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16051680",
@@ -34185,7 +34185,7 @@
     },
     "nettiauto:16051653": {
       "firstSeenAt": "2026-10-16T13:02:03.054Z",
-      "lastSeenAt": "2026-10-19T17:02:07.700Z",
+      "lastSeenAt": "2026-10-19T19:01:58.056Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16051653",
@@ -34206,7 +34206,7 @@
     },
     "nettiauto:16052054": {
       "firstSeenAt": "2026-10-16T14:03:32.318Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16052054",
@@ -34250,7 +34250,7 @@
     },
     "nettiauto:16052205": {
       "firstSeenAt": "2026-10-16T15:02:06.535Z",
-      "lastSeenAt": "2026-10-19T17:02:07.701Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16052205",
@@ -34272,7 +34272,7 @@
     },
     "nettiauto:16052647": {
       "firstSeenAt": "2026-10-16T20:58:41.959Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.043Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16052647",
@@ -34294,7 +34294,7 @@
     },
     "nettiauto:16052749": {
       "firstSeenAt": "2026-10-17T06:06:34.849Z",
-      "lastSeenAt": "2026-10-19T17:02:07.703Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16052749",
@@ -34337,7 +34337,7 @@
     },
     "nettiauto:16052812": {
       "firstSeenAt": "2026-10-17T09:01:47.585Z",
-      "lastSeenAt": "2026-10-19T17:02:07.707Z",
+      "lastSeenAt": "2026-10-19T19:01:58.062Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16052812",
@@ -34359,7 +34359,7 @@
     },
     "nettiauto:16055008": {
       "firstSeenAt": "2026-10-19T07:01:45.709Z",
-      "lastSeenAt": "2026-10-19T17:02:07.704Z",
+      "lastSeenAt": "2026-10-19T19:01:58.059Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055008",
@@ -34381,7 +34381,7 @@
     },
     "nettiauto:16055275": {
       "firstSeenAt": "2026-10-19T09:01:52.843Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055275",
@@ -34402,7 +34402,7 @@
     },
     "nettiauto:16055247": {
       "firstSeenAt": "2026-10-19T09:01:53.823Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055247",
@@ -34423,7 +34423,7 @@
     },
     "nettiauto:16055093": {
       "firstSeenAt": "2026-10-19T09:01:53.827Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055093",
@@ -34445,7 +34445,7 @@
     },
     "nettiauto:16055082": {
       "firstSeenAt": "2026-10-19T09:01:53.832Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.058Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055082",
@@ -34467,7 +34467,7 @@
     },
     "nettiauto:16055672": {
       "firstSeenAt": "2026-10-19T11:01:42.908Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16055672",
@@ -34489,7 +34489,7 @@
     },
     "nettiauto:15969430": {
       "firstSeenAt": "2026-10-19T13:01:56.810Z",
-      "lastSeenAt": "2026-10-19T17:02:07.686Z",
+      "lastSeenAt": "2026-10-19T19:01:58.042Z",
       "detailCheckedAt": "2026-10-19T13:01:56.810Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/15969430",
@@ -34510,7 +34510,7 @@
     },
     "nettiauto:16056116": {
       "firstSeenAt": "2026-10-19T13:01:58.227Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056116",
@@ -34532,7 +34532,7 @@
     },
     "nettiauto:16056168": {
       "firstSeenAt": "2026-10-19T13:01:58.227Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056168",
@@ -34554,7 +34554,7 @@
     },
     "nettiauto:16056524": {
       "firstSeenAt": "2026-10-19T15:01:57.115Z",
-      "lastSeenAt": "2026-10-19T17:02:07.688Z",
+      "lastSeenAt": "2026-10-19T19:01:58.044Z",
       "detailCheckedAt": "2026-10-19T15:01:57.115Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056524",
@@ -34575,7 +34575,7 @@
     },
     "nettiauto:16056459": {
       "firstSeenAt": "2026-10-19T15:02:02.238Z",
-      "lastSeenAt": "2026-10-19T17:02:07.691Z",
+      "lastSeenAt": "2026-10-19T19:01:58.047Z",
       "detailCheckedAt": "2026-10-19T15:02:02.238Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056459",
@@ -34596,7 +34596,7 @@
     },
     "nettiauto:16056448": {
       "firstSeenAt": "2026-10-19T15:02:02.243Z",
-      "lastSeenAt": "2026-10-19T17:02:07.695Z",
+      "lastSeenAt": "2026-10-19T19:01:58.050Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056448",
@@ -34618,7 +34618,7 @@
     },
     "nettiauto:16056470": {
       "firstSeenAt": "2026-10-19T15:02:02.245Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056470",
@@ -34640,7 +34640,7 @@
     },
     "nettiauto:16056433": {
       "firstSeenAt": "2026-10-19T15:02:02.245Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056433",
@@ -34662,7 +34662,7 @@
     },
     "nettiauto:16056463": {
       "firstSeenAt": "2026-10-19T15:02:02.245Z",
-      "lastSeenAt": "2026-10-19T17:02:07.697Z",
+      "lastSeenAt": "2026-10-19T19:01:58.052Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056463",
@@ -34684,7 +34684,7 @@
     },
     "nettiauto:16056413": {
       "firstSeenAt": "2026-10-19T15:02:02.246Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056413",
@@ -34706,7 +34706,7 @@
     },
     "nettiauto:16056444": {
       "firstSeenAt": "2026-10-19T15:02:02.246Z",
-      "lastSeenAt": "2026-10-19T17:02:07.698Z",
+      "lastSeenAt": "2026-10-19T19:01:58.053Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056444",
@@ -34728,7 +34728,7 @@
     },
     "nettiauto:16056651": {
       "firstSeenAt": "2026-10-19T15:02:02.247Z",
-      "lastSeenAt": "2026-10-19T17:02:07.699Z",
+      "lastSeenAt": "2026-10-19T19:01:58.054Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056651",
@@ -34749,7 +34749,7 @@
     },
     "nettiauto:16056248": {
       "firstSeenAt": "2026-10-19T15:02:02.252Z",
-      "lastSeenAt": "2026-10-19T17:02:07.702Z",
+      "lastSeenAt": "2026-10-19T19:01:58.057Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056248",
@@ -34770,7 +34770,7 @@
     },
     "nettiauto:16056684": {
       "firstSeenAt": "2026-10-19T17:02:07.692Z",
-      "lastSeenAt": "2026-10-19T17:02:07.692Z",
+      "lastSeenAt": "2026-10-19T19:01:58.048Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/polestar/2/16056684",
@@ -34799,7 +34799,7 @@
     "169a334a-aad9-4957-80a9-756f10789a1f": {
       "firstRunAt": "2026-08-26T20:00:51.997Z",
       "name": "Polestar 2",
-      "lastRunAt": "2026-10-19T17:02:09.366Z",
+      "lastRunAt": "2026-10-19T19:01:58.900Z",
       "spec": "04c869be2c4306af"
     }
   },
