@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-26T10:03:39.629Z",
+  "updatedAt": "2026-10-26T11:21:50.568Z",
   "files": [
     {
       "file": "nettiauto-bmw-320.json",
@@ -31,9 +31,9 @@
         "make": "toyota",
         "model": "corolla"
       },
-      "listings": 1065,
-      "updatedAt": "2026-10-26T10:03:39.629Z",
-      "completeAt": "2026-10-26T10:03:39.629Z"
+      "listings": 1073,
+      "updatedAt": "2026-10-26T11:21:50.568Z",
+      "completeAt": "2026-10-26T11:21:50.568Z"
     }
   ]
 }
