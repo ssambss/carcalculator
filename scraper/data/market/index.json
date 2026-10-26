@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-26T06:01:52.804Z",
+  "updatedAt": "2026-10-26T08:05:37.572Z",
   "files": [
     {
       "file": "nettiauto-bmw-320.json",
@@ -23,6 +23,17 @@
       "listings": 1029,
       "updatedAt": "2026-10-26T06:01:52.804Z",
       "completeAt": "2026-10-26T06:01:52.804Z"
+    },
+    {
+      "file": "nettiauto-toyota-corolla.json",
+      "source": "nettiauto",
+      "search": {
+        "make": "toyota",
+        "model": "corolla"
+      },
+      "listings": 1056,
+      "updatedAt": "2026-10-26T08:05:37.572Z",
+      "completeAt": "2026-10-26T08:05:37.572Z"
     }
   ]
 }
