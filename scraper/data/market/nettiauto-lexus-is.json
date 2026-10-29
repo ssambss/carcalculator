@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-10-29T18:01:20.056Z",
-  "completeAt": "2026-10-29T18:01:20.056Z",
+  "updatedAt": "2026-10-29T20:01:18.836Z",
+  "completeAt": "2026-10-29T20:01:18.836Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",14500]]},
@@ -66,6 +66,6 @@
     "16073644": {"title":"2,2","year":2006,"mileage":430000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",2999]]},
     "16074163": {"title":"2,2, 220d","year":2007,"mileage":417,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"MJP-auto","vin":null,"first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",2890]]},
     "16076936": {"title":"2,5, 300h Executive","year":2016,"mileage":151000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Verkkokauppa","vin":"46dbfa74b519d740","first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",22800]]},
-    "16077143": {"title":"2,0","year":1991,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",7000]]}
+    "16077143": {"title":"2,0","year":1999,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-29","prices":[["2026-10-29",7000]]}
   }
 }
