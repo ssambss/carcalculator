@@ -2,13 +2,13 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-10-30T08:01:19.258Z",
-  "completeAt": "2026-10-30T08:01:19.258Z",
+  "updatedAt": "2026-10-30T10:01:30.596Z",
+  "completeAt": "2026-10-30T10:01:30.596Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",14500]]},
     "15638611": {"title":"2,5, 2.5 V6 Aut! Webasto+Kake | Vakkari | Keyless | Xenon | Koukku | Muistipenkit | 2xrenkaat | Katsastettu 7/2026 |jne.","year":2010,"mileage":316000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Oulun DM-Auto Oy","vin":"7bba3495017222ca","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",11450]]},
-    "15726908": {"title":"2,5, 300h Executive","year":2016,"mileage":244000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"LänsiAuto Hämeenlinna","vin":"042f209b6659f750","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",15290]]},
+    "15726908": {"title":"2,5, 300h Executive","year":2016,"mileage":244000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"LänsiAuto Hämeenlinna","vin":"042f209b6659f750","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",15290],["2026-10-30",15280]]},
     "15747928": {"title":"2,5, 250 Sedan","year":2008,"mileage":208000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Vaihtoautomaa Lempäälä","vin":"0bc36f5f3acb6961","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",11990]]},
     "15832988": {"title":"2,5, IS250 AWD","year":2007,"mileage":325000,"fuel":"Bensiini","drive":"Neliveto","battery":null,"seller":"K-Auto Helsinki","vin":"822fd51c3efbb206","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",6790]]},
     "15859603": {"title":"3,5, 310hv / GSE21 IS350 Version S / Näyttävä sopivasti laiteltu ripeä yksilö","year":2006,"mileage":124000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Japan Import 99","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",13800]]},
@@ -65,7 +65,7 @@
     "16072757": {"title":"2,0, Toyota Motorsport TTE Remmiahdin","year":2000,"mileage":413000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",7490]]},
     "16073644": {"title":"2,2","year":2006,"mileage":430000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",2999]]},
     "16074163": {"title":"2,2, 220d","year":2007,"mileage":417,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"MJP-auto","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",2890]]},
-    "16076936": {"title":"2,5, 300h Executive","year":2016,"mileage":151000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Verkkokauppa","vin":"46dbfa74b519d740","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",22800]]},
+    "16076936": {"title":"2,5, 300h Executive ** Merkkihuollettu **","year":2016,"mileage":151000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Espoo Koskelo","vin":"46dbfa74b519d740","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",22800]]},
     "16077143": {"title":"2,0","year":1999,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",7000]]}
   }
 }
