@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-10-30T16:01:43.334Z",
-  "completeAt": "2026-10-30T16:01:43.334Z",
+  "updatedAt": "2026-10-30T18:01:23.830Z",
+  "completeAt": "2026-10-30T18:01:23.830Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",14500]]},
@@ -30,6 +30,7 @@
     "15992331": {"title":"2,5, 250 ** Vakionopeudensäädin / P-tutkat / Xenon / Keyless / 2x Erikoisvanteet / Huoltokirja / Juuri katsastettu! **","year":2007,"mileage":265000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Bilar99 - Helsinki","vin":"692c0487a56b14b2","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",10690]]},
     "15995510": {"title":"2,5, 300h Comfort","year":2015,"mileage":172000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kauppatalo J.Inkeröinen Oy","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",18800]]},
     "15998499": {"title":"2,5, 300h Executive","year":2014,"mileage":266500,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Wetteri Oulu","vin":"f836f0972043961e","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",13990]]},
+    "15999602": {"title":"2,5, 250 Luxury Package ** lmastoidut istuimet / Muistinahat / KeyLessGo / Xenon / Vakkari / Tutkat **","year":2007,"mileage":216000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Saka Finland Oy Hämeenlinna","vin":"9ad24c3fbe851df2","first":"2026-10-30","last":"2026-10-30","prices":[["2026-10-30",10890]]},
     "15999964": {"title":"2,5, 250 aut.","year":2008,"mileage":240000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Rinta-Joupin Autoliike, Oulu","vin":"e59cf2b138a62019","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",9990]]},
     "16003109": {"title":"2,2, 220d","year":2010,"mileage":248897,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"b96720b792bf0c11","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",6867]]},
     "16005429": {"title":"2,5, 250 A F-Sport | Ruosteeton | Helmi","year":2011,"mileage":98000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"VT AUTOSTYLE","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",14590]]},
@@ -70,6 +71,7 @@
     "16076936": {"title":"2,5, 300h Executive ** Merkkihuollettu **","year":2016,"mileage":151000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Espoo Koskelo","vin":"46dbfa74b519d740","first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",22800]]},
     "16077143": {"title":"2,0","year":1999,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-30","prices":[["2026-10-29",7000]]},
     "16078541": {"title":"2,5, LEXUS IS300H Sedan (AA) 4ov 2494cm3","year":2017,"mileage":165000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"J. Rinta-Jouppi Oulu","vin":"0e8e4700972e7148","first":"2026-10-30","last":"2026-10-30","prices":[["2026-10-30",23800]]},
-    "16079348": {"title":"2,5, 300h Comfort","year":2014,"mileage":226000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"K-Auto Oulu, Vaihtoautot","vin":"326967dad0ca31c2","first":"2026-10-30","last":"2026-10-30","prices":[["2026-10-30",15690]]}
+    "16079348": {"title":"2,5, 300h Comfort","year":2014,"mileage":226000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"K-Auto Oulu, Vaihtoautot","vin":"326967dad0ca31c2","first":"2026-10-30","last":"2026-10-30","prices":[["2026-10-30",15690]]},
+    "16079459": {"title":"2,5, 300h F-Sport ** ACC / Suomi-auto / P.tutkat / Sporttipenkit / KeyLessGo / Digimittaristo / Lohkolämm **","year":2014,"mileage":325000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Saka Finland Oy Oulu","vin":"85f230529d3f8112","first":"2026-10-30","last":"2026-10-30","prices":[["2026-10-30",15290]]}
   }
 }
