@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-10-31T12:01:20.496Z",
-  "completeAt": "2026-10-31T12:01:20.496Z",
+  "updatedAt": "2026-10-31T14:01:37.496Z",
+  "completeAt": "2026-10-31T14:01:37.496Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",14500]]},
@@ -24,6 +24,7 @@
     "15954238": {"title":"2,5, /syystarjous! XE30 Look / P.tutkat / Nahkaratti / Keyless-Go / Cruise / Aut.Ilm / Metalliväri","year":2007,"mileage":238000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Koiviston Autotalo Oy","vin":"e723d3b31df7b501","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",9930]]},
     "15954797": {"title":"2,5, 250 A F-Sport","year":2011,"mileage":317000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",11900]]},
     "15964977": {"title":"2,5, 300h Hybrid A Comfort","year":2017,"mileage":117000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Lempäälä","vin":"4c71d38af2521669","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",24090]]},
+    "15969536": {"title":"3,5","year":2006,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-31","last":"2026-10-31","prices":[["2026-10-31",13000]]},
     "15971094": {"title":"2,5, 300h Luxury / Suomi-auto / Xenon / Nahat / Sähköpenkit / Peruutuskamera / Navi / Vakionopeudensäädin","year":2016,"mileage":122000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Wetteri Airport","vin":"9e79ace28cb3e55d","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",21900]]},
     "15975280": {"title":"2,5, 300h Hybrid A Comfort","year":2017,"mileage":110000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Toyota Tampere","vin":"d4e127105972c697","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",22880]]},
     "15990807": {"title":"2,2, 220d","year":2006,"mileage":214000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Kamux Raisio","vin":"aefee93358f4d542","first":"2026-10-29","last":"2026-10-31","prices":[["2026-10-29",6900]]},
