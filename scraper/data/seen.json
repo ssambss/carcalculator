@@ -2,7 +2,7 @@
   "version": 3,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-11-02T12:01:18.485Z",
+  "updatedAt": "2026-11-02T18:00:57.605Z",
   "runs": 615,
   "listings": {
     "nettiauto:12959170": {
@@ -61564,5 +61564,5 @@
       "removedAt": "2026-10-29T20:01:41.615Z"
     }
   },
-  "staleNoticeAt": "2026-11-02T04:01:10.209Z"
+  "staleNoticeAt": "2026-11-02T18:00:57.605Z"
 }
