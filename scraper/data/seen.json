@@ -2,8 +2,8 @@
   "version": 3,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-11-03T08:00:56.513Z",
-  "runs": 615,
+  "updatedAt": "2026-11-03T20:02:00.601Z",
+  "runs": 616,
   "listings": {
     "nettiauto:12959170": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
@@ -59901,7 +59901,7 @@
     },
     "nettiauto:16003109": {
       "firstSeenAt": "2026-10-29T12:01:15.975Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16003109",
@@ -59916,7 +59916,8 @@
           "reasons": [
             "248 897 km over 200 000 km",
             "6 867 € under 15 000 €",
-            "year 2010 before 2014",
+            "year 2010 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -59925,7 +59926,7 @@
     },
     "nettiauto:16056561": {
       "firstSeenAt": "2026-10-29T12:01:15.976Z",
-      "lastSeenAt": "2026-11-02T12:01:14.600Z",
+      "lastSeenAt": "2026-11-03T20:01:26.122Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16056561",
@@ -59940,7 +59941,8 @@
           "reasons": [
             "500 000 km over 200 000 km",
             "2 500 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -59949,7 +59951,7 @@
     },
     "nettiauto:16069188": {
       "firstSeenAt": "2026-10-29T12:01:15.976Z",
-      "lastSeenAt": "2026-11-02T12:01:14.600Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16069188",
@@ -59964,7 +59966,8 @@
           "reasons": [
             "406 000 km over 200 000 km",
             "2 500 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -59973,7 +59976,7 @@
     },
     "nettiauto:16074163": {
       "firstSeenAt": "2026-10-29T12:01:15.976Z",
-      "lastSeenAt": "2026-11-02T12:01:14.600Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16074163",
@@ -59987,7 +59990,8 @@
           "status": "rejected",
           "reasons": [
             "2 890 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60092,7 +60096,7 @@
     },
     "nettiauto:16069041": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16069041",
@@ -60107,7 +60111,7 @@
           "reasons": [
             "372 000 km over 200 000 km",
             "4 800 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60116,7 +60120,7 @@
     },
     "nettiauto:16054139": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054139",
@@ -60131,7 +60135,8 @@
           "reasons": [
             "365 000 km over 200 000 km",
             "4 999 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60140,7 +60145,7 @@
     },
     "nettiauto:16064648": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16064648",
@@ -60155,7 +60160,8 @@
           "reasons": [
             "317 000 km over 200 000 km",
             "5 500 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60164,7 +60170,7 @@
     },
     "nettiauto:16059870": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16059870",
@@ -60179,7 +60185,8 @@
           "reasons": [
             "325 000 km over 200 000 km",
             "5 800 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60188,7 +60195,7 @@
     },
     "nettiauto:16072434": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16072434",
@@ -60203,7 +60210,8 @@
           "reasons": [
             "318 517 km over 200 000 km",
             "6 000 € under 15 000 €",
-            "year 2003 before 2014",
+            "year 2003 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60212,22 +60220,23 @@
     },
     "nettiauto:15832988": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15832988",
       "title": "2,5, IS250 AWD",
       "year": 2007,
       "mileage": 325000,
-      "price": 6790,
+      "price": 6690,
       "seller": "K-Auto Helsinki",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
             "325 000 km over 200 000 km",
-            "6 790 € under 15 000 €",
-            "year 2007 before 2014",
+            "6 690 € under 15 000 €",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60236,7 +60245,7 @@
     },
     "nettiauto:15990807": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15990807",
@@ -60251,7 +60260,8 @@
           "reasons": [
             "214 000 km over 200 000 km",
             "6 900 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60260,7 +60270,7 @@
     },
     "nettiauto:16054730": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054730",
@@ -60275,7 +60285,8 @@
           "reasons": [
             "255 000 km over 200 000 km",
             "7 400 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60308,7 +60319,7 @@
     },
     "nettiauto:16030991": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16030991",
@@ -60323,7 +60334,7 @@
           "reasons": [
             "278 793 km over 200 000 km",
             "7 800 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60332,7 +60343,7 @@
     },
     "nettiauto:16014012": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16014012",
@@ -60347,7 +60358,8 @@
           "reasons": [
             "242 000 km over 200 000 km",
             "9 900 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60356,7 +60368,7 @@
     },
     "nettiauto:15954238": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954238",
@@ -60371,7 +60383,8 @@
           "reasons": [
             "238 000 km over 200 000 km",
             "9 930 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60380,7 +60393,7 @@
     },
     "nettiauto:15999964": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15999964",
@@ -60395,7 +60408,8 @@
           "reasons": [
             "240 000 km over 200 000 km",
             "9 990 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60404,7 +60418,7 @@
     },
     "nettiauto:16041232": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16041232",
@@ -60419,7 +60433,8 @@
           "reasons": [
             "277 000 km over 200 000 km",
             "10 000 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60428,7 +60443,7 @@
     },
     "nettiauto:15992331": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15992331",
@@ -60443,7 +60458,8 @@
           "reasons": [
             "265 000 km over 200 000 km",
             "10 690 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60452,7 +60468,7 @@
     },
     "nettiauto:16036515": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16036515",
@@ -60466,7 +60482,8 @@
           "status": "rejected",
           "reasons": [
             "10 900 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60475,7 +60492,7 @@
     },
     "nettiauto:15638611": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15638611",
@@ -60490,7 +60507,8 @@
           "reasons": [
             "316 000 km over 200 000 km",
             "10 980 € under 15 000 €",
-            "year 2010 before 2014",
+            "year 2010 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60499,7 +60517,7 @@
     },
     "nettiauto:15954797": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954797",
@@ -60514,7 +60532,8 @@
           "reasons": [
             "317 000 km over 200 000 km",
             "11 800 € under 15 000 €",
-            "year 2011 before 2014",
+            "year 2011 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60523,7 +60542,7 @@
     },
     "nettiauto:15747928": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15747928",
@@ -60538,7 +60557,8 @@
           "reasons": [
             "208 000 km over 200 000 km",
             "11 990 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60547,7 +60567,7 @@
     },
     "nettiauto:16067984": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16067984",
@@ -60562,7 +60582,8 @@
           "reasons": [
             "254 500 km over 200 000 km",
             "12 000 € under 15 000 €",
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60571,7 +60592,7 @@
     },
     "nettiauto:16048627": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16048627",
@@ -60585,7 +60606,8 @@
           "status": "rejected",
           "reasons": [
             "12 490 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60594,7 +60616,7 @@
     },
     "nettiauto:15909225": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15909225",
@@ -60608,7 +60630,7 @@
           "status": "rejected",
           "reasons": [
             "13 790 € under 15 000 €",
-            "year 2005 before 2014",
+            "year 2005 before 2016",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60617,7 +60639,7 @@
     },
     "nettiauto:15859603": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15859603",
@@ -60631,7 +60653,8 @@
           "status": "rejected",
           "reasons": [
             "13 800 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60640,7 +60663,7 @@
     },
     "nettiauto:16020534": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16020534",
@@ -60654,7 +60677,8 @@
           "status": "rejected",
           "reasons": [
             "13 890 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60685,7 +60709,7 @@
     },
     "nettiauto:15939223": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15939223",
@@ -60700,7 +60724,8 @@
           "reasons": [
             "290 000 km over 200 000 km",
             "13 999 € under 15 000 €",
-            "year 2013 before 2014"
+            "year 2013 before 2016",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -60708,7 +60733,7 @@
     },
     "nettiauto:15579164": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15579164",
@@ -60722,7 +60747,9 @@
           "status": "rejected",
           "reasons": [
             "342 000 km over 200 000 km",
-            "14 500 € under 15 000 €"
+            "14 500 € under 15 000 €",
+            "year 2014 before 2016",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -60730,7 +60757,7 @@
     },
     "nettiauto:16005429": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16005429",
@@ -60744,7 +60771,8 @@
           "status": "rejected",
           "reasons": [
             "14 590 € under 15 000 €",
-            "year 2011 before 2014",
+            "year 2011 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60753,7 +60781,7 @@
     },
     "nettiauto:16017241": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16017241",
@@ -60767,7 +60795,8 @@
           "status": "rejected",
           "reasons": [
             "14 800 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60776,7 +60805,7 @@
     },
     "nettiauto:15421459": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15421459",
@@ -60790,7 +60819,8 @@
           "status": "rejected",
           "reasons": [
             "14 890 € under 15 000 €",
-            "year 2005 before 2014",
+            "year 2005 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60799,7 +60829,7 @@
     },
     "nettiauto:15917409": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15917409",
@@ -60813,7 +60843,8 @@
           "status": "rejected",
           "reasons": [
             "14 900 € under 15 000 €",
-            "year 2012 before 2014",
+            "year 2012 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60845,7 +60876,7 @@
     },
     "nettiauto:16031877": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16031877",
@@ -60859,7 +60890,8 @@
           "status": "rejected",
           "reasons": [
             "245 000 km over 200 000 km",
-            "year 1999 before 2014",
+            "year 1999 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60868,20 +60900,21 @@
     },
     "nettiauto:15726908": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15726908",
       "title": "2,5, 300h Executive",
       "year": 2016,
       "mileage": 244000,
-      "price": 15280,
+      "price": 15270,
       "seller": "LänsiAuto Hämeenlinna",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "244 000 km over 200 000 km"
+            "244 000 km over 200 000 km",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -60889,7 +60922,7 @@
     },
     "nettiauto:15947659": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15947659",
@@ -60903,7 +60936,8 @@
           "status": "rejected",
           "reasons": [
             "271 000 km over 200 000 km",
-            "year 2013 before 2014"
+            "year 2013 before 2016",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -60911,7 +60945,7 @@
     },
     "nettiauto:15921905": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15921905",
@@ -60924,7 +60958,8 @@
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "year 2011 before 2014",
+            "year 2011 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60933,7 +60968,7 @@
     },
     "nettiauto:15995510": {
       "firstSeenAt": "2026-10-29T12:01:17.309Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:26.125Z",
       "detailCheckedAt": "2026-10-29T12:01:17.309Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15995510",
@@ -60944,15 +60979,18 @@
       "seller": "Kauppatalo J.Inkeröinen Oy",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "year 2015 before 2016",
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16007243": {
       "firstSeenAt": "2026-10-29T12:01:17.309Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:26.125Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16007243",
@@ -60965,7 +61003,8 @@
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "year 2012 before 2014",
+            "year 2012 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -60974,26 +61013,28 @@
     },
     "nettiauto:16042117": {
       "firstSeenAt": "2026-10-29T12:01:18.242Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T12:01:18.242Z",
+      "lastSeenAt": "2026-11-03T20:01:44.391Z",
+      "detailCheckedAt": "2026-11-03T20:01:44.391Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16042117",
       "title": "2,5, 300h Hybrid A Comfort ** 2.Om Suomi-auto / Lohko+sisätilanlämmitin / Tutkat / Vakkari / KeyLess / LED / Puolinahat **",
       "year": 2017,
       "mileage": 163000,
-      "price": 21800,
+      "price": 21480,
       "seller": "Saka Finland Oy Nummela",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16066065": {
       "firstSeenAt": "2026-10-29T12:01:19.433Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:44.391Z",
       "detailCheckedAt": "2026-10-29T12:01:19.433Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16066065",
@@ -61004,15 +61045,18 @@
       "seller": "Nelipyörä Seinäjoki",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "year 2014 before 2016",
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16051022": {
       "firstSeenAt": "2026-10-29T12:01:19.433Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:44.391Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16051022",
@@ -61025,7 +61069,8 @@
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "year 2007 before 2014",
+            "year 2007 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61034,14 +61079,14 @@
     },
     "nettiauto:15971094": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:44.391Z",
       "detailCheckedAt": "2026-10-29T12:01:21.052Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15971094",
       "title": "2,5, 300h Luxury / Suomi-auto / Xenon / Nahat / Sähköpenkit / Peruutuskamera / Navi / Vakionopeudensäädin",
       "year": 2016,
       "mileage": 122000,
-      "price": 21900,
+      "price": 21800,
       "seller": "Wetteri Airport",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
@@ -61053,8 +61098,8 @@
     },
     "nettiauto:16010743": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": null,
+      "lastSeenAt": "2026-11-03T20:01:45.454Z",
+      "detailCheckedAt": "2026-11-03T20:01:45.454Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16010743",
       "title": "2,5, 300h F-Sport / UPEA SPORTTI-HYBRIDI / PUNAISET NAHAT / BC RACING / DOTZ / ALK.299 EUR/KK",
@@ -61064,16 +61109,18 @@
       "seller": "JDM Outlet",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-29T12:01:37.628Z"
         }
       }
     },
     "nettiauto:15975280": {
       "firstSeenAt": "2026-10-29T12:01:23.018Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T12:01:23.018Z",
+      "lastSeenAt": "2026-11-03T20:01:48.930Z",
+      "detailCheckedAt": "2026-11-03T20:01:48.930Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15975280",
       "title": "2,5, 300h Hybrid A Comfort",
@@ -61083,16 +61130,18 @@
       "seller": "Toyota Tampere",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16053141": {
       "firstSeenAt": "2026-10-29T12:01:24.233Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T12:01:24.233Z",
+      "lastSeenAt": "2026-11-03T20:01:50.848Z",
+      "detailCheckedAt": "2026-11-03T20:01:50.848Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16053141",
       "title": "2,5, 300h Hybrid A Executive",
@@ -61102,15 +61151,17 @@
       "seller": "Rinta-Joupin Autoliike, Pori",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16053585": {
       "firstSeenAt": "2026-10-29T12:01:24.233Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:50.848Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16053585",
@@ -61121,16 +61172,19 @@
       "seller": "Bilar99 - Raisio",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "year 2014 before 2016",
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-29T12:01:37.628Z"
         }
       }
     },
     "nettiauto:15964977": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T12:01:25.847Z",
+      "lastSeenAt": "2026-11-03T20:01:54.457Z",
+      "detailCheckedAt": "2026-11-03T20:01:54.457Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15964977",
       "title": "2,5, 300h Hybrid A Comfort",
@@ -61140,15 +61194,17 @@
       "seller": "Bilar99 - Lempäälä",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16037577": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:54.457Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16037577",
@@ -61159,16 +61215,19 @@
       "seller": "Kamux Espoo Niittykumpu",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "year 2015 before 2016",
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-29T12:01:37.628Z"
         }
       }
     },
     "nettiauto:16033141": {
       "firstSeenAt": "2026-10-29T12:01:26.847Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T12:01:26.847Z",
+      "lastSeenAt": "2026-11-03T20:01:56.992Z",
+      "detailCheckedAt": "2026-11-03T20:01:56.992Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16033141",
       "title": "2,5, 300h Hybrid A Executive",
@@ -61178,16 +61237,18 @@
       "seller": "Autokeskus Oy Olari",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16015622": {
       "firstSeenAt": "2026-10-29T12:01:26.847Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": null,
+      "lastSeenAt": "2026-11-03T20:01:57.270Z",
+      "detailCheckedAt": "2026-11-03T20:01:57.270Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16015622",
       "title": "2,0, 300h 2.5 F-Sport Kamera AdpFart Keyless Drag 223hk",
@@ -61197,15 +61258,17 @@
       "seller": "Kamux Verkkokauppa",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-29T12:01:37.628Z"
         }
       }
     },
     "nettiauto:15915565": {
       "firstSeenAt": "2026-10-29T12:01:26.848Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:57.270Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15915565",
@@ -61218,8 +61281,8 @@
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "32 890 € over 30 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61228,7 +61291,7 @@
     },
     "nettiauto:16030874": {
       "firstSeenAt": "2026-10-29T12:01:26.848Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
+      "lastSeenAt": "2026-11-03T20:01:57.270Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16030874",
@@ -61243,7 +61306,8 @@
           "reasons": [
             "400 000 km over 200 000 km",
             "4 990 € under 15 000 €",
-            "year 2008 before 2014",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61252,8 +61316,8 @@
     },
     "nettiauto:16076936": {
       "firstSeenAt": "2026-10-29T16:01:34.328Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": "2026-10-29T16:01:34.328Z",
+      "lastSeenAt": "2026-11-03T20:01:47.992Z",
+      "detailCheckedAt": "2026-11-03T20:01:47.992Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16076936",
       "title": "2,5, 300h Executive ** Merkkihuollettu **",
@@ -61263,15 +61327,17 @@
       "seller": "Kamux Espoo Koskelo",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T08:01:31.940Z"
         }
       }
     },
     "nettiauto:16077143": {
       "firstSeenAt": "2026-10-29T18:01:20.053Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16077143",
@@ -61286,7 +61352,8 @@
           "reasons": [
             "335 000 km over 200 000 km",
             "7 000 € under 15 000 €",
-            "year 1999 before 2014",
+            "year 1999 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61295,22 +61362,23 @@
     },
     "nettiauto:15814348": {
       "firstSeenAt": "2026-10-30T12:01:17.939Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15814348",
       "title": "2,5, 300h Comfort",
       "year": 2013,
       "mileage": 252000,
-      "price": 13780,
+      "price": 13750,
       "seller": "Bilar99 - Vantaa, Tuupakka",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
             "252 000 km over 200 000 km",
-            "13 780 € under 15 000 €",
-            "year 2013 before 2014"
+            "13 750 € under 15 000 €",
+            "year 2013 before 2016",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -61318,8 +61386,8 @@
     },
     "nettiauto:16078541": {
       "firstSeenAt": "2026-10-30T13:46:33.160Z",
-      "lastSeenAt": "2026-11-02T12:01:14.603Z",
-      "detailCheckedAt": null,
+      "lastSeenAt": "2026-11-03T20:01:52.709Z",
+      "detailCheckedAt": "2026-11-03T20:01:52.709Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16078541",
       "title": "2,5, LEXUS IS300H Sedan (AA) 4ov 2494cm3",
@@ -61329,29 +61397,32 @@
       "seller": "J. Rinta-Jouppi Oulu",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
-          "status": "match",
-          "reasons": [],
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
+          ],
           "announcedAt": "2026-10-30T13:46:35.008Z"
         }
       }
     },
     "nettiauto:16061638": {
       "firstSeenAt": "2026-10-30T16:01:43.332Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16061638",
       "title": "2,5, 250 #TYYLIKÄS! #MarkLevinson #VaaleetNahat #P.Kamera #Keyless #Lohkolämmitin&sisätilanpistoke",
       "year": 2008,
       "mileage": 200000,
-      "price": 10990,
+      "price": 10980,
       "seller": "RS-Trade",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "10 990 € under 15 000 €",
-            "year 2008 before 2014",
+            "10 980 € under 15 000 €",
+            "year 2008 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61381,22 +61452,22 @@
     },
     "nettiauto:15999602": {
       "firstSeenAt": "2026-10-30T18:01:23.829Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15999602",
       "title": "2,5, 250 Luxury Package ** lmastoidut istuimet / Muistinahat / KeyLessGo / Xenon / Vakkari / Tutkat **",
       "year": 2007,
       "mileage": 216000,
-      "price": 10890,
+      "price": 10800,
       "seller": "Saka Finland Oy Hämeenlinna",
       "filters": {
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
             "216 000 km over 200 000 km",
-            "10 890 € under 15 000 €",
-            "year 2007 before 2014",
+            "10 800 € under 15 000 €",
+            "year 2007 before 2016",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61405,12 +61476,12 @@
     },
     "nettiauto:16079459": {
       "firstSeenAt": "2026-10-30T18:01:23.830Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16079459",
-      "title": "2,5, 300h F-Sport ** ACC / Suomi-auto / P.tutkat / Sporttipenkit / KeyLessGo / Digimittaristo / Lohkolämm **",
-      "year": 2014,
+      "title": "2,5, 300h F Sport ** Adapt. Cruise / KeylessGo / Digimittaristo / LED-ajovalot / Ratinlämmitys / Suomi-auto **",
+      "year": 2013,
       "mileage": 325000,
       "price": 15290,
       "seller": "Saka Finland Oy Oulu",
@@ -61418,7 +61489,9 @@
         "20459660-c4ca-4064-9c99-18ea859dfba4": {
           "status": "rejected",
           "reasons": [
-            "325 000 km over 200 000 km"
+            "325 000 km over 200 000 km",
+            "year 2013 before 2016",
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -61426,7 +61499,7 @@
     },
     "nettiauto:15969536": {
       "firstSeenAt": "2026-10-31T14:01:37.494Z",
-      "lastSeenAt": "2026-11-02T12:01:14.602Z",
+      "lastSeenAt": "2026-11-03T20:01:26.124Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15969536",
@@ -61440,7 +61513,8 @@
           "status": "rejected",
           "reasons": [
             "13 000 € under 15 000 €",
-            "year 2006 before 2014",
+            "year 2006 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
           ],
           "announcedAt": null
@@ -61449,7 +61523,7 @@
     },
     "nettiauto:16081952": {
       "firstSeenAt": "2026-11-02T12:01:14.601Z",
-      "lastSeenAt": "2026-11-02T12:01:14.601Z",
+      "lastSeenAt": "2026-11-03T20:01:26.123Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16081952",
@@ -61464,8 +61538,30 @@
           "reasons": [
             "396 000 km over 200 000 km",
             "5 800 € under 15 000 €",
-            "year 2001 before 2014",
+            "year 2001 before 2016",
+            "variant does not say luxury",
             "no mention of hybrid"
+          ],
+          "announcedAt": null
+        }
+      }
+    },
+    "nettiauto:16083365": {
+      "firstSeenAt": "2026-11-03T20:01:35.400Z",
+      "lastSeenAt": "2026-11-03T20:01:35.400Z",
+      "detailCheckedAt": "2026-11-03T20:01:35.400Z",
+      "sourceId": "nettiauto",
+      "url": "https://www.nettiauto.com/lexus/is/16083365",
+      "title": "2,5, 300h Hybrid A Comfort *Suomi-auto!*",
+      "year": 2018,
+      "mileage": 168000,
+      "price": 20490,
+      "seller": "Kamux Tampere Lakalaiva",
+      "filters": {
+        "20459660-c4ca-4064-9c99-18ea859dfba4": {
+          "status": "rejected",
+          "reasons": [
+            "variant does not say luxury"
           ],
           "announcedAt": null
         }
@@ -61492,9 +61588,9 @@
     },
     "20459660-c4ca-4064-9c99-18ea859dfba4": {
       "firstRunAt": "2026-10-29T12:01:37.629Z",
-      "spec": "139d6694e1111fd1",
-      "name": "Lexus IS 300h",
-      "lastRunAt": "2026-11-02T12:01:18.481Z"
+      "spec": "f84ff0f13dbebf49",
+      "name": "Lexus IS 300h Luxury",
+      "lastRunAt": "2026-11-03T20:02:00.598Z"
     }
   },
   "tco": {
@@ -61554,7 +61650,7 @@
     "nettiauto:15981066": {
       "addedAt": "2026-10-26T10:03:41.941Z",
       "confirmedAt": "2026-10-26T11:21:51.962Z",
-      "checkedAt": "2026-11-02T08:01:24.362Z"
+      "checkedAt": "2026-11-03T20:01:58.731Z"
     },
     "nettiauto:16061752": {
       "addedAt": "2026-10-26T10:03:41.941Z",
@@ -61564,5 +61660,5 @@
       "removedAt": "2026-10-29T20:01:41.615Z"
     }
   },
-  "staleNoticeAt": "2026-11-03T08:00:56.512Z"
+  "staleNoticeAt": "2026-11-03T20:01:08.957Z"
 }
