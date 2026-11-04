@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-04T06:01:14.922Z",
-  "completeAt": "2026-11-04T06:01:14.922Z",
+  "updatedAt": "2026-11-04T08:01:15.576Z",
+  "completeAt": "2026-11-04T08:01:15.576Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",14500]]},
@@ -75,6 +75,7 @@
     "16079348": {"title":"2,5, 300h Comfort","year":2014,"mileage":226000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"K-Auto Oulu, Vaihtoautot","vin":"326967dad0ca31c2","first":"2026-10-30","last":"2026-11-02","prices":[["2026-10-30",15690]]},
     "16079459": {"title":"2,5, 300h F Sport ** Adapt. Cruise / KeylessGo / Digimittaristo / LED-ajovalot / Ratinlämmitys / Suomi-auto **","year":2013,"mileage":325000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Saka Finland Oy Oulu","vin":"85f230529d3f8112","first":"2026-10-30","last":"2026-11-04","prices":[["2026-10-30",15290]]},
     "16081952": {"title":"3,0, 219hv / IS300 SportCross / 2JZ / Asiallinen yksilö huippuvarustetasolla","year":2001,"mileage":396000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Japan Import 99","vin":null,"first":"2026-11-02","last":"2026-11-04","prices":[["2026-11-02",5800]]},
-    "16083365": {"title":"2,5, 300h Hybrid A Comfort *Suomi-auto!*","year":2018,"mileage":168000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Tampere Lakalaiva","vin":"db5aa84b3b54233a","first":"2026-11-03","last":"2026-11-04","prices":[["2026-11-03",20490]]}
+    "16083365": {"title":"2,5, 300h Hybrid A Comfort *Suomi-auto!*","year":2018,"mileage":168000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Tampere Lakalaiva","vin":"db5aa84b3b54233a","first":"2026-11-03","last":"2026-11-04","prices":[["2026-11-03",20490]]},
+    "16085662": {"title":"2,5, 300h F Sport","year":2014,"mileage":234000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Oy Autoliike Nystedt Bilaffär Ab, Vaasa","vin":"bd6bd64958ba7a44","first":"2026-11-04","last":"2026-11-04","prices":[["2026-11-04",19980]]}
   }
 }
