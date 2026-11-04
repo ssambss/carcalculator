@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-04T22:01:10.437Z",
-  "completeAt": "2026-11-04T22:01:10.437Z",
+  "updatedAt": "2026-11-04T22:48:59.879Z",
+  "completeAt": "2026-11-04T22:48:59.879Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",14890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",14500]]},
@@ -77,7 +77,7 @@
     "16081952": {"title":"3,0, 219hv / IS300 SportCross / 2JZ / Asiallinen yksilö huippuvarustetasolla","year":2001,"mileage":396000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Japan Import 99","vin":null,"first":"2026-11-02","last":"2026-11-04","prices":[["2026-11-02",5800]]},
     "16083365": {"title":"2,5, 300h Hybrid A Comfort *Suomi-auto!*","year":2018,"mileage":168000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Tampere Lakalaiva","vin":"db5aa84b3b54233a","first":"2026-11-03","last":"2026-11-04","prices":[["2026-11-03",20490]]},
     "16085662": {"title":"2,5, 300h F Sport","year":2014,"mileage":234000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Oy Autoliike Nystedt Bilaffär Ab, Vaasa","vin":"bd6bd64958ba7a44","first":"2026-11-04","last":"2026-11-04","prices":[["2026-11-04",19980]]},
-    "16085957": {"title":"2,2, 220d","year":2006,"mileage":442543,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-04","last":"2026-11-04","prices":[["2026-11-04",2590]]},
+    "16085957": {"title":"2,2, 220d","year":2006,"mileage":432654,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-04","last":"2026-11-04","prices":[["2026-11-04",2590]]},
     "16085976": {"title":"3,5, IS 350 ** JDM / GSE21 / Mark Levinson / Apple Carplay / Vakionopeudensäädin **","year":2008,"mileage":127000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"SL Automyynti","vin":"414814c82a8fd5de","first":"2026-11-04","last":"2026-11-04","prices":[["2026-11-04",13900]]}
   }
 }
