@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-06T10:01:16.153Z",
-  "completeAt": "2026-11-06T10:01:16.153Z",
+  "updatedAt": "2026-11-06T11:35:23.638Z",
+  "completeAt": "2026-11-06T11:35:23.638Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-06","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-06","prices":[["2026-10-29",14500]]},
@@ -82,6 +82,7 @@
     "16087747": {"title":"2,5, 300h F-Sport","year":2016,"mileage":109000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Tuusula","vin":"df8e097847a9d660","first":"2026-11-05","last":"2026-11-06","prices":[["2026-11-05",25900]]},
     "16089405": {"title":"2,5","year":2011,"mileage":317000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Rahoitustie","vin":null,"first":"2026-11-05","last":"2026-11-06","prices":[["2026-11-05",11000]]},
     "16089428": {"title":"2,0","year":2005,"mileage":240000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-05","last":"2026-11-06","prices":[["2026-11-05",5000]]},
-    "16089868": {"title":"2,2, 220d","year":2010,"mileage":401000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"37289f2ada57916f","first":"2026-11-06","last":"2026-11-06","prices":[["2026-11-06",4100]]}
+    "16089868": {"title":"2,2, 220d","year":2010,"mileage":401000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"37289f2ada57916f","first":"2026-11-06","last":"2026-11-06","prices":[["2026-11-06",4100]]},
+    "16090177": {"title":"2,5","year":2015,"mileage":273000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"55b8a96422597095","first":"2026-11-06","last":"2026-11-06","prices":[["2026-11-06",13500]]}
   }
 }
