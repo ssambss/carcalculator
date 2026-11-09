@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-09T14:01:27.929Z",
-  "completeAt": "2026-11-09T14:01:27.929Z",
+  "updatedAt": "2026-11-09T16:01:35.577Z",
+  "completeAt": "2026-11-09T16:01:35.577Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-09","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-09","prices":[["2026-10-29",14500]]},
@@ -88,6 +88,7 @@
     "16091929": {"title":"2,5, 300h Hybrid A Executive | Facelift |","year":2017,"mileage":124000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"K-Auto Tampere","vin":"5efe549db2163683","first":"2026-11-07","last":"2026-11-09","prices":[["2026-11-07",25900]]},
     "16092845": {"title":"3,0, 300 SportCross","year":2003,"mileage":318517,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"07bc57c76cef31a9","first":"2026-11-07","last":"2026-11-09","prices":[["2026-11-07",6000]]},
     "16093202": {"title":"2,5, 300h Executive","year":2013,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"62af1303a69b0779","first":"2026-11-08","last":"2026-11-09","prices":[["2026-11-08",12500]]},
-    "16093903": {"title":"2,5, 300h Hybrid A Sport","year":2016,"mileage":160000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Oulu Limingantulli","vin":"90027381fcb7eecc","first":"2026-11-09","last":"2026-11-09","prices":[["2026-11-09",22700]]}
+    "16093903": {"title":"2,5, 300h Hybrid A Sport","year":2016,"mileage":160000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Oulu Limingantulli","vin":"90027381fcb7eecc","first":"2026-11-09","last":"2026-11-09","prices":[["2026-11-09",22700]]},
+    "16095338": {"title":"2,0","year":2000,"mileage":420000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-09","last":"2026-11-09","prices":[["2026-11-09",3900]]}
   }
 }
