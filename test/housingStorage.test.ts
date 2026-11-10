@@ -74,6 +74,16 @@ describe('normalising', () => {
     expect(p.updatedAt).toBe(p.createdAt)
   })
 
+  it('gives the wait card a current rent of its own, empty until typed', () => {
+    // A situation saved before the field existed must not borrow rent-or-buy's
+    // comparable-home rent for it.
+    const old = normalizeSituation({ rentPerMonth: 1401 })
+    expect(old.waitRentPerMonth).toBe(0)
+    expect(old.rentPerMonth).toBe(1401)
+    expect(normalizeSituation({ waitRentPerMonth: '1 190' }).waitRentPerMonth).toBe(1190)
+    expect(normalizeSituation({ waitRentPerMonth: -5 }).waitRentPerMonth).toBe(0)
+  })
+
   it('reads a place as owned unless it says it is an aso home', () => {
     // Every place saved before the choice existed was a purchase.
     expect(normalizeProperty({ name: 'Kamppi', price: 249000 }).tenure).toBe('owned')

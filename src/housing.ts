@@ -95,6 +95,13 @@ export interface HousingSituation {
   waitOtherCash: number
   /** waiting: what the household invests a month on top of the ASP deposits while it lives there, € */
   waitInvestPerMonth: number
+  /**
+   * waiting: the rent paid now, € / month - what staying put is held against;
+   * 0 = no comparison. Not `rentPerMonth`, which is what a home comparable to
+   * the one being bought would rent for: the place you live in now is a
+   * different home at a different rent.
+   */
+  waitRentPerMonth: number
   /** the year the area price projection runs to; 0 = two years from now */
   projectionYear: number
 }
@@ -157,6 +164,7 @@ export const DEFAULT_HOUSING: HousingSituation = {
   waitMoveIn: '',
   waitOtherCash: 0,
   waitInvestPerMonth: 0,
+  waitRentPerMonth: 0,
   // "Two years from now" until the buyer names the year - the horizon of
   // somebody saving up, and one that moves with the calendar on its own.
   projectionYear: 0,

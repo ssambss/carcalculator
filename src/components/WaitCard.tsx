@@ -17,7 +17,7 @@ import { NumberField } from './NumberField'
  * ASP bonus keeps accruing for the first saving year and five calendar years
  * after it. This card counts the cash that builds on each of those later
  * days, what that cash reaches, and how the same years would have gone
- * renting instead. The maths is `waiting.ts`; the saving plan's deposits and
+ * staying in the current rental. The maths is `waiting.ts`; the saving plan's deposits and
  * check-ins are read, never written.
  */
 
@@ -129,6 +129,19 @@ export function WaitCard({
           unit="€/mo"
           hint={`on top of the saving plan’s ASP deposits (${fmtEur(deposits)}/mo${together ? ' together' : ''}), which carry on`}
         />
+        {/*
+          Its own rent, not rent-or-buy's: that one prices a home like the
+          one being bought, this one is the rental you would otherwise stay
+          in while you wait - a different home at a different rent.
+        */}
+        <NumberField
+          compact
+          label="Current rent"
+          value={s.waitRentPerMonth}
+          onChange={(n) => set({ waitRentPerMonth: Math.max(0, n) })}
+          unit="€/mo"
+          hint="what you pay now — staying put is what the aso home is held against; 0 leaves the comparison out"
+        />
       </div>
 
       <div className="schedule-subjects" role="tablist" aria-label="Buy after">
@@ -166,10 +179,10 @@ export function WaitCard({
         </div>
         {renting && (
           <div className="stat">
-            <span className="stat-label">Against renting</span>
+            <span className="stat-label">Against staying put</span>
             <span className="stat-value">{signedEur(row.cash - row.rentingCash!)}</span>
             <span className="stat-sub">
-              renting the same years at {fmtEur(s.rentPerMonth)}/mo would leave{' '}
+              staying in your {fmtEur(s.waitRentPerMonth)}/mo rental the same years would leave{' '}
               {fmtEur(row.rentingCash!)} — the same money a month either way
             </span>
           </div>
@@ -211,7 +224,7 @@ export function WaitCard({
               <th>Investments</th>
               <th>ASO payment back</th>
               {anyLoanLeft && <th>Its loan left</th>}
-              {renting && <th>Renting instead</th>}
+              {renting && <th>Staying put</th>}
               <th>Living there / mo</th>
             </tr>
           </thead>
@@ -267,11 +280,11 @@ export function WaitCard({
         within three months of moving out, so the purchase may need a short bridge until it lands,
         and later still if the aso company is short of funds.
         {renting &&
-          ` Renting instead keeps all the cash outside ASP invested and has the same money a month: whichever home costs less invests the difference${
+          ` Staying put keeps all the cash outside ASP invested and has the same money a month, the rent rising ${fmtNum(s.rentGrowthPct)} %/yr like the käyttövastike: whichever home costs less invests the difference${
             result.renterShortMonths > 0
-              ? `; in ${result.renterShortMonths} months the rent cost more than the aso home and everything set aside, so the renter invested nothing then`
+              ? `; in ${result.renterShortMonths} months the rent cost more than the aso home and everything set aside, so nothing was invested then`
               : ''
-          }.`}{' '}
+          }. The two are different homes, so the gap is also what the move buys you.`}{' '}
         What the cash buys is today’s ceiling with that cash: no raises are assumed, and the rates
         are your situation’s — which is the point of waiting, since a better rate lowers the
         payment more than it moves a stress-tested ceiling. Under 55, getting the aso home takes

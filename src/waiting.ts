@@ -25,7 +25,9 @@
  * ends the ASP saving and its bonus, so the payment is paid from the cash
  * outside it, or borrowed.
  *
- * Beside it, the same years **renting instead** at the situation's rent: the
+ * Beside it, the same years **staying where you rent now** (`waitRentPerMonth`
+ * - not rent-or-buy's `rentPerMonth`, which prices a home like the one being
+ * bought, while the comparison here is the rental you would stay in): the
  * cash outside ASP stays invested whole, and the household has the same
  * money a month - what the aso home costs (charges and the payment's loan)
  * against the rent - so whichever is cheaper invests the difference. The ASP
@@ -67,7 +69,7 @@ export interface WaitYear {
   asoLoanLeft: number
   /** everything together: the cash the purchase has */
   cash: number
-  /** the same, had the household rented instead for these years; null without a rent typed */
+  /** the same, had the household stayed in its rental for these years; null without a current rent typed */
   rentingCash: number | null
   /** the highest price that cash reaches, at today's income and rules */
   ceiling: number
@@ -75,7 +77,7 @@ export interface WaitYear {
   insideCap: number | null
   /** € a month the aso home cost in the last year of this wait - charges plus the payment's loan; 0 on the plan as it was */
   monthlyCost: number
-  /** € a month renting cost then; null without a rent typed, and on the plan as it was */
+  /** € a month the current rent had risen to then; null without one typed, and on the plan as it was */
   monthlyRent: number | null
 }
 
@@ -144,7 +146,7 @@ export function waitInAso(
   // The payment's loan: a plain bank loan, never ASP - as in asoCost.
   const loan = amortization(asoLoan, { ...s, useAspLoan: false })
   const r = monthlyRate(s.investmentReturnPct)
-  const renting = s.rentPerMonth > 0
+  const renting = s.waitRentPerMonth > 0
 
   // Buying on the move-in day as planned: the accounts then, and the cash
   // outside them - taken as cash, since what it holds in gains is not known.
@@ -180,7 +182,7 @@ export function waitInAso(
     const uplift = Math.pow(1 + s.rentGrowthPct / 100, Math.floor((m - 1) / 12))
     const row = loan.months[m - 1]
     const asoCost = charges * uplift + (row ? row.interest + row.principal : 0)
-    const rent = s.rentPerMonth * uplift
+    const rent = s.waitRentPerMonth * uplift
 
     asoPortfolio = asoPortfolio * (1 + r) + invest
     asoPut += invest
@@ -214,7 +216,7 @@ export function waitInAso(
       rentingCash: renting ? asp + afterGainsTax(rentPortfolio, rentPut, s.gainsTaxPct) : null,
       ...reach(cash, s),
       monthlyCost: charges * yearUplift + (first ? first.interest + first.principal : 0),
-      monthlyRent: renting ? s.rentPerMonth * yearUplift : null,
+      monthlyRent: renting ? s.waitRentPerMonth * yearUplift : null,
     })
   }
 

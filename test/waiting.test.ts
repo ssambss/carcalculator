@@ -38,7 +38,7 @@ const still = (over: Partial<HousingSituation> = {}): HousingSituation => ({
   housingSharePct: 40,
   ratePct: 3.5,
   termYears: 25,
-  rentPerMonth: 1400,
+  waitRentPerMonth: 1400,
   investmentReturnPct: 0,
   homeValueGrowthPct: 0,
   rentGrowthPct: 0,
@@ -193,8 +193,36 @@ describe('waiting in an aso home', () => {
     }
   })
 
-  it('leaves the renting column out when no rent is typed', () => {
-    const w = waitInAso(kivisto, moveIn, still({ rentPerMonth: 0 }), plan(), [], today)
+  it('leaves the renting column out when no current rent is typed', () => {
+    const w = waitInAso(kivisto, moveIn, still({ waitRentPerMonth: 0 }), plan(), [], today)
     expect(w.rows.every((row) => row.rentingCash === null && row.monthlyRent === null)).toBe(true)
+  })
+
+  it('holds the aso home against the current rent, never rent-or-buy’s comparable-home rent', () => {
+    // 1 401 € is what a home like the one being bought would rent for; the
+    // rental the household would stay in costs 1 190 €. Only the second may
+    // move this card - and it must not need the first at all.
+    const a = waitInAso(
+      kivisto,
+      moveIn,
+      still({ rentPerMonth: 1401, waitRentPerMonth: 1190 }),
+      plan(),
+      [],
+      today,
+    )
+    const b = waitInAso(
+      kivisto,
+      moveIn,
+      still({ rentPerMonth: 0, waitRentPerMonth: 1190 }),
+      plan(),
+      [],
+      today,
+    )
+    expect(a).toEqual(b)
+    // 1 220 € against 1 190 €: staying put invests 30 € a month more.
+    for (const row of a.rows.slice(1)) {
+      expect(row.rentingCash! - row.cash).toBeCloseTo((1220 - 1190) * 12 * row.years, 4)
+    }
+    expect(a.rows[1].monthlyRent).toBe(1190)
   })
 })

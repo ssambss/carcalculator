@@ -206,7 +206,10 @@ color-coded cost breakdown and a side-by-side comparison table.
     outside ASP, never out of an ASP account.
 
   Beside it: what that cash buys (inside the ASP cap, at today's income),
-  and how the same years would have gone renting at the same money a month.
+  and how the same years would have gone staying in your current rental at
+  the same money a month. That rental's rent is the card's own **Current
+  rent** field, not "Rent instead", which prices a home like the one you
+  would buy.
 - **What kind of home a place is** (Edit → Type, Rooms): flat (*kerrostalo*)
   with its room count, terraced house (*rivitalo*) or detached house
   (*omakotitalo*). It picks which of Statistics Finland's series the place is

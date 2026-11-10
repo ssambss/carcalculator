@@ -138,6 +138,7 @@ export function normalizeSituation(raw: unknown): HousingSituation {
         : d.waitMoveIn,
     waitOtherCash: Math.max(0, toNum(s.waitOtherCash, d.waitOtherCash)),
     waitInvestPerMonth: Math.max(0, toNum(s.waitInvestPerMonth, d.waitInvestPerMonth)),
+    waitRentPerMonth: Math.max(0, toNum(s.waitRentPerMonth, d.waitRentPerMonth)),
     projectionYear: Math.max(0, Math.round(toNum(s.projectionYear, d.projectionYear))),
   }
 }

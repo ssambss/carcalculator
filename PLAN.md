@@ -1521,9 +1521,23 @@ thousand euros either way, set by the two homes' monthly difference and the
 payment earning the index rather than the return. So the flexibility is
 waiting itself; the aso home is a good place to do it, not a money-maker.
 
+**Its own current rent (2026-11-10, user's call):** the renting column first
+read `rentPerMonth`, rent-or-buy's rent for a home like the one being
+bought. For this household that was 1 401 €, against 1 190 € for the rental
+they would actually stay in. That swung three years from about 4 600 € in
+the aso home's favour to about 4 000 € in staying put's. The card now has
+`waitRentPerMonth` ("Current rent"), 0 until typed. 0 hides the column
+rather than falling back to `rentPerMonth`, because the two are different
+homes, and the column says "Staying put". A test pins that `rentPerMonth`
+cannot move this card.
+
 ---
 
 ## Log
+
+- **2026-11-10** — **The wait card's own current rent.** "Staying put" is
+  held against the rent you pay now (a new "Current rent" field), not
+  rent-or-buy's comparable-home rent. 440 frontend tests, verified in Edge.
 
 - **2026-11-10** — **Wait in an aso home, buy later.** A card that counts the
   cash one to five years after the planned purchase day if the household
