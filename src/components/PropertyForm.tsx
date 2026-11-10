@@ -16,11 +16,13 @@ function postalHint(code: string): string {
 }
 
 /** What the type field says under itself: which price series the place will be read against. */
-function typeHint(type: HomeType | '', rooms: number): string {
+function typeHint(type: HomeType | '', rooms: number, aso: boolean): string {
   if (!type) return 'read as all flats in the price data until you say'
   const kind = seriesKindFor(type, rooms)
   if (kind === null)
-    return 'real estate: the higher transfer tax, by itself; not in the housing-company price data — no area trend, the zone index still applies'
+    return aso
+      ? 'not in the housing-company price data — the area card has no trend for it'
+      : 'real estate: the higher transfer tax, by itself; not in the housing-company price data — no area trend, the zone index still applies'
   if (type === 'terraced') return 'one price series whatever the size'
   return rooms > 0
     ? `measured against ${kindLabel(kind).toLowerCase()} in its area`
@@ -37,6 +39,7 @@ interface Props {
 export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
   const [draft, setDraft] = useState<PropertyListing>({ ...initial })
   const set = (patch: Partial<PropertyListing>) => setDraft((d) => ({ ...d, ...patch }))
+  const aso = draft.tenure === 'aso'
 
   function save() {
     onSave({ ...draft, name: draft.name.trim() || 'Unnamed place' })
@@ -78,12 +81,45 @@ export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
                 />
               </span>
             </label>
-            <NumberField
-              label="Asking price"
-              value={draft.price}
-              onChange={(n) => set({ price: Math.max(0, n) })}
-              unit="€"
-            />
+            {/*
+              Owned or a right of occupancy: which money the place takes. The
+              other kind's figures are kept, not cleared, so flipping the
+              choice by mistake and back loses nothing - the maths reads only
+              the chosen kind's fields.
+            */}
+            <label className="field span-2">
+              <span className="field-label">Tenure</span>
+              <span className="field-input-wrap">
+                <select
+                  value={draft.tenure}
+                  onChange={(e) => set({ tenure: e.target.value === 'aso' ? 'aso' : 'owned' })}
+                >
+                  <option value="owned">Buy it — omistusasunto</option>
+                  <option value="aso">Right of occupancy — asumisoikeusasunto</option>
+                </select>
+              </span>
+              <span className="field-hint">
+                {aso
+                  ? 'a one-off payment that comes back index-linked when you move out, then a monthly käyttövastike — no price, no transfer tax, no ASP loan. Takes a järjestysnumero from Varke, and under 55 an asset test: nothing that could pay half the price of a comparable home'
+                  : 'a purchase: measured against your ceiling, financed as the situation says'}
+              </span>
+            </label>
+            {aso ? (
+              <NumberField
+                label="ASO payment"
+                value={draft.asoPayment}
+                onChange={(n) => set({ asoPayment: Math.max(0, n) })}
+                unit="€"
+                hint="asumisoikeusmaksu — at most 15 % of the home's cost in a state-supported aso home"
+              />
+            ) : (
+              <NumberField
+                label="Asking price"
+                value={draft.price}
+                onChange={(n) => set({ price: Math.max(0, n) })}
+                unit="€"
+              />
+            )}
             <NumberField
               label="Size"
               value={draft.sizeM2}
@@ -112,7 +148,7 @@ export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
                   ))}
                 </select>
               </span>
-              <span className="field-hint">{typeHint(draft.homeType, draft.rooms)}</span>
+              <span className="field-hint">{typeHint(draft.homeType, draft.rooms, aso)}</span>
             </label>
             <NumberField
               label="Rooms"
@@ -154,20 +190,32 @@ export function PropertyForm({ initial, isNew, onSave, onCancel }: Props) {
         <div className="form-section">
           <div className="section-title">Charges per month</div>
           <div className="form-grid">
-            <NumberField
-              label="Maintenance charge"
-              value={draft.maintenancePerMonth}
-              onChange={(n) => set({ maintenancePerMonth: Math.max(0, n) })}
-              unit="€/mo"
-              hint="hoitovastike"
-            />
-            <NumberField
-              label="Financing charge"
-              value={draft.financingChargePerMonth}
-              onChange={(n) => set({ financingChargePerMonth: Math.max(0, n) })}
-              unit="€/mo"
-              hint="rahoitusvastike — the housing company's own loan"
-            />
+            {aso ? (
+              <NumberField
+                label="Usage charge"
+                value={draft.usageChargePerMonth}
+                onChange={(n) => set({ usageChargePerMonth: Math.max(0, n) })}
+                unit="€/mo"
+                hint="käyttövastike — about 15 €/m² a month in the capital region in 2025 (Varke); water is usually billed on top, so add it to Other"
+              />
+            ) : (
+              <>
+                <NumberField
+                  label="Maintenance charge"
+                  value={draft.maintenancePerMonth}
+                  onChange={(n) => set({ maintenancePerMonth: Math.max(0, n) })}
+                  unit="€/mo"
+                  hint="hoitovastike"
+                />
+                <NumberField
+                  label="Financing charge"
+                  value={draft.financingChargePerMonth}
+                  onChange={(n) => set({ financingChargePerMonth: Math.max(0, n) })}
+                  unit="€/mo"
+                  hint="rahoitusvastike — the housing company's own loan"
+                />
+              </>
+            )}
             <NumberField
               label="Other"
               value={draft.otherPerMonth}

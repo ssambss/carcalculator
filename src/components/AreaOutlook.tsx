@@ -201,6 +201,7 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
   const picked = pickedArea ? byCode.get(pickedArea.code) : undefined
   const current = picked ?? city
   const candidateCodes = useMemo(() => new Set(candidates.map((c) => c.area.code)), [candidates])
+  const forSale = useMemo(() => candidates.filter((c) => c.p.tenure !== 'aso'), [candidates])
   const yearsFromNow = Math.max(0, targetYear - new Date().getFullYear())
   // The chips come from the city, which always has figures to the last year -
   // a stale area has no horizons of its own and shows its history alone.
@@ -370,9 +371,12 @@ export function AreaOutlook({ situation, properties, onChange }: Props) {
         />
       )}
 
-      {candidates.length > 0 && (
+      {/* A right of occupancy is never sold, so it has no price to carry
+          forward - its payment follows an index, not the area. It still
+          marks its area in the table below. */}
+      {forSale.length > 0 && (
         <Candidates
-          candidates={candidates}
+          candidates={forSale}
           outlookFor={outlookFor}
           kind={kind}
           yearsFromNow={yearsFromNow}

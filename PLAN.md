@@ -1394,9 +1394,104 @@ still runs on the 2015 series. Filters became per city (`zone:espoo:1`; an old
 `zone:3` falls back to all), search matches the city name, and switching city
 opens on one of your places there read as its own kind.
 
+**Asumisoikeusasunto (2026-11-10, user's ask — "an asumisoikeusasunto
+option to the housing side"):** a place now has a **tenure**: owned (every
+place saved before, and anything a file does not say) or `aso`. An aso place
+carries `asoPayment` (the asumisoikeusmaksu) and `usageChargePerMonth` (the
+käyttövastike) beside `otherPerMonth`. The owned fields stay in the record so
+a mistaken flip in the form loses nothing, and the maths reads only the
+chosen tenure's fields (a test asserts an owned record with aso figures typed
+in costs exactly what it did).
+
+The rules, checked against primary sources (LAO 393/2021 as consolidated
+30.12.2025, Varke, Verohallinto, the 1.6.2026 ASP and state-guarantee laws):
+
+- The payment is at most 15 % of the home's cost in a state-supported aso
+  home, 30 % in a free-financed one.
+- It comes back as the payment plus the change in the building cost index,
+  with **no cap** on the rise and never below the payment (§ 56). The owner
+  pays it within three months of the move-out, or later, with late-payment
+  interest, if the company lacks funds (§ 60).
+- The right can be pledged (§ 58), and banks lend against it. Nordea wants
+  5 % own money and says ASP loans are not granted for it. The 2025 ASP and
+  state-guarantee laws define a home as shares or property, so neither
+  covers a right of occupancy.
+- Giving the right up after two years' residence is tax-free like an own
+  home's sale (TVL 48 §).
+- Under 55, the asset test still applies: you are excluded if your assets
+  could pay half the price of a comparable home (§ 13).
+
+So `asoCost` pays the payment from savings first, borrows the rest as a
+regular loan even with ASP on, and charges no transfer tax and no buying
+costs. `asoReach` is the ceiling's rule turned to a payment: the place's own
+charges come off the housing share, the rest carries a loan at your rate and
+under the stress test, and the cash share of the payment must be in savings.
+A käyttövastike that alone overruns the share leaves no reach at all.
+
+In the bar the käyttövastike got its own category, `usageCharge`, in series
+slot 3 (the renting teal), ordered after principal. The aso bar (interest,
+principal, usage, other) passes the palette validator in both themes; teal
+beside the green maintenance slot fails in dark (ΔE 11.9), and the two never
+share a bar. The side-by-side shows "—" rather than a highlighted 0 € for a
+charge the tenure cannot have, and the projected-value rows compound the
+payment's index for an aso column.
+
+**Rent or buy against an aso home:** `rentVsBuy(h, s, alt)` takes an
+`Alternative`, renting by default (a test pins the default to the old
+result). With an aso home the other household:
+
+- pays the payment out of the buyer's closing cash and invests what is left,
+  or borrows the shortfall as a regular loan whose payments come out of its
+  budget;
+- pays the käyttövastike in the rent's place, rising with the same yearly
+  figure as the owner's charges;
+- ends with its portfolio plus the payment as it would come back (`asoValue`,
+  floored at the payment, untaxed), less what is still owed on that loan.
+
+The flat-world identity extends to it: aso minus buyer is exactly tax +
+interest + owner's charges − aso charges − the aso loan's interest. The
+break-even rent becomes a **break-even käyttövastike**, with the payment
+held. The new situation field `asoIndexPct` defaults to 2 %, the same as
+the home-value guess, so neither side starts ahead (the index rose 3.4 % in
+the year to 9/2026). The alternative is a chip row in that card, local to
+it; the subject chips stay shared with the schedule card, and aso places
+are never subjects.
+
+Worth knowing about the result: for this household an aso home costs more
+per month than an ASP purchase almost from the start. Most months are then
+"short" (the aso charges exceed the owner's whole budget), and the
+fixed-owner rule of 2026-09-07 credits that extra spending to nobody. The
+aso line is flattered, not penalised, by it, and the card counts the months.
+
+**Not done, deliberately:**
+
+- Aso places are not saving goals. That card's cash need, ASP cap and bonus
+  interest are all about buying, and the bonus is only paid at an ASP
+  purchase.
+- No collateral modelling. Nordea counts the right at 75 % of its value.
+- The company's own risk is named in the card's note but not modeled: the
+  payment is the company's equity, it ranks behind creditors in a bankruptcy,
+  and redeemed homes were 10.2 % of the stock in 5/2026.
+- HE 156/2026 (pending, from 1.1.2027) would let Varke release under-occupied
+  houses from the aso rules, with a right to buy the flat at a discount or to
+  stay as a tenant.
+
+As with `postalCode`, an old bundle that edits an aso place writes it back
+without the new fields, so it reads as a 0 € purchase until re-edited.
+
 ---
 
 ## Log
+
+- **2026-11-10** — **Asumisoikeusasunto.** A place can be a right of
+  occupancy: the payment and käyttövastike in place of a price and company
+  charges, a regular loan (never ASP) for what savings miss, no transfer tax.
+  "Within reach" checks the cash share, the charges and the loan the rest of
+  the share carries. The payment comes back at the building cost index,
+  never below what was paid. Rent-or-buy can weigh a purchase against any aso
+  place, with a break-even käyttövastike. Rules checked against LAO
+  393/2021, Varke and Verohallinto. 428 frontend tests, verified in Edge at
+  1280 px (light) and 390 px (dark).
 
 - **2026-10-04** — **Espoo and Vantaa.** "Helsinki by area" is now "Prices by
   area" across Helsinki, Espoo (with Kauniainen) and Vantaa, one city at a

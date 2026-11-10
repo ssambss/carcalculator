@@ -87,6 +87,8 @@ export interface HousingSituation {
   gainsTaxPct: number
   /** what the owner puts into investments each month on top of the housing costs, € — a fixed figure */
   ownerInvestPerMonth: number
+  /** how fast the building cost index rises, %/yr — what an aso payment comes back as on moving out; it never comes back below the payment */
+  asoIndexPct: number
   /** the year the area price projection runs to; 0 = two years from now */
   projectionYear: number
 }
@@ -138,6 +140,12 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // Zero until the buyer says otherwise: the renter then invests only what the
   // housing costs leave, and the owner nothing - the conservative reading.
   ownerInvestPerMonth: 0,
+  // An aso payment comes back grown by the building cost index
+  // (rakennuskustannusindeksi), with no cap on the rise and never below the
+  // payment (LAO 393/2021 § 56). The index rose 3.4 % in the year to 9/2026;
+  // 2 % is the same modest long-run guess the home's value starts from, so
+  // neither side of rent-or-buy is handed a head start by default.
+  asoIndexPct: 2,
   // "Two years from now" until the buyer names the year - the horizon of
   // somebody saving up, and one that moves with the calendar on its own.
   projectionYear: 0,
@@ -170,14 +178,29 @@ export function transferTaxPctFor(homeType: HomeType | '', s: HousingSituation):
   return homeType === 'detached' ? s.transferTaxRealEstatePct : s.transferTaxPct
 }
 
+/**
+ * How the home would be held. Owned is the purchase every other card is
+ * about; `aso` is an asumisoikeusasunto - a right of occupancy bought with a
+ * one-off payment that comes back, index-linked, on moving out, and lived in
+ * for a monthly käyttövastike. Nothing is bought, so there is no price, no
+ * transfer tax, no ASP loan and no home whose value moves.
+ */
+export type Tenure = 'owned' | 'aso'
+
 /** A flat or house you are actually considering. */
 export interface PropertyListing {
   id: string
   name: string
   notes: string
   favorite: boolean
-  /** asking price, € */
+  /** owned (the default) or a right of occupancy - which of the fields below the maths reads */
+  tenure: Tenure
+  /** asking price, € - owned places only */
   price: number
+  /** asumisoikeusmaksu, € - the one-off payment for a right of occupancy; aso places only */
+  asoPayment: number
+  /** käyttövastike, € / month - what an aso home charges in place of rent; aso places only */
+  usageChargePerMonth: number
   sizeM2: number
   /** postal code, e.g. "00730" — ties a place in Helsinki, Espoo, Kauniainen or Vantaa to its area's price history; any other code is kept but read against nothing */
   postalCode: string
@@ -185,9 +208,9 @@ export interface PropertyListing {
   homeType: HomeType | ''
   /** rooms — the 2 of "2h+k", kitchen not counted; 0 = not said */
   rooms: number
-  /** hoitovastike — the housing company's upkeep charge, € / month */
+  /** hoitovastike — the housing company's upkeep charge, € / month; owned places only */
   maintenancePerMonth: number
-  /** rahoitusvastike — the company's own loan, € / month; often optional to pay off */
+  /** rahoitusvastike — the company's own loan, € / month; often optional to pay off; owned places only */
   financingChargePerMonth: number
   /** parking, sauna, broadband, whatever else is fixed — € / month */
   otherPerMonth: number
@@ -425,6 +448,13 @@ export const HOUSING_CATEGORIES = [
   // vision), and interest and principal are the two series that touch in
   // every housing chart. Blue against orange passes every check in both themes.
   { key: 'principal', label: 'Loan principal (equity)', series: 1 },
+  // An aso home's käyttövastike, in the renting teal of the rent-or-buy card:
+  // it is the rent-like part of that way of living. After principal, not
+  // beside maintenance, because the two never share a bar (an aso home has
+  // no hoitovastike) and the green maintenance slot sits too close to the
+  // teal in the dark theme; the bars an aso place draws - interest,
+  // principal, usage, other - pass the palette validator in both themes.
+  { key: 'usageCharge', label: 'Usage charge (käyttövastike)', series: 3 },
   { key: 'maintenance', label: 'Maintenance charge', series: 6 },
   { key: 'financingCharge', label: 'Financing charge', series: 5 },
   { key: 'other', label: 'Other', series: 7 },
@@ -471,6 +501,7 @@ export interface PropertyCost {
  * price can be within reach as a flat and over the ceiling as a house.
  */
 export function propertyCost(p: PropertyListing, s: HousingSituation): PropertyCost {
+  if (p.tenure === 'aso') return asoCost(p, s)
   const transferTax = (p.price * transferTaxPctFor(p.homeType, s)) / 100
   const loan = Math.max(0, p.price + transferTax + s.buyingCosts - householdSavings(s))
   const downPayment = Math.max(0, p.price - loan)
@@ -499,11 +530,114 @@ export function propertyCost(p: PropertyListing, s: HousingSituation): PropertyC
     breakdown: {
       interest,
       principal,
+      usageCharge: 0,
       maintenance: p.maintenancePerMonth,
       financingCharge: p.financingChargePerMonth,
       other: p.otherPerMonth,
     },
   }
+}
+
+/* ---------------------------------------------------- right of occupancy */
+
+/** The situation an aso payment's loan is priced under: a plain bank loan, never ASP. */
+const regularOnly = (s: HousingSituation): HousingSituation => ({ ...s, useAspLoan: false })
+
+/** What an aso place's monthly charges are: the käyttövastike and whatever else is fixed. */
+export const asoChargesPerMonth = (p: PropertyListing): number =>
+  p.usageChargePerMonth + p.otherPerMonth
+
+export interface AsoReach {
+  /** € / month left for a loan once the place's own charges are paid; negative = the charges alone overrun the share */
+  budget: number
+  /** the largest loan that budget carries at your rate and under the stress test */
+  maxLoan: number
+  /** the largest payment savings plus that loan reach, and the cash share allows */
+  maxPayment: number
+}
+
+/**
+ * How large an aso payment the household reaches with this place's charges.
+ *
+ * The same rules the ceiling keeps, read for a home whose running cost is a
+ * käyttövastike instead of a maintenance guess: housing may take the share of
+ * net income, the place's own charges come off it first, and whatever is left
+ * carries a loan - at the rate you would pay and under the stress test - for
+ * the part of the payment savings do not cover. A käyttövastike that alone
+ * overruns the share leaves no reach at all, however much is saved: the
+ * payment is a one-off, the charge is every month.
+ *
+ * The minimum cash share applies to the payment as it does to a price: banks
+ * lend against a right of occupancy (it can be pledged, LAO § 58) but want
+ * their own-money share of it in cash - Nordea asks 5 % (11/2026). Whether
+ * the statutory loan cap itself covers these loans is not settled anywhere
+ * public, so this reads the situation's cash share as the bank's practice.
+ */
+export function asoReach(p: PropertyListing, s: HousingSituation): AsoReach {
+  const budget =
+    (householdIncome(s) * s.housingSharePct) / 100 - householdOtherLoans(s) - asoChargesPerMonth(p)
+  if (budget < 0) return { budget, maxLoan: 0, maxPayment: 0 }
+  const byPayment = maxLoanForPayment(budget, s.ratePct, s.termYears * 12)
+  const byStress = maxLoanForPayment(budget, s.stressRatePct, Math.min(s.termYears, 25) * 12)
+  const maxLoan = Math.min(byPayment, byStress)
+  const d = s.minDownPaymentPct / 100
+  const savings = householdSavings(s)
+  const byCash = d > 0 ? savings / d : Number.POSITIVE_INFINITY
+  return { budget, maxLoan, maxPayment: Math.min(savings + maxLoan, byCash) }
+}
+
+/**
+ * What living in an aso home would cost per month.
+ *
+ * Savings pay the payment first, as they would a down payment; a loan covers
+ * what they do not, as a plain bank loan at your rate and term - ASP loans
+ * are not granted for a right of occupancy, and the ASP and state-guarantee
+ * laws of 1.6.2026 (339/2025, 340/2025) cover shares and property only. No
+ * transfer tax and no buying costs: nothing changes hands but the right. The
+ * käyttövastike sits in the bar where an owned home's charges would.
+ *
+ * `costPerMonth` leaves the loan's principal out exactly as it does for a
+ * purchase, and for the same reason: it pays down a loan against something
+ * that comes back - here the payment itself, returned on moving out.
+ */
+function asoCost(p: PropertyListing, s: HousingSituation): PropertyCost {
+  const loan = Math.max(0, p.asoPayment - householdSavings(s))
+  const split = splitLoan(loan, regularOnly(s))
+  const interest = split.firstMonthInterest
+  const principal = Math.max(0, split.payment - interest)
+  const totalPerMonth = split.payment + asoChargesPerMonth(p)
+  const reach = asoReach(p, s)
+  return {
+    loan,
+    aspLoan: 0,
+    regularLoan: split.regular,
+    downPayment: p.asoPayment - loan,
+    transferTax: 0,
+    loanPayment: split.payment,
+    totalPerMonth,
+    costPerMonth: totalPerMonth - principal,
+    pricePerM2: null,
+    fits: reach.budget >= 0 && p.asoPayment <= reach.maxPayment,
+    breakdown: {
+      interest,
+      principal,
+      usageCharge: p.usageChargePerMonth,
+      maintenance: 0,
+      financingCharge: 0,
+      other: p.otherPerMonth,
+    },
+  }
+}
+
+/**
+ * The aso payment as it comes back after `years`: the payment plus the change
+ * in the building cost index (rakennuskustannusindeksi) since it was paid -
+ * never less than the payment itself, which is what the law guarantees when
+ * the index has fallen (LAO 393/2021 § 56). Improvements the resident was
+ * allowed to make are added on top in real life; not modeled.
+ */
+export function asoReturned(payment: number, indexPct: number, years: number): number {
+  return Math.max(payment, payment * Math.pow(1 + indexPct / 100, years))
 }
 
 /* ------------------------------------------------------------ over the years */
@@ -638,11 +772,18 @@ export interface RentVsBuyMonth {
   buyerPays: number
   /** € of that which is the housing charges */
   charges: number
-  /** € the renter pays this month */
+  /**
+   * € the renter pays this month. "The renter" throughout is the household
+   * that does not buy: with an aso home as the alternative, this is its
+   * käyttövastike and other charges, and the renter's fields are that
+   * household's.
+   */
   rent: number
+  /** € the renter pays on a loan for the aso payment, if the closing cash did not cover it; 0 when renting */
+  altLoanPayment: number
   /** € the owner puts into investments this month - the fixed figure from the situation */
   ownerInvests: number
-  /** € the renter invests: the owner's whole budget less the rent, never below zero */
+  /** € the renter invests: the owner's whole budget less the rent (and any aso loan), never below zero */
   renterInvests: number
   /** € by which the rent exceeded the owner's whole budget this month, if it did */
   renterShort: number
@@ -650,12 +791,16 @@ export interface RentVsBuyMonth {
   loanBalance: number
   /** home value less what is still owed */
   homeEquity: number
+  /** what the aso payment would come back as if given up this month - 0 when renting */
+  asoValue: number
+  /** € still owed on the aso payment's loan */
+  altLoanBalance: number
   /** the buyer's side portfolio, if rent ever cost more than owning */
   buyerPortfolio: number
   renterPortfolio: number
   /** home equity plus the side portfolio, gains taxed */
   buyerNetWorth: number
-  /** the renter's portfolio, gains taxed */
+  /** the renter's portfolio, gains taxed - plus, in an aso home, the payment as it would come back less its loan */
   renterNetWorth: number
 }
 
@@ -664,8 +809,16 @@ export interface RentVsBuy {
   /** who ends ahead, and from which month they stayed ahead; null if level at the end */
   leader: 'buy' | 'rent' | null
   leaderFrom: number | null
-  /** € the renter put in over the whole term, the closing cash included */
+  /** what the renter does instead of buying */
+  alternative: Alternative
+  /** € the renter put in over the whole term, the closing cash included (less any aso payment) */
   renterInvested: number
+  /** € the renter invested on day one: the closing cash, less the aso payment */
+  renterStart: number
+  /** € borrowed for the aso payment, when the closing cash fell short of it */
+  altLoan: number
+  /** € of interest on that loan over the term */
+  altInterest: number
   /** € the owner put into investments over the whole term */
   ownerInvested: number
   /** months in which the rent outgrew the owner's whole budget, so the renter invested nothing */
@@ -686,7 +839,8 @@ export interface RentVsBuy {
    * wins below it, buying above. Rent touches only the renter's side, so this
    * one is clean: higher rent always means less invested. Null when buying
    * wins even rent-free, or renting wins even when rent takes the owner's
-   * whole budget (tell them apart by `leader`).
+   * whole budget (tell them apart by `leader`). Against an aso home it is
+   * that home's monthly charges that move, the payment held where it is.
    */
   breakEvenRent: number | null
 }
@@ -699,27 +853,79 @@ function afterGainsTax(portfolio: number, contributed: number, taxPct: number): 
   return portfolio - (Math.max(0, portfolio - contributed) * taxPct) / 100
 }
 
-function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuyMonth[] {
+/**
+ * What the other household does instead of buying: rent at the situation's
+ * figure, or live in an aso home - pay its payment in at the start (from the
+ * closing cash the buyer would have spent, with a loan for any part that cash
+ * does not cover), pay its charges every month, and have the payment back,
+ * index-linked and never below what was paid, at the end.
+ */
+export type Alternative =
+  | { kind: 'rent' }
+  | {
+      kind: 'aso'
+      /** the asumisoikeusmaksu, € */
+      payment: number
+      /** käyttövastike plus the place's other fixed charges, € / month at today's level */
+      chargesPerMonth: number
+    }
+
+export const RENTING: Alternative = { kind: 'rent' }
+
+/** An aso place as the alternative to buying. */
+export const asoAlternative = (p: PropertyListing): Alternative => ({
+  kind: 'aso',
+  payment: p.asoPayment,
+  chargesPerMonth: asoChargesPerMonth(p),
+})
+
+/** What the alternative household starts with invested, and borrows, out of the buyer's closing cash. */
+function alternativeStart(h: Holding, alt: Alternative): { invested: number; loan: number } {
+  if (alt.kind === 'rent') return { invested: h.cashAtClosing, loan: 0 }
+  return {
+    invested: Math.max(0, h.cashAtClosing - alt.payment),
+    loan: Math.max(0, alt.payment - h.cashAtClosing),
+  }
+}
+
+function simulate(
+  h: Holding,
+  s: HousingSituation,
+  returnPct: number,
+  alt: Alternative,
+): RentVsBuyMonth[] {
   const schedule = amortization(h.loan, s)
   const horizon = Math.max(1, Math.round(s.termYears * 12))
   const r = monthlyRate(returnPct)
   const g = monthlyRate(s.homeValueGrowthPct)
+  const start = alternativeStart(h, alt)
+  // The aso payment's loan, when the closing cash falls short of it: a plain
+  // bank loan at the regular rate, never ASP - as in asoCost.
+  const altSchedule = amortization(start.loan, regularOnly(s))
+  const idx = monthlyRate(s.asoIndexPct)
 
-  let renterPortfolio = h.cashAtClosing
-  let renterContributed = h.cashAtClosing
+  let renterPortfolio = start.invested
+  let renterContributed = start.invested
   let buyerPortfolio = 0
   let buyerContributed = 0
   let homeValue = h.price
+  const asoPayment = alt.kind === 'aso' ? alt.payment : 0
+  // The payment at the index; what comes back is never less than the payment.
+  let asoIndexed = asoPayment
   const out: RentVsBuyMonth[] = []
 
   for (let m = 1; m <= horizon; m++) {
-    // Rent and charges step up once a year, as leases and vastikkeet do.
+    // Rent and charges step up once a year, as leases and vastikkeet do - an
+    // aso home's käyttövastike with them.
     const uplift = Math.pow(1 + s.rentGrowthPct / 100, Math.floor((m - 1) / 12))
-    const rent = s.rentPerMonth * uplift
+    const rent = (alt.kind === 'rent' ? s.rentPerMonth : alt.chargesPerMonth) * uplift
     const charges = h.chargesPerMonth * uplift
     const payment = schedule.months[m - 1]
     const buyerPays = (payment ? payment.interest + payment.principal : 0) + charges
     const loanBalance = payment ? payment.balance : 0
+    const altPayment = altSchedule.months[m - 1]
+    const altLoanPayment = altPayment ? altPayment.interest + altPayment.principal : 0
+    const altLoanBalance = altPayment ? altPayment.balance : 0
 
     // Both grow for the month. Then the owner invests the fixed figure, and
     // the renter invests what the same total budget leaves after the rent -
@@ -727,8 +933,10 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
     renterPortfolio *= 1 + r
     buyerPortfolio *= 1 + r
     homeValue *= 1 + g
+    asoIndexed *= 1 + idx
+    const asoValue = Math.max(asoPayment, asoIndexed)
     const ownerInvests = Math.max(0, s.ownerInvestPerMonth)
-    const renterBudget = buyerPays + ownerInvests - rent
+    const renterBudget = buyerPays + ownerInvests - rent - altLoanPayment
     const renterInvests = Math.max(0, renterBudget)
     renterPortfolio += renterInvests
     renterContributed += renterInvests
@@ -741,16 +949,20 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
       buyerPays,
       charges,
       rent,
+      altLoanPayment,
       ownerInvests,
       renterInvests,
       renterShort: Math.max(0, -renterBudget),
       homeValue,
       loanBalance,
       homeEquity,
+      asoValue,
+      altLoanBalance,
       buyerPortfolio,
       renterPortfolio,
       buyerNetWorth: homeEquity + afterGainsTax(buyerPortfolio, buyerContributed, s.gainsTaxPct),
-      renterNetWorth: afterGainsTax(renterPortfolio, renterContributed, s.gainsTaxPct),
+      renterNetWorth:
+        asoValue - altLoanBalance + afterGainsTax(renterPortfolio, renterContributed, s.gainsTaxPct),
     })
   }
   return out
@@ -784,10 +996,30 @@ function simulate(h: Holding, s: HousingSituation, returnPct: number): RentVsBuy
  * for them), and rent-vs-own differences in insurance or utilities. Each is a
  * refinement on a comparison whose answer is dominated by three guesses:
  * the return, the home's growth, and how rents move.
+ *
+ * **An aso home instead of renting** (`alt`): the same budget rule, with the
+ * käyttövastike in the rent's place. The aso household pays the payment out
+ * of the closing cash on day one and invests what is left of that cash; if
+ * the payment is the larger, it borrows the difference as a plain bank loan
+ * and the loan's payments come out of its monthly budget. Its wealth is the
+ * portfolio plus the payment as it would come back - grown at the index rate
+ * the situation assumes, never below what was paid - less what is still owed
+ * on that loan. The returned payment is not taxed: giving up a right of
+ * occupancy lived in for two years is tax-free on the same terms as selling
+ * an own home (TVL 48 §, Verohallinto's guidance of 9.5.2022).
+ *
+ * What it does not see: the payment is the aso company's equity, so in a
+ * bankruptcy it ranks behind the company's creditors, and a company short of
+ * funds may pay it back late (LAO §§ 59-62). The line assumes it comes back.
  */
-export function rentVsBuy(h: Holding, s: HousingSituation): RentVsBuy {
-  const months = simulate(h, s, s.investmentReturnPct)
+export function rentVsBuy(
+  h: Holding,
+  s: HousingSituation,
+  alt: Alternative = RENTING,
+): RentVsBuy {
+  const months = simulate(h, s, s.investmentReturnPct, alt)
   const last = months[months.length - 1]
+  const start = alternativeStart(h, alt)
 
   // Who leads at the end, and how far back they have led without a break.
   const sign = (m: RentVsBuyMonth) => Math.sign(m.buyerNetWorth - m.renterNetWorth)
@@ -800,26 +1032,35 @@ export function rentVsBuy(h: Holding, s: HousingSituation): RentVsBuy {
   }
 
   // The renter's lead at the horizon, as a function of one input at a time.
-  const renterLead = (over: Partial<HousingSituation>, returnPct = s.investmentReturnPct) => {
-    const run = simulate(h, { ...s, ...over }, returnPct)
+  const renterLead = (sit: HousingSituation, a: Alternative, returnPct = sit.investmentReturnPct) => {
+    const run = simulate(h, sit, returnPct, a)
     const end = run[run.length - 1]
     return end.renterNetWorth - end.buyerNetWorth
   }
-  const breakEvenReturnPct = firstCrossing((pct) => renterLead({}, pct), 0, 30, 60)
+  const breakEvenReturnPct = firstCrossing((pct) => renterLead(s, alt, pct), 0, 30, 60)
   // Rent only ever takes from the renter, so buying's lead rises with it; the
-  // scan runs up to the rent that swallows the owner's whole first-month budget.
+  // scan runs up to the rent that swallows the owner's whole first-month
+  // budget - what is left of it after an aso loan's payment, when there is
+  // one. Against an aso home the rent is its monthly charges.
   const first = months[0]
-  const wholeBudget = first.buyerPays + first.ownerInvests
+  const wholeBudget = first.buyerPays + first.ownerInvests - first.altLoanPayment
+  const leadAtRent = (rent: number) =>
+    alt.kind === 'rent'
+      ? renterLead({ ...s, rentPerMonth: rent }, alt)
+      : renterLead(s, { ...alt, chargesPerMonth: rent })
   const breakEvenRent =
-    wholeBudget > 0
-      ? firstCrossing((rent) => -renterLead({ rentPerMonth: rent }), 0, wholeBudget, 40)
-      : null
+    wholeBudget > 0 ? firstCrossing((rent) => -leadAtRent(rent), 0, wholeBudget, 40) : null
 
+  const altSchedule = amortization(start.loan, regularOnly(s))
   return {
     months,
     leader: finalSign > 0 ? 'buy' : finalSign < 0 ? 'rent' : null,
     leaderFrom,
-    renterInvested: h.cashAtClosing + months.reduce((sum, m) => sum + m.renterInvests, 0),
+    alternative: alt,
+    renterStart: start.invested,
+    altLoan: start.loan,
+    altInterest: altSchedule.totalInterest,
+    renterInvested: start.invested + months.reduce((sum, m) => sum + m.renterInvests, 0),
     ownerInvested: months.reduce((sum, m) => sum + m.ownerInvests, 0),
     renterShortMonths: months.filter((m) => m.renterShort > 0).length,
     totalRent: months.reduce((sum, m) => sum + m.rent, 0),

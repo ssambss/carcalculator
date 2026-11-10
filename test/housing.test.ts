@@ -14,6 +14,8 @@ import {
   HOUSING_CATEGORIES,
   affordability,
   amortization,
+  asoReach,
+  asoReturned,
   maxLoanForPayment,
   paymentForLoan,
   propertyCost,
@@ -42,7 +44,10 @@ const flat = (over: Partial<PropertyListing> = {}): PropertyListing => ({
   name: 'Kamppi 58 m²',
   notes: '',
   favorite: false,
+  tenure: 'owned',
   price: 249000,
+  asoPayment: 0,
+  usageChargePerMonth: 0,
   sizeM2: 58,
   postalCode: '',
   homeType: '',
@@ -371,6 +376,127 @@ describe('what a candidate costs', () => {
     const c = propertyCost(flat(), s)
     const declared = HOUSING_CATEGORIES.map((cat) => cat.key).sort()
     expect(Object.keys(c.breakdown).sort()).toEqual(declared)
+  })
+})
+
+describe('a right of occupancy', () => {
+  const s = situation()
+  // A Vantaa 3h+k on asumisoikeus: 36 000 € in, 1 050 €/mo käyttövastike,
+  // 25 € of water and parking. Owned-side fields deliberately left filled in,
+  // as a place flipped from owned to aso in the form would leave them.
+  const aso = (over: Partial<PropertyListing> = {}) =>
+    flat({
+      tenure: 'aso',
+      asoPayment: 36000,
+      usageChargePerMonth: 1050,
+      otherPerMonth: 25,
+      sizeM2: 72,
+      ...over,
+    })
+
+  it('pays the payment out of savings, with no tax and no buying costs', () => {
+    const c = propertyCost(aso(), situation({ buyingCosts: 2000 }))
+    // 40 000 € saved covers 36 000 €: nothing borrowed, nothing changes hands but the right.
+    expect(c.loan).toBe(0)
+    expect(c.downPayment).toBe(36000)
+    expect(c.transferTax).toBe(0)
+  })
+
+  it('reads the payment and the käyttövastike, never the owned fields', () => {
+    // The flat's 249 000 € price and 245 € hoitovastike are still in the
+    // record; none of it may leak into what the aso place costs.
+    const c = propertyCost(aso(), s)
+    expect(c.totalPerMonth).toBeCloseTo(1075, 6)
+    expect(c.breakdown.usageCharge).toBe(1050)
+    expect(c.breakdown.maintenance).toBe(0)
+    expect(c.breakdown.financingCharge).toBe(0)
+    expect(c.breakdown.other).toBe(25)
+    expect(c.pricePerM2).toBeNull()
+  })
+
+  it('borrows what savings do not cover, as a regular loan even with ASP on', () => {
+    // 60 000 € in on 40 000 € saved: a 20 000 € loan at the regular 3.5 %
+    // over 25 years - ASP money is for buying a home, and this is not one.
+    const sit = situation({ useAspLoan: true, aspRatePct: 2.5 })
+    const c = propertyCost(aso({ asoPayment: 60000 }), sit)
+    expect(c.loan).toBe(20000)
+    expect(c.aspLoan).toBe(0)
+    expect(c.regularLoan).toBe(20000)
+    expect(c.loanPayment).toBeCloseTo(paymentForLoan(20000, 3.5, 300), 6)
+    expect(c.breakdown.interest).toBeCloseTo((20000 * 0.035) / 12, 6)
+    expect(c.breakdown.interest + c.breakdown.principal).toBeCloseTo(c.loanPayment, 6)
+    expect(c.totalPerMonth).toBeCloseTo(c.loanPayment + 1075, 6)
+  })
+
+  it('leaves the loan principal out of the cost, since the payment comes back', () => {
+    const c = propertyCost(aso({ asoPayment: 60000 }), s)
+    expect(c.costPerMonth).toBeCloseTo(c.totalPerMonth - c.breakdown.principal, 6)
+    // With no loan the cost is the charges, whole.
+    expect(propertyCost(aso(), s).costPerMonth).toBeCloseTo(1075, 6)
+  })
+
+  it('keeps every breakdown key a declared category', () => {
+    const declared = HOUSING_CATEGORIES.map((cat) => cat.key).sort()
+    expect(Object.keys(propertyCost(aso(), s).breakdown).sort()).toEqual(declared)
+  })
+
+  it('is within reach when savings plus the loan the rest of the budget carries cover it', () => {
+    // 3 400 × 35 % − 190 − 1 075 = −75: the käyttövastike alone overruns the
+    // share, so no amount of savings makes the place affordable.
+    const tight = asoReach(aso(), s)
+    expect(tight.budget).toBeCloseTo(-75, 6)
+    expect(tight.maxPayment).toBe(0)
+    expect(propertyCost(aso(), s).fits).toBe(false)
+
+    // At 4 000 € net the share leaves 1 400 − 190 − 1 075 = 135 € for a loan;
+    // the stress test (6 %, 25 years) is the tighter rule and sizes it.
+    const roomy = situation({ netIncomePerMonth: 4000 })
+    const r = asoReach(aso(), roomy)
+    expect(r.budget).toBeCloseTo(135, 6)
+    expect(r.maxLoan).toBeCloseTo(maxLoanForPayment(135, 6, 300), 6)
+    expect(r.maxPayment).toBeCloseTo(40000 + r.maxLoan, 6)
+    expect(propertyCost(aso({ asoPayment: r.maxPayment - 1 }), roomy).fits).toBe(true)
+    expect(propertyCost(aso({ asoPayment: r.maxPayment + 1 }), roomy).fits).toBe(false)
+  })
+
+  it('counts a couple as one household, like the ceiling does', () => {
+    const couple = situation({
+      netIncomePerMonth: 1700,
+      savings: 20000,
+      otherLoanPaymentsPerMonth: 95,
+      buyingTogether: true,
+      partnerNetIncomePerMonth: 1700,
+      partnerSavings: 20000,
+      partnerOtherLoanPaymentsPerMonth: 95,
+    })
+    expect(asoReach(aso(), couple)).toEqual(asoReach(aso(), s))
+    expect(propertyCost(aso(), couple)).toEqual(propertyCost(aso(), s))
+  })
+
+  it('comes back at the index, compounded yearly, and never below the payment', () => {
+    expect(asoReturned(36000, 2, 10)).toBeCloseTo(36000 * Math.pow(1.02, 10), 6)
+    expect(asoReturned(36000, 0, 10)).toBe(36000)
+    // A falling index still returns the payment itself (LAO § 56).
+    expect(asoReturned(36000, -1, 10)).toBe(36000)
+  })
+
+  it('needs the cash share of the payment in savings, like a price does', () => {
+    // 2 000 € saved at a 5 % cash share reaches a 40 000 € payment at most,
+    // however much loan the income would carry.
+    const thin = situation({ netIncomePerMonth: 9000, savings: 2000 })
+    const r = asoReach(aso(), thin)
+    expect(2000 + r.maxLoan).toBeGreaterThan(40000)
+    expect(r.maxPayment).toBeCloseTo(40000, 6)
+    expect(propertyCost(aso({ asoPayment: 41000 }), thin).fits).toBe(false)
+    expect(propertyCost(aso({ asoPayment: 39000 }), thin).fits).toBe(true)
+  })
+
+  it('leaves an owned place exactly as it was', () => {
+    // The tenure is the only switch: an owned record with aso figures typed
+    // in once costs what it always did.
+    expect(propertyCost(flat({ asoPayment: 36000, usageChargePerMonth: 1050 }), s)).toEqual(
+      propertyCost(flat(), s),
+    )
   })
 })
 

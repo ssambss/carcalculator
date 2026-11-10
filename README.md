@@ -180,6 +180,19 @@ color-coded cost breakdown and a side-by-side comparison table.
   highlighted — these are not costs, and the lowest growth is no prize. The
   rows show even before a place has a postal code, reading "—" with the
   reason, rather than hiding.
+- **Asumisoikeusasunto** (Edit → Tenure): a place can be a right of
+  occupancy instead of a purchase. It takes the *asumisoikeusmaksu* and the
+  monthly *käyttövastike* in place of a price and company charges: savings pay
+  the payment first and a plain bank loan (never ASP) covers the rest, with no
+  transfer tax. It is **within reach** when the cash share is in savings, the
+  charges fit the housing share, and what is left of the share carries the
+  loan under the stress test. Its card shows the käyttövastike per m² and what
+  the payment comes back as in ten years at the building cost index (never
+  below what was paid). In the side-by-side it sits beside the purchases, with
+  "—" for charges it does not have. In **Rent instead** it can stand in for
+  renting: the purchase against that aso home, with the payment coming back
+  untaxed at the end. The saving plan, the loan's life and "priced forward"
+  stay about purchases.
 - **What kind of home a place is** (Edit → Type, Rooms): flat (*kerrostalo*)
   with its room count, terraced house (*rivitalo*) or detached house
   (*omakotitalo*). It picks which of Statistics Finland's series the place is

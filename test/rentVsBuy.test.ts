@@ -8,8 +8,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_HOUSING,
+  RENTING,
   amortization,
+  paymentForLoan,
   rentVsBuy,
+  type Alternative,
   type Holding,
   type HousingSituation,
 } from '../src/housing'
@@ -35,12 +38,13 @@ const kamppi: Holding = {
   chargesPerMonth: 265,
 }
 
-/** Everything flat: no returns, no growth, no rent rises, no tax. */
+/** Everything flat: no returns, no growth, no rent rises, no index, no tax. */
 const still = (over: Partial<HousingSituation> = {}) =>
   situation({
     investmentReturnPct: 0,
     homeValueGrowthPct: 0,
     rentGrowthPct: 0,
+    asoIndexPct: 0,
     gainsTaxPct: 0,
     ...over,
   })
@@ -251,7 +255,112 @@ describe('rent or buy', () => {
   })
 })
 
+describe('an aso home instead of renting', () => {
+  // 36 000 € in, 1 050 € käyttövastike plus 25 € other - less than the
+  // 40 000 € Kamppi's closing would take, so 4 000 € is left to invest.
+  const home: Alternative = { kind: 'aso', payment: 36000, chargesPerMonth: 1075 }
+  const dear: Alternative = { kind: 'aso', payment: 60000, chargesPerMonth: 1075 }
+
+  it('weighs against renting unless told otherwise', () => {
+    const s = situation({ ownerInvestPerMonth: 200 })
+    expect(rentVsBuy(kamppi, s)).toEqual(rentVsBuy(kamppi, s, RENTING))
+  })
+
+  it('reads its own charges, not the rent typed for renting', () => {
+    const a = rentVsBuy(kamppi, still({ rentPerMonth: 800 }), home)
+    const b = rentVsBuy(kamppi, still({ rentPerMonth: 0 }), home)
+    expect(a.months).toEqual(b.months)
+    expect(a.totalRent).toBeCloseTo(1075 * 300, 4)
+  })
+
+  it('with everything still, the gap is the money that bought nothing, less its charges', () => {
+    // The payment comes back whole and the cash it leaves is banked, so the
+    // aso household ends ahead by exactly what the buyer spent on tax,
+    // interest and charges, less what it spent on its own charges.
+    const s = still()
+    const r = rentVsBuy(kamppi, s, home)
+    const end = r.months[r.months.length - 1]
+    const { totalInterest } = amortization(kamppi.loan, s)
+    expect(r.renterStart).toBe(4000)
+    expect(r.altLoan).toBe(0)
+    expect(r.renterShortMonths).toBe(0)
+    expect(end.asoValue).toBe(36000)
+    expect(end.renterNetWorth - end.buyerNetWorth).toBeCloseTo(
+      3735 + totalInterest + 265 * 300 - 1075 * 300,
+      2,
+    )
+  })
+
+  it('borrows what the closing cash does not cover, and pays it back out of the budget', () => {
+    // 60 000 € against 40 000 €: 20 000 € borrowed as a plain loan, nothing
+    // left to invest on day one, and the loan's interest is one more euro
+    // that bought nothing.
+    const s = still()
+    const r = rentVsBuy(kamppi, s, dear)
+    const end = r.months[r.months.length - 1]
+    const { totalInterest } = amortization(kamppi.loan, s)
+    const loan = amortization(20000, { ...s, useAspLoan: false })
+    expect(r.renterStart).toBe(0)
+    expect(r.altLoan).toBe(20000)
+    expect(r.altInterest).toBeCloseTo(loan.totalInterest, 6)
+    expect(r.months[0].altLoanPayment).toBeCloseTo(paymentForLoan(20000, 3.5, 300), 6)
+    expect(r.months[0].altLoanBalance).toBeCloseTo(loan.months[0].balance, 6)
+    expect(end.altLoanBalance).toBe(0)
+    expect(r.renterShortMonths).toBe(0)
+    expect(end.renterNetWorth - end.buyerNetWorth).toBeCloseTo(
+      3735 + totalInterest + 265 * 300 - 1075 * 300 - loan.totalInterest,
+      2,
+    )
+  })
+
+  it('never puts the payment’s loan on ASP terms', () => {
+    const s = still({ useAspLoan: true, aspRatePct: 1 })
+    const r = rentVsBuy(kamppi, s, dear)
+    expect(r.months[0].altLoanPayment).toBeCloseTo(paymentForLoan(20000, 3.5, 300), 6)
+  })
+
+  it('grows the payment at the index, monthly to the stated yearly rate', () => {
+    const r = rentVsBuy(kamppi, still({ asoIndexPct: 2 }), home)
+    expect(r.months[11].asoValue).toBeCloseTo(36000 * 1.02, 6)
+    expect(r.months[299].asoValue).toBeCloseTo(36000 * Math.pow(1.02, 25), 4)
+  })
+
+  it('never counts the payment below what was paid, however the index falls', () => {
+    const r = rentVsBuy(kamppi, still({ asoIndexPct: -2 }), home)
+    expect(r.months.every((m) => m.asoValue === 36000)).toBe(true)
+  })
+
+  it('does not tax the returned payment', () => {
+    // Investments earning nothing leave no gains to tax, so the gains tax can
+    // only reach the aso household's wealth through the payment - and must not.
+    const untaxed = rentVsBuy(kamppi, still({ asoIndexPct: 3 }), home)
+    const taxed = rentVsBuy(kamppi, still({ asoIndexPct: 3, gainsTaxPct: 30 }), home)
+    expect(taxed.months[299].renterNetWorth).toBeCloseTo(untaxed.months[299].renterNetWorth, 6)
+  })
+
+  it('finds the käyttövastike at which both end level, the payment held', () => {
+    const s = situation({ ownerInvestPerMonth: 300 })
+    const r = rentVsBuy(kamppi, s, home)
+    expect(r.breakEvenRent).not.toBeNull()
+    const charge = r.breakEvenRent!
+    const lead = (chargesPerMonth: number) => {
+      const months = rentVsBuy(kamppi, s, { ...home, chargesPerMonth }).months
+      const last = months[months.length - 1]
+      return last.renterNetWorth - last.buyerNetWorth
+    }
+    expect(lead(charge)).toBeCloseTo(0, -1)
+    expect(lead(charge - 50)).toBeGreaterThan(0)
+    expect(lead(charge + 50)).toBeLessThan(0)
+  })
+})
+
 describe('the rent-or-buy inputs in storage', () => {
+  it('seed the aso index, and let it fall but not past what compounding can take', () => {
+    expect(normalizeSituation({}).asoIndexPct).toBe(DEFAULT_HOUSING.asoIndexPct)
+    expect(normalizeSituation({ asoIndexPct: '1,5' }).asoIndexPct).toBe(1.5)
+    expect(normalizeSituation({ asoIndexPct: -500 }).asoIndexPct).toBe(-99)
+  })
+
   it('seed fresh situations with the defaults', () => {
     const s = normalizeSituation({})
     expect(s.rentPerMonth).toBe(0)

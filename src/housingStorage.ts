@@ -50,7 +50,10 @@ export function newProperty(): PropertyListing {
     name: '',
     notes: '',
     favorite: false,
+    tenure: 'owned',
     price: 0,
+    asoPayment: 0,
+    usageChargePerMonth: 0,
     sizeM2: 0,
     postalCode: '',
     homeType: '',
@@ -126,6 +129,7 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     homeValueGrowthPct: Math.max(-99, toNum(s.homeValueGrowthPct, d.homeValueGrowthPct)),
     gainsTaxPct: Math.min(100, Math.max(0, toNum(s.gainsTaxPct, d.gainsTaxPct))),
     ownerInvestPerMonth: Math.max(0, toNum(s.ownerInvestPerMonth, d.ownerInvestPerMonth)),
+    asoIndexPct: Math.max(-99, toNum(s.asoIndexPct, d.asoIndexPct)),
     projectionYear: Math.max(0, Math.round(toNum(s.projectionYear, d.projectionYear))),
   }
 }
@@ -139,7 +143,13 @@ export function normalizeProperty(raw: unknown): PropertyListing {
     name: typeof p.name === 'string' ? p.name : '',
     notes: typeof p.notes === 'string' ? p.notes : '',
     favorite: p.favorite === true,
+    // Owned unless it says otherwise: every place saved before there was a
+    // choice was a purchase, and an unknown word must not turn one into
+    // something else.
+    tenure: p.tenure === 'aso' ? 'aso' : 'owned',
     price: Math.max(0, toNum(p.price, 0)),
+    asoPayment: Math.max(0, toNum(p.asoPayment, 0)),
+    usageChargePerMonth: Math.max(0, toNum(p.usageChargePerMonth, 0)),
     sizeM2: Math.max(0, toNum(p.sizeM2, 0)),
     // Digits only, five at most: "00730", never "00730 Tapanila" or a typo's letters.
     postalCode: typeof p.postalCode === 'string' ? p.postalCode.replace(/\D/g, '').slice(0, 5) : '',

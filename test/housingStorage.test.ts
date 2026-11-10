@@ -74,6 +74,17 @@ describe('normalising', () => {
     expect(p.updatedAt).toBe(p.createdAt)
   })
 
+  it('reads a place as owned unless it says it is an aso home', () => {
+    // Every place saved before the choice existed was a purchase.
+    expect(normalizeProperty({ name: 'Kamppi', price: 249000 }).tenure).toBe('owned')
+    expect(normalizeProperty({ tenure: 'aso' }).tenure).toBe('aso')
+    expect(normalizeProperty({ tenure: 'rental' }).tenure).toBe('owned')
+    const p = normalizeProperty({ tenure: 'aso', asoPayment: '36 000', usageChargePerMonth: -5 })
+    expect(p.asoPayment).toBe(36000)
+    expect(p.usageChargePerMonth).toBe(0)
+    expect(newProperty().tenure).toBe('owned')
+  })
+
   it('keeps only the digits of a postal code, and no more than five', () => {
     // A place saved before the field existed simply has none.
     expect(normalizeProperty({ name: 'Kamppi' }).postalCode).toBe('')

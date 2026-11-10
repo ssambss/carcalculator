@@ -15,12 +15,16 @@ import {
   HOME_TYPES,
   HOUSING_CATEGORIES,
   affordability,
+  asoReach,
+  asoReturned,
   householdIncome,
   householdSavings,
   propertyCost,
+  type HousingCategoryKey,
   type HousingSituation,
   type PropertyCost,
   type PropertyListing,
+  type Tenure,
 } from '../housing'
 import {
   ALL_AREAS,
@@ -122,6 +126,12 @@ export function HousingView({
 
   const fitsCount = data.properties.filter((p) => costs.get(p.id)?.fits ?? true).length
 
+  // A purchase and a right of occupancy answer different questions: the
+  // purchase cards (the saving plan, the loan's life, prices by area) look at
+  // what is bought; an aso place is what rent-or-buy weighs a purchase against.
+  const owned = useMemo(() => sorted.filter((p) => p.tenure !== 'aso'), [sorted])
+  const asoPlaces = useMemo(() => sorted.filter((p) => p.tenure === 'aso'), [sorted])
+
   // What the analysis cards can look at: the ceiling first, then each
   // candidate, in the order the cards show them.
   const subjects = useMemo<AnalysisSubject[]>(() => {
@@ -135,7 +145,7 @@ export function HousingView({
         cashAtClosing: ceiling.downPayment + ceiling.transferTax + s.buyingCosts,
         chargesPerMonth: s.maintenanceEstimatePerMonth,
       },
-      ...sorted.map((p) => {
+      ...owned.map((p) => {
         const c = costs.get(p.id)
         return {
           id: p.id,
@@ -147,7 +157,7 @@ export function HousingView({
         }
       }),
     ]
-  }, [ceiling, sorted, costs, data.situation])
+  }, [ceiling, owned, costs, data.situation])
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -193,8 +203,9 @@ export function HousingView({
         <div className="card empty-state">
           <div className="empty-title display">No places yet</div>
           <p className="empty-text">
-            Add a flat or house you are actually looking at — it gets measured against your
-            ceiling and costed per month, charges and all.
+            Add a flat or house you are actually looking at — to buy, or an asumisoikeusasunto —
+            and it gets measured against what you can reach and costed per month, charges and
+            all.
           </p>
           <button className="btn btn-primary" onClick={onAdd}>
             Add your first place
@@ -233,6 +244,7 @@ export function HousingView({
                     key={p.id}
                     property={p}
                     cost={costs.get(p.id)!}
+                    situation={data.situation}
                     cheapest={p.id === cheapestId}
                     selected={selectedIds.has(p.id)}
                     onToggleSelect={() => toggleSelected(p.id)}
@@ -255,10 +267,12 @@ export function HousingView({
 
       {/* First of the folded cards: the one that gets revisited, a balance
           logged every month or so, and the one that feeds the ceiling. */}
+      {/* Purchases only: the card's cash need, ASP cap and bonus interest are
+          all about buying, and an aso payment has none of them. */}
       <SavingCard
         store={saving}
         situation={data.situation}
-        places={sorted}
+        places={owned}
         onChangeSituation={store.saveSituation}
       />
 
@@ -274,6 +288,7 @@ export function HousingView({
         subjects={subjects}
         subjectId={subjectId}
         onSelectSubject={setSubjectId}
+        asoPlaces={asoPlaces}
         onChange={store.saveSituation}
       />
 
@@ -623,9 +638,13 @@ function homeChip(p: PropertyListing): string {
   return p.rooms > 0 ? `${label} · ${p.rooms} ${p.rooms === 1 ? 'room' : 'rooms'}` : label
 }
 
+/** How long on the payment's index the aso card states what comes back - a stay, not a loan term. */
+const ASO_BACK_YEARS = 10
+
 function PropertyCard({
   property: p,
   cost,
+  situation,
   cheapest,
   selected,
   onToggleSelect,
@@ -635,6 +654,7 @@ function PropertyCard({
 }: {
   property: PropertyListing
   cost: PropertyCost
+  situation: HousingSituation
   cheapest: boolean
   selected: boolean
   onToggleSelect: () => void
@@ -642,6 +662,7 @@ function PropertyCard({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const aso = p.tenure === 'aso'
   return (
     <div className={`card car-card${selected ? ' selected' : ''}`}>
       <div className="car-card-head">
@@ -672,9 +693,10 @@ function PropertyCard({
       {/* A row of their own: beside the name, two chips this long left it a
           few letters of width - "Tapanila" one letter a line. */}
       <div className="card-chips">
+        {aso && <span className="chip">Asumisoikeus</span>}
         {p.homeType && <span className="chip">{homeChip(p)}</span>}
         <span className={`chip${cost.fits ? '' : ' chip-over'}`}>
-          {cost.fits ? 'within reach' : 'over the ceiling'}
+          {cost.fits ? 'within reach' : aso ? 'out of reach' : 'over the ceiling'}
         </span>
       </div>
 
@@ -702,39 +724,70 @@ function PropertyCard({
         )}
       </div>
 
-      <div className="stat-row">
-        <div className="stat">
-          <span className="stat-label">Price</span>
-          <span className="stat-value">{fmtEur(p.price)}</span>
-        </div>
-        {cost.pricePerM2 !== null && (
+      {aso ? (
+        <div className="stat-row">
           <div className="stat">
-            <span className="stat-label">Per m²</span>
-            <span className="stat-value">{fmtEur(cost.pricePerM2)}</span>
+            <span className="stat-label">ASO payment</span>
+            <span className="stat-value">{fmtEur(p.asoPayment)}</span>
           </div>
-        )}
-        {cost.aspLoan > 0 && cost.regularLoan > 0 ? (
-          <>
+          {p.sizeM2 > 0 && p.usageChargePerMonth > 0 && (
             <div className="stat">
-              <span className="stat-label">ASP loan</span>
-              <span className="stat-value">{fmtEur(cost.aspLoan)}</span>
+              <span className="stat-label">Vastike / m²</span>
+              <span className="stat-value">{fmtEurExact(p.usageChargePerMonth / p.sizeM2)}</span>
             </div>
-            <div className="stat">
-              <span className="stat-label">Regular on top</span>
-              <span className="stat-value">{fmtEur(cost.regularLoan)}</span>
-            </div>
-          </>
-        ) : (
+          )}
           <div className="stat">
-            <span className="stat-label">{cost.aspLoan > 0 ? 'Loan (all ASP)' : 'Loan'}</span>
+            <span className="stat-label">{cost.loan > 0 ? 'Loan for it' : 'Loan'}</span>
             <span className="stat-value">{fmtEur(cost.loan)}</span>
           </div>
-        )}
-        <div className="stat">
-          <span className="stat-label">Cost / mo</span>
-          <span className="stat-value">{fmtEur(cost.costPerMonth)}</span>
+          <div className="stat">
+            <span className="stat-label">Cost / mo</span>
+            <span className="stat-value">{fmtEur(cost.costPerMonth)}</span>
+          </div>
+          {p.asoPayment > 0 && (
+            <div className="stat">
+              <span className="stat-label">Back in {ASO_BACK_YEARS} yrs</span>
+              <span className="stat-value">
+                {fmtEur(asoReturned(p.asoPayment, situation.asoIndexPct, ASO_BACK_YEARS))}
+              </span>
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <div className="stat-row">
+          <div className="stat">
+            <span className="stat-label">Price</span>
+            <span className="stat-value">{fmtEur(p.price)}</span>
+          </div>
+          {cost.pricePerM2 !== null && (
+            <div className="stat">
+              <span className="stat-label">Per m²</span>
+              <span className="stat-value">{fmtEur(cost.pricePerM2)}</span>
+            </div>
+          )}
+          {cost.aspLoan > 0 && cost.regularLoan > 0 ? (
+            <>
+              <div className="stat">
+                <span className="stat-label">ASP loan</span>
+                <span className="stat-value">{fmtEur(cost.aspLoan)}</span>
+              </div>
+              <div className="stat">
+                <span className="stat-label">Regular on top</span>
+                <span className="stat-value">{fmtEur(cost.regularLoan)}</span>
+              </div>
+            </>
+          ) : (
+            <div className="stat">
+              <span className="stat-label">{cost.aspLoan > 0 ? 'Loan (all ASP)' : 'Loan'}</span>
+              <span className="stat-value">{fmtEur(cost.loan)}</span>
+            </div>
+          )}
+          <div className="stat">
+            <span className="stat-label">Cost / mo</span>
+            <span className="stat-value">{fmtEur(cost.costPerMonth)}</span>
+          </div>
+        </div>
+      )}
 
       <BreakdownBar
         breakdown={cost.breakdown}
@@ -789,6 +842,12 @@ function longRunNote(r: NominalRates): string {
   return `${zone} · since ${r.longRunSince}`
 }
 
+/** The charges a tenure never has: a purchase pays no käyttövastike, an aso home no company charges. */
+const NOT_FOR: Record<Tenure, ReadonlySet<HousingCategoryKey>> = {
+  owned: new Set(['usageCharge']),
+  aso: new Set(['maintenance', 'financingCharge']),
+}
+
 function HousingTable({
   properties,
   costs,
@@ -829,6 +888,7 @@ function HousingTable({
     list.some(({ c }) => c.breakdown[cat.key] > 0),
   )
   const anyAsp = list.some(({ c }) => c.aspLoan > 0)
+  const anyAso = list.some(({ p }) => p.tenure === 'aso')
   // The value rows fold away with their long note: they are the one part of
   // the table that is not a cost, and the part read least often.
   const [projectionOpen, toggleProjection] = useOpen('housing.table.projection')
@@ -856,28 +916,59 @@ function HousingTable({
           </thead>
           <tbody>
             <tr>
-              <th className="rowhead">Asking price</th>
-              {list.map(({ p }, i) => (
-                <td
-                  key={p.id}
-                  className={`num${minClass(
-                    list.map((x) => x.p.price),
-                    i,
-                  )}`}
-                >
-                  {fmtEur(p.price)}
-                </td>
-              ))}
+              <th className="rowhead">{anyAso ? 'Price or ASO payment' : 'Asking price'}</th>
+              {list.map(({ p }, i) =>
+                p.tenure === 'aso' ? (
+                  // Not marked lowest: a payment that comes back is not a
+                  // cheaper price, and highlighting it as one would say so.
+                  <td key={p.id} className="num">
+                    {fmtEur(p.asoPayment)}
+                    <br />
+                    <span className="cell-note">ASO payment</span>
+                  </td>
+                ) : (
+                  <td
+                    key={p.id}
+                    className={`num${minClass(
+                      list.map((x) =>
+                        x.p.tenure === 'aso' ? Number.POSITIVE_INFINITY : x.p.price,
+                      ),
+                      i,
+                    )}`}
+                  >
+                    {fmtEur(p.price)}
+                  </td>
+                ),
+              )}
             </tr>
             <tr>
               <th className="rowhead">Against the ceiling</th>
-              {list.map(({ p, c }) => (
-                <td key={p.id} className={`num${c.fits ? '' : ' over-ceiling'}`}>
-                  {c.fits
-                    ? `${fmtEur(ceiling - p.price)} under`
-                    : `${fmtEur(p.price - ceiling)} over`}
-                </td>
-              ))}
+              {list.map(({ p, c }) => {
+                if (p.tenure !== 'aso') {
+                  return (
+                    <td key={p.id} className={`num${c.fits ? '' : ' over-ceiling'}`}>
+                      {c.fits
+                        ? `${fmtEur(ceiling - p.price)} under`
+                        : `${fmtEur(p.price - ceiling)} over`}
+                    </td>
+                  )
+                }
+                // An aso place has no price to hold against the ceiling; it
+                // is held against what savings plus a loan reach once its own
+                // charges are paid out of the housing share.
+                const reach = asoReach(p, situation)
+                return (
+                  <td key={p.id} className={`num${c.fits ? '' : ' over-ceiling'}`}>
+                    {reach.budget < 0
+                      ? `charges ${fmtEur(-reach.budget)} over the share`
+                      : c.fits
+                        ? `${fmtEur(reach.maxPayment - p.asoPayment)} under`
+                        : `${fmtEur(p.asoPayment - reach.maxPayment)} over`}
+                    <br />
+                    <span className="cell-note">its own reach</span>
+                  </td>
+                )
+              })}
             </tr>
             <tr>
               <th className="rowhead">Per m²</th>
@@ -926,26 +1017,44 @@ function HousingTable({
             {anyAsp && (
               <tr>
                 <th className="rowhead">Regular loan on top</th>
-                {list.map(({ p, c }) => (
-                  <td key={p.id} className={`num${c.regularLoan > 0 ? '' : ' muted'}`}>
-                    {c.regularLoan > 0 ? fmtEur(c.regularLoan) : c.loan > 0 ? 'fits in ASP' : '—'}
-                  </td>
-                ))}
+                {list.map(({ p, c }) =>
+                  p.tenure === 'aso' ? (
+                    <td key={p.id} className="num muted">
+                      —
+                    </td>
+                  ) : (
+                    <td key={p.id} className={`num${c.regularLoan > 0 ? '' : ' muted'}`}>
+                      {c.regularLoan > 0 ? fmtEur(c.regularLoan) : c.loan > 0 ? 'fits in ASP' : '—'}
+                    </td>
+                  ),
+                )}
               </tr>
             )}
             {visibleCategories.map((cat) => {
-              const values = list.map(({ c }) => c.breakdown[cat.key])
+              // A charge the place's tenure does not have - a käyttövastike on
+              // a purchase, a hoitovastike on an aso home - is not a zero to
+              // win the row with, so it reads "—" and is left out of the race.
+              const applies = (p: PropertyListing) => !NOT_FOR[p.tenure].has(cat.key)
+              const values = list.map(({ p, c }) =>
+                applies(p) ? c.breakdown[cat.key] : Number.POSITIVE_INFINITY,
+              )
               return (
                 <tr key={cat.key}>
                   <th className="rowhead">
                     <span className="swatch" style={{ background: `var(--series-${cat.series})` }} />
                     {cat.label}
                   </th>
-                  {list.map(({ p }, i) => (
-                    <td key={p.id} className={`num${minClass(values, i)}`}>
-                      {fmtEurExact(values[i])}
-                    </td>
-                  ))}
+                  {list.map(({ p }, i) =>
+                    applies(p) ? (
+                      <td key={p.id} className={`num${minClass(values, i)}`}>
+                        {fmtEurExact(values[i])}
+                      </td>
+                    ) : (
+                      <td key={p.id} className="num muted">
+                        —
+                      </td>
+                    ),
+                  )}
                 </tr>
               )
             })}
@@ -1009,25 +1118,42 @@ function HousingTable({
                 </tr>
                 {projectionOpen && (
                   <>
+                    {/* An aso place is never sold, so the area's prices say
+                        nothing about what it brings back: its column carries
+                        the payment's index instead, said so in the first row. */}
                     <tr>
                       <th className="rowhead">Zone’s long run</th>
-                      {list.map(({ p, r }) => (
-                        <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
-                          {r.longRunPct === null ? '—' : `${fmtPct(r.longRunPct)}/yr`}
-                          <br />
-                          <span className="cell-note">{longRunNote(r)}</span>
-                        </td>
-                      ))}
+                      {list.map(({ p, r }) =>
+                        p.tenure === 'aso' ? (
+                          <td key={p.id} className="num">
+                            {fmtPct(situation.asoIndexPct)}/yr
+                            <br />
+                            <span className="cell-note">not sold · the payment’s index</span>
+                          </td>
+                        ) : (
+                          <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
+                            {r.longRunPct === null ? '—' : `${fmtPct(r.longRunPct)}/yr`}
+                            <br />
+                            <span className="cell-note">{longRunNote(r)}</span>
+                          </td>
+                        ),
+                      )}
                     </tr>
                     <tr>
                       <th className="rowhead">Area’s own trend</th>
-                      {list.map(({ p, r }) => (
-                        <td key={p.id} className={`num${r.trendPct === null ? ' muted' : ''}`}>
-                          {r.trendPct === null ? '—' : `${fmtPct(r.trendPct)}/yr`}
-                          <br />
-                          <span className="cell-note">{trendNote(r)}</span>
-                        </td>
-                      ))}
+                      {list.map(({ p, r }) =>
+                        p.tenure === 'aso' ? (
+                          <td key={p.id} className="num muted">
+                            —
+                          </td>
+                        ) : (
+                          <td key={p.id} className={`num${r.trendPct === null ? ' muted' : ''}`}>
+                            {r.trendPct === null ? '—' : `${fmtPct(r.trendPct)}/yr`}
+                            <br />
+                            <span className="cell-note">{trendNote(r)}</span>
+                          </td>
+                        ),
+                      )}
                     </tr>
                     {HORIZON_OFFSETS.map((offset, i) => (
                       <tr key={offset}>
@@ -1039,19 +1165,31 @@ function HousingTable({
                             your guess {fmtPct(cumulativePct(guess, yearsFromNow + offset))}
                           </span>
                         </th>
-                        {list.map(({ p, r }) => (
-                          <td key={p.id} className={`num${r.longRunPct === null ? ' muted' : ''}`}>
-                            {r.longRunPct === null
-                              ? '—'
-                              : fmtPct(cumulativePct(r.longRunPct, yearsFromNow + offset))}
-                            <br />
-                            <span className="cell-note">
-                              {r.trendPct === null
+                        {list.map(({ p, r }) =>
+                          p.tenure === 'aso' ? (
+                            <td key={p.id} className="num">
+                              {/* never back below the payment, whatever the index does */}
+                              {fmtPct(
+                                Math.max(0, cumulativePct(situation.asoIndexPct, yearsFromNow + offset)),
+                              )}
+                            </td>
+                          ) : (
+                            <td
+                              key={p.id}
+                              className={`num${r.longRunPct === null ? ' muted' : ''}`}
+                            >
+                              {r.longRunPct === null
                                 ? '—'
-                                : fmtPct(cumulativePct(r.trendPct, yearsFromNow + offset))}
-                            </span>
-                          </td>
-                        ))}
+                                : fmtPct(cumulativePct(r.longRunPct, yearsFromNow + offset))}
+                              <br />
+                              <span className="cell-note">
+                                {r.trendPct === null
+                                  ? '—'
+                                  : fmtPct(cumulativePct(r.trendPct, yearsFromNow + offset))}
+                              </span>
+                            </td>
+                          ),
+                        )}
                       </tr>
                     ))}
                   </>
@@ -1083,11 +1221,19 @@ function HousingTable({
               same kind of figure, so they are not compounded as one.
             </>
           )}
-          {list.some(({ r }) => r.area === null) && (
+          {list.some(({ p, r }) => p.tenure !== 'aso' && r.area === null) && (
             <>
               {' '}
               A place reads “—” until it carries a postal code in {coverage(AREA_PRICES)} (Edit →
               Postal code) — the price data covers those and nowhere else.
+            </>
+          )}
+          {anyAso && (
+            <>
+              {' '}
+              An aso home is never sold, so the area’s prices are not its story: its column
+              compounds the index its payment comes back at ({fmtPct(situation.asoIndexPct)}/yr,
+              set in “Rent instead”).
             </>
           )}
         </p>
