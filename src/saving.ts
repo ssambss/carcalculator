@@ -306,6 +306,21 @@ function bonusEnd(firstMonth: string): number {
   return dayOf(`${year}-01-01`)!
 }
 
+/**
+ * The last calendar year each saver's bonus accrues in - the fifth after the
+ * year of their first deposit - for the savers who have said when that was.
+ * The bonus earned by then is still paid at a later purchase; it just stops
+ * growing.
+ */
+export function bonusLastYears(plan: SavingPlan, s: HousingSituation): { saver: Saver; year: number }[] {
+  return saversOf(s).flatMap((saver) => {
+    const first = saver === 'self' ? plan.aspFirstMonth : plan.partnerAspFirstMonth
+    return monthStart(first) === null
+      ? []
+      : [{ saver, year: Number(first.slice(0, 4)) + BONUS_YEARS_AFTER_FIRST }]
+  })
+}
+
 /** € × months of balance between two check-ins, read as the straight line between them. */
 function lineMonths(a: BalancePoint, b: BalancePoint, until: number): number {
   const to = Math.min(b.day, until)

@@ -193,6 +193,20 @@ color-coded cost breakdown and a side-by-side comparison table.
   renting: the purchase against that aso home, with the payment coming back
   untaxed at the end. The saving plan, the loan's life and "priced forward"
   stay about purchases.
+- **Wait in an aso home, buy later** (housing mode, once there is an aso
+  place): the flexibility question. If you move into the aso home on the day
+  you meant to buy (or one you pick) and buy one to five years later, what
+  is the cash then? Each row adds up:
+  - the ASP accounts, still at the saving plan's deposits, with the bonus
+    paid at the purchase, which stops growing after the fifth calendar year
+    following the first deposit;
+  - what you invest on top, after tax on its gains;
+  - the aso payment back at the index;
+  - less any loan you took for the payment, which comes out of the cash
+    outside ASP, never out of an ASP account.
+
+  Beside it: what that cash buys (inside the ASP cap, at today's income),
+  and how the same years would have gone renting at the same money a month.
 - **What kind of home a place is** (Edit → Type, Rooms): flat (*kerrostalo*)
   with its room count, terraced house (*rivitalo*) or detached house
   (*omakotitalo*). It picks which of Statistics Finland's series the place is

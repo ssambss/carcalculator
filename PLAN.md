@@ -1479,9 +1479,59 @@ aso line is flattered, not penalised, by it, and the card counts the months.
 As with `postalCode`, an old bundle that edits an aso place writes it back
 without the new fields, so it reads as a 0 € purchase until re-edited.
 
+**Wait in an aso home, buy later (2026-11-10, user's ask):** "the
+flexibility it provides … if the interests would be non-favorable at that
+time, we could just keep saving while living in a home we are happy to live
+in … what kind of cash we could build up during that time". This is a
+different question from rent-or-buy's aso-for-good. `waitInAso()` in
+`src/waiting.ts` runs from a move-in day (the saving plan's purchase day
+until one is typed) and gives the cash on that day had they bought as
+planned, then on each of the five yearly days after. The cash adds up:
+
+- **The ASP accounts**: `savingStatus` asked about a later purchase day,
+  so check-ins, deposits, the 1 % and the bonus are the saving card's own.
+  The bonus accrues through the fifth calendar year after the first deposit
+  (`bonusLastYears`), so a first deposit in 9/2026 earns it through 2031, and
+  waiting past that keeps what was earned.
+- **Investments**: the cash outside ASP the payment leaves, plus a fixed sum
+  a month, after the gains tax.
+- **The aso payment back** at the index, never below the payment.
+- **Less** what is still owed on the payment's loan.
+
+The payment comes out of the cash outside ASP and never out of an ASP
+account, since a withdrawal ends the ASP saving. The renting column holds
+the household to the same money a month. With everything still, renting
+minus aso is exactly the two homes' monthly difference times the months,
+plus the interest on the payment's loan; the tests pin that identity. What
+the cash buys is today's ceiling, and the price whose loan fills the ASP
+cap, with no raises assumed.
+
+Three new situation fields, `waitMoveIn`, `waitOtherCash` and
+`waitInvestPerMonth`, default to nothing assumed. The card names three
+limits it does not model:
+
+- The payment is paid out within three months of moving out, so a purchase
+  may need a bridge until it lands.
+- A short-funded aso company can pay it later still.
+- The under-55 asset test is applied on the day of applying.
+
+What the sample figures showed: almost all of the extra cash comes from the
+saving itself, which renting would do as well. Aso against renting is a few
+thousand euros either way, set by the two homes' monthly difference and the
+payment earning the index rather than the return. So the flexibility is
+waiting itself; the aso home is a good place to do it, not a money-maker.
+
 ---
 
 ## Log
+
+- **2026-11-10** — **Wait in an aso home, buy later.** A card that counts the
+  cash one to five years after the planned purchase day if the household
+  lives in an aso home meanwhile: ASP accounts with the bonus (which stops
+  growing after its window), investments after tax, the payment back at the
+  index, any loan for it repaid. Shown against renting at the same money a
+  month, with what the cash buys inside the ASP cap. 438 frontend tests,
+  verified in Edge at 1280 px (light) and 390 px (dark).
 
 - **2026-11-10** — **Asumisoikeusasunto.** A place can be a right of
   occupancy: the payment and käyttövastike in place of a price and company

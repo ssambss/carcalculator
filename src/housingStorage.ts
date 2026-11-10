@@ -130,6 +130,14 @@ export function normalizeSituation(raw: unknown): HousingSituation {
     gainsTaxPct: Math.min(100, Math.max(0, toNum(s.gainsTaxPct, d.gainsTaxPct))),
     ownerInvestPerMonth: Math.max(0, toNum(s.ownerInvestPerMonth, d.ownerInvestPerMonth)),
     asoIndexPct: Math.max(-99, toNum(s.asoIndexPct, d.asoIndexPct)),
+    // A day or nothing: anything that is not a real 'YYYY-MM-DD' falls back to
+    // the plan's purchase day, the default.
+    waitMoveIn:
+      typeof s.waitMoveIn === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.waitMoveIn)
+        ? s.waitMoveIn
+        : d.waitMoveIn,
+    waitOtherCash: Math.max(0, toNum(s.waitOtherCash, d.waitOtherCash)),
+    waitInvestPerMonth: Math.max(0, toNum(s.waitInvestPerMonth, d.waitInvestPerMonth)),
     projectionYear: Math.max(0, Math.round(toNum(s.projectionYear, d.projectionYear))),
   }
 }

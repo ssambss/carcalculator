@@ -89,6 +89,12 @@ export interface HousingSituation {
   ownerInvestPerMonth: number
   /** how fast the building cost index rises, %/yr — what an aso payment comes back as on moving out; it never comes back below the payment */
   asoIndexPct: number
+  /** waiting in an aso home: 'YYYY-MM-DD' of moving in; '' = the saving plan's purchase day, else today */
+  waitMoveIn: string
+  /** waiting: the household's cash outside the ASP accounts on moving in, € - what pays the aso payment */
+  waitOtherCash: number
+  /** waiting: what the household invests a month on top of the ASP deposits while it lives there, € */
+  waitInvestPerMonth: number
   /** the year the area price projection runs to; 0 = two years from now */
   projectionYear: number
 }
@@ -146,6 +152,11 @@ export const DEFAULT_HOUSING: HousingSituation = {
   // 2 % is the same modest long-run guess the home's value starts from, so
   // neither side of rent-or-buy is handed a head start by default.
   asoIndexPct: 2,
+  // Waiting in an aso home: nothing assumed about money the app has not been
+  // told of - no cash outside ASP, no investing beyond the saving plan.
+  waitMoveIn: '',
+  waitOtherCash: 0,
+  waitInvestPerMonth: 0,
   // "Two years from now" until the buyer names the year - the horizon of
   // somebody saving up, and one that moves with the calendar on its own.
   projectionYear: 0,

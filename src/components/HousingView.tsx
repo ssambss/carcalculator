@@ -49,6 +49,7 @@ import { NumberField } from './NumberField'
 import { PropertyFilterBar } from './PropertyFilterBar'
 import { RentVsBuy } from './RentVsBuy'
 import { SavingCard } from './SavingCard'
+import { WaitCard } from './WaitCard'
 
 /** Why the ceiling stops where it does, in words somebody can act on. */
 const LIMIT_NOTE: Record<string, string> = {
@@ -275,6 +276,17 @@ export function HousingView({
         places={owned}
         onChangeSituation={store.saveSituation}
       />
+
+      {/* The saving carried on from a home that is not bought: right after
+          the plan it extends, and only once there is an aso home to wait in. */}
+      {asoPlaces.length > 0 && (
+        <WaitCard
+          situation={data.situation}
+          saving={saving}
+          asoPlaces={asoPlaces}
+          onChange={store.saveSituation}
+        />
+      )}
 
       <LoanSchedule
         situation={data.situation}
