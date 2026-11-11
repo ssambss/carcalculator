@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-11T16:01:20.523Z",
-  "completeAt": "2026-11-11T16:01:20.523Z",
+  "updatedAt": "2026-11-11T18:01:14.981Z",
+  "completeAt": "2026-11-11T18:01:14.981Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-11","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-11","prices":[["2026-10-29",14500]]},
@@ -89,9 +89,10 @@
     "16092845": {"title":"3,0, 300 SportCross","year":2003,"mileage":318517,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"07bc57c76cef31a9","first":"2026-11-07","last":"2026-11-11","prices":[["2026-11-07",6000]]},
     "16093202": {"title":"2,5, 300h Executive","year":2013,"mileage":335000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"62af1303a69b0779","first":"2026-11-08","last":"2026-11-11","prices":[["2026-11-08",12500]]},
     "16093903": {"title":"2,5, 300h Hybrid A Sport","year":2016,"mileage":160000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Oulu Limingantulli","vin":"90027381fcb7eecc","first":"2026-11-09","last":"2026-11-11","prices":[["2026-11-09",22700]]},
-    "16095338": {"title":"2,0","year":2000,"mileage":420000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-09","last":"2026-11-11","prices":[["2026-11-09",3900]]},
+    "16095338": {"title":"2,0","year":2000,"mileage":420000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-09","last":"2026-11-11","prices":[["2026-11-09",3900],["2026-11-11",3800]]},
     "16097024": {"title":"2,5","year":2007,"mileage":389016,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"2096ca7b4123fa4f","first":"2026-11-10","last":"2026-11-11","prices":[["2026-11-10",5500]]},
     "16097350": {"title":"2,5, 300h F Sport *HIENO* *HUIPPUVARUSTEET*","year":2014,"mileage":214000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Mikkeli","vin":"19f8b35c82958bae","first":"2026-11-10","last":"2026-11-11","prices":[["2026-11-10",21890]]},
-    "16099328": {"title":"2,5, 250 aut.","year":2007,"mileage":255000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Wetteri Oulu","vin":"5dd94417a06a9810","first":"2026-11-11","last":"2026-11-11","prices":[["2026-11-11",9900]]}
+    "16099328": {"title":"2,5, 250 aut.","year":2007,"mileage":255000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Wetteri Oulu","vin":"5dd94417a06a9810","first":"2026-11-11","last":"2026-11-11","prices":[["2026-11-11",9900]]},
+    "16099902": {"title":"2,0, Ei tieliikennekelpoinen - is200","year":1999,"mileage":390000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-11","last":"2026-11-11","prices":[["2026-11-11",1000]]}
   }
 }
