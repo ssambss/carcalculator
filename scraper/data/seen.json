@@ -2,8 +2,8 @@
   "version": 3,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-11-11T22:01:21.022Z",
-  "runs": 731,
+  "updatedAt": "2026-11-11T22:53:50.473Z",
+  "runs": 732,
   "listings": {
     "nettiauto:12959170": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
@@ -59901,7 +59901,7 @@
     },
     "nettiauto:16003109": {
       "firstSeenAt": "2026-10-29T12:01:15.975Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16003109",
@@ -59926,7 +59926,7 @@
     },
     "nettiauto:16056561": {
       "firstSeenAt": "2026-10-29T12:01:15.976Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.958Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16056561",
@@ -59951,7 +59951,7 @@
     },
     "nettiauto:16069188": {
       "firstSeenAt": "2026-10-29T12:01:15.976Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.958Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16069188",
@@ -60096,7 +60096,7 @@
     },
     "nettiauto:16069041": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16069041",
@@ -60120,7 +60120,7 @@
     },
     "nettiauto:16054139": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054139",
@@ -60145,7 +60145,7 @@
     },
     "nettiauto:16064648": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16064648",
@@ -60170,7 +60170,7 @@
     },
     "nettiauto:16059870": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16059870",
@@ -60245,7 +60245,7 @@
     },
     "nettiauto:15990807": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15990807",
@@ -60270,7 +60270,7 @@
     },
     "nettiauto:16054730": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054730",
@@ -60319,7 +60319,7 @@
     },
     "nettiauto:16030991": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16030991",
@@ -60368,7 +60368,7 @@
     },
     "nettiauto:15954238": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954238",
@@ -60393,7 +60393,7 @@
     },
     "nettiauto:15999964": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15999964",
@@ -60418,7 +60418,7 @@
     },
     "nettiauto:16041232": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16041232",
@@ -60443,7 +60443,7 @@
     },
     "nettiauto:15992331": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15992331",
@@ -60468,7 +60468,7 @@
     },
     "nettiauto:16036515": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16036515",
@@ -60492,7 +60492,7 @@
     },
     "nettiauto:15638611": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15638611",
@@ -60517,7 +60517,7 @@
     },
     "nettiauto:15954797": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954797",
@@ -60542,7 +60542,7 @@
     },
     "nettiauto:15747928": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15747928",
@@ -60592,7 +60592,7 @@
     },
     "nettiauto:16048627": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16048627",
@@ -60616,7 +60616,7 @@
     },
     "nettiauto:15909225": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15909225",
@@ -60639,7 +60639,7 @@
     },
     "nettiauto:15859603": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15859603",
@@ -60663,7 +60663,7 @@
     },
     "nettiauto:16020534": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16020534",
@@ -60709,7 +60709,7 @@
     },
     "nettiauto:15939223": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15939223",
@@ -60733,7 +60733,7 @@
     },
     "nettiauto:15579164": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15579164",
@@ -60757,7 +60757,7 @@
     },
     "nettiauto:16005429": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16005429",
@@ -60781,7 +60781,7 @@
     },
     "nettiauto:16017241": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16017241",
@@ -60805,7 +60805,7 @@
     },
     "nettiauto:15421459": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15421459",
@@ -60829,7 +60829,7 @@
     },
     "nettiauto:15917409": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15917409",
@@ -60922,7 +60922,7 @@
     },
     "nettiauto:15947659": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15947659",
@@ -60945,7 +60945,7 @@
     },
     "nettiauto:15921905": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15921905",
@@ -60968,7 +60968,7 @@
     },
     "nettiauto:15995510": {
       "firstSeenAt": "2026-10-29T12:01:17.309Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-10-29T12:01:17.309Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15995510",
@@ -60990,7 +60990,7 @@
     },
     "nettiauto:16007243": {
       "firstSeenAt": "2026-10-29T12:01:17.309Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16007243",
@@ -61013,7 +61013,7 @@
     },
     "nettiauto:16042117": {
       "firstSeenAt": "2026-10-29T12:01:18.242Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:44.391Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16042117",
@@ -61034,7 +61034,7 @@
     },
     "nettiauto:16066065": {
       "firstSeenAt": "2026-10-29T12:01:19.433Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-10-29T12:01:19.433Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16066065",
@@ -61056,7 +61056,7 @@
     },
     "nettiauto:16051022": {
       "firstSeenAt": "2026-10-29T12:01:19.433Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16051022",
@@ -61079,7 +61079,7 @@
     },
     "nettiauto:15971094": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-10-29T12:01:21.052Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15971094",
@@ -61098,7 +61098,7 @@
     },
     "nettiauto:16010743": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:45.454Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16010743",
@@ -61119,7 +61119,7 @@
     },
     "nettiauto:15975280": {
       "firstSeenAt": "2026-10-29T12:01:23.018Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:48.930Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15975280",
@@ -61161,7 +61161,7 @@
     },
     "nettiauto:16053585": {
       "firstSeenAt": "2026-10-29T12:01:24.233Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16053585",
@@ -61183,7 +61183,7 @@
     },
     "nettiauto:15964977": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-05T10:40:20.552Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15964977",
@@ -61204,7 +61204,7 @@
     },
     "nettiauto:16037577": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16037577",
@@ -61247,7 +61247,7 @@
     },
     "nettiauto:16015622": {
       "firstSeenAt": "2026-10-29T12:01:26.847Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:57.270Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16015622",
@@ -61268,7 +61268,7 @@
     },
     "nettiauto:15915565": {
       "firstSeenAt": "2026-10-29T12:01:26.848Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15915565",
@@ -61316,7 +61316,7 @@
     },
     "nettiauto:16076936": {
       "firstSeenAt": "2026-10-29T16:01:34.328Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:47.992Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16076936",
@@ -61337,7 +61337,7 @@
     },
     "nettiauto:16077143": {
       "firstSeenAt": "2026-10-29T18:01:20.053Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16077143",
@@ -61362,7 +61362,7 @@
     },
     "nettiauto:15814348": {
       "firstSeenAt": "2026-10-30T12:01:17.939Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.957Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15814348",
@@ -61386,7 +61386,7 @@
     },
     "nettiauto:16078541": {
       "firstSeenAt": "2026-10-30T13:46:33.160Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:52.709Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16078541",
@@ -61407,7 +61407,7 @@
     },
     "nettiauto:16061638": {
       "firstSeenAt": "2026-10-30T16:01:43.332Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16061638",
@@ -61452,7 +61452,7 @@
     },
     "nettiauto:15999602": {
       "firstSeenAt": "2026-10-30T18:01:23.829Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15999602",
@@ -61476,7 +61476,7 @@
     },
     "nettiauto:16079459": {
       "firstSeenAt": "2026-10-30T18:01:23.830Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16079459",
@@ -61499,7 +61499,7 @@
     },
     "nettiauto:15969536": {
       "firstSeenAt": "2026-10-31T14:01:37.494Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15969536",
@@ -61523,7 +61523,7 @@
     },
     "nettiauto:16081952": {
       "firstSeenAt": "2026-11-02T12:01:14.601Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16081952",
@@ -61548,7 +61548,7 @@
     },
     "nettiauto:16083365": {
       "firstSeenAt": "2026-11-03T20:01:35.400Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-03T20:01:35.400Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16083365",
@@ -61569,7 +61569,7 @@
     },
     "nettiauto:16085662": {
       "firstSeenAt": "2026-11-04T08:01:15.574Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16085662",
@@ -61617,7 +61617,7 @@
     },
     "nettiauto:16085976": {
       "firstSeenAt": "2026-11-04T09:27:51.986Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16085976",
@@ -61641,7 +61641,7 @@
     },
     "nettiauto:16087747": {
       "firstSeenAt": "2026-11-05T08:01:07.926Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-05T08:01:07.926Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16087747",
@@ -61662,7 +61662,7 @@
     },
     "nettiauto:16089428": {
       "firstSeenAt": "2026-11-05T20:01:27.524Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16089428",
@@ -61687,7 +61687,7 @@
     },
     "nettiauto:16089405": {
       "firstSeenAt": "2026-11-05T20:01:27.525Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16089405",
@@ -61712,7 +61712,7 @@
     },
     "nettiauto:16089868": {
       "firstSeenAt": "2026-11-06T10:01:16.148Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16089868",
@@ -61737,7 +61737,7 @@
     },
     "nettiauto:16090177": {
       "firstSeenAt": "2026-11-06T11:35:23.636Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16090177",
@@ -61761,7 +61761,7 @@
     },
     "nettiauto:16090595": {
       "firstSeenAt": "2026-11-06T14:01:35.353Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16090595",
@@ -61786,7 +61786,7 @@
     },
     "nettiauto:16091929": {
       "firstSeenAt": "2026-11-07T10:00:01.308Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-07T10:00:01.308Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16091929",
@@ -61807,7 +61807,7 @@
     },
     "nettiauto:16092845": {
       "firstSeenAt": "2026-11-07T20:01:11.690Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16092845",
@@ -61832,7 +61832,7 @@
     },
     "nettiauto:16093202": {
       "firstSeenAt": "2026-11-08T12:01:24.997Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.961Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16093202",
@@ -61856,7 +61856,7 @@
     },
     "nettiauto:16093903": {
       "firstSeenAt": "2026-11-09T08:01:14.796Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": "2026-11-09T08:01:14.796Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16093903",
@@ -61877,7 +61877,7 @@
     },
     "nettiauto:16095338": {
       "firstSeenAt": "2026-11-09T16:01:35.574Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.958Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16095338",
@@ -61902,7 +61902,7 @@
     },
     "nettiauto:16097024": {
       "firstSeenAt": "2026-11-10T14:01:16.789Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.959Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16097024",
@@ -61927,7 +61927,7 @@
     },
     "nettiauto:16097350": {
       "firstSeenAt": "2026-11-10T15:48:25.263Z",
-      "lastSeenAt": "2026-11-11T22:01:19.582Z",
+      "lastSeenAt": "2026-11-11T22:53:48.962Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16097350",
@@ -61950,7 +61950,7 @@
     },
     "nettiauto:16099328": {
       "firstSeenAt": "2026-11-11T14:01:26.483Z",
-      "lastSeenAt": "2026-11-11T22:01:19.581Z",
+      "lastSeenAt": "2026-11-11T22:53:48.960Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16099328",
@@ -61975,7 +61975,7 @@
     },
     "nettiauto:16099902": {
       "firstSeenAt": "2026-11-11T18:01:14.977Z",
-      "lastSeenAt": "2026-11-11T22:01:19.580Z",
+      "lastSeenAt": "2026-11-11T22:53:48.958Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16099902",
@@ -62021,7 +62021,7 @@
       "firstRunAt": "2026-10-29T12:01:37.629Z",
       "spec": "f84ff0f13dbebf49",
       "name": "Lexus IS 300h Luxury",
-      "lastRunAt": "2026-11-11T22:01:21.020Z"
+      "lastRunAt": "2026-11-11T22:53:50.470Z"
     }
   },
   "tco": {
