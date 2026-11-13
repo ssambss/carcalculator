@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-13T12:01:25.847Z",
-  "completeAt": "2026-11-13T12:01:25.847Z",
+  "updatedAt": "2026-11-13T14:01:19.392Z",
+  "completeAt": "2026-11-13T14:01:19.392Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",14500]]},
@@ -47,7 +47,7 @@
     "16031877": {"title":"4,3, is200","year":1999,"mileage":245000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",15000]]},
     "16033141": {"title":"2,5, 300h Hybrid A Executive","year":2018,"mileage":85000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Autokeskus Oy Olari","vin":"3ac3b944bebacf01","first":"2026-10-29","last":"2026-11-04","prices":[["2026-10-29",26890]]},
     "16036515": {"title":"2,5, 250 | Huoltokirja | Katsastus 10/2027 asti! | 2 x renkaat | Vakkari |","year":2007,"mileage":135000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Etelän Autoliike - Mäntsälä","vin":"38bf7e18485c26da","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",10900]]},
-    "16037577": {"title":"2,5, 300h F Sport - Huollettu 10/26!","year":2015,"mileage":132000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Espoo Niittykumpu","vin":"c4aeafcc5b1083c4","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",24900],["2026-11-04",24790]]},
+    "16037577": {"title":"2,5, 300h F Sport - Huollettu 10/26!","year":2015,"mileage":132000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Espoo Niittykumpu","vin":"c4aeafcc5b1083c4","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",24900],["2026-11-04",24790],["2026-11-13",24490]]},
     "16041232": {"title":"2,5","year":2006,"mileage":277000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",10000]]},
     "16042117": {"title":"2,5, 300h Hybrid A Comfort ** 2.Om Suomi-auto / Lohko+sisätilanlämmitin / Tutkat / Vakkari / KeyLess / LED / Puolinahat **","year":2017,"mileage":163000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Saka Finland Oy Nummela","vin":"a80d0d4e15a17f74","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",21800],["2026-11-03",21480]]},
     "16048627": {"title":"3,5, IS 350","year":2006,"mileage":154000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",12490]]},
@@ -57,7 +57,7 @@
     "16054139": {"title":"2,2, 220d","year":2008,"mileage":365000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",4999]]},
     "16054730": {"title":"2,5, IS 250 V6","year":2007,"mileage":255000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"fab1a0989254e380","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",7400]]},
     "16056561": {"title":"2,2, Ei tieliikennekelpoinen","year":2006,"mileage":500000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"4d7d6745972ada29","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",2500]]},
-    "16059870": {"title":"2,2, 220d Sport Package","year":2007,"mileage":325000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"76a35cd28036fba7","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",5800]]},
+    "16059870": {"title":"2,2, 220d Sport Package","year":2007,"mileage":325000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"76a35cd28036fba7","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",5800],["2026-11-13",5700]]},
     "16061638": {"title":"2,5, 250 #TYYLIKÄS! #MarkLevinson #VaaleetNahat #P.Kamera #Keyless #Lohkolämmitin&sisätilanpistoke","year":2008,"mileage":200000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"RS-Trade","vin":"f1649ec0f883f00b","first":"2026-10-30","last":"2026-11-13","prices":[["2026-10-30",10990],["2026-11-03",10980],["2026-11-07",10900],["2026-11-10",10890]]},
     "16064648": {"title":"2,2, 220d","year":2006,"mileage":317000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",5500],["2026-11-10",5600]]},
     "16066065": {"title":"2,5, 300h Executive","year":2014,"mileage":122000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Nelipyörä Seinäjoki","vin":"981c3159e6b883e0","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",21800]]},
@@ -94,6 +94,6 @@
     "16097350": {"title":"2,5, 300h F Sport *HIENO* *HUIPPUVARUSTEET*","year":2014,"mileage":214000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Mikkeli","vin":"19f8b35c82958bae","first":"2026-11-10","last":"2026-11-13","prices":[["2026-11-10",21890]]},
     "16099328": {"title":"2,5, 250 aut.","year":2007,"mileage":255000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Wetteri Oulu","vin":"5dd94417a06a9810","first":"2026-11-11","last":"2026-11-13","prices":[["2026-11-11",9900]]},
     "16099902": {"title":"2,0, Ei tieliikennekelpoinen - is200","year":1999,"mileage":390000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-11","last":"2026-11-12","prices":[["2026-11-11",1000]]},
-    "16102562": {"title":"2,5, Ei tieliikennekelpoinen - Sport Package","year":2007,"mileage":207000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"e27c9f15508029bb","first":"2026-11-13","last":"2026-11-13","prices":[["2026-11-13",11500]]}
+    "16102562": {"title":"2,5, Sport Package","year":2007,"mileage":207000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"e27c9f15508029bb","first":"2026-11-13","last":"2026-11-13","prices":[["2026-11-13",11500]]}
   }
 }
