@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-13T08:01:16.236Z",
-  "completeAt": "2026-11-13T08:01:16.236Z",
+  "updatedAt": "2026-11-13T10:01:23.060Z",
+  "completeAt": "2026-11-13T10:01:23.060Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-13","prices":[["2026-10-29",14500]]},
@@ -93,6 +93,7 @@
     "16097024": {"title":"2,5","year":2007,"mileage":389016,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"2096ca7b4123fa4f","first":"2026-11-10","last":"2026-11-13","prices":[["2026-11-10",5500]]},
     "16097350": {"title":"2,5, 300h F Sport *HIENO* *HUIPPUVARUSTEET*","year":2014,"mileage":214000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Kamux Mikkeli","vin":"19f8b35c82958bae","first":"2026-11-10","last":"2026-11-13","prices":[["2026-11-10",21890]]},
     "16099328": {"title":"2,5, 250 aut.","year":2007,"mileage":255000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Wetteri Oulu","vin":"5dd94417a06a9810","first":"2026-11-11","last":"2026-11-13","prices":[["2026-11-11",9900]]},
-    "16099902": {"title":"2,0, Ei tieliikennekelpoinen - is200","year":1999,"mileage":390000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-11","last":"2026-11-12","prices":[["2026-11-11",1000]]}
+    "16099902": {"title":"2,0, Ei tieliikennekelpoinen - is200","year":1999,"mileage":390000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-11","last":"2026-11-12","prices":[["2026-11-11",1000]]},
+    "16102562": {"title":"2,5, Ei tieliikennekelpoinen - Sport Package","year":2007,"mileage":207000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"e27c9f15508029bb","first":"2026-11-13","last":"2026-11-13","prices":[["2026-11-13",11500]]}
   }
 }
