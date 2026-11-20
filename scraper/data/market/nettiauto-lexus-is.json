@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-20T06:22:21.958Z",
-  "completeAt": "2026-11-20T06:22:21.958Z",
+  "updatedAt": "2026-11-20T08:01:09.709Z",
+  "completeAt": "2026-11-20T08:01:09.709Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-20","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-20","prices":[["2026-10-29",14500]]},
@@ -99,6 +99,7 @@
     "16107602": {"title":"2,5, 300h Luxury","year":2014,"mileage":257000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Lahti","vin":"2a94461c61ed78e7","first":"2026-11-16","last":"2026-11-20","prices":[["2026-11-16",14900]]},
     "16112656": {"title":"2,5, is250 sport","year":2006,"mileage":210000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"e239ec34029dd2d3","first":"2026-11-19","last":"2026-11-20","prices":[["2026-11-19",6350]]},
     "16112870": {"title":"2,5, 300h Hybrid A Executive Edition ** Merkkihuollettu! / P-kamera / Ratin Lämmitys / KeyLessGo / LED **","year":2020,"mileage":88000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Saka Finland Oy Tampere","vin":"9ba10ec8121f9e9f","first":"2026-11-19","last":"2026-11-20","prices":[["2026-11-19",29900]]},
-    "16113055": {"title":"3,5, 350 F Sport / GSE21 / +300HV / TEHOKAS SPORTTI-LEXUS / NAHAT / KATTOLUUKKU / ALK.279 EUR/KK","year":2011,"mileage":131600,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"JDM Outlet","vin":"3cdf6cc83778d6d7","first":"2026-11-19","last":"2026-11-20","prices":[["2026-11-19",19890]]}
+    "16113055": {"title":"3,5, 350 F Sport / GSE21 / +300HV / TEHOKAS SPORTTI-LEXUS / NAHAT / KATTOLUUKKU / ALK.279 EUR/KK","year":2011,"mileage":131600,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"JDM Outlet","vin":"3cdf6cc83778d6d7","first":"2026-11-19","last":"2026-11-20","prices":[["2026-11-19",19890]]},
+    "16114007": {"title":"3,5, IS350","year":2006,"mileage":154000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-20","last":"2026-11-20","prices":[["2026-11-20",13480]]}
   }
 }
