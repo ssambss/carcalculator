@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-21T12:01:13.249Z",
-  "completeAt": "2026-11-21T12:01:13.249Z",
+  "updatedAt": "2026-11-21T14:01:26.047Z",
+  "completeAt": "2026-11-21T14:01:26.047Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-21","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-21","prices":[["2026-10-29",14500]]},
@@ -104,6 +104,7 @@
     "16114186": {"title":"2,2, 220d Sport Package","year":2007,"mileage":325000,"fuel":"Diesel","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"76a35cd28036fba7","first":"2026-11-20","last":"2026-11-21","prices":[["2026-11-20",5700]]},
     "16115229": {"title":"5,0, F","year":2010,"mileage":134000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Nordic Special Cars","vin":null,"first":"2026-11-20","last":"2026-11-21","prices":[["2026-11-20",29900]]},
     "16115288": {"title":"2,5, 250 aut.","year":2007,"mileage":163000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":"d1c98710d1dd554f","first":"2026-11-20","last":"2026-11-21","prices":[["2026-11-20",11300]]},
-    "16115832": {"title":"2,0, 200 SportCross","year":2004,"mileage":268400,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-20","last":"2026-11-21","prices":[["2026-11-20",4700]]}
+    "16115832": {"title":"2,0, 200 SportCross","year":2004,"mileage":268400,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-20","last":"2026-11-21","prices":[["2026-11-20",4700]]},
+    "16116563": {"title":"2,5, 300h Hybrid A Executive","year":2018,"mileage":137000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Vaihtoautomaa Jyväskylä","vin":"085d97b50956c4b4","first":"2026-11-21","last":"2026-11-21","prices":[["2026-11-21",23900]]}
   }
 }
