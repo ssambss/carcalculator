@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T20:01:21.284Z",
+  "updatedAt": "2026-11-24T22:01:13.520Z",
   "files": [
     {
       "file": "nettiauto-bmw-320.json",
@@ -21,8 +21,8 @@
         "model": "is"
       },
       "listings": 105,
-      "updatedAt": "2026-11-24T20:01:21.284Z",
-      "completeAt": "2026-11-24T20:01:21.284Z"
+      "updatedAt": "2026-11-24T22:01:13.520Z",
+      "completeAt": "2026-11-24T22:01:13.520Z"
     },
     {
       "file": "nettiauto-polestar-2.json",
