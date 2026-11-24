@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T08:01:25.399Z",
+  "updatedAt": "2026-11-24T10:01:13.687Z",
   "files": [
     {
       "file": "nettiauto-bmw-320.json",
@@ -20,9 +20,9 @@
         "make": "lexus",
         "model": "is"
       },
-      "listings": 103,
-      "updatedAt": "2026-11-24T08:01:25.399Z",
-      "completeAt": "2026-11-24T08:01:25.399Z"
+      "listings": 104,
+      "updatedAt": "2026-11-24T10:01:13.687Z",
+      "completeAt": "2026-11-24T10:01:13.687Z"
     },
     {
       "file": "nettiauto-polestar-2.json",
