@@ -2,8 +2,8 @@
   "version": 1,
   "source": "nettiauto",
   "search": {"make":"lexus","model":"is"},
-  "updatedAt": "2026-11-26T14:01:26.857Z",
-  "completeAt": "2026-11-26T14:01:26.857Z",
+  "updatedAt": "2026-11-26T16:01:22.227Z",
+  "completeAt": "2026-11-26T16:01:22.227Z",
   "listings": {
     "15421459": {"title":"3,5, 350 | 3.5L V6 | 318HP | ENKEI 19'' | ALUSTASARJA | RAHOITUS","year":2005,"mileage":129000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"BM Myynti","vin":"1cb406d8924ca740","first":"2026-10-29","last":"2026-11-26","prices":[["2026-10-29",14890],["2026-11-06",13890]]},
     "15579164": {"title":"2,5, IS 300H EXECUTIVE \"SUOMIAUTO\" Hieno, Täydellinen Lexus huoltokirja","year":2014,"mileage":342000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Auto-Ässä","vin":null,"first":"2026-10-29","last":"2026-11-26","prices":[["2026-10-29",14500]]},
@@ -114,6 +114,7 @@
     "16122982": {"title":"2,5, 300h Hybrid A Comfort","year":2016,"mileage":153000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Tampere","vin":"70346076076b2e84","first":"2026-11-25","last":"2026-11-26","prices":[["2026-11-25",21700],["2026-11-26",21450]]},
     "16123135": {"title":"2,0","year":2000,"mileage":390000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Private seller","vin":null,"first":"2026-11-25","last":"2026-11-26","prices":[["2026-11-25",5000]]},
     "16124112": {"title":"2,5, 4D IS250 SEDAN 2.5 AUTOMATIC-GSE20L-AETLHW/273","year":2006,"mileage":310000,"fuel":"Bensiini","drive":"Takaveto","battery":null,"seller":"Bilar99 - Vantaa, Tuupakka","vin":"f3d25798bcf17103","first":"2026-11-26","last":"2026-11-26","prices":[["2026-11-26",7900]]},
-    "16124249": {"title":"2,5, 300h Hybrid A F Sport","year":2019,"mileage":113000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Lahti","vin":"685e5b446b3180bf","first":"2026-11-26","last":"2026-11-26","prices":[["2026-11-26",31790]]}
+    "16124249": {"title":"2,5, 300h Hybrid A F Sport","year":2019,"mileage":113000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"Bilar99 - Lahti","vin":"685e5b446b3180bf","first":"2026-11-26","last":"2026-11-26","prices":[["2026-11-26",31790]]},
+    "16124788": {"title":"2,5, 300h Hybrid A Executive","year":2018,"mileage":115000,"fuel":"Hybridi (bensiini/sähkö)","drive":"Takaveto","battery":null,"seller":"J. Rinta-Jouppi Raisio","vin":"8a38943ac767eb07","first":"2026-11-26","last":"2026-11-26","prices":[["2026-11-26",25890]]}
   }
 }
