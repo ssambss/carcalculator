@@ -2,8 +2,8 @@
   "version": 3,
   "seeded": true,
   "seededAt": "2026-08-26T15:14:27.845Z",
-  "updatedAt": "2026-11-26T06:01:06.668Z",
-  "runs": 932,
+  "updatedAt": "2026-11-26T08:01:15.067Z",
+  "runs": 933,
   "listings": {
     "nettiauto:12959170": {
       "firstSeenAt": "2026-08-26T15:14:26.047Z",
@@ -1990,29 +1990,6 @@
           "status": "rejected",
           "reasons": [
             "169 000 km over 150 000 km",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15726455": {
-      "firstSeenAt": "2026-08-26T19:27:40.443Z",
-      "lastSeenAt": "2026-08-28T07:07:17.819Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15726455",
-      "title": "2,0, dA E91 Touring",
-      "year": 2007,
-      "mileage": 94000,
-      "price": 8870,
-      "seller": "KymppiPlus Raisio",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2007 before 2020",
-            "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
           ],
@@ -4425,28 +4402,6 @@
         }
       }
     },
-    "nettiauto:15786140": {
-      "firstSeenAt": "2026-08-26T19:27:40.447Z",
-      "lastSeenAt": "2026-08-28T07:07:17.812Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15786140",
-      "title": "2,0, TwinPower Turbo A Limited xDrive Edition F31 Touring ** Koukku / Tutkat / Vakkari / Suomi-auto **",
-      "year": 2013,
-      "mileage": 180000,
-      "price": 13490,
-      "seller": "Saka Finland Oy Koskelo",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2013 before 2020",
-            "180 000 km over 150 000 km",
-            "variant does not say g20"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15786812": {
       "firstSeenAt": "2026-08-26T15:13:21.216Z",
       "lastSeenAt": "2026-08-30T13:30:16.353Z",
@@ -4596,27 +4551,6 @@
             "year 2006 before 2020",
             "199 000 km over 150 000 km",
             "variant does not say xdrive",
-            "variant does not say g20"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15789347": {
-      "firstSeenAt": "2026-08-26T19:27:40.452Z",
-      "lastSeenAt": "2026-08-28T07:07:17.824Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15789347",
-      "title": "2,0, F30 Sedan LCI A xDrive M Sport – Valmiina talven liukkaille!",
-      "year": 2017,
-      "mileage": 128000,
-      "price": 19900,
-      "seller": "Kamux Rovaniemi",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2017 before 2020",
             "variant does not say g20"
           ],
           "announcedAt": null
@@ -5024,29 +4958,6 @@
             "only pilot lite found, not the full pilot package",
             "no plus package found"
           ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15794985": {
-      "firstSeenAt": "2026-08-26T15:13:09.926Z",
-      "lastSeenAt": "2026-08-28T07:08:11.677Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15794985",
-      "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh",
-      "year": 2022,
-      "mileage": 56000,
-      "price": 34480,
-      "seller": "LänsiAuto Turku",
-      "filters": {
-        "(pre-filters)": {
-          "status": "match",
-          "reasons": [],
-          "announcedAt": "2026-08-26T15:14:27.845Z"
-        },
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "match",
-          "reasons": [],
           "announcedAt": null
         }
       }
@@ -5468,27 +5379,6 @@
           "reasons": [
             "variant does not say dual motor",
             "only pilot lite found, not the full pilot package",
-            "no plus package found"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15803060": {
-      "firstSeenAt": "2026-08-26T15:11:59.337Z",
-      "lastSeenAt": "2026-08-28T07:08:07.063Z",
-      "detailCheckedAt": "2026-08-26T19:56:45.813Z",
-      "url": "https://www.nettiauto.com/polestar/2/15803060",
-      "title": "78 kWh, Long Range Dual Motor, 300 kW, 78kWh",
-      "year": 2021,
-      "mileage": 105000,
-      "price": 27880,
-      "seller": "Kamux Pori",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "only \"pilot assist\" found - that feature ships without the package too",
             "no plus package found"
           ],
           "announcedAt": null
@@ -6099,28 +5989,6 @@
         }
       }
     },
-    "nettiauto:15813159": {
-      "firstSeenAt": "2026-08-26T15:14:23.270Z",
-      "lastSeenAt": "2026-08-28T07:08:11.683Z",
-      "detailCheckedAt": "2026-08-26T15:14:23.270Z",
-      "url": "https://www.nettiauto.com/polestar/2/15813159",
-      "title": "78 kWh, Performance Dual Motor 350kW, 78kWh # SUPERHIENO! Pilot-Lite ja Plus paketit, Adapt.vakkari, H&K, Takuu 1/2028 asti! #",
-      "year": 2023,
-      "mileage": 22000,
-      "price": 41700,
-      "seller": "Vaihtokaara Pori",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "41 700 € over 35 000 €",
-            "variant does not say long range",
-            "only pilot lite found, not the full pilot package"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15813348": {
       "firstSeenAt": "2026-08-26T15:12:25.151Z",
       "lastSeenAt": "2026-10-01T13:02:06.932Z",
@@ -6574,28 +6442,6 @@
           "status": "rejected",
           "reasons": [
             "159 000 km over 120 000 km",
-            "no plus package found"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15821623": {
-      "firstSeenAt": "2026-08-26T15:11:58.784Z",
-      "lastSeenAt": "2026-08-28T07:08:07.062Z",
-      "detailCheckedAt": "2026-08-26T19:56:20.177Z",
-      "url": "https://www.nettiauto.com/polestar/2/15821623",
-      "title": "78 kWh, Long Range Single Motor, 170kW, 78kWh *SOH 92,8%*",
-      "year": 2022,
-      "mileage": 86000,
-      "price": 27500,
-      "seller": "Future Store Drivalia",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "variant does not say dual motor",
-            "no pilot package found",
             "no plus package found"
           ],
           "announcedAt": null
@@ -7567,28 +7413,6 @@
         }
       }
     },
-    "nettiauto:15835195": {
-      "firstSeenAt": "2026-08-26T19:27:45.482Z",
-      "lastSeenAt": "2026-08-28T07:07:17.826Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15835195",
-      "title": "2,0, F30 Sedan 320d A xDrive Business Exclusive M Sport ** Suomi-auto / ACC / Sport-nahat / Digimittaristo / Prof.Navi **",
-      "year": 2019,
-      "mileage": 79000,
-      "price": 24900,
-      "seller": "Saka Finland Oy Vaasa",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2019 before 2020",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15835252": {
       "firstSeenAt": "2026-08-26T15:12:11.945Z",
       "lastSeenAt": "2026-08-30T13:30:16.347Z",
@@ -8162,27 +7986,6 @@
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15843710": {
-      "firstSeenAt": "2026-08-26T19:27:40.452Z",
-      "lastSeenAt": "2026-08-28T07:07:17.824Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15843710",
-      "title": "2,0, F30 Sedan 320i A xDrive Business Sport *** Rahoitustarjous 3.99% (+kulut)",
-      "year": 2017,
-      "mileage": 104000,
-      "price": 20890,
-      "seller": "Hedin Automotive Pori",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2017 before 2020",
-            "variant does not say g20"
           ],
           "announcedAt": null
         }
@@ -9685,27 +9488,6 @@
         }
       }
     },
-    "nettiauto:15862693": {
-      "firstSeenAt": "2026-08-26T15:14:26.930Z",
-      "lastSeenAt": "2026-08-28T07:08:11.685Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15862693",
-      "title": "82 kWh, Long range Dual motor Performance, 350kW, 82kWh – 476 hv sähköistä suorituskykyä!",
-      "year": 2024,
-      "mileage": 44000,
-      "price": 43890,
-      "seller": "Kamux Turku",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "year 2024 after 2023",
-            "43 890 € over 35 000 €"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15862803": {
       "firstSeenAt": "2026-08-26T19:27:40.434Z",
       "lastSeenAt": "2026-08-30T13:29:20.292Z",
@@ -10074,27 +9856,6 @@
         "169a334a-aad9-4957-80a9-756f10789a1f": {
           "status": "rejected",
           "reasons": [
-            "no plus package found"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15866702": {
-      "firstSeenAt": "2026-08-26T15:12:30.749Z",
-      "lastSeenAt": "2026-08-28T07:08:11.673Z",
-      "detailCheckedAt": "2026-08-26T19:59:15.001Z",
-      "url": "https://www.nettiauto.com/polestar/2/15866702",
-      "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh",
-      "year": 2022,
-      "mileage": 62000,
-      "price": 31800,
-      "seller": "Auto-Kuopio Oy",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "no pilot package found",
             "no plus package found"
           ],
           "announcedAt": null
@@ -12495,27 +12256,6 @@
         }
       }
     },
-    "nettiauto:15894837": {
-      "firstSeenAt": "2026-08-26T15:11:58.783Z",
-      "lastSeenAt": "2026-08-28T07:08:07.060Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15894837",
-      "title": "78 kWh, Long Range Single Motor 170kW 78kWh / Pilot- ja Plus-pkt. / Pixel-LED / 360° / H&K / ACC / Lämpöpumppu / Lasikatto",
-      "year": 2022,
-      "mileage": 154000,
-      "price": 25690,
-      "seller": "KIESI Espoo Koskelo",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "154 000 km over 120 000 km",
-            "variant does not say dual motor"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15894850": {
       "firstSeenAt": "2026-08-26T19:27:40.438Z",
       "lastSeenAt": "2026-08-28T19:32:04.930Z",
@@ -12579,28 +12319,6 @@
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15895451": {
-      "firstSeenAt": "2026-08-26T15:12:09.591Z",
-      "lastSeenAt": "2026-08-28T07:08:08.911Z",
-      "detailCheckedAt": "2026-08-27T13:38:04.145Z",
-      "url": "https://www.nettiauto.com/polestar/2/15895451",
-      "title": "78 kWh, Long Range Single Motor, 170kW, 78kWh",
-      "year": 2023,
-      "mileage": 45000,
-      "price": 29550,
-      "seller": "LänsiAuto Tampere",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "variant does not say dual motor",
-            "no pilot package found",
-            "no plus package found"
           ],
           "announcedAt": null
         }
@@ -13057,31 +12775,6 @@
         }
       }
     },
-    "nettiauto:15898483": {
-      "firstSeenAt": "2026-08-26T15:13:31.685Z",
-      "lastSeenAt": "2026-08-28T07:08:11.678Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15898483",
-      "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh",
-      "year": 2022,
-      "mileage": 58000,
-      "price": 35900,
-      "seller": "Etelä-Suomen Autotalo Oy",
-      "filters": {
-        "(pre-filters)": {
-          "status": "match",
-          "reasons": [],
-          "announcedAt": "2026-08-26T15:14:27.845Z"
-        },
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "35 900 € over 35 000 €"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15898729": {
       "firstSeenAt": "2026-08-26T15:12:29.217Z",
       "lastSeenAt": "2026-10-26T06:01:52.789Z",
@@ -13190,30 +12883,6 @@
             "297 000 km over 150 000 km",
             "variant does not say xdrive",
             "variant does not say g20"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15899266": {
-      "firstSeenAt": "2026-08-26T19:27:40.445Z",
-      "lastSeenAt": "2026-08-28T07:07:17.820Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15899266",
-      "title": "2,0",
-      "year": 2014,
-      "mileage": 399000,
-      "price": 11490,
-      "seller": "Private seller",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2014 before 2020",
-            "399 000 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20",
-            "no mention of bensiini"
           ],
           "announcedAt": null
         }
@@ -13442,28 +13111,6 @@
         }
       }
     },
-    "nettiauto:15900842": {
-      "firstSeenAt": "2026-08-26T19:27:40.438Z",
-      "lastSeenAt": "2026-08-28T07:07:17.817Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15900842",
-      "title": "2,0, A E90 Sedan -- Myydään Huutokaupat.com",
-      "year": 2009,
-      "mileage": 123000,
-      "price": 5790,
-      "seller": "Bilar99 - Vantaa, Varisto",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2009 before 2020",
-            "variant does not say xdrive",
-            "variant does not say g20"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15900872": {
       "firstSeenAt": "2026-08-26T19:27:40.447Z",
       "lastSeenAt": "2026-08-30T13:29:20.300Z",
@@ -13527,29 +13174,6 @@
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15901176": {
-      "firstSeenAt": "2026-08-26T19:27:40.444Z",
-      "lastSeenAt": "2026-08-28T07:07:17.820Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15901176",
-      "title": "2,2, Ci Cabriolet M-Sport",
-      "year": 2004,
-      "mileage": 188000,
-      "price": 9900,
-      "seller": "TT Car Center Oy",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2004 before 2020",
-            "188 000 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20"
           ],
           "announcedAt": null
         }
@@ -14456,28 +14080,6 @@
         }
       }
     },
-    "nettiauto:15907812": {
-      "firstSeenAt": "2026-08-26T15:12:48.104Z",
-      "lastSeenAt": "2026-08-28T07:08:11.674Z",
-      "detailCheckedAt": "2026-08-26T19:59:40.354Z",
-      "url": "https://www.nettiauto.com/polestar/2/15907812",
-      "title": "78 kWh, Long Range Single Motor Elektro 78kWh",
-      "year": 2023,
-      "mileage": 26000,
-      "price": 32480,
-      "seller": "Kamux Jyväskylä",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "variant does not say dual motor",
-            "only pilot lite found, not the full pilot package",
-            "no plus package found"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15907887": {
       "firstSeenAt": "2026-08-26T19:27:40.451Z",
       "lastSeenAt": "2026-08-30T13:29:20.301Z",
@@ -14800,29 +14402,6 @@
         }
       }
     },
-    "nettiauto:15910271": {
-      "firstSeenAt": "2026-08-26T15:13:12.037Z",
-      "lastSeenAt": "2026-08-28T07:08:11.677Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15910271",
-      "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh (MY23)",
-      "year": 2023,
-      "mileage": 75000,
-      "price": 34500,
-      "seller": "Etelä-Suomen Autotalo Oy",
-      "filters": {
-        "(pre-filters)": {
-          "status": "match",
-          "reasons": [],
-          "announcedAt": "2026-08-26T15:14:27.845Z"
-        },
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "match",
-          "reasons": [],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15910301": {
       "firstSeenAt": "2026-08-26T15:14:07.079Z",
       "lastSeenAt": "2026-08-30T13:30:16.355Z",
@@ -15140,29 +14719,6 @@
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15912751": {
-      "firstSeenAt": "2026-08-26T19:27:40.429Z",
-      "lastSeenAt": "2026-08-28T07:07:17.810Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15912751",
-      "title": "2,0, E91 Touring Business",
-      "year": 2008,
-      "mileage": 373993,
-      "price": 875,
-      "seller": "Private seller",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2008 before 2020",
-            "373 993 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20"
           ],
           "announcedAt": null
         }
@@ -16060,30 +15616,6 @@
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15918715": {
-      "firstSeenAt": "2026-08-26T15:14:08.801Z",
-      "lastSeenAt": "2026-08-28T07:08:11.680Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/polestar/2/15918715",
-      "title": "82 kWh, Long range Single motor, 220kW, 82kWh",
-      "year": 2024,
-      "mileage": 29000,
-      "price": 38790,
-      "seller": "J. Rinta-Jouppi Helsinki",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "year 2024 after 2023",
-            "38 790 € over 35 000 €",
-            "variant does not say dual motor",
-            "pilot mentioned but not clearly as a package",
-            "no plus package found"
           ],
           "announcedAt": null
         }
@@ -17895,29 +17427,6 @@
         }
       }
     },
-    "nettiauto:15929269": {
-      "firstSeenAt": "2026-08-26T19:27:40.440Z",
-      "lastSeenAt": "2026-08-28T07:07:17.818Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15929269",
-      "title": "2,2",
-      "year": 2001,
-      "mileage": 204500,
-      "price": 7350,
-      "seller": "Private seller",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2001 before 2020",
-            "204 500 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15929324": {
       "firstSeenAt": "2026-08-26T15:14:11.322Z",
       "lastSeenAt": "2026-10-20T13:01:52.270Z",
@@ -18855,30 +18364,6 @@
         }
       }
     },
-    "nettiauto:15934074": {
-      "firstSeenAt": "2026-08-26T19:27:40.432Z",
-      "lastSeenAt": "2026-08-28T07:07:17.812Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15934074",
-      "title": "2,0",
-      "year": 2010,
-      "mileage": 333814,
-      "price": 3000,
-      "seller": "Private seller",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2010 before 2020",
-            "333 814 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15934090": {
       "firstSeenAt": "2026-08-26T19:27:40.441Z",
       "lastSeenAt": "2026-08-30T13:29:20.297Z",
@@ -19421,30 +18906,6 @@
         }
       }
     },
-    "nettiauto:15935620": {
-      "firstSeenAt": "2026-08-26T19:27:40.445Z",
-      "lastSeenAt": "2026-08-28T07:07:17.820Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15935620",
-      "title": "2,0, TwinPower Turbo A F30 Sedan // Sport-penkit / BiXenon / 19\" Vanteet / 2x renkaat / Cruise / Suomi-auto",
-      "year": 2013,
-      "mileage": 214000,
-      "price": 10990,
-      "seller": "Bilkom",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2013 before 2020",
-            "214 000 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15935660": {
       "firstSeenAt": "2026-08-26T15:11:59.337Z",
       "lastSeenAt": "2026-08-30T13:30:14.737Z",
@@ -19550,30 +19011,6 @@
           "reasons": [
             "year 2008 before 2020",
             "466 600 km over 150 000 km",
-            "variant does not say xdrive",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15936307": {
-      "firstSeenAt": "2026-08-26T19:27:40.436Z",
-      "lastSeenAt": "2026-08-28T07:07:17.814Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15936307",
-      "title": "2,0, M47 webasto puhelinohjauksella",
-      "year": 2006,
-      "mileage": 287000,
-      "price": 4100,
-      "seller": "Private seller",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2006 before 2020",
-            "287 000 km over 150 000 km",
             "variant does not say xdrive",
             "variant does not say g20",
             "no mention of bensiini"
@@ -21197,28 +20634,6 @@
         }
       }
     },
-    "nettiauto:15942861": {
-      "firstSeenAt": "2026-08-26T15:13:54.495Z",
-      "lastSeenAt": "2026-08-28T07:08:11.679Z",
-      "detailCheckedAt": "2026-08-26T15:13:54.495Z",
-      "url": "https://www.nettiauto.com/polestar/2/15942861",
-      "title": "78 kWh, Long Range Dual Motor, 300kW, 78kWh",
-      "year": 2023,
-      "mileage": 47000,
-      "price": 36900,
-      "seller": "Kamux Kuopio",
-      "filters": {
-        "169a334a-aad9-4957-80a9-756f10789a1f": {
-          "status": "rejected",
-          "reasons": [
-            "36 900 € over 35 000 €",
-            "only pilot lite found, not the full pilot package",
-            "plus mentioned but not clearly as a package"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
     "nettiauto:15942960": {
       "firstSeenAt": "2026-08-26T19:27:40.432Z",
       "lastSeenAt": "2026-08-30T13:29:20.291Z",
@@ -21854,29 +21269,6 @@
             "year 2002 before 2020",
             "408 000 km over 150 000 km",
             "variant does not say xdrive",
-            "variant does not say g20",
-            "no mention of bensiini"
-          ],
-          "announcedAt": null
-        }
-      }
-    },
-    "nettiauto:15945508": {
-      "firstSeenAt": "2026-08-26T19:27:40.438Z",
-      "lastSeenAt": "2026-08-28T07:07:17.817Z",
-      "detailCheckedAt": null,
-      "url": "https://www.nettiauto.com/bmw/320/15945508",
-      "title": "2,0, xDrive LCI A E90 Sedan Business ** Myydään huutokaupat.com **",
-      "year": 2009,
-      "mileage": 355000,
-      "price": 5900,
-      "seller": "Saka Finland Oy Select",
-      "filters": {
-        "be0ab02a-2d6e-4a1e-b3b0-9912b658fc77": {
-          "status": "rejected",
-          "reasons": [
-            "year 2009 before 2020",
-            "355 000 km over 150 000 km",
             "variant does not say g20",
             "no mention of bensiini"
           ],
@@ -59030,7 +58422,7 @@
     },
     "nettiauto:16003109": {
       "firstSeenAt": "2026-10-29T12:01:15.975Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16003109",
@@ -59249,7 +58641,7 @@
     },
     "nettiauto:16054139": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054139",
@@ -59399,7 +58791,7 @@
     },
     "nettiauto:16054730": {
       "firstSeenAt": "2026-10-29T12:01:15.977Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16054730",
@@ -59497,7 +58889,7 @@
     },
     "nettiauto:15954238": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954238",
@@ -59547,7 +58939,7 @@
     },
     "nettiauto:16041232": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16041232",
@@ -59572,7 +58964,7 @@
     },
     "nettiauto:15992331": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15992331",
@@ -59597,7 +58989,7 @@
     },
     "nettiauto:16036515": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16036515",
@@ -59621,7 +59013,7 @@
     },
     "nettiauto:15638611": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15638611",
@@ -59646,7 +59038,7 @@
     },
     "nettiauto:15954797": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15954797",
@@ -59671,7 +59063,7 @@
     },
     "nettiauto:15747928": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15747928",
@@ -59745,7 +59137,7 @@
     },
     "nettiauto:15909225": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15909225",
@@ -59768,7 +59160,7 @@
     },
     "nettiauto:15859603": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15859603",
@@ -59792,7 +59184,7 @@
     },
     "nettiauto:16020534": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16020534",
@@ -59862,7 +59254,7 @@
     },
     "nettiauto:15579164": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15579164",
@@ -59886,7 +59278,7 @@
     },
     "nettiauto:16005429": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16005429",
@@ -59910,7 +59302,7 @@
     },
     "nettiauto:16017241": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16017241",
@@ -59934,7 +59326,7 @@
     },
     "nettiauto:15421459": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15421459",
@@ -59958,7 +59350,7 @@
     },
     "nettiauto:15917409": {
       "firstSeenAt": "2026-10-29T12:01:15.978Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15917409",
@@ -60051,7 +59443,7 @@
     },
     "nettiauto:15947659": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15947659",
@@ -60074,7 +59466,7 @@
     },
     "nettiauto:15921905": {
       "firstSeenAt": "2026-10-29T12:01:15.979Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15921905",
@@ -60119,7 +59511,7 @@
     },
     "nettiauto:16007243": {
       "firstSeenAt": "2026-10-29T12:01:17.309Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16007243",
@@ -60185,7 +59577,7 @@
     },
     "nettiauto:16051022": {
       "firstSeenAt": "2026-10-29T12:01:19.433Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16051022",
@@ -60208,7 +59600,7 @@
     },
     "nettiauto:15971094": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-10-29T12:01:21.052Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15971094",
@@ -60227,7 +59619,7 @@
     },
     "nettiauto:16010743": {
       "firstSeenAt": "2026-10-29T12:01:21.052Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-17T22:01:51.096Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16010743",
@@ -60248,7 +59640,7 @@
     },
     "nettiauto:15975280": {
       "firstSeenAt": "2026-10-29T12:01:23.018Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-17T22:01:53.479Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15975280",
@@ -60269,7 +59661,7 @@
     },
     "nettiauto:16053141": {
       "firstSeenAt": "2026-10-29T12:01:24.233Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-17T16:01:19.898Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16053141",
@@ -60290,7 +59682,7 @@
     },
     "nettiauto:16053585": {
       "firstSeenAt": "2026-10-29T12:01:24.233Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16053585",
@@ -60312,7 +59704,7 @@
     },
     "nettiauto:15964977": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-24T13:34:55.219Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15964977",
@@ -60333,7 +59725,7 @@
     },
     "nettiauto:16037577": {
       "firstSeenAt": "2026-10-29T12:01:25.847Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16037577",
@@ -60397,7 +59789,7 @@
     },
     "nettiauto:15915565": {
       "firstSeenAt": "2026-10-29T12:01:26.848Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15915565",
@@ -60445,7 +59837,7 @@
     },
     "nettiauto:16076936": {
       "firstSeenAt": "2026-10-29T16:01:34.328Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-24T12:01:20.250Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16076936",
@@ -60466,7 +59858,7 @@
     },
     "nettiauto:16077143": {
       "firstSeenAt": "2026-10-29T18:01:20.053Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16077143",
@@ -60515,7 +59907,7 @@
     },
     "nettiauto:16078541": {
       "firstSeenAt": "2026-10-30T13:46:33.160Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-17T10:01:25.085Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16078541",
@@ -60536,7 +59928,7 @@
     },
     "nettiauto:16061638": {
       "firstSeenAt": "2026-10-30T16:01:43.332Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16061638",
@@ -60605,7 +59997,7 @@
     },
     "nettiauto:16079459": {
       "firstSeenAt": "2026-10-30T18:01:23.830Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16079459",
@@ -60629,7 +60021,7 @@
     },
     "nettiauto:15969536": {
       "firstSeenAt": "2026-10-31T14:01:37.494Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15969536",
@@ -60678,7 +60070,7 @@
     },
     "nettiauto:16083365": {
       "firstSeenAt": "2026-11-03T20:01:35.400Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-24T16:01:35.653Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16083365",
@@ -60699,7 +60091,7 @@
     },
     "nettiauto:16085662": {
       "firstSeenAt": "2026-11-04T08:01:15.574Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16085662",
@@ -60747,7 +60139,7 @@
     },
     "nettiauto:16085976": {
       "firstSeenAt": "2026-11-04T09:27:51.986Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16085976",
@@ -60771,7 +60163,7 @@
     },
     "nettiauto:16087747": {
       "firstSeenAt": "2026-11-05T08:01:07.926Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-23T10:01:05.184Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16087747",
@@ -60817,7 +60209,7 @@
     },
     "nettiauto:16089405": {
       "firstSeenAt": "2026-11-05T20:01:27.525Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16089405",
@@ -60842,7 +60234,7 @@
     },
     "nettiauto:16089868": {
       "firstSeenAt": "2026-11-06T10:01:16.148Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16089868",
@@ -60867,7 +60259,7 @@
     },
     "nettiauto:16090177": {
       "firstSeenAt": "2026-11-06T11:35:23.636Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16090177",
@@ -60891,7 +60283,7 @@
     },
     "nettiauto:16090595": {
       "firstSeenAt": "2026-11-06T14:01:35.353Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16090595",
@@ -60937,7 +60329,7 @@
     },
     "nettiauto:16092845": {
       "firstSeenAt": "2026-11-07T20:01:11.690Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16092845",
@@ -60962,7 +60354,7 @@
     },
     "nettiauto:16093202": {
       "firstSeenAt": "2026-11-08T12:01:24.997Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16093202",
@@ -61032,7 +60424,7 @@
     },
     "nettiauto:16097024": {
       "firstSeenAt": "2026-11-10T14:01:16.789Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16097024",
@@ -61130,7 +60522,7 @@
     },
     "nettiauto:16102562": {
       "firstSeenAt": "2026-11-13T10:01:23.057Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16102562",
@@ -61180,7 +60572,7 @@
     },
     "nettiauto:16107602": {
       "firstSeenAt": "2026-11-16T16:01:11.997Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16107602",
@@ -61203,7 +60595,7 @@
     },
     "nettiauto:16112656": {
       "firstSeenAt": "2026-11-19T12:01:07.351Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16112656",
@@ -61228,7 +60620,7 @@
     },
     "nettiauto:16113055": {
       "firstSeenAt": "2026-11-19T14:01:21.197Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16113055",
@@ -61251,7 +60643,7 @@
     },
     "nettiauto:16112870": {
       "firstSeenAt": "2026-11-19T14:01:23.825Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-19T14:01:23.825Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16112870",
@@ -61272,7 +60664,7 @@
     },
     "nettiauto:16114007": {
       "firstSeenAt": "2026-11-20T08:01:09.707Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16114007",
@@ -61296,7 +60688,7 @@
     },
     "nettiauto:16114186": {
       "firstSeenAt": "2026-11-20T10:01:16.260Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16114186",
@@ -61321,7 +60713,7 @@
     },
     "nettiauto:16115229": {
       "firstSeenAt": "2026-11-20T14:01:27.884Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16115229",
@@ -61344,7 +60736,7 @@
     },
     "nettiauto:16115288": {
       "firstSeenAt": "2026-11-20T15:40:28.636Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16115288",
@@ -61368,7 +60760,7 @@
     },
     "nettiauto:16115832": {
       "firstSeenAt": "2026-11-20T20:01:16.297Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16115832",
@@ -61393,7 +60785,7 @@
     },
     "nettiauto:16116563": {
       "firstSeenAt": "2026-11-21T14:01:26.046Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-21T14:01:26.046Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16116563",
@@ -61414,7 +60806,7 @@
     },
     "nettiauto:16117307": {
       "firstSeenAt": "2026-11-22T14:01:28.139Z",
-      "lastSeenAt": "2026-11-26T06:01:05.442Z",
+      "lastSeenAt": "2026-11-26T08:01:13.993Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16117307",
@@ -61439,7 +60831,7 @@
     },
     "nettiauto:16117327": {
       "firstSeenAt": "2026-11-22T14:01:28.140Z",
-      "lastSeenAt": "2026-11-26T06:01:05.444Z",
+      "lastSeenAt": "2026-11-26T08:01:13.995Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16117327",
@@ -61463,7 +60855,7 @@
     },
     "nettiauto:15949062": {
       "firstSeenAt": "2026-11-24T10:01:13.684Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/15949062",
@@ -61488,7 +60880,7 @@
     },
     "nettiauto:16120660": {
       "firstSeenAt": "2026-11-24T13:34:57.596Z",
-      "lastSeenAt": "2026-11-26T06:01:05.446Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-24T13:34:57.596Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16120660",
@@ -61509,7 +60901,7 @@
     },
     "nettiauto:16122832": {
       "firstSeenAt": "2026-11-25T15:59:55.492Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.996Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16122832",
@@ -61531,7 +60923,7 @@
     },
     "nettiauto:16122982": {
       "firstSeenAt": "2026-11-25T15:59:56.858Z",
-      "lastSeenAt": "2026-11-26T06:01:05.445Z",
+      "lastSeenAt": "2026-11-26T08:01:13.997Z",
       "detailCheckedAt": "2026-11-25T15:59:56.858Z",
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16122982",
@@ -61552,7 +60944,7 @@
     },
     "nettiauto:16123135": {
       "firstSeenAt": "2026-11-25T18:01:18.427Z",
-      "lastSeenAt": "2026-11-26T06:01:05.443Z",
+      "lastSeenAt": "2026-11-26T08:01:13.994Z",
       "detailCheckedAt": null,
       "sourceId": "nettiauto",
       "url": "https://www.nettiauto.com/lexus/is/16123135",
@@ -61598,7 +60990,7 @@
       "firstRunAt": "2026-10-29T12:01:37.629Z",
       "spec": "f84ff0f13dbebf49",
       "name": "Lexus IS 300h Luxury",
-      "lastRunAt": "2026-11-26T06:01:06.665Z"
+      "lastRunAt": "2026-11-26T08:01:15.063Z"
     }
   },
   "tco": {
